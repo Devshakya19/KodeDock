@@ -1,32 +1,49 @@
-use actix_web::{web, HttpResponse};
-use crate::services::{AppState, ApiResponse, supabase::SupabaseClient};
-use crate::models::{Wallet, TopupRequest};
+use actix_web::{web, HttpRequest, HttpResponse};
+use sqlx::PgPool;
+use crate::models::Wallet;
+use crate::services::ApiResponse;
+use crate::middleware::extract_user_id;
 
 pub async fn get_balance(
-    state: web::Data<AppState>,
+    pool: web::Data<PgPool>,
+    req: HttpRequest,
 ) -> HttpResponse {
-    let client = SupabaseClient::new(&state);
+    let user_id = match extract_user_id(&req) {
+        Ok(id) => id,
+        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized")),
+    };
 
-    // TODO: Get user_id from JWT token
-    let query = "user_id=eq.00000000-0000-0000-0000-000000000000";
+    let user_uuid = match uuid::Uuid::parse_str(&user_id) {
+        Ok(uuid) => uuid,
+        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID")),
+    };
 
-    match client.query::<Vec<Wallet>>("wallets", query).await {
-        Ok(wallets) => {
-            match wallets.into_iter().next() {
-                Some(wallet) => HttpResponse::Ok().json(ApiResponse::success(wallet, "Balance fetched")),
-                None => HttpResponse::NotFound().json(ApiResponse::<()>::error("Wallet not found")),
-            }
+    match sqlx::query_as::<_, Wallet>("SELECT * FROM wallets WHERE user_id = $1")
+        .bind(user_uuid)
+        .fetch_optional(pool.get_ref())
+        .await
+    {
+        Ok(Some(wallet)) => HttpResponse::Ok().json(ApiResponse::success(wallet, "Balance fetched")),
+        Ok(None) => HttpResponse::NotFound().json(ApiResponse::<()>::error("Wallet not found")),
+        Err(e) => {
+            log::error!("Failed to fetch wallet: {}", e);
+            HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to fetch wallet"))
         }
-        Err(e) => HttpResponse::InternalServerError().json(ApiResponse::<()>::error(&e)),
     }
 }
 
 pub async fn topup(
-    _state: web::Data<AppState>,
-    _body: web::Json<TopupRequest>,
+    req: HttpRequest,
+    _pool: web::Data<PgPool>,
+    _body: web::Json<serde_json::Value>,
 ) -> HttpResponse {
+    // Verify user is authenticated
+    let _user_id = match extract_user_id(&req) {
+        Ok(id) => id,
+        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized")),
+    };
+
     // TODO: Implement Razorpay integration
-    // For now, return a placeholder
     HttpResponse::Ok().json(ApiResponse::<()> {
         success: true,
         data: None,

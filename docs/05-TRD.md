@@ -16,7 +16,7 @@
 | Tailwind CSS | 4 | Styling |
 | shadcn/ui | New York | Component library |
 | Framer Motion | 12+ | Animations |
-| Supabase SSR | 0.12+ | Auth client |
+| JWT Auth | - | Auth client |
 
 ### Key Dependencies
 
@@ -24,8 +24,6 @@
 {
   "next": "^16.1.1",
   "react": "^19.0.0",
-  "@supabase/ssr": "^0.12.2",
-  "@supabase/supabase-js": "^2.110.5",
   "framer-motion": "^12.23.2",
   "lucide-react": "^0.525.0",
   "sonner": "^2.0.6"
@@ -42,7 +40,7 @@
 |------------|---------|
 | Rust | Language |
 | Actix-Web / Axum | HTTP framework |
-| Supabase Rust client | Database access |
+| SQLx / Diesel | Database access |
 | Serde | JSON serialization |
 | Tokio | Async runtime |
 
@@ -139,7 +137,7 @@ GET    /api/analytics/user/:userId      # User behavior analytics
 
 ```sql
 CREATE TABLE profiles (
-  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
   full_name TEXT,
   role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'developer', 'admin')),
   bio TEXT,
@@ -274,8 +272,6 @@ CREATE TABLE notifications (
 ### Frontend (.env.local)
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=xxx
 NEXT_PUBLIC_API_URL=http://localhost:4001
 NEXT_PUBLIC_WS_URL=ws://localhost:4004
 ```
@@ -284,8 +280,7 @@ NEXT_PUBLIC_WS_URL=ws://localhost:4004
 
 ```env
 PORT=4001
-SUPABASE_URL=https://xxx.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=xxx
+DATABASE_URL=postgres://codehaat:codehaat_secret@localhost:5432/codehaat
 REDIS_URL=redis://localhost:6379
 JWT_SECRET=xxx
 ```
@@ -294,8 +289,6 @@ JWT_SECRET=xxx
 
 ```env
 PORT=4002
-SUPABASE_URL=https://xxx.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=xxx
 REDIS_URL=redis://localhost:6379
 ```
 
@@ -303,8 +296,6 @@ REDIS_URL=redis://localhost:6379
 
 ```env
 PORT=4003
-SUPABASE_URL=https://xxx.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=xxx
 REDIS_URL=redis://localhost:6379
 GITHUB_APP_ID=xxx
 GITHUB_PRIVATE_KEY=xxx
@@ -316,8 +307,6 @@ DOCKER_SOCKET=/var/run/docker.sock
 ```env
 PORT=4004
 REDIS_URL=redis://localhost:6379
-SUPABASE_URL=https://xxx.supabase.co
-SUPABASE_ANON_KEY=xxx
 ```
 
 ---

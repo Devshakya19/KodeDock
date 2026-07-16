@@ -11,6 +11,7 @@ app.include_router(recommendations.router, prefix="/api/recommendations", tags=[
 app.include_router(search.router, prefix="/api/search", tags=["search"])
 app.include_router(analytics.router, prefix="/api/analytics", tags=["analytics"])
 
+
 @app.get("/health")
 async def health_check():
     return {"status": "ok", "service": "codehaat-ai", "version": "0.1.0"}

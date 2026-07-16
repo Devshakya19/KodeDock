@@ -17,7 +17,8 @@ import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Badge } from "@/shared/ui/badge";
-import { createClient } from "@/shared/lib/supabase/client";
+import { auth } from "@/shared/lib/auth";
+import { uploadFile } from "@/shared/lib/upload";
 
 const CATEGORIES = [
   "Web Templates",
@@ -32,6 +33,7 @@ export default function NewProductPage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
 
@@ -46,7 +48,7 @@ export default function NewProductPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   // Handle image selection
-  function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -62,13 +64,23 @@ export default function NewProductPage() {
       return;
     }
 
-    // Create preview URL
+    // Show local preview immediately
     const previewUrl = URL.createObjectURL(file);
     setImagePreview(previewUrl);
 
-    // In production, upload to Supabase Storage or similar
-    // For now, we'll use the preview URL as the image URL
-    setImageUrl(previewUrl);
+    // Upload to SeaweedFS in background
+    setUploading(true);
+    setError("");
+    try {
+      const result = await uploadFile(file, "product");
+      setImageUrl(result.public_url);
+    } catch (err) {
+      setError("Failed to upload image. Please try again.");
+      setImagePreview(null);
+      setImageUrl("");
+    } finally {
+      setUploading(false);
+    }
   }
 
   // Remove image
@@ -86,8 +98,7 @@ export default function NewProductPage() {
     setError("");
 
     try {
-      const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
+      const session = await auth.getSession();
 
       if (!session) {
         setError("You must be logged in to create a product");
@@ -100,7 +111,7 @@ export default function NewProductPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${session.access_token}`,
+          "Authorization": `Bearer ${session.token}`,
         },
         body: JSON.stringify({
           title,
@@ -318,13 +329,13 @@ export default function NewProductPage() {
                 <div className="flex items-center gap-4 pt-4">
                   <Button
                     type="submit"
-                    disabled={loading}
+                    disabled={loading || uploading}
                     className="bg-slate-950 text-white hover:bg-slate-800"
                   >
-                    {loading ? (
+                    {loading || uploading ? (
                       <Loader2 className="w-4 h-4 animate-spin mr-2" />
                     ) : null}
-                    List Product
+                    {uploading ? "Uploading image..." : "List Product"}
                   </Button>
                   <Link href="/seller/products">
                     <Button type="button" variant="outline" className="border-slate-300 text-slate-700">

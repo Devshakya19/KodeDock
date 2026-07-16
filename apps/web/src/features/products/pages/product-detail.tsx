@@ -16,7 +16,7 @@ import {
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Badge } from "@/shared/ui/badge";
-import { createClient } from "@/shared/lib/supabase/client";
+import { auth } from "@/shared/lib/auth";
 import { apiGet } from "@/shared/lib/api";
 
 interface Product {
@@ -60,7 +60,7 @@ export default function ProductDetailPage() {
   const [buying, setBuying] = useState(false);
   const [error, setError] = useState("");
 
-  const supabase = createClient();
+  // Auth handled by custom auth client
   const productId = params.id as string;
 
   useEffect(() => {
@@ -94,14 +94,13 @@ export default function ProductDetailPage() {
     setError("");
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const session = await auth.getSession();
       if (!session) {
         router.push("/login");
         return;
       }
 
-      // TODO: Call backend API to create order
-      alert("Purchase flow will be implemented with Razorpay integration");
+      router.push(`/checkout?product_id=${productId}`);
     } catch (err) {
       setError("Failed to process purchase");
     } finally {

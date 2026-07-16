@@ -37,7 +37,7 @@ body:
         - AI Service (Python)
         - Infra Worker (Go)
         - Real-Time (Node.js)
-        - Database (Supabase)
+        - Database (PostgreSQL)
         - Multiple Services
         - Other
     validations:

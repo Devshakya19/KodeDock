@@ -8,7 +8,7 @@ import { Eye, EyeOff, Loader2, Check } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Card, CardContent } from "@/shared/ui/card";
-import { createClient } from "@/shared/lib/supabase/client";
+import { auth } from "@/shared/lib/auth";
 
 const PASSWORD_REQUIREMENTS = [
   { label: "At least 8 characters", test: (p: string) => p.length >= 8 },
@@ -26,40 +26,31 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
-  const supabase = createClient();
-
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: fullName, role: "user" },
-        emailRedirectTo: `${window.location.origin}/api/auth/callback`,
-      },
-    });
-
-    if (error) {
-      setError(error.message);
+    try {
+      await auth.signUp({
+        email,
+        password,
+        fullName,
+        role: "user",
+      });
+      setSuccess(true);
+    } catch (err: any) {
+      setError(err.message || "Registration failed");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    setSuccess(true);
-    setLoading(false);
   }
 
   async function handleGithubLogin() {
     setLoading(true);
-    await supabase.auth.signInWithOAuth({
-      provider: "github",
-      options: {
-        redirectTo: `${window.location.origin}/api/auth/callback`,
-      },
-    });
+    // TODO: Implement GitHub OAuth
+    setError("GitHub login coming soon");
+    setLoading(false);
   }
 
   if (success) {
@@ -70,11 +61,9 @@ export default function RegisterPage() {
             <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
               <Check className="w-7 h-7 text-emerald-600" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-950">Check your email</h1>
+            <h1 className="text-2xl font-bold text-slate-950">Account created!</h1>
             <p className="text-sm text-slate-600 mt-3 leading-relaxed">
-              We sent a verification link to{" "}
-              <span className="font-semibold text-slate-950">{email}</span>.
-              Click the link to activate your account.
+              You can now sign in with your credentials.
             </p>
             <Button
               variant="outline"

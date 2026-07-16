@@ -1,4 +1,4 @@
-import { createClient } from "@/shared/lib/supabase/server";
+import { auth } from "@/shared/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ShoppingCart, Package, Clock, ArrowRight } from "lucide-react";
@@ -32,12 +32,12 @@ async function fetchOrders(userId: string, token: string) {
 }
 
 export default async function DashboardHomePage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  // Auth handled by custom auth client
+  const user = await auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: { session } } = await supabase.auth.getSession();
-  const token = session?.access_token || "";
+  const session = await auth.getSession();
+  const token = session?.token || "";
 
   // Fetch data from backend API
   const [profile, orders] = await Promise.all([
@@ -45,7 +45,7 @@ export default async function DashboardHomePage() {
     fetchOrders(user.id, token),
   ]);
 
-  const fullName = profile?.full_name || user.user_metadata?.full_name || "";
+  const fullName = profile?.full_name || user.full_name || "";
   const shortName = fullName ? fullName.split(" ")[0] : "there";
   const totalOrders = orders?.length || 0;
   const totalSpent = orders?.reduce((sum: number, o: any) => sum + o.amount_paise, 0) || 0;
@@ -96,7 +96,7 @@ export default async function DashboardHomePage() {
               <div>
                 <div className="text-sm text-slate-500">Member Since</div>
                 <div className="text-lg font-bold text-slate-950">
-                  {new Date(user.created_at).toLocaleDateString("en-IN", { month: "short", year: "numeric" })}
+                  {user.created_at ? new Date(user.created_at).toLocaleDateString("en-IN", { month: "short", year: "numeric" }) : "N/A"}
                 </div>
               </div>
             </div>

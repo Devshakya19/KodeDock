@@ -1,36 +1,41 @@
-import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { getUserRole, ROLES } from "@/shared/lib/roles";
 
+// Simple JWT decode (no verification - verification happens on backend)
+function decodeToken(token: string): { sub: string; email: string; role: string } | null {
+  try {
+    const payload = token.split(".")[1];
+    if (!payload) return null;
+    const decoded = JSON.parse(atob(payload));
+    return {
+      sub: decoded.sub,
+      email: decoded.email,
+      role: decoded.role,
+    };
+  } catch {
+    return null;
+  }
+}
+
 export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request });
+  let response = NextResponse.next({ request });
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            request.cookies.set(name, value)
-          );
-          supabaseResponse = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
-        },
-      },
+  // Get token from cookie or Authorization header
+  const tokenCookie = request.cookies.get("codehaat_token")?.value;
+  const authHeader = request.headers.get("Authorization");
+  const token = tokenCookie || (authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null);
+
+  let user = null;
+  let role = "user";
+
+  if (token) {
+    const decoded = decodeToken(token);
+    if (decoded) {
+      user = { id: decoded.sub, email: decoded.email };
+      role = decoded.role || "user";
     }
-  );
+  }
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const role = getUserRole(user);
   const pathname = request.nextUrl.pathname;
 
   // --- Route classification ---
@@ -44,9 +49,13 @@ export async function updateSession(request: NextRequest) {
   const isBuyerDashboard = pathname.startsWith("/dashboard");
   const isSellerDashboard = pathname.startsWith("/seller");
   const isDeveloperRegister = pathname.startsWith("/developer-register");
+  const isCart = pathname.startsWith("/cart");
+  const isCheckout = pathname.startsWith("/checkout");
+  const isNotifications = pathname.startsWith("/notifications");
+  const isOrders = pathname.startsWith("/orders");
 
   const isProtectedRoute =
-    isBuyerBrowse || isBuyerDashboard || isSellerDashboard || pathname.startsWith("/settings");
+    isBuyerBrowse || isBuyerDashboard || isSellerDashboard || isCart || isCheckout || isNotifications || isOrders;
 
   // --- Rule 1: Unauthenticated → /login ---
   if (isProtectedRoute && !user) {
@@ -55,8 +64,8 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // --- Rule 2: Developer hits /browse or /dashboard → redirect to /seller ---
-  if ((isBuyerBrowse || isBuyerDashboard) && user && role === ROLES.DEVELOPER) {
+  // --- Rule 2: Developer hits buyer routes → redirect to /seller ---
+  if ((isBuyerBrowse || isBuyerDashboard || isCart || isCheckout) && user && role === ROLES.DEVELOPER) {
     const url = request.nextUrl.clone();
     url.pathname = "/seller";
     return NextResponse.redirect(url);
@@ -90,5 +99,5 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  return supabaseResponse;
+  return response;
 }

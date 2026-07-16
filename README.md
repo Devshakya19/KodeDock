@@ -8,6 +8,12 @@
 
 ---
 
+> **PROPRIETARY SOFTWARE** — This repository contains proprietary and confidential
+> code owned by CodeHaat. Unauthorized copying, cloning, distribution, or use of this
+> code is strictly prohibited and may result in legal action. See [LICENSE](LICENSE) for details.
+
+---
+
 ## What is CodeHaat?
 
 CodeHaat is a two-sided digital goods marketplace where developers can buy and sell production-grade code assets. Unlike traditional platforms that distribute static .zip files, CodeHaat delivers code directly to buyers' GitHub accounts as private repositories.
@@ -27,13 +33,13 @@ CodeHaat is a two-sided digital goods marketplace where developers can buy and s
 
 - Docker & Docker Compose
 - Node.js 20+ (for local development)
-- Supabase account (free tier works)
+- PostgreSQL (auto-provisioned via Docker Compose)
 
 ### 1. Clone & Setup
 
 ```bash
-git clone https://github.com/codehaat/codehaat.git
-cd codehaat
+git clone https://github.com/Devshakya19/CodeHaat.git
+cd CodeHaat
 ```
 
 ### 2. Configure Environment
@@ -45,15 +51,12 @@ cp services/ai-service/.env.example services/ai-service/.env
 cp services/infra-worker/.env.example services/infra-worker/.env
 cp services/realtime-service/.env.example services/realtime-service/.env
 
-# Edit .env files with your Supabase credentials
+# Edit .env files as needed
 ```
 
-### 3. Setup Database
+### 3. Run with Docker
 
-1. Create a free account at [supabase.com](https://supabase.com)
-2. Create a new project
-3. Go to SQL Editor and run `supabase/FRESH_DATABASE.sql`
-4. Copy your project URL and anon key to `apps/web/.env.local`
+Database is auto-provisioned via Docker Compose (PostgreSQL 16).
 
 ### 4. Run with Docker
 
@@ -91,9 +94,9 @@ docker compose logs -f
 | **AI Service** | Python, FastAPI | Recommendations, search |
 | **Worker** | Go | Background jobs, GitHub |
 | **Real-Time** | Node.js, WebSockets | Live notifications |
-| **Database** | Supabase (PostgreSQL) | Data storage |
+| **Database** | PostgreSQL 16 | Data storage |
 | **Cache** | Redis | Queues, caching, pub/sub |
-| **Auth** | Supabase Auth | Authentication |
+| **Auth** | JWT (custom) | Authentication |
 | **Payments** | Razorpay | INR payments |
 
 ---
@@ -122,11 +125,7 @@ codehaat/
 │   ├── infra-worker/                 # Go background worker
 │   └── realtime-service/             # Node.js WebSocket
 │
-├── supabase/
-│   ├── FRESH_DATABASE.sql           # Full database setup
-│   ├── DATABASE_FULL_SETUP.sql      # Idempotent setup
-│   └── migrations/                  # Database migrations
-│
+
 ├── assets/
 │   └── LOGO-DESIGN.md              # Brand assets guide
 │
@@ -177,7 +176,7 @@ codehaat/
                           │
                           ▼
 ┌─────────────────────────────────────────────────────────┐
-│  6. Data Layer (Supabase + Redis)                       │
+│  6. Data Layer (PostgreSQL + Redis)                      │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -186,13 +185,13 @@ codehaat/
 ## Frontend Architecture
 
 The frontend is a **pure UI layer** — it only handles:
-- **Auth**: Login, register, password reset (via Supabase Auth)
+- **Auth**: Login, register, password reset (via custom JWT auth)
 - **UI**: Rendering pages, forms, and components
 
 All data operations go through the **Backend API** (Rust Core Engine).
 
 ```
-Frontend → Backend API → Supabase Database
+Frontend → Backend API → PostgreSQL Database
    ↑           ↑
 Auth only    Data ops
 ```
@@ -245,7 +244,7 @@ Auth only    Data ops
 
 ### Setup
 
-Run `supabase/FRESH_DATABASE.sql` in Supabase SQL Editor for a fresh database.
+Database is auto-provisioned and schema auto-imported via Docker Compose on first `docker compose up -d`.
 
 ---
 
@@ -273,6 +272,16 @@ Run `supabase/FRESH_DATABASE.sql` in Supabase SQL Editor for a fresh database.
 |-------|------|
 | `/browse` | Product browsing home |
 | `/products/[id]` | Product detail page |
+| `/cart` | Shopping cart |
+| `/checkout` | Checkout & payment |
+| `/orders/[id]` | Order confirmation |
+| `/dashboard` | Buyer dashboard |
+| `/dashboard/profile` | User profile |
+| `/dashboard/purchases` | Purchase history |
+| `/dashboard/settings` | Account settings |
+| `/notifications` | Notifications |
+| `/search` | Search results |
+| `/category/[slug]` | Category browse |
 
 ### Seller Pages (role: developer)
 | Route | Page |
@@ -280,9 +289,11 @@ Run `supabase/FRESH_DATABASE.sql` in Supabase SQL Editor for a fresh database.
 | `/seller` | Seller dashboard |
 | `/seller/products` | Product list |
 | `/seller/products/new` | Create product |
+| `/seller/products/[id]/edit` | Edit product |
+| `/seller/orders` | Order management |
+| `/seller/earnings` | Earnings analytics |
 | `/seller/profile` | Seller profile |
-| `/seller/settings` | Seller settings |
-| `/seller/earnings` | Earnings (coming soon) |
+| `/seller/settings` | Account settings |
 
 ### Company Pages
 | Route | Page |
@@ -350,8 +361,6 @@ docker compose down           # Stop all services
 ### Frontend (`apps/web/.env.local`)
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 NEXT_PUBLIC_API_URL=http://localhost:4001
 ```
 
@@ -359,8 +368,7 @@ NEXT_PUBLIC_API_URL=http://localhost:4001
 
 ```env
 PORT=4001
-SUPABASE_URL=your-supabase-url
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+DATABASE_URL=postgres://codehaat:codehaat_secret@localhost:5432/codehaat
 REDIS_URL=redis://localhost:6379
 JWT_SECRET=your-jwt-secret
 ```
@@ -369,7 +377,17 @@ JWT_SECRET=your-jwt-secret
 
 ## License
 
-Private — CodeHaat. All rights reserved.
+This project is **proprietary software** owned by CodeHaat.
+
+- Unauthorized copying, cloning, or distribution is **strictly prohibited**
+- See [LICENSE](LICENSE) for the full license agreement
+- For licensing inquiries, contact: legal@codehaat.com
+
+---
+
+## Copyright
+
+Copyright (c) 2025 CodeHaat. All rights reserved.
 
 ---
 

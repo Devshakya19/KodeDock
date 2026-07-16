@@ -1,0 +1,14 @@
+{
+  "identities": [
+    {
+      "name": "codehaat",
+      "credentials": [
+        {
+          "accessKey": "codehaat_seaweed",
+          "secretKey": "codehaat_seaweed_secret"
+        }
+      ],
+      "actions": ["Read", "List", "Write", "Tagging"]
+    }
+  ]
+}

@@ -1,38 +1,33 @@
 -- =============================================================================
--- CODEHAAT — FRESH DATABASE SETUP
+-- CODEHAAT — PostgreSQL Database Setup
 -- =============================================================================
--- Run this in Supabase SQL Editor for a clean start.
--- This will DELETE ALL data and recreate everything.
+-- Compatible with standard PostgreSQL
 -- =============================================================================
 
--- STEP 1: DROP EVERYTHING
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-DROP TRIGGER IF EXISTS on_product_category_change ON products;
-DROP TRIGGER IF EXISTS on_order_status_change ON orders;
-DROP TRIGGER IF EXISTS on_review_change ON reviews;
-
-DROP FUNCTION IF EXISTS handle_new_user() CASCADE;
-DROP FUNCTION IF EXISTS update_category_product_count() CASCADE;
-DROP FUNCTION IF EXISTS update_product_sales_count() CASCADE;
-DROP FUNCTION IF EXISTS update_product_rating() CASCADE;
-
-DROP TABLE IF EXISTS disputes CASCADE;
-DROP TABLE IF EXISTS notifications CASCADE;
-DROP TABLE IF EXISTS reviews CASCADE;
-DROP TABLE IF EXISTS escrow CASCADE;
-DROP TABLE IF EXISTS orders CASCADE;
-DROP TABLE IF EXISTS wallet_transactions CASCADE;
-DROP TABLE IF EXISTS wallets CASCADE;
-DROP TABLE IF EXISTS products CASCADE;
-DROP TABLE IF EXISTS categories CASCADE;
-DROP TABLE IF EXISTS profiles CASCADE;
-
--- STEP 2: CREATE EXTENSION
+-- STEP 1: CREATE EXTENSION
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- STEP 3: CREATE TABLES
-CREATE TABLE profiles (
-  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+-- STEP 2: CREATE TABLES
+
+-- Users table
+CREATE TABLE IF NOT EXISTS users (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  email TEXT UNIQUE NOT NULL,
+  password_hash TEXT,
+  full_name TEXT,
+  role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'developer', 'admin')),
+  avatar_url TEXT,
+  github_username TEXT,
+  github_id TEXT,
+  google_id TEXT,
+  is_verified BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Profiles table (linked to users)
+CREATE TABLE IF NOT EXISTS profiles (
+  id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
   full_name TEXT,
   role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'developer', 'admin')),
   bio TEXT,
@@ -46,7 +41,7 @@ CREATE TABLE profiles (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE categories (
+CREATE TABLE IF NOT EXISTS categories (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name TEXT NOT NULL UNIQUE,
   slug TEXT NOT NULL UNIQUE,
@@ -58,10 +53,10 @@ CREATE TABLE categories (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE products (
+CREATE TABLE IF NOT EXISTS products (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   seller_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  category_id UUID REFERENCES categories(id),
+  category_id UUID REFERENCES categories(id) ON DELETE SET NULL,
   title TEXT NOT NULL,
   slug TEXT NOT NULL UNIQUE,
   description TEXT,
@@ -85,7 +80,7 @@ CREATE TABLE products (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE wallets (
+CREATE TABLE IF NOT EXISTS wallets (
   user_id UUID PRIMARY KEY REFERENCES profiles(id) ON DELETE CASCADE,
   balance_paise INTEGER NOT NULL DEFAULT 0 CHECK (balance_paise >= 0),
   pending_paise INTEGER NOT NULL DEFAULT 0 CHECK (pending_paise >= 0),
@@ -95,9 +90,9 @@ CREATE TABLE wallets (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE wallet_transactions (
+CREATE TABLE IF NOT EXISTS wallet_transactions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  wallet_user_id UUID NOT NULL REFERENCES wallets(user_id),
+  wallet_user_id UUID NOT NULL REFERENCES wallets(user_id) ON DELETE CASCADE,
   type TEXT NOT NULL CHECK (type IN ('topup', 'purchase', 'sale', 'withdrawal', 'refund', 'adjustment', 'commission')),
   amount_paise INTEGER NOT NULL,
   balance_after_paise INTEGER NOT NULL,
@@ -107,14 +102,14 @@ CREATE TABLE wallet_transactions (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE orders (
+CREATE TABLE IF NOT EXISTS orders (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  buyer_id UUID NOT NULL REFERENCES profiles(id),
-  seller_id UUID NOT NULL REFERENCES profiles(id),
-  product_id UUID NOT NULL REFERENCES products(id),
-  amount_paise INTEGER NOT NULL,
-  platform_fee_paise INTEGER NOT NULL,
-  seller_amount_paise INTEGER NOT NULL,
+  buyer_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  seller_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  amount_paise INTEGER NOT NULL CHECK (amount_paise >= 0),
+  platform_fee_paise INTEGER NOT NULL CHECK (platform_fee_paise >= 0),
+  seller_amount_paise INTEGER NOT NULL CHECK (seller_amount_paise >= 0),
   status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'completed', 'refunded', 'disputed', 'cancelled')),
   razorpay_order_id TEXT,
   razorpay_payment_id TEXT,
@@ -127,7 +122,7 @@ CREATE TABLE orders (
   resolved_at TIMESTAMPTZ
 );
 
-CREATE TABLE escrow (
+CREATE TABLE IF NOT EXISTS escrow (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   order_id UUID NOT NULL REFERENCES orders(id) UNIQUE,
   amount_paise INTEGER NOT NULL,
@@ -137,11 +132,11 @@ CREATE TABLE escrow (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE reviews (
+CREATE TABLE IF NOT EXISTS reviews (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
-  user_id UUID NOT NULL REFERENCES profiles(id),
-  order_id UUID NOT NULL REFERENCES orders(id),
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
   rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
   title TEXT,
   comment TEXT,
@@ -152,7 +147,7 @@ CREATE TABLE reviews (
   UNIQUE(product_id, user_id)
 );
 
-CREATE TABLE notifications (
+CREATE TABLE IF NOT EXISTS notifications (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   type TEXT NOT NULL,
@@ -163,53 +158,68 @@ CREATE TABLE notifications (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE disputes (
+CREATE TABLE IF NOT EXISTS disputes (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  order_id UUID NOT NULL REFERENCES orders(id),
-  raised_by UUID NOT NULL REFERENCES profiles(id),
+  order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+  raised_by UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   reason TEXT NOT NULL,
   description TEXT,
   status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'under_review', 'resolved', 'closed')),
   resolution TEXT,
-  resolved_by UUID REFERENCES profiles(id),
+  resolved_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   resolved_at TIMESTAMPTZ
 );
 
--- STEP 4: CREATE INDEXES
-CREATE INDEX idx_products_seller ON products(seller_id);
-CREATE INDEX idx_products_category ON products(category_id);
-CREATE INDEX idx_products_status ON products(status);
-CREATE INDEX idx_products_slug ON products(slug);
-CREATE INDEX idx_wallet_tx_user ON wallet_transactions(wallet_user_id);
-CREATE INDEX idx_wallet_tx_type ON wallet_transactions(type);
-CREATE INDEX idx_wallet_tx_created ON wallet_transactions(created_at);
-CREATE INDEX idx_orders_buyer ON orders(buyer_id);
-CREATE INDEX idx_orders_seller ON orders(seller_id);
-CREATE INDEX idx_orders_product ON orders(product_id);
-CREATE INDEX idx_orders_status ON orders(status);
-CREATE INDEX idx_escrow_status ON escrow(status);
-CREATE INDEX idx_escrow_held_until ON escrow(held_until);
-CREATE INDEX idx_reviews_product ON reviews(product_id);
-CREATE INDEX idx_notifications_user ON notifications(user_id);
-CREATE INDEX idx_notifications_unread ON notifications(user_id, is_read) WHERE is_read = FALSE;
+-- STEP 3: CREATE INDEXES
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_products_seller ON products(seller_id);
+CREATE INDEX IF NOT EXISTS idx_products_category ON products(category_id);
+CREATE INDEX IF NOT EXISTS idx_products_status ON products(status);
+CREATE INDEX IF NOT EXISTS idx_products_slug ON products(slug);
+CREATE INDEX IF NOT EXISTS idx_wallet_tx_user ON wallet_transactions(wallet_user_id);
+CREATE INDEX IF NOT EXISTS idx_wallet_tx_type ON wallet_transactions(type);
+CREATE INDEX IF NOT EXISTS idx_wallet_tx_created ON wallet_transactions(created_at);
+CREATE INDEX IF NOT EXISTS idx_orders_buyer ON orders(buyer_id);
+CREATE INDEX IF NOT EXISTS idx_orders_seller ON orders(seller_id);
+CREATE INDEX IF NOT EXISTS idx_orders_product ON orders(product_id);
+CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
+CREATE INDEX IF NOT EXISTS idx_orders_seller_status ON orders(seller_id, status);
+CREATE INDEX IF NOT EXISTS idx_escrow_status ON escrow(status);
+CREATE INDEX IF NOT EXISTS idx_escrow_held_until ON escrow(held_until);
+CREATE INDEX IF NOT EXISTS idx_reviews_product ON reviews(product_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_unread ON notifications(user_id, is_read) WHERE is_read = FALSE;
+CREATE INDEX IF NOT EXISTS idx_disputes_order ON disputes(order_id);
 
--- STEP 5: CREATE FUNCTIONS
+-- Password reset tokens
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  token TEXT NOT NULL UNIQUE,
+  expires_at TIMESTAMPTZ NOT NULL,
+  used BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_password_reset_token ON password_reset_tokens(token);
+CREATE INDEX IF NOT EXISTS idx_password_reset_user ON password_reset_tokens(user_id);
+
+-- STEP 4: CREATE FUNCTIONS (PostgreSQL triggers)
+
+-- Auto-create profile when user is created
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
   INSERT INTO public.profiles (id, full_name, role)
-  VALUES (
-    NEW.id,
-    COALESCE(NEW.raw_user_meta_data->>'full_name', ''),
-    COALESCE(NEW.raw_user_meta_data->>'role', 'user')
-  );
+  VALUES (NEW.id, COALESCE(NEW.full_name, ''), NEW.role);
   INSERT INTO public.wallets (user_id, balance_paise)
   VALUES (NEW.id, 0);
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql;
 
+-- Update category product count
 CREATE OR REPLACE FUNCTION update_category_product_count()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -223,8 +233,9 @@ BEGIN
   END IF;
   RETURN NULL;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql;
 
+-- Update product sales count on order status change
 CREATE OR REPLACE FUNCTION update_product_sales_count()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -235,8 +246,9 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql;
 
+-- Update product rating on review change
 CREATE OR REPLACE FUNCTION update_product_rating()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -246,93 +258,39 @@ BEGIN
   WHERE id = NEW.product_id;
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql;
 
--- STEP 6: CREATE TRIGGERS
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
+-- STEP 5: CREATE TRIGGERS
+
+-- Trigger: Auto-create profile when user is created
+CREATE TRIGGER on_user_created
+  AFTER INSERT ON users
   FOR EACH ROW EXECUTE FUNCTION handle_new_user();
 
+-- Trigger: Update category count on product changes
 CREATE TRIGGER on_product_category_change
   AFTER INSERT OR UPDATE OR DELETE ON products
   FOR EACH ROW EXECUTE FUNCTION update_category_product_count();
 
+-- Trigger: Update sales count on order status change
 CREATE TRIGGER on_order_status_change
   AFTER UPDATE ON orders
   FOR EACH ROW EXECUTE FUNCTION update_product_sales_count();
 
+-- Trigger: Update rating on review change
 CREATE TRIGGER on_review_change
   AFTER INSERT OR UPDATE OR DELETE ON reviews
   FOR EACH ROW EXECUTE FUNCTION update_product_rating();
 
--- STEP 7: SEED CATEGORIES
+-- STEP 6: SEED CATEGORIES
 INSERT INTO categories (name, slug, icon, sort_order) VALUES
   ('Web Templates', 'web-templates', 'layout', 1),
   ('Mobile Apps', 'mobile-apps', 'smartphone', 2),
   ('UI Kits', 'ui-kits', 'palette', 3),
   ('B.Tech Projects', 'btech-projects', 'graduation-cap', 4),
   ('Boilerplates', 'boilerplates', 'terminal', 5),
-  ('API Templates', 'api-templates', 'code', 6);
-
--- STEP 8: ENABLE RLS ON ALL TABLES
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
-ALTER TABLE products ENABLE ROW LEVEL SECURITY;
-ALTER TABLE wallets ENABLE ROW LEVEL SECURITY;
-ALTER TABLE wallet_transactions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
-ALTER TABLE escrow ENABLE ROW LEVEL SECURITY;
-ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
-ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
-ALTER TABLE disputes ENABLE ROW LEVEL SECURITY;
-
--- STEP 9: CREATE RLS POLICIES
--- PROFILES
-CREATE POLICY "profiles_select" ON profiles FOR SELECT USING (true);
-CREATE POLICY "profiles_insert" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
-CREATE POLICY "profiles_update" ON profiles FOR UPDATE USING (auth.uid() = id);
-CREATE POLICY "profiles_delete" ON profiles FOR DELETE USING (auth.uid() = id);
-
--- CATEGORIES
-CREATE POLICY "categories_select" ON categories FOR SELECT USING (true);
-
--- PRODUCTS
-CREATE POLICY "products_select_active" ON products FOR SELECT USING (status = 'active');
-CREATE POLICY "products_select_own" ON products FOR SELECT USING (auth.uid() = seller_id);
-CREATE POLICY "products_manage_own" ON products FOR ALL USING (auth.uid() = seller_id);
-
--- WALLETS
-CREATE POLICY "wallets_manage_own" ON wallets FOR ALL USING (auth.uid() = user_id);
-
--- WALLET TRANSACTIONS
-CREATE POLICY "wallet_tx_manage_own" ON wallet_transactions FOR ALL USING (
-  wallet_user_id IN (SELECT user_id FROM wallets WHERE user_id = auth.uid())
-);
-
--- ORDERS
-CREATE POLICY "orders_select_buyer" ON orders FOR SELECT USING (auth.uid() = buyer_id);
-CREATE POLICY "orders_select_seller" ON orders FOR SELECT USING (auth.uid() = seller_id);
-CREATE POLICY "orders_insert" ON orders FOR INSERT WITH CHECK (auth.uid() = buyer_id);
-
--- ESCROW
-CREATE POLICY "escrow_select" ON escrow FOR SELECT USING (
-  order_id IN (SELECT id FROM orders WHERE buyer_id = auth.uid() OR seller_id = auth.uid())
-);
-
--- REVIEWS
-CREATE POLICY "reviews_select" ON reviews FOR SELECT USING (true);
-CREATE POLICY "reviews_insert" ON reviews FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "reviews_update" ON reviews FOR UPDATE USING (auth.uid() = user_id);
-
--- NOTIFICATIONS
-CREATE POLICY "notifications_manage_own" ON notifications FOR ALL USING (auth.uid() = user_id);
-
--- DISPUTES
-CREATE POLICY "disputes_select" ON disputes FOR SELECT USING (
-  order_id IN (SELECT id FROM orders WHERE buyer_id = auth.uid() OR seller_id = auth.uid())
-);
-CREATE POLICY "disputes_insert" ON disputes FOR INSERT WITH CHECK (auth.uid() = raised_by);
+  ('API Templates', 'api-templates', 'code', 6)
+ON CONFLICT (name) DO NOTHING;
 
 -- DONE!
--- All tables created, RLS policies set, triggers working.
--- You need to re-register your account after running this.
+-- All tables created, triggers working, categories seeded.

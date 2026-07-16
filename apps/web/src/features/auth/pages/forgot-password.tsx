@@ -2,11 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Loader2, Mail } from "lucide-react";
+import { Loader2, CheckCircle } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Card, CardContent } from "@/shared/ui/card";
-import { createClient } from "@/shared/lib/supabase/client";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -14,25 +13,31 @@ export default function ForgotPasswordPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
-  const supabase = createClient();
-
-  async function handleReset(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
+      const response = await fetch(`${apiUrl}/api/auth/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
 
-    if (error) {
-      setError(error.message);
+      const result = await response.json();
+
+      if (result.success) {
+        setSuccess(true);
+      } else {
+        setError(result.error || "Failed to send reset link");
+      }
+    } catch (err) {
+      setError("Network error. Please try again.");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    setSuccess(true);
-    setLoading(false);
   }
 
   if (success) {
@@ -40,33 +45,20 @@ export default function ForgotPasswordPage() {
       <div className="w-full max-w-md">
         <Card className="border-slate-200 shadow-lg shadow-slate-200/20">
           <CardContent className="p-8 text-center">
-            <div className="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
-              <Mail className="w-7 h-7 text-blue-600" />
+            <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-7 h-7 text-emerald-600" />
             </div>
             <h1 className="text-2xl font-bold text-slate-950">Check your email</h1>
             <p className="text-sm text-slate-600 mt-3 leading-relaxed">
-              We sent a password reset link to{" "}
-              <span className="font-semibold text-slate-950">{email}</span>.
-              Follow the link to reset your password.
+              If an account exists with{" "}
+              <span className="font-semibold text-slate-950">{email}</span>,
+              we&apos;ve sent a password reset link.
             </p>
-            <div className="mt-6 space-y-3">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setSuccess(false);
-                  setEmail("");
-                }}
-                className="w-full border-slate-300 text-slate-700"
-              >
-                Try another email
-              </Button>
-              <Link
-                href="/login"
-                className="block text-sm font-medium text-slate-600 hover:text-slate-950 transition-colors"
-              >
+            <Link href="/login">
+              <Button variant="outline" className="mt-6 border-slate-300 text-slate-700">
                 Back to sign in
-              </Link>
-            </div>
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </div>
@@ -90,7 +82,7 @@ export default function ForgotPasswordPage() {
             </div>
           )}
 
-          <form onSubmit={handleReset} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1.5">
                 Email address
@@ -119,13 +111,12 @@ export default function ForgotPasswordPage() {
             </Button>
           </form>
 
-          <Link
-            href="/login"
-            className="mt-6 flex items-center justify-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-950 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to sign in
-          </Link>
+          <p className="mt-6 text-center text-sm text-slate-600">
+            Remember your password?{" "}
+            <Link href="/login" className="font-semibold text-slate-950 hover:underline">
+              Sign in
+            </Link>
+          </p>
         </CardContent>
       </Card>
     </div>

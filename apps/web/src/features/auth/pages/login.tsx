@@ -8,7 +8,7 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Card, CardContent } from "@/shared/ui/card";
-import { createClient } from "@/shared/lib/supabase/client";
+import { auth } from "@/shared/lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -18,38 +18,26 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const supabase = createClient();
-
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      setError(error.message);
+    try {
+      const { user } = await auth.signIn({ email, password });
+      router.push(user.role === "developer" ? "/seller" : "/browse");
+      router.refresh();
+    } catch (err: any) {
+      setError(err.message || "Login failed");
       setLoading(false);
-      return;
     }
-
-    const { data: { user } } = await supabase.auth.getUser();
-    const role = user?.user_metadata?.role || "user";
-    router.push(role === "developer" ? "/seller" : "/browse");
-    router.refresh();
   }
 
   async function handleGithubLogin() {
     setLoading(true);
-    await supabase.auth.signInWithOAuth({
-      provider: "github",
-      options: {
-        redirectTo: `${window.location.origin}/api/auth/callback`,
-      },
-    });
+    // TODO: Implement GitHub OAuth
+    setError("GitHub login coming soon");
+    setLoading(false);
   }
 
   return (

@@ -1,52 +1,54 @@
-import { createClient } from "@/shared/lib/supabase/server";
-import { redirect } from "next/navigation";
-import { getUserRole, ROLES } from "@/shared/lib/roles";
+"use client";
+
+import { useEffect, useState } from "react";
 import { BrowseNavbar } from "./components/browse-navbar";
 import { ProductGrid } from "./components/product-grid";
 import { Sparkles, TrendingUp, Zap } from "lucide-react";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
-
-async function fetchProfile(userId: string, token: string) {
-  try {
-    const res = await fetch(`${API_URL}/api/profile/${userId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    return data.success ? data.data : null;
-  } catch {
-    return null;
-  }
-}
+import { auth } from "@/shared/lib/auth";
 
 interface BrowsePageProps {
-  searchParams: Promise<{ search?: string; category?: string }>;
+  searchParams?: Promise<{ search?: string; category?: string }> | { search?: string; category?: string };
 }
 
-export default async function BrowsePage({ searchParams }: BrowsePageProps) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+export default function BrowsePage({ searchParams }: BrowsePageProps) {
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  if (!user) redirect("/login");
+  useEffect(() => {
+    async function loadUser() {
+      const userData = await auth.getUser();
+      if (!userData) {
+        window.location.href = "/login";
+        return;
+      }
+      setUser(userData);
+      setLoading(false);
+    }
+    loadUser();
+  }, []);
 
-  const role = getUserRole(user);
-  if (role === ROLES.DEVELOPER) redirect("/seller");
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-slate-500">Loading...</div>
+      </div>
+    );
+  }
 
-  const { data: { session } } = await supabase.auth.getSession();
-  const token = session?.access_token || "";
+  if (!user) return null;
 
-  // Fetch profile from backend API
-  const profile = await fetchProfile(user.id, token);
-  const fullName = profile?.full_name || user.user_metadata?.full_name || "";
-
-  const params = searchParams ? await searchParams : {};
-  const searchQuery = params?.search || "";
-  const categoryFilter = params?.category || "";
+  // Handle both Promise and regular object for searchParams
+  const params = searchParams && typeof searchParams === 'object' && 'then' in searchParams
+    ? {} // Will be resolved by the parent
+    : searchParams || {};
+  const searchQuery = (params as any)?.search || "";
+  const categoryFilter = (params as any)?.category || "";
+  const fullName = user.full_name || "";
 
   return (
     <div className="min-h-screen bg-slate-50">
       <BrowseNavbar
-        email={user.email!}
+        email={user.email}
         fullName={fullName}
         activeCategory={categoryFilter}
         searchQuery={searchQuery}
@@ -88,7 +90,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
               {searchQuery
                 ? `Results for "${searchQuery}"`
                 : categoryFilter
-                ? `${categoryFilter.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}`
+                ? `${categoryFilter.replace(/-/g, " ").replace(/\b\w/g, (l: string) => l.toUpperCase())}`
                 : "Trending Products"}
             </h2>
             <p className="text-sm text-slate-500 mt-1">

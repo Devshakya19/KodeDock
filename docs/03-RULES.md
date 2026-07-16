@@ -251,7 +251,7 @@ POST   /api/wallet/topup      # Top up wallet
 
 1. **Never expose** service-role keys to the frontend
 2. **Always verify** JWT tokens on every API request
-3. **Use RLS** on all Supabase tables
+3. **Validate** all inputs on the backend
 4. **Validate** all inputs with Zod on the backend
 5. **Rate limit** all API endpoints
 6. **Sanitize** user inputs to prevent XSS
@@ -274,8 +274,7 @@ POST   /api/wallet/topup      # Top up wallet
 
 ```env
 # .env.example (committed to git)
-NEXT_PUBLIC_SUPABASE_URL=your-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-key
+NEXT_PUBLIC_API_URL=http://localhost:4001
 ```
 
 ---

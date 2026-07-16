@@ -1,4 +1,4 @@
-import { createClient } from "@/shared/lib/supabase/server";
+import { auth } from "@/shared/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ShoppingCart, ExternalLink, Package } from "lucide-react";
@@ -21,12 +21,12 @@ async function fetchOrders(userId: string, token: string) {
 }
 
 export default async function PurchasesPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  // Auth handled by custom auth client
+  const user = await auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: { session } } = await supabase.auth.getSession();
-  const token = session?.access_token || "";
+  const session = await auth.getSession();
+  const token = session?.token || "";
 
   const orders = await fetchOrders(user.id, token);
 

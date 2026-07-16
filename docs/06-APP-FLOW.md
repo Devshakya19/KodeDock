@@ -17,9 +17,9 @@ Clicks "Create account"
   ↓
 Frontend validates input
   ↓
-Supabase auth.signUp() with role: "user"
+POST /api/auth/register with role: "user"
   ↓
-Supabase sends verification email
+Backend sends verification email
   ↓
 User sees "Check your email" screen
   ↓
@@ -41,7 +41,7 @@ Enters Email + Password
   ↓
 Clicks "Sign in"
   ↓
-Supabase auth.signInWithPassword()
+POST /api/auth/login
   ↓
 Frontend checks user_metadata.role
   ↓
@@ -147,9 +147,9 @@ Fills: Full Name, Email, Password
   ↓
 Clicks "Create seller account"
   ↓
-Supabase auth.signUp() with role: "developer"
+POST /api/auth/register with role: "developer"
   ↓
-Supabase sends verification email
+Backend sends verification email
   ↓
 User clicks email link
   ↓
@@ -235,7 +235,7 @@ Admin visits /login
   ↓
 Enters admin credentials
   ↓
-Supabase auth.signInWithPassword()
+POST /api/auth/login
   ↓
 Frontend checks role: "admin"
   ↓

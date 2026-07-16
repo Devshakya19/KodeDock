@@ -9,11 +9,15 @@ import {
   User,
   Settings,
   LogOut,
+  Store,
+  Bell,
 } from "lucide-react";
 
 const NAV_ITEMS = [
+  { label: "Browse Marketplace", href: "/browse", icon: Store },
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "My Purchases", href: "/dashboard/purchases", icon: ShoppingCart },
+  { label: "Notifications", href: "/notifications", icon: Bell },
   { label: "Profile", href: "/dashboard/profile", icon: User },
   { label: "Settings", href: "/dashboard/settings", icon: Settings },
 ];

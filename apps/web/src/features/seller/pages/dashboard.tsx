@@ -1,7 +1,7 @@
-import { createClient } from "@/shared/lib/supabase/server";
+import { auth } from "@/shared/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Package, TrendingUp, DollarSign, Plus, BarChart3, Settings } from "lucide-react";
+import { Package, TrendingUp, DollarSign, Plus, BarChart3, Settings, ShoppingCart } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { getUserRole, ROLES } from "@/shared/lib/roles";
@@ -21,15 +21,15 @@ async function fetchSellerStats(token: string) {
 }
 
 export default async function DashboardPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  // Auth handled by custom auth client
+  const user = await auth.getUser();
   if (!user) redirect("/login");
 
   const role = getUserRole(user);
   if (role !== ROLES.DEVELOPER) redirect("/browse");
 
-  const { data: { session } } = await supabase.auth.getSession();
-  const token = session?.access_token || "";
+  const session = await auth.getSession();
+  const token = session?.token || "";
 
   const stats = await fetchSellerStats(token);
 
@@ -39,7 +39,7 @@ export default async function DashboardPage() {
         <div>
           <h1 className="text-2xl font-bold text-slate-950">Seller Dashboard</h1>
           <p className="text-slate-600 mt-1">
-            Welcome back, {user.user_metadata?.full_name || user.email}
+            Welcome back, {user.full_name || user.email}
           </p>
         </div>
         <Link href="/seller/products/new">
@@ -109,7 +109,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="mt-8 grid sm:grid-cols-3 gap-4">
+      <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Link href="/seller/products">
           <Card className="border-slate-200 hover:border-slate-950 hover:shadow-lg transition-all cursor-pointer">
             <CardContent className="p-5 flex items-center gap-4">
@@ -117,6 +117,18 @@ export default async function DashboardPage() {
               <div>
                 <div className="font-semibold text-slate-950 text-sm">My Products</div>
                 <div className="text-xs text-slate-500">{stats.active_products} active</div>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/seller/orders">
+          <Card className="border-slate-200 hover:border-slate-950 hover:shadow-lg transition-all cursor-pointer">
+            <CardContent className="p-5 flex items-center gap-4">
+              <ShoppingCart className="w-5 h-5 text-slate-600" />
+              <div>
+                <div className="font-semibold text-slate-950 text-sm">Orders</div>
+                <div className="text-xs text-slate-500">Track sales</div>
               </div>
             </CardContent>
           </Card>

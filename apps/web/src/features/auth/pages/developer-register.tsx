@@ -4,11 +4,11 @@ import { GithubIcon } from "@/shared/components/github-icon";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Eye, EyeOff, Loader2, Check, ArrowRight } from "lucide-react";
+import { Eye, EyeOff, Loader2, Check } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Card, CardContent } from "@/shared/ui/card";
-import { createClient } from "@/shared/lib/supabase/client";
+import { auth } from "@/shared/lib/auth";
 
 const PASSWORD_REQUIREMENTS = [
   { label: "At least 8 characters", test: (p: string) => p.length >= 8 },
@@ -26,43 +26,31 @@ export default function DeveloperRegisterPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
-  const supabase = createClient();
-
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
-          role: "developer",
-        },
-        emailRedirectTo: `${window.location.origin}/api/auth/callback`,
-      },
-    });
-
-    if (error) {
-      setError(error.message);
+    try {
+      await auth.signUp({
+        email,
+        password,
+        fullName,
+        role: "developer",
+      });
+      setSuccess(true);
+    } catch (err: any) {
+      setError(err.message || "Registration failed");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    setSuccess(true);
-    setLoading(false);
   }
 
   async function handleGithubLogin() {
     setLoading(true);
-    await supabase.auth.signInWithOAuth({
-      provider: "github",
-      options: {
-        redirectTo: `${window.location.origin}/api/auth/callback`,
-      },
-    });
+    // TODO: Implement GitHub OAuth
+    setError("GitHub login coming soon");
+    setLoading(false);
   }
 
   if (success) {
@@ -73,11 +61,9 @@ export default function DeveloperRegisterPage() {
             <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
               <Check className="w-7 h-7 text-emerald-600" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-950">Check your email</h1>
+            <h1 className="text-2xl font-bold text-slate-950">Seller account created!</h1>
             <p className="text-sm text-slate-600 mt-3 leading-relaxed">
-              We sent a verification link to{" "}
-              <span className="font-semibold text-slate-950">{email}</span>.
-              Click it to activate your seller account.
+              You can now sign in and start selling your code.
             </p>
             <Button
               variant="outline"
@@ -97,12 +83,9 @@ export default function DeveloperRegisterPage() {
       <Card className="border-slate-200 shadow-lg shadow-slate-200/20">
         <CardContent className="p-8">
           <div className="text-center mb-8">
-            <div className="w-12 h-12 rounded-xl bg-slate-950 flex items-center justify-center mx-auto mb-4">
-              <ArrowRight className="w-6 h-6 text-white" />
-            </div>
-            <h1 className="text-2xl font-bold text-slate-950">Start selling on CodeHaat</h1>
+            <h1 className="text-2xl font-bold text-slate-950">Create seller account</h1>
             <p className="text-sm text-slate-600 mt-2">
-              Create your seller account and start earning in minutes
+              Start selling your code on CodeHaat
             </p>
           </div>
 
@@ -219,12 +202,15 @@ export default function DeveloperRegisterPage() {
 
           <p className="mt-6 text-center text-sm text-slate-600">
             Already have an account?{" "}
-            <Link href="/login" className="font-semibold text-slate-950 hover:underline">
+            <Link
+              href="/login"
+              className="font-semibold text-slate-950 hover:underline"
+            >
               Sign in
             </Link>
           </p>
           <p className="mt-2 text-center text-xs text-slate-500">
-            Just want to buy code?{" "}
+            Want to buy code?{" "}
             <Link href="/register" className="font-medium text-slate-700 hover:underline">
               Create buyer account
             </Link>

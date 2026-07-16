@@ -7,3 +7,4 @@ pub mod wallet;
 pub mod orders;
 pub mod reviews;
 pub mod notifications;
+pub mod upload;

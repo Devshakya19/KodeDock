@@ -12,7 +12,7 @@
 | AI Service | Python | 4002 | Recommendations, search, fraud |
 | Infrastructure Worker | Go | 4003 | GitHub API, Docker, background jobs |
 | Real-Time Service | Node.js | 4004 | WebSocket notifications |
-| Database | Supabase | - | Postgres + Auth + Storage |
+| Database | PostgreSQL | - | Primary database |
 | Cache/Queue | Redis | 6379 | Jobs, cache, pub/sub |
 
 ---
@@ -29,7 +29,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 ```sql
 CREATE TABLE profiles (
-  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
   full_name TEXT,
   role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'developer', 'admin')),
   bio TEXT,
@@ -48,19 +48,15 @@ CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
   INSERT INTO public.profiles (id, full_name, role)
-  VALUES (
-    NEW.id,
-    COALESCE(NEW.raw_user_meta_data->>'full_name', ''),
-    COALESCE(NEW.raw_user_meta_data->>'role', 'user')
-  );
+  VALUES (NEW.id, COALESCE(NEW.full_name, ''), NEW.role);
   INSERT INTO public.wallets (user_id, balance_paise)
   VALUES (NEW.id, 0);
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql;
 
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
+CREATE TRIGGER on_user_created
+  AFTER INSERT ON users
   FOR EACH ROW EXECUTE FUNCTION handle_new_user();
 ```
 
@@ -261,36 +257,14 @@ CREATE TABLE disputes (
 
 ---
 
-## 3. RLS Policies
+## 3. Row-Level Security Policies
 
 ```sql
--- Profiles: Users can read all, update own
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Public profiles" ON profiles FOR SELECT USING (true);
-CREATE POLICY "Update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
-
--- Products: Public read, seller write
-ALTER TABLE products ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Public products" ON products FOR SELECT USING (status = 'active');
-CREATE POLICY "Seller manages own products" ON products FOR ALL USING (auth.uid() = seller_id);
-
--- Wallets: Users can read own only
-ALTER TABLE wallets ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Own wallet" ON wallets FOR SELECT USING (auth.uid() = user_id);
-
--- Orders: Buyer and seller can read own
-ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Buyer reads own orders" ON orders FOR SELECT USING (auth.uid() = buyer_id);
-CREATE POLICY "Seller reads own orders" ON orders FOR SELECT USING (auth.uid() = seller_id);
-
--- Reviews: Public read, buyer write
-ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Public reviews" ON reviews FOR SELECT USING (true);
-CREATE POLICY "Buyer writes review" ON reviews FOR INSERT WITH CHECK (auth.uid() = user_id);
-
--- Notifications: Users can read own
-ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Own notifications" ON notifications FOR SELECT USING (auth.uid() = user_id);
+-- Note: RLS is optional when using a service-role connection from the backend.
+-- Enable if exposing the database directly to clients.
+-- ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+-- CREATE POLICY "Public profiles" ON profiles FOR SELECT USING (true);
+-- CREATE POLICY "Update own profile" ON profiles FOR UPDATE USING (id = current_setting('app.current_user_id')::uuid);
 ```
 
 ---

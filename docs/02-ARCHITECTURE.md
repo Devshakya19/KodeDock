@@ -34,7 +34,7 @@
 │  • Wallet balance management                                    │
 │  • Escrow system (hold/release/refund)                          │
 │  • Transaction processing                                       │
-│  • Database read/write (via Supabase client)                    │
+│  • Database read/write (SQLx client)                              │
 │                                                                 │
 │  NOTE: Redis integration planned for Phase 2                    │
 └───────┬─────────────────────────┬───────────────────────────────┘
@@ -68,7 +68,7 @@
 │                    6. DATA LAYER                                │
 │                                                                 │
 │  ┌─────────────────────┐    ┌─────────────────────────────┐    │
-│  │  Supabase (Postgres)│    │  Redis                       │    │
+│  │  PostgreSQL (Postgres)│    │  Redis                       │    │
 │  │                     │    │                              │    │
 │  │  • Users & Profiles │    │  • Job queues (BullMQ)       │    │
 │  │  • Products         │    │  • Session cache             │    │
@@ -76,7 +76,7 @@
 │  │  • Wallets          │    │  • Pub/Sub messaging         │    │
 │  │  • Escrow           │    │  • Real-time state           │    │
 │  │  • Reviews          │    │                              │    │
-│  │  • RLS policies     │    │                              │    │
+│  │  • Triggers/RLS     │    │                              │    │
 │  └─────────────────────┘    └─────────────────────────────┘    │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -94,7 +94,7 @@
 | **Port** | 3000 |
 | **Role** | Render user interfaces, handle SSR/SEO |
 | **Database Access** | None — calls backend services only |
-| **Auth** | Supabase client-side (JWT tokens) |
+| **Auth** | JWT-based (custom auth) |
 
 ### Service 2: Core Engine (Rust)
 
@@ -104,7 +104,7 @@
 | **Framework** | Actix-Web or Axum |
 | **Port** | 4001 |
 | **Role** | Main gateway, security, transactions |
-| **Database Access** | Supabase (service-role key) |
+| **Database Access** | PostgreSQL (service-role connection) |
 | **Responsibilities** | JWT verification, wallet management, escrow, transactions |
 
 ### Service 3: AI Service (Python)
@@ -115,7 +115,7 @@
 | **Framework** | FastAPI |
 | **Port** | 4002 |
 | **Role** | Intelligence layer |
-| **Database Access** | Read-only (via Supabase) |
+| **Database Access** | Read-only (SQLx client) |
 | **Responsibilities** | Recommendations, AI search, fraud detection |
 
 ### Service 4: Infrastructure Worker (Go)
@@ -126,7 +126,7 @@
 | **Framework** | Standard library + goroutines |
 | **Port** | 4003 |
 | **Role** | Background automation |
-| **Database Access** | Supabase (service-role key) |
+| **Database Access** | PostgreSQL (service-role connection) |
 | **Responsibilities** | Job processing, GitHub API, Docker management |
 
 ### Service 5: Real-Time Service (Node.js)
@@ -144,7 +144,7 @@
 
 | Component | Purpose |
 |-----------|---------|
-| **Supabase (Postgres)** | Primary database — users, products, orders, wallets |
+| **PostgreSQL** | Primary database — users, products, orders, wallets |
 | **Redis** | Job queues, caching, rate limiting, pub/sub |
 
 ---
@@ -154,13 +154,13 @@
 | From | To | Protocol | Purpose |
 |------|----|----------|---------|
 | Next.js | Rust Core | REST + JWT | All API calls |
-| Rust Core | Supabase | HTTPS | Database operations |
+| Rust Core | PostgreSQL | TCP | Database operations |
 | Rust Core | Redis | TCP | Publish events |
 | Go Worker | Redis | TCP | Consume jobs |
 | Go Worker | GitHub API | HTTPS | Repo operations |
 | Go Worker | Docker | TCP | Container management |
 | Python AI | Redis | TCP | Subscribe to events |
-| Python AI | Supabase | HTTPS | Read data |
+| Python AI | PostgreSQL | TCP | Read data |
 | Go Worker | Node.js Realtime | WebSocket | Send notifications |
 | Node.js Realtime | Browser | WebSocket | Push to client |
 
@@ -171,7 +171,7 @@
 ```
 1. Buyer clicks "Buy Now" on product page
    ↓
-2. Next.js sends request to Rust Core with Supabase JWT
+2. Next.js sends request to Rust Core with JWT
    ↓
 3. Rust Core verifies JWT token
    ↓
@@ -233,8 +233,8 @@
 └──────────────────┬──────────────────────────┘
                    │
 ┌──────────────────▼──────────────────────────┐
-│              Supabase (Managed)              │
-│              Postgres + Auth + Storage       │
+│              PostgreSQL (Managed)            │
+│              Primary Database               │
 └─────────────────────────────────────────────┘
 ```
 
@@ -245,7 +245,7 @@
 | Level | Strategy |
 |-------|----------|
 | **Horizontal** | Docker containers can be scaled per service |
-| **Database** | Supabase handles connection pooling + read replicas |
+| **Database** | PostgreSQL handles connection pooling + read replicas |
 | **Caching** | Redis caches frequent queries (products, categories) |
 | **Queue** | Redis + BullMQ handles job processing asynchronously |
 | **CDN** | Cloudflare serves static assets globally |

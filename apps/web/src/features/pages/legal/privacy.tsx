@@ -36,7 +36,7 @@ export default function PrivacyPage() {
           <h2 className="text-xl font-semibold text-slate-950 mb-3">3. Data Sharing</h2>
           <p>We do not sell your personal information. We share data only with:</p>
           <ul className="list-disc pl-6 mt-2 space-y-1">
-            <li><strong>Service Providers:</strong> Supabase (database), Razorpay (payments), GitHub (code delivery)</li>
+            <li><strong>Service Providers:</strong> PostgreSQL (database), Razorpay (payments), GitHub (code delivery)</li>
             <li><strong>Legal Requirements:</strong> When required by law or to protect our rights</li>
           </ul>
         </section>

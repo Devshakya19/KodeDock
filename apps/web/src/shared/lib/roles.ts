@@ -6,10 +6,10 @@ export const ROLES = {
 export type UserRole = (typeof ROLES)[keyof typeof ROLES];
 
 export function getUserRole(
-  user: { user_metadata?: Record<string, unknown> } | null
+  user: { role?: string } | null
 ): UserRole {
   if (!user) return ROLES.USER;
-  return (user.user_metadata?.role as UserRole) || ROLES.USER;
+  return (user.role as UserRole) || ROLES.USER;
 }
 
 export function isDeveloper(role: UserRole): boolean {

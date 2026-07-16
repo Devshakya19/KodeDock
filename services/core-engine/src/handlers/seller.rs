@@ -1,113 +1,302 @@
-use actix_web::{web, HttpResponse};
-use uuid::Uuid;
-use crate::services::{AppState, ApiResponse, supabase::SupabaseClient};
+use actix_web::{web, HttpRequest, HttpResponse};
+use sqlx::PgPool;
 use crate::models::{Product, CreateProductRequest, UpdateProductRequest, SellerStats};
+use crate::services::ApiResponse;
+use crate::middleware::extract_user_id;
+use crate::storage::StorageClient;
 
 pub async fn create_product(
-    state: web::Data<AppState>,
+    pool: web::Data<PgPool>,
+    req: HttpRequest,
     body: web::Json<CreateProductRequest>,
 ) -> HttpResponse {
-    let client = SupabaseClient::new(&state);
+    let seller_id = match extract_user_id(&req) {
+        Ok(id) => id,
+        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized")),
+    };
 
-    // TODO: Get seller_id from JWT token
-    let seller_id = Uuid::parse_str("00000000-0000-0000-0000-000000000000").unwrap();
+    let seller_uuid = match uuid::Uuid::parse_str(&seller_id) {
+        Ok(uuid) => uuid,
+        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID")),
+    };
 
     let slug = body.title.to_lowercase().replace(" ", "-");
 
-    let product = serde_json::json!({
-        "seller_id": seller_id,
-        "title": body.title,
-        "slug": slug,
-        "description": body.description,
-        "long_description": body.long_description,
-        "price_paise": body.price_paise,
-        "original_price_paise": body.original_price_paise,
-        "category_id": body.category_id,
-        "tags": body.tags,
-        "github_repo_url": body.github_repo_url,
-        "image_url": body.image_url,
-        "demo_url": body.demo_url,
-        "tech_stack": body.tech_stack,
-        "status": "active"
-    });
+    // Validate image_url if provided — must be from our storage or empty
+    if let Some(ref url) = body.image_url {
+        let s3_public_url = std::env::var("S3_PUBLIC_URL").unwrap_or_default();
+        if !s3_public_url.is_empty() && !url.starts_with(&s3_public_url) {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid image URL"));
+        }
+    }
 
-    match client.insert::<_, Product>("products", &product).await {
+    // Handle category_id - could be UUID or category name
+    let category_id = match &body.category_id {
+        Some(val) => {
+            // Check if it's a UUID
+            if let Ok(uuid) = uuid::Uuid::parse_str(val) {
+                Some(uuid)
+            } else {
+                // Look up by name
+                match sqlx::query_scalar::<_, uuid::Uuid>("SELECT id FROM categories WHERE name = $1")
+                    .bind(val)
+                    .fetch_optional(pool.get_ref())
+                    .await
+                {
+                    Ok(Some(uuid)) => Some(uuid),
+                    _ => None,
+                }
+            }
+        }
+        None => None,
+    };
+
+    match sqlx::query_as::<_, Product>(
+        r#"INSERT INTO products (seller_id, title, slug, description, long_description, price_paise, original_price_paise, category_id, tags, github_repo_url, image_url, demo_url, tech_stack, status)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, 'active')
+           RETURNING *"#
+    )
+    .bind(seller_uuid)
+    .bind(&body.title)
+    .bind(&slug)
+    .bind(&body.description)
+    .bind(&body.long_description)
+    .bind(body.price_paise)
+    .bind(body.original_price_paise)
+    .bind(category_id)
+    .bind(&body.tags)
+    .bind(&body.github_repo_url)
+    .bind(&body.image_url)
+    .bind(&body.demo_url)
+    .bind(&body.tech_stack)
+    .fetch_one(pool.get_ref())
+    .await
+    {
         Ok(product) => HttpResponse::Ok().json(ApiResponse::success(product, "Product created")),
-        Err(e) => HttpResponse::InternalServerError().json(ApiResponse::<()>::error(&e)),
+        Err(e) => {
+            log::error!("Failed to create product: {}", e);
+            HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to create product"))
+        }
     }
 }
 
 pub async fn list_seller_products(
-    state: web::Data<AppState>,
+    pool: web::Data<PgPool>,
+    req: HttpRequest,
 ) -> HttpResponse {
-    let client = SupabaseClient::new(&state);
+    let seller_id = match extract_user_id(&req) {
+        Ok(id) => id,
+        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized")),
+    };
 
-    // TODO: Get seller_id from JWT token
-    let seller_id = "00000000-0000-0000-0000-000000000000";
+    let seller_uuid = match uuid::Uuid::parse_str(&seller_id) {
+        Ok(uuid) => uuid,
+        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID")),
+    };
 
-    match client.query::<Vec<Product>>("products", &format!("seller_id=eq.{}&order=created_at.desc", seller_id)).await {
+    match sqlx::query_as::<_, Product>("SELECT * FROM products WHERE seller_id = $1 ORDER BY created_at DESC")
+        .bind(seller_uuid)
+        .fetch_all(pool.get_ref())
+        .await
+    {
         Ok(products) => HttpResponse::Ok().json(ApiResponse::success(products, "Products fetched")),
-        Err(e) => HttpResponse::InternalServerError().json(ApiResponse::<()>::error(&e)),
+        Err(e) => {
+            log::error!("Failed to fetch seller products: {}", e);
+            HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to fetch products"))
+        }
     }
 }
 
 pub async fn update_product(
-    state: web::Data<AppState>,
+    pool: web::Data<PgPool>,
+    req: HttpRequest,
     path: web::Path<String>,
     body: web::Json<UpdateProductRequest>,
 ) -> HttpResponse {
-    let client = SupabaseClient::new(&state);
-    let id = path.into_inner();
+    let seller_id = match extract_user_id(&req) {
+        Ok(id) => id,
+        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized")),
+    };
 
-    match client.update::<_, Product>("products", &id, &body.0).await {
-        Ok(product) => HttpResponse::Ok().json(ApiResponse::success(product, "Product updated")),
-        Err(e) => HttpResponse::InternalServerError().json(ApiResponse::<()>::error(&e)),
+    let seller_uuid = match uuid::Uuid::parse_str(&seller_id) {
+        Ok(uuid) => uuid,
+        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID")),
+    };
+
+    let id = match uuid::Uuid::parse_str(&path.into_inner()) {
+        Ok(uuid) => uuid,
+        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid product ID")),
+    };
+
+    // Verify ownership
+    match sqlx::query_scalar::<_, uuid::Uuid>("SELECT seller_id FROM products WHERE id = $1")
+        .bind(id)
+        .fetch_optional(pool.get_ref())
+        .await
+    {
+        Ok(Some(owner_id)) if owner_id == seller_uuid => {}
+        Ok(_) => return HttpResponse::NotFound().json(ApiResponse::<()>::error("Product not found")),
+        Err(e) => {
+            log::error!("Failed to verify ownership: {}", e);
+            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Database error"));
+        }
+    }
+
+    match sqlx::query_as::<_, Product>(
+        r#"UPDATE products SET
+           title = COALESCE($2, title),
+           description = COALESCE($3, description),
+           long_description = COALESCE($4, long_description),
+           price_paise = COALESCE($5, price_paise),
+           original_price_paise = COALESCE($6, original_price_paise),
+           category_id = COALESCE($7, category_id),
+           tags = COALESCE($8, tags),
+           status = COALESCE($9, status),
+           github_repo_url = COALESCE($10, github_repo_url),
+           image_url = COALESCE($11, image_url),
+           demo_url = COALESCE($12, demo_url),
+           tech_stack = COALESCE($13, tech_stack),
+           updated_at = NOW()
+           WHERE id = $1 RETURNING *"#
+    )
+    .bind(id)
+    .bind(&body.title)
+    .bind(&body.description)
+    .bind(&body.long_description)
+    .bind(body.price_paise)
+    .bind(body.original_price_paise)
+    .bind(body.category_id.as_deref().and_then(|s| uuid::Uuid::parse_str(s).ok()))
+    .bind(&body.tags)
+    .bind(&body.status)
+    .bind(&body.github_repo_url)
+    .bind(&body.image_url)
+    .bind(&body.demo_url)
+    .bind(&body.tech_stack)
+    .fetch_optional(pool.get_ref())
+    .await
+    {
+        Ok(Some(product)) => HttpResponse::Ok().json(ApiResponse::success(product, "Product updated")),
+        Ok(None) => HttpResponse::NotFound().json(ApiResponse::<()>::error("Product not found")),
+        Err(e) => {
+            log::error!("Failed to update product: {}", e);
+            HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to update product"))
+        }
     }
 }
 
 pub async fn delete_product(
-    state: web::Data<AppState>,
+    pool: web::Data<PgPool>,
+    storage: web::Data<StorageClient>,
+    req: HttpRequest,
     path: web::Path<String>,
 ) -> HttpResponse {
-    let client = SupabaseClient::new(&state);
-    let id = path.into_inner();
+    let seller_id = match extract_user_id(&req) {
+        Ok(id) => id,
+        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized")),
+    };
 
-    match client.delete("products", &id).await {
+    let seller_uuid = match uuid::Uuid::parse_str(&seller_id) {
+        Ok(uuid) => uuid,
+        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID")),
+    };
+
+    let id = match uuid::Uuid::parse_str(&path.into_inner()) {
+        Ok(uuid) => uuid,
+        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid product ID")),
+    };
+
+    // Verify ownership before deletion
+    match sqlx::query_scalar::<_, uuid::Uuid>("SELECT seller_id FROM products WHERE id = $1")
+        .bind(id)
+        .fetch_optional(pool.get_ref())
+        .await
+    {
+        Ok(Some(owner_id)) if owner_id == seller_uuid => {}
+        Ok(_) => return HttpResponse::NotFound().json(ApiResponse::<()>::error("Product not found")),
+        Err(e) => {
+            log::error!("Failed to verify ownership: {}", e);
+            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Database error"));
+        }
+    }
+
+    // Fetch product to get image_url before deletion
+    if let Ok(Some(image_url)) = sqlx::query_scalar::<_, String>(
+        "SELECT image_url FROM products WHERE id = $1 AND image_url IS NOT NULL"
+    )
+    .bind(id)
+    .fetch_optional(pool.get_ref())
+    .await
+    {
+        if let Some(key) = storage.extract_key_from_url(&image_url) {
+            if let Err(e) = storage.delete_object(&key).await {
+                log::warn!("Failed to delete product image from storage: {}", e);
+            }
+        }
+    }
+
+    match sqlx::query("DELETE FROM products WHERE id = $1")
+        .bind(id)
+        .execute(pool.get_ref())
+        .await
+    {
         Ok(_) => HttpResponse::Ok().json(ApiResponse::<()> {
             success: true,
             data: None,
             message: Some("Product deleted".to_string()),
             error: None,
         }),
-        Err(e) => HttpResponse::InternalServerError().json(ApiResponse::<()>::error(&e)),
+        Err(e) => {
+            log::error!("Failed to delete product: {}", e);
+            HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to delete product"))
+        }
     }
 }
 
 pub async fn get_stats(
-    state: web::Data<AppState>,
+    pool: web::Data<PgPool>,
+    req: HttpRequest,
 ) -> HttpResponse {
-    let client = SupabaseClient::new(&state);
+    let seller_id = match extract_user_id(&req) {
+        Ok(id) => id,
+        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized")),
+    };
 
-    // TODO: Get seller_id from JWT token
-    let seller_id = "00000000-0000-0000-0000-000000000000";
+    let seller_uuid = match uuid::Uuid::parse_str(&seller_id) {
+        Ok(uuid) => uuid,
+        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID")),
+    };
 
-    // Fetch products count
-    let products = client.query::<Vec<serde_json::Value>>("products", &format!("seller_id=eq.{}", seller_id)).await.unwrap_or_default();
-    let total_products = products.len() as i32;
-    let active_products = products.iter().filter(|p| p.get("status").and_then(|s| s.as_str()) == Some("active")).count() as i32;
+    let total_products = sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM products WHERE seller_id = $1")
+        .bind(seller_uuid)
+        .fetch_one(pool.get_ref())
+        .await
+        .unwrap_or(0) as i32;
 
-    // Fetch completed orders
-    let orders = client.query::<Vec<serde_json::Value>>("orders", &format!("seller_id=eq.{}&status=eq.completed", seller_id)).await.unwrap_or_default();
-    let total_sales = orders.len() as i32;
-    let total_revenue_paise: i32 = orders.iter().filter_map(|o| o.get("seller_amount_paise").and_then(|v| v.as_i64())).sum::<i64>() as i32;
-    let total_earned_paise = total_revenue_paise;
+    let active_products = sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM products WHERE seller_id = $1 AND status = 'active'")
+        .bind(seller_uuid)
+        .fetch_one(pool.get_ref())
+        .await
+        .unwrap_or(0) as i32;
+
+    let total_sales = sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM orders WHERE seller_id = $1 AND status = 'completed'")
+        .bind(seller_uuid)
+        .fetch_one(pool.get_ref())
+        .await
+        .unwrap_or(0) as i32;
+
+    let total_revenue = sqlx::query_scalar::<_, Option<i64>>("SELECT COALESCE(SUM(seller_amount_paise), 0) FROM orders WHERE seller_id = $1 AND status = 'completed'")
+        .bind(seller_uuid)
+        .fetch_one(pool.get_ref())
+        .await
+        .unwrap_or(Some(0))
+        .unwrap_or(0) as i32;
 
     let stats = SellerStats {
         total_products,
         active_products,
         total_sales,
-        total_revenue_paise,
-        total_earned_paise,
+        total_revenue_paise: total_revenue,
+        total_earned_paise: total_revenue,
     };
 
     HttpResponse::Ok().json(ApiResponse::success(stats, "Stats fetched"))

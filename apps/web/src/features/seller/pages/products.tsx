@@ -1,4 +1,4 @@
-import { createClient } from "@/shared/lib/supabase/server";
+import { auth } from "@/shared/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Plus, Package } from "lucide-react";
@@ -21,12 +21,12 @@ async function fetchSellerProducts(token: string) {
 }
 
 export default async function ProductsPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  // Auth handled by custom auth client
+  const user = await auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: { session } } = await supabase.auth.getSession();
-  const token = session?.access_token || "";
+  const session = await auth.getSession();
+  const token = session?.token || "";
 
   const products = await fetchSellerProducts(token);
 
@@ -66,43 +66,45 @@ export default async function ProductsPage() {
       ) : (
         <div className="space-y-4">
           {products.map((product: any) => (
-            <Card key={product.id} className="border-slate-200 hover:border-slate-300 transition-colors">
-              <CardContent className="p-5">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center">
-                      <Package className="w-5 h-5 text-slate-500" />
+            <Link key={product.id} href={`/seller/products/${product.id}/edit`}>
+              <Card className="border-slate-200 hover:border-slate-300 transition-colors cursor-pointer">
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center">
+                        <Package className="w-5 h-5 text-slate-500" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-slate-950">{product.title}</h3>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Badge
+                            variant={product.status === "active" ? "default" : "secondary"}
+                            className={`text-[10px] ${
+                              product.status === "active"
+                                ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+                                : "bg-slate-100 text-slate-600 border-slate-200"
+                            }`}
+                          >
+                            {product.status}
+                          </Badge>
+                          <span className="text-xs text-slate-500">
+                            {product.category?.name || "Uncategorized"}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-slate-950">{product.title}</h3>
-                      <div className="flex items-center gap-2 mt-1">
-                        <Badge
-                          variant={product.status === "active" ? "default" : "secondary"}
-                          className={`text-[10px] ${
-                            product.status === "active"
-                              ? "bg-emerald-100 text-emerald-700 border-emerald-200"
-                              : "bg-slate-100 text-slate-600 border-slate-200"
-                          }`}
-                        >
-                          {product.status}
-                        </Badge>
-                        <span className="text-xs text-slate-500">
-                          {product.category?.name || "Uncategorized"}
-                        </span>
+                    <div className="text-right">
+                      <div className="text-lg font-bold text-slate-950">
+                        ₹{(product.price_paise / 100).toLocaleString()}
+                      </div>
+                      <div className="text-xs text-slate-500">
+                        {product.sales_count || 0} sales
                       </div>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-lg font-bold text-slate-950">
-                      ₹{(product.price_paise / 100).toLocaleString()}
-                    </div>
-                    <div className="text-xs text-slate-500">
-                      {product.sales_count || 0} sales
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       )}

@@ -1,18 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, CheckCircle } from "lucide-react";
+import { Loader2, CheckCircle, Camera } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Card, CardContent } from "@/shared/ui/card";
-import { createClient } from "@/shared/lib/supabase/client";
+import { auth } from "@/shared/lib/auth";
 import { apiGet, apiPut } from "@/shared/lib/api";
+import { uploadFile } from "@/shared/lib/upload";
 
 export default function ProfilePage() {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
 
@@ -23,11 +26,37 @@ export default function ProfilePage() {
   const [avatarUrl, setAvatarUrl] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
 
-  const supabase = createClient();
+  // Auth handled by custom auth client
+
+  async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setError("Please select an image file");
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      setError("Avatar must be less than 2MB");
+      return;
+    }
+
+    setUploadingAvatar(true);
+    setError("");
+    try {
+      const result = await uploadFile(file, "avatar");
+      setAvatarUrl(result.public_url);
+    } catch (err) {
+      setError("Failed to upload avatar. Please try again.");
+    } finally {
+      setUploadingAvatar(false);
+    }
+  }
 
   useEffect(() => {
     async function loadProfile() {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await auth.getUser();
       if (!user) {
         router.push("/login");
         return;
@@ -39,19 +68,19 @@ export default function ProfilePage() {
       const result = await apiGet<any>(`/api/profile/${user.id}`);
 
       if (result.success && result.data) {
-        setFullName(result.data.full_name || user.user_metadata?.full_name || "");
+        setFullName(result.data.full_name || user.full_name || "");
         setBio(result.data.bio || "");
         setWebsite(result.data.website || "");
         setLocation(result.data.location || "");
         setAvatarUrl(result.data.avatar_url || "");
       } else {
-        setFullName(user.user_metadata?.full_name || "");
+        setFullName(user.full_name || "");
       }
       setLoading(false);
     }
 
     loadProfile();
-  }, [router, supabase]);
+  }, [router, auth]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -111,18 +140,39 @@ export default function ProfilePage() {
 
             {/* Avatar */}
             <div className="flex items-center gap-4 mb-8">
-              <div className="w-20 h-20 rounded-full bg-slate-950 flex items-center justify-center overflow-hidden">
-                {avatarUrl ? (
-                  <img src={avatarUrl} alt="" className="w-20 h-20 object-cover" />
-                ) : (
-                  <span className="text-2xl font-bold text-white">
-                    {(fullName || "U").charAt(0).toUpperCase()}
-                  </span>
-                )}
+              <div className="relative group">
+                <div className="w-20 h-20 rounded-full bg-slate-950 flex items-center justify-center overflow-hidden">
+                  {avatarUrl ? (
+                    <img src={avatarUrl} alt="" className="w-20 h-20 object-cover" />
+                  ) : (
+                    <span className="text-2xl font-bold text-white">
+                      {(fullName || "U").charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarUpload}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingAvatar}
+                  className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                >
+                  {uploadingAvatar ? (
+                    <Loader2 className="w-5 h-5 text-white animate-spin" />
+                  ) : (
+                    <Camera className="w-5 h-5 text-white" />
+                  )}
+                </button>
               </div>
               <div>
                 <div className="text-sm font-medium text-slate-950">{fullName || "User"}</div>
-                <div className="text-xs text-slate-500">Profile Photo</div>
+                <div className="text-xs text-slate-500">Click to change photo</div>
               </div>
             </div>
 

@@ -40,25 +40,27 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-2 md:grid-cols-6 gap-8">
           <div className="col-span-2">
-            <a href="#" className="flex items-center gap-2.5 mb-4">
+            <Link href="/" className="flex items-center gap-2.5 mb-4">
               <div className="w-8 h-8 rounded-lg bg-slate-950 flex items-center justify-center text-white">
                 <Terminal className="w-4.5 h-4.5" />
               </div>
               <span className="text-xl font-bold tracking-tight text-slate-950">
                 Code<span className="text-slate-600">Haat</span>
               </span>
-            </a>
+            </Link>
             <p className="text-sm text-slate-600 leading-relaxed max-w-xs">
               India&apos;s simplest developer marketplace for code delivered as GitHub repos.
             </p>
             <div className="flex items-center gap-3 mt-6">
               {[
-                { label: "GitHub", icon: GithubIcon },
-                { label: "Twitter", icon: Globe },
+                { label: "GitHub", icon: GithubIcon, href: "https://github.com/codehaat" },
+                { label: "Twitter", icon: Globe, href: "https://twitter.com/codehaat" },
               ].map((social) => (
                 <a
                   key={social.label}
-                  href="#"
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="w-9 h-9 rounded-lg bg-white flex items-center justify-center text-slate-600 hover:text-slate-950 border border-slate-200 transition-colors"
                   aria-label={social.label}
                 >

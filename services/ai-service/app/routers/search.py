@@ -3,16 +3,19 @@ from pydantic import BaseModel
 
 router = APIRouter()
 
+
 class SearchRequest(BaseModel):
     query: str
     category: str | None = None
     min_price: int | None = None
     max_price: int | None = None
 
+
 class SearchResponse(BaseModel):
     products: list
     total: int
     query: str
+
 
 @router.post("/", response_model=SearchResponse)
 async def search_products(request: SearchRequest):

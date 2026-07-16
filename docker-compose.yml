@@ -1,9 +1,24 @@
 services:
+  # PostgreSQL - Primary Database
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: codehaat
+      POSTGRES_USER: codehaat
+      POSTGRES_PASSWORD: codehaat_secret
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/01-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U codehaat -d codehaat"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
   # Redis - Cache & Job Queue
   redis:
     image: redis:7-alpine
-    ports:
-      - "6379:6379"
     volumes:
       - redis_data:/data
     healthcheck:
@@ -11,6 +26,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   # Frontend - Next.js
   frontend:
@@ -18,17 +34,14 @@ services:
       context: ./apps/web
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_SUPABASE_URL: https://jarghrxmeknhlclzirfj.supabase.co
-        NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphcmdocnhtZWtuaGxjbHppcmZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM4MzIxNDAsImV4cCI6MjA5OTQwODE0MH0.MQJe1HDpTyE2--ztHq4jdRVoo1smbtcNOT_O7nqGzdk
-        NEXT_PUBLIC_API_URL: http://core-engine:4001
+        NEXT_PUBLIC_API_URL: http://localhost:4001
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_SUPABASE_URL=https://jarghrxmeknhlclzirfj.supabase.co
-      - NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphcmdocnhtZWtuaGxjbHppcmZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM4MzIxNDAsImV4cCI6MjA5OTQwODE0MH0.MQJe1HDpTyE2--ztHq4jdRVoo1smbtcNOT_O7nqGzdk
-      - NEXT_PUBLIC_API_URL=http://core-engine:4001
+      - NEXT_PUBLIC_API_URL=http://localhost:4001
     depends_on:
       - core-engine
+    restart: unless-stopped
 
   # Core Engine - Rust (Main API Gateway)
   core-engine:
@@ -42,11 +55,14 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+      postgres:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:4001/health"]
       interval: 30s
       timeout: 10s
       retries: 3
+    restart: unless-stopped
 
   # AI Service - Python (Recommendations & Search)
   ai-service:
@@ -65,6 +81,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    restart: unless-stopped
 
   # Infra Worker - Go (Background Jobs & GitHub)
   infra-worker:
@@ -75,11 +92,10 @@ services:
       - "4003:4003"
     env_file:
       - ./services/infra-worker/.env
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       redis:
         condition: service_healthy
+    restart: unless-stopped
 
   # Real-Time Service - Node.js (WebSocket)
   realtime-service:
@@ -93,6 +109,26 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+    restart: unless-stopped
+
+  # SeaweedFS - Object Storage (S3-compatible)
+  seaweedfs:
+    image: chrislusf/seaweedfs
+    container_name: seaweedfs
+    ports:
+      - "8333:8333"
+    volumes:
+      - seaweedfs_data:/data
+      - ./config/seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
+    command: "server -s3 -s3.port=8333 -s3.config /etc/seaweedfs/s3.json -volume.max=100 -volume.fileSizeLimitMB=64"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8333"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
 volumes:
   redis_data:
+  postgres_data:
+  seaweedfs_data:

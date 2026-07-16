@@ -1,12 +1,6 @@
-pub mod supabase;
+pub mod auth;
 
 use serde::{Deserialize, Serialize};
-
-#[derive(Clone)]
-pub struct AppState {
-    pub supabase_url: String,
-    pub supabase_key: String,
-}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ApiResponse<T> {

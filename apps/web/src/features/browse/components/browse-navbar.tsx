@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Search, Menu, User } from "lucide-react";
+import { Search, Menu, ShoppingCart, Bell, LayoutDashboard } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { CodeHaatLogo } from "@/shared/components/codehaat-logo";
@@ -65,7 +65,7 @@ export function BrowseNavbar({
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-xl">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center gap-6">
-        <CodeHaatLogo />
+        <CodeHaatLogo href="/browse" />
 
         {/* Search bar */}
         <div className="hidden md:flex flex-1 max-w-xl">
@@ -87,8 +87,30 @@ export function BrowseNavbar({
           </form>
         </div>
 
-        {/* Right side - Profile */}
-        <div className="hidden md:flex items-center gap-3">
+        {/* Right side - Actions */}
+        <div className="hidden md:flex items-center gap-2">
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-950 hover:bg-slate-100 transition-colors"
+          >
+            <LayoutDashboard className="w-4 h-4" />
+            <span className="hidden lg:inline">Dashboard</span>
+          </Link>
+          <Link
+            href="/cart"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-950 hover:bg-slate-100 transition-colors"
+          >
+            <ShoppingCart className="w-4 h-4" />
+            <span className="hidden lg:inline">Cart</span>
+          </Link>
+          <Link
+            href="/notifications"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-950 hover:bg-slate-100 transition-colors"
+          >
+            <Bell className="w-4 h-4" />
+            <span className="hidden lg:inline">Notifications</span>
+          </Link>
+          <div className="w-px h-6 bg-slate-200 mx-1" />
           <Link
             href="/dashboard/profile"
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
@@ -141,6 +163,12 @@ export function BrowseNavbar({
               </Link>
               <Link href="/dashboard/purchases" className="text-sm font-medium text-slate-700 hover:text-slate-950">
                 My Purchases
+              </Link>
+              <Link href="/cart" className="text-sm font-medium text-slate-700 hover:text-slate-950">
+                Cart
+              </Link>
+              <Link href="/notifications" className="text-sm font-medium text-slate-700 hover:text-slate-950">
+                Notifications
               </Link>
               <form action="/api/auth/logout" method="post">
                 <Button variant="outline" className="w-full border-slate-300 text-slate-700">

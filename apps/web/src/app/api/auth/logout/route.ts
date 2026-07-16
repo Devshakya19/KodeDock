@@ -1,9 +1,8 @@
-import { createClient } from "@/shared/lib/supabase/server";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-  const supabase = await createClient();
-  await supabase.auth.signOut();
+  // In our custom auth system, logout is handled client-side
+  // The client removes the token from localStorage
   const { origin } = new URL(request.url);
   return NextResponse.redirect(`${origin}/login`);
 }
