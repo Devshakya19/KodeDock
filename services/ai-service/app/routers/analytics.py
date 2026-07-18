@@ -1,5 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from pydantic import BaseModel
+from app.limiter import limiter
 
 router = APIRouter()
 
@@ -12,11 +13,12 @@ class AnalyticsResponse(BaseModel):
 
 
 @router.get("/dashboard", response_model=AnalyticsResponse)
-async def get_dashboard_analytics():
+@limiter.limit("30/minute")
+async def get_dashboard_analytics(request: Request):
     # TODO: Implement real analytics
     return AnalyticsResponse(
         total_users=0,
         total_products=0,
         total_orders=0,
-        total_revenue=0
+        total_revenue=0,
     )

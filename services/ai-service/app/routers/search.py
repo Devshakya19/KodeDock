@@ -1,5 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from pydantic import BaseModel
+from app.limiter import limiter
 
 router = APIRouter()
 
@@ -18,11 +19,11 @@ class SearchResponse(BaseModel):
 
 
 @router.post("/", response_model=SearchResponse)
-async def search_products(request: SearchRequest):
+@limiter.limit("30/minute")
+async def search_products(request: Request, body: SearchRequest):
     # TODO: Implement AI-powered search
-    # For now, return empty results
     return SearchResponse(
         products=[],
         total=0,
-        query=request.query
+        query=body.query,
     )

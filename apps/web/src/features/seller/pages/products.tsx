@@ -1,4 +1,4 @@
-import { auth } from "@/shared/lib/auth";
+import { getServerUser, serverApiGet } from "@/shared/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Plus, Package } from "lucide-react";
@@ -6,29 +6,23 @@ import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Badge } from "@/shared/ui/badge";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
-
-async function fetchSellerProducts(token: string) {
-  try {
-    const res = await fetch(`${API_URL}/api/seller/products`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    return data.success ? data.data : [];
-  } catch {
-    return [];
-  }
+interface SellerProduct {
+  id: string;
+  title: string;
+  description: string;
+  price_paise: number;
+  category_name: string | null;
+  status: string;
+  image_url: string | null;
+  sales_count: number;
 }
 
 export default async function ProductsPage() {
-  // Auth handled by custom auth client
-  const user = await auth.getUser();
+  const user = await getServerUser();
   if (!user) redirect("/login");
 
-  const session = await auth.getSession();
-  const token = session?.token || "";
-
-  const products = await fetchSellerProducts(token);
+  const res = await serverApiGet<SellerProduct[]>("/seller/products");
+  const products = res.data ?? [];
 
   return (
     <>
@@ -65,37 +59,43 @@ export default async function ProductsPage() {
         </Card>
       ) : (
         <div className="space-y-4">
-          {products.map((product: any) => (
+          {products.map((product) => (
             <Link key={product.id} href={`/seller/products/${product.id}/edit`}>
               <Card className="border-slate-200 hover:border-slate-300 transition-colors cursor-pointer">
                 <CardContent className="p-5">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center">
-                        <Package className="w-5 h-5 text-slate-500" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-slate-950">{product.title}</h3>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge
-                            variant={product.status === "active" ? "default" : "secondary"}
-                            className={`text-[10px] ${
-                              product.status === "active"
-                                ? "bg-emerald-100 text-emerald-700 border-emerald-200"
-                                : "bg-slate-100 text-slate-600 border-slate-200"
-                            }`}
-                          >
-                            {product.status}
-                          </Badge>
-                          <span className="text-xs text-slate-500">
-                            {product.category?.name || "Uncategorized"}
-                          </span>
-                        </div>
+                  <div className="flex items-center gap-4">
+                    {/* Product image */}
+                    <div className="w-16 h-16 rounded-xl bg-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+                      {product.image_url ? (
+                        <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
+                      ) : (
+                        <Package className="w-6 h-6 text-slate-400" />
+                      )}
+                    </div>
+                    {/* Product info */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-slate-950 truncate">{product.title}</h3>
+                      <p className="text-xs text-slate-500 mt-0.5 truncate">{product.description || "No description"}</p>
+                      <div className="flex items-center gap-2 mt-1.5">
+                        <Badge
+                          variant={product.status === "active" ? "default" : "secondary"}
+                          className={`text-[10px] ${
+                            product.status === "active"
+                              ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+                              : "bg-slate-100 text-slate-600 border-slate-200"
+                          }`}
+                        >
+                          {product.status}
+                        </Badge>
+                        <span className="text-xs text-slate-500">
+                          {product.category_name || "Uncategorized"}
+                        </span>
                       </div>
                     </div>
-                    <div className="text-right">
+                    {/* Price & sales */}
+                    <div className="text-right flex-shrink-0">
                       <div className="text-lg font-bold text-slate-950">
-                        ₹{(product.price_paise / 100).toLocaleString()}
+                        INR {(product.price_paise / 100).toLocaleString()}
                       </div>
                       <div className="text-xs text-slate-500">
                         {product.sales_count || 0} sales

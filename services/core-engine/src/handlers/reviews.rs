@@ -13,7 +13,7 @@ pub async fn list_reviews(
         Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid product ID")),
     };
 
-    match sqlx::query_as::<_, Review>("SELECT * FROM reviews WHERE product_id = $1 ORDER BY created_at DESC")
+    match sqlx::query_as::<_, Review>("SELECT * FROM reviews WHERE product_id = $1 ORDER BY created_at DESC LIMIT 50")
         .bind(product_id)
         .fetch_all(pool.get_ref())
         .await
@@ -46,12 +46,13 @@ pub async fn create_review(
         return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Rating must be between 1 and 5"));
     }
 
-    // Verify the order belongs to this user and is completed
+    // Verify the order belongs to this user, is completed, and product_id matches
     match sqlx::query_scalar::<_, uuid::Uuid>(
-        "SELECT id FROM orders WHERE id = $1 AND buyer_id = $2 AND status = 'completed'"
+        "SELECT id FROM orders WHERE id = $1 AND buyer_id = $2 AND product_id = $3 AND status = 'completed'"
     )
     .bind(body.order_id)
     .bind(user_uuid)
+    .bind(body.product_id)
     .fetch_optional(pool.get_ref())
     .await
     {
@@ -64,8 +65,8 @@ pub async fn create_review(
     }
 
     match sqlx::query_as::<_, Review>(
-        r#"INSERT INTO reviews (product_id, user_id, order_id, rating, title, comment)
-           VALUES ($1, $2, $3, $4, $5, $6)
+        r#"INSERT INTO reviews (product_id, user_id, order_id, rating, title, comment, is_verified_purchase)
+           VALUES ($1, $2, $3, $4, $5, $6, true)
            RETURNING *"#
     )
     .bind(body.product_id)

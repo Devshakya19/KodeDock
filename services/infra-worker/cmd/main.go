@@ -31,9 +31,16 @@ func parseRedisURL(redisURL string) *redis.Options {
 		if port == "" {
 			port = "6379"
 		}
-		return &redis.Options{
+		opts := &redis.Options{
 			Addr: fmt.Sprintf("%s:%s", host, port),
 		}
+		// Extract password from userinfo (redis://:password@host:port)
+		if u.User != nil {
+			if password, ok := u.User.Password(); ok && password != "" {
+				opts.Password = password
+			}
+		}
+		return opts
 	}
 
 	// Handle host:port format

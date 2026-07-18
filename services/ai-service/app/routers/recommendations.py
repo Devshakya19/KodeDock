@@ -1,5 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from pydantic import BaseModel
+from app.limiter import limiter
 
 router = APIRouter()
 
@@ -10,10 +11,10 @@ class RecommendationResponse(BaseModel):
 
 
 @router.get("/{user_id}", response_model=RecommendationResponse)
-async def get_recommendations(user_id: str):
+@limiter.limit("10/minute")
+async def get_recommendations(request: Request, user_id: str):
     # TODO: Implement recommendation engine
-    # For now, return popular products
     return RecommendationResponse(
         products=[],
-        algorithm="popular"
+        algorithm="popular",
     )

@@ -63,7 +63,7 @@ export default function SellerProfilePage() {
         return;
       }
 
-      const result = await apiGet<any>(`/api/profile/${user.id}`);
+      const result = await apiGet<any>(`/profile/${user.id}`);
 
       if (result.success && result.data) {
         setFullName(result.data.full_name || user.full_name || "");
@@ -86,7 +86,7 @@ export default function SellerProfilePage() {
     const user = await auth.getUser();
     if (!user) return;
 
-    const result = await apiPut("/api/profile", {
+    const result = await apiPut("/profile", {
       id: user.id,
       full_name: fullName,
       bio,

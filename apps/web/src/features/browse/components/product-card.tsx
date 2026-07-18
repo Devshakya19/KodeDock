@@ -30,14 +30,18 @@ export function ProductCard({
   seller,
   rating,
   reviews,
+  image,
   tags = [],
 }: ProductCardProps) {
   return (
     <Link href={`/products/${id}`}>
       <Card className="group border border-slate-200 hover:border-slate-950 hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden h-full">
-        {/* Product Image Placeholder */}
-        <div className="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center relative">
-          <GithubIcon className="w-10 h-10 text-slate-400" />
+        <div className="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center relative overflow-hidden">
+          {image ? (
+            <img src={image} alt={title} className="w-full h-full object-cover" />
+          ) : (
+            <GithubIcon className="w-10 h-10 text-slate-400" />
+          )}
           <Badge
             variant="secondary"
             className="absolute top-3 left-3 text-[10px] px-2 py-0.5 bg-white/90 border border-slate-200"
@@ -57,28 +61,22 @@ export function ProductCard({
           </h3>
           <p className="text-xs text-slate-500 mt-1 line-clamp-2">{description}</p>
 
-          {/* Tags */}
           {tags.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-2">
               {tags.slice(0, 3).map((tag) => (
-                <span
-                  key={tag}
-                  className="text-[10px] px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded"
-                >
+                <span key={tag} className="text-[10px] px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded">
                   {tag}
                 </span>
               ))}
             </div>
           )}
 
-          {/* Rating */}
           <div className="flex items-center gap-1 mt-3">
             <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
             <span className="text-xs font-medium text-slate-700">{rating}</span>
             <span className="text-xs text-slate-400">({reviews})</span>
           </div>
 
-          {/* Price + Seller */}
           <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
             <div className="flex items-center gap-2">
               <span className="text-base font-bold text-slate-950">₹{price}</span>

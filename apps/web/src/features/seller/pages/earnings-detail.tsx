@@ -5,9 +5,7 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
-import { auth } from "@/shared/lib/auth";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
+import { apiGet } from "@/shared/lib/api";
 
 export default function EarningsDetailPage() {
   const router = useRouter();
@@ -18,24 +16,14 @@ export default function EarningsDetailPage() {
 
   useEffect(() => {
     async function loadStats() {
-      const user = await auth.getUser();
-      if (!user) {
-        router.push("/login");
-        return;
-      }
-
       try {
-        const session = await auth.getSession();
-        const res = await fetch(`${API_URL}/api/seller/stats`, {
-          headers: { Authorization: `Bearer ${session?.token}` },
-        });
-        const data = await res.json();
-        if (data.success) setStats(data.data);
+        const res = await apiGet<any>("/seller/stats");
+        if (res.success) setStats(res.data);
       } catch {}
       setLoading(false);
     }
     loadStats();
-  }, [router, auth]);
+  }, [router]);
 
   if (loading) {
     return (

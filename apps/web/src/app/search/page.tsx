@@ -1,4 +1,3 @@
-import { auth } from "@/shared/lib/auth";
 import Link from "next/link";
 import { Search, ArrowLeft, Package } from "lucide-react";
 import { Input } from "@/shared/ui/input";
@@ -6,19 +5,17 @@ import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Badge } from "@/shared/ui/badge";
 import { CodeHaatLogo } from "@/shared/components/codehaat-logo";
+import { serverApiGet } from "@/shared/lib/auth";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
-
-async function searchProducts(query: string, category: string, sort: string) {
+async function searchProducts(query: string, category: string, sort: string): Promise<any[]> {
   try {
     const params = new URLSearchParams();
     if (query) params.set("search", query);
     if (category) params.set("category", category);
     if (sort) params.set("sort", sort);
 
-    const res = await fetch(`${API_URL}/api/products?${params.toString()}`);
-    const data = await res.json();
-    return data.success ? data.data : [];
+    const res = await serverApiGet<any[]>(`/products?${params.toString()}`);
+    return res.data ?? [];
   } catch {
     return [];
   }

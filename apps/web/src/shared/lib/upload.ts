@@ -1,6 +1,11 @@
-import { auth } from "@/shared/lib/auth";
+/**
+ * File upload — presign request goes through the proxy (needs auth cookie).
+ *
+ * The actual file PUT goes through a Next.js API route proxy that forwards
+ * to SeaweedFS internally. This avoids exposing SeaweedFS to the browser.
+ */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
+const PROXY_BASE = "/api/proxy";
 
 interface PresignResponse {
   upload_url: string;
@@ -24,15 +29,13 @@ export async function uploadFile(
     throw new Error("File must be less than 5MB");
   }
 
-  const session = await auth.getSession();
-  if (!session) throw new Error("Not authenticated");
-
-  const presignRes = await fetch(`${API_URL}/api/upload/presign`, {
+  // Step 1: Get presigned URL via proxy (small JSON, cookie auth)
+  const presignRes = await fetch(`${PROXY_BASE}/upload/presign`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${session.token}`,
     },
+    credentials: "include",
     body: JSON.stringify({
       filename: file.name,
       content_type: file.type,
@@ -49,9 +52,11 @@ export async function uploadFile(
     throw new Error(presignData.error || "Failed to get upload URL");
   }
 
-  const { upload_url, public_url }: PresignResponse = presignData.data;
+  const { upload_url, public_url, key }: PresignResponse = presignData.data;
 
-  const uploadRes = await fetch(upload_url, {
+  // Step 2: Upload file through Next.js proxy to SeaweedFS
+  // The proxy rewrites localhost:8333 → seaweedfs:8333 (Docker internal)
+  const uploadRes = await fetch(`/api/upload/file?url=${encodeURIComponent(upload_url)}`, {
     method: "PUT",
     headers: {
       "Content-Type": file.type,
@@ -60,8 +65,9 @@ export async function uploadFile(
   });
 
   if (!uploadRes.ok) {
-    throw new Error("Failed to upload file");
+    const errData = await uploadRes.json().catch(() => ({ error: "Upload failed" }));
+    throw new Error(errData.error || "Failed to upload file");
   }
 
-  return { public_url, key: presignData.data.key };
+  return { public_url, key };
 }

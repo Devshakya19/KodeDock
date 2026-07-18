@@ -18,7 +18,7 @@ pub async fn list_notifications(
         Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID")),
     };
 
-    match sqlx::query_as::<_, Notification>("SELECT * FROM notifications WHERE user_id = $1 ORDER BY created_at DESC")
+    match sqlx::query_as::<_, Notification>("SELECT * FROM notifications WHERE user_id = $1 ORDER BY created_at DESC LIMIT 50")
         .bind(user_uuid)
         .fetch_all(pool.get_ref())
         .await

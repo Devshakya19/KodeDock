@@ -8,6 +8,7 @@ import { Input } from "@/shared/ui/input";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Badge } from "@/shared/ui/badge";
 import { auth } from "@/shared/lib/auth";
+import { apiPost, apiDelete } from "@/shared/lib/api";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function SettingsPage() {
   const [error, setError] = useState("");
 
   const [email, setEmail] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -50,20 +52,45 @@ export default function SettingsPage() {
       return;
     }
 
-    // TODO: Implement password update via backend
-    setSuccess("Password updated successfully");
-    setNewPassword("");
-    setConfirmPassword("");
-    setTimeout(() => setSuccess(""), 3000);
-    setSaving(false);
+    try {
+      const result = await apiPost("/auth/change-password", {
+        current_password: currentPassword,
+        new_password: newPassword,
+      });
+
+      if (result.success) {
+        setSuccess("Password updated successfully");
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+        setTimeout(() => setSuccess(""), 3000);
+      } else {
+        setError(result.error || "Failed to update password");
+      }
+    } catch {
+      setError("Network error");
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function handleDeleteAccount() {
     if (!confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
       return;
     }
-    // TODO: Implement account deletion via backend
-    alert("Account deletion will be implemented via backend");
+
+    try {
+      const result = await apiDelete("/auth/delete-account");
+      if (result.success) {
+        // signOut may fail after account deletion — don't block redirect
+        try { await auth.signOut(); } catch {}
+        window.location.replace("/login");
+      } else {
+        alert(result.error || "Failed to delete account");
+      }
+    } catch {
+      alert("Network error");
+    }
   }
 
   if (loading) {
@@ -122,6 +149,21 @@ export default function SettingsPage() {
 
             <form onSubmit={handlePasswordChange} className="space-y-4">
               <div>
+                <label htmlFor="currentPassword" className="block text-sm font-medium text-slate-700 mb-1.5">
+                  Current Password
+                </label>
+                <Input
+                  id="currentPassword"
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="Enter current password"
+                  required
+                  className="h-11 border-slate-300 bg-white"
+                />
+              </div>
+
+              <div>
                 <label htmlFor="newPassword" className="block text-sm font-medium text-slate-700 mb-1.5">
                   New Password
                 </label>
@@ -131,6 +173,7 @@ export default function SettingsPage() {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Enter new password"
+                  required
                   className="h-11 border-slate-300 bg-white"
                 />
               </div>
@@ -145,6 +188,7 @@ export default function SettingsPage() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm new password"
+                  required
                   className="h-11 border-slate-300 bg-white"
                 />
               </div>

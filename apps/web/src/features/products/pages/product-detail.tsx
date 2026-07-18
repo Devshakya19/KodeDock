@@ -12,6 +12,9 @@ import {
   Clock,
   Eye,
   Loader2,
+  Shield,
+  Zap,
+  Users,
 } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
@@ -27,17 +30,16 @@ interface Product {
   long_description: string;
   price_paise: number;
   original_price_paise: number | null;
-  category: { name: string } | null;
-  seller: { full_name: string; avatar_url: string | null; github_username: string | null } | null;
+  category_name: string | null;
+  seller_id: string;
   tags: string[];
   tech_stack: string[];
   status: string;
-  github_repo_url: string | null;
   image_url: string | null;
   demo_url: string | null;
   sales_count: number;
   view_count: number;
-  rating: number;
+  rating: string | number;
   review_count: number;
   created_at: string;
 }
@@ -51,35 +53,66 @@ interface Review {
   created_at: string;
 }
 
+interface SellerProfile {
+  id: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  github_username: string | null;
+  bio: string | null;
+}
+
+function StarRating({ rating, size = "w-4 h-4" }: { rating: number; size?: string }) {
+  return (
+    <div className="flex gap-0.5">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <Star
+          key={i}
+          className={`${size} ${
+            i < Math.round(rating)
+              ? "fill-amber-400 text-amber-400"
+              : "text-slate-200"
+          }`}
+        />
+      ))}
+    </div>
+  );
+}
+
 export default function ProductDetailPage() {
   const params = useParams();
   const router = useRouter();
   const [product, setProduct] = useState<Product | null>(null);
+  const [seller, setSeller] = useState<SellerProfile | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [buying, setBuying] = useState(false);
   const [error, setError] = useState("");
 
-  // Auth handled by custom auth client
   const productId = params.id as string;
 
   useEffect(() => {
     async function loadProduct() {
       try {
-        // Fetch product from backend API
-        const productResult = await apiGet<Product>(`/api/products/${productId}`);
+        const productResult = await apiGet<Product>(`/products/${productId}`);
         if (productResult.success && productResult.data) {
           setProduct(productResult.data);
+
+          // Fetch seller profile
+          if (productResult.data.seller_id) {
+            const sellerResult = await apiGet<SellerProfile>(`/profile/${productResult.data.seller_id}`);
+            if (sellerResult.success && sellerResult.data) {
+              setSeller(sellerResult.data);
+            }
+          }
         } else {
           setError("Product not found");
           setLoading(false);
           return;
         }
 
-        // Fetch reviews from backend API
-        const reviewsResult = await apiGet<Review[]>(`/api/reviews/${productId}`);
-        setReviews(reviewsResult.data || []);
-      } catch (err) {
+        const reviewsResult = await apiGet<Review[]>(`/reviews/${productId}`);
+        setReviews(reviewsResult.data ?? []);
+      } catch {
         setError("Failed to load product");
       } finally {
         setLoading(false);
@@ -92,16 +125,14 @@ export default function ProductDetailPage() {
   async function handleBuy() {
     setBuying(true);
     setError("");
-
     try {
-      const session = await auth.getSession();
-      if (!session) {
+      const user = await auth.getUser();
+      if (!user) {
         router.push("/login");
         return;
       }
-
       router.push(`/checkout?product_id=${productId}`);
-    } catch (err) {
+    } catch {
       setError("Failed to process purchase");
     } finally {
       setBuying(false);
@@ -133,197 +164,92 @@ export default function ProductDetailPage() {
   const price = product.price_paise / 100;
   const originalPrice = product.original_price_paise ? product.original_price_paise / 100 : null;
   const discount = originalPrice ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0;
+  const ratingNum = typeof product.rating === "string" ? parseFloat(product.rating) : product.rating;
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center">
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <header className="border-b border-slate-200 bg-white sticky top-0 z-10">
+        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Link href="/browse" className="flex items-center gap-2 text-slate-600 hover:text-slate-950 transition-colors">
             <ArrowLeft className="w-4 h-4" />
             <span className="text-sm font-medium">Back to Browse</span>
           </Link>
+          <div className="flex items-center gap-2 text-sm text-slate-500">
+            <Eye className="w-4 h-4" />
+            <span>{product.view_count} views</span>
+          </div>
         </nav>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Left: Product Info */}
-          <div className="lg:col-span-2 space-y-6">
-            <div className="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl flex items-center justify-center relative overflow-hidden">
-              <GithubIcon className="w-16 h-16 text-slate-400" />
+        {/* Image + Purchase Section */}
+        <div className="grid lg:grid-cols-5 gap-8 mb-10">
+          {/* Image (3 cols) */}
+          <div className="lg:col-span-3">
+            <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 shadow-lg">
+              {product.image_url ? (
+                <img
+                  src={product.image_url}
+                  alt={product.title}
+                  className="w-full aspect-video object-cover"
+                />
+              ) : (
+                <div className="aspect-video flex items-center justify-center">
+                  <GithubIcon className="w-20 h-20 text-slate-300" />
+                </div>
+              )}
               {discount > 0 && (
-                <Badge className="absolute top-4 right-4 bg-emerald-500 text-white border-0">
+                <Badge className="absolute top-4 right-4 bg-emerald-500 text-white border-0 text-sm px-3 py-1">
                   {discount}% OFF
                 </Badge>
               )}
             </div>
-
-            <div>
-              <Badge variant="secondary" className="mb-2 bg-slate-100 border-slate-200 text-slate-700">
-                {product.category?.name || "Uncategorized"}
-              </Badge>
-              <h1 className="text-2xl sm:text-3xl font-bold text-slate-950">{product.title}</h1>
-            </div>
-
-            <div>
-              <h2 className="text-lg font-semibold text-slate-950 mb-2">Description</h2>
-              <p className="text-slate-600 leading-relaxed">
-                {product.description || "No description available."}
-              </p>
-            </div>
-
-            {product.long_description && (
-              <div>
-                <h2 className="text-lg font-semibold text-slate-950 mb-2">Details</h2>
-                <div className="text-slate-600 leading-relaxed whitespace-pre-wrap">
-                  {product.long_description}
-                </div>
-              </div>
-            )}
-
-            {product.tags && product.tags.length > 0 && (
-              <div>
-                <h2 className="text-lg font-semibold text-slate-950 mb-2">Tags</h2>
-                <div className="flex flex-wrap gap-2">
-                  {product.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="bg-slate-100 border-slate-200 text-slate-700">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {product.tech_stack && product.tech_stack.length > 0 && (
-              <div>
-                <h2 className="text-lg font-semibold text-slate-950 mb-2">Tech Stack</h2>
-                <div className="flex flex-wrap gap-2">
-                  {product.tech_stack.map((tech) => (
-                    <Badge key={tech} variant="secondary" className="bg-blue-50 border-blue-200 text-blue-700">
-                      {tech}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div>
-              <h2 className="text-lg font-semibold text-slate-950 mb-4">
-                Reviews ({product.review_count})
-              </h2>
-              {reviews.length === 0 ? (
-                <p className="text-slate-500 text-sm">No reviews yet.</p>
-              ) : (
-                <div className="space-y-4">
-                  {reviews.map((review) => (
-                    <Card key={review.id} className="border-slate-200">
-                      <CardContent className="p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="flex gap-0.5">
-                            {Array.from({ length: 5 }).map((_, i) => (
-                              <Star
-                                key={i}
-                                className={`w-3.5 h-3.5 ${
-                                  i < review.rating
-                                    ? "fill-amber-400 text-amber-400"
-                                    : "text-slate-300"
-                                }`}
-                              />
-                            ))}
-                          </div>
-                          <span className="text-xs text-slate-500">
-                            {new Date(review.created_at).toLocaleDateString("en-IN")}
-                          </span>
-                        </div>
-                        {review.title && (
-                          <h4 className="text-sm font-semibold text-slate-950 mb-1">{review.title}</h4>
-                        )}
-                        <p className="text-sm text-slate-600">{review.comment}</p>
-                        <div className="mt-2 text-xs text-slate-500">
-                          by {review.user?.full_name || "Anonymous"}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
 
-          {/* Right: Purchase Card */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-24">
-              <Card className="border-slate-200">
-                <CardContent className="p-6">
-                  <div className="mb-4">
-                    <div className="flex items-baseline gap-3">
-                      <span className="text-3xl font-bold text-slate-950">₹{price.toLocaleString()}</span>
-                      {originalPrice && (
-                        <span className="text-lg text-slate-400 line-through">₹{originalPrice.toLocaleString()}</span>
-                      )}
-                    </div>
-                    {discount > 0 && (
-                      <p className="text-sm text-emerald-600 font-medium mt-1">
-                        {discount}% off — Save ₹{(originalPrice! - price).toLocaleString()}
-                      </p>
+          {/* Purchase Card (2 cols) */}
+          <div className="lg:col-span-2">
+            <div className="sticky top-24 space-y-5">
+              {/* Category */}
+              <Badge variant="secondary" className="bg-slate-100 border-slate-200 text-slate-700 text-xs px-3 py-1">
+                {product.category_name || "Uncategorized"}
+              </Badge>
+
+              {/* Title */}
+              <h1 className="text-2xl sm:text-3xl font-bold text-slate-950 leading-tight">
+                {product.title}
+              </h1>
+
+              {/* Rating + Stats */}
+              <div className="flex items-center gap-3">
+                <StarRating rating={ratingNum} />
+                <span className="text-sm font-medium text-slate-900">{ratingNum.toFixed(1)}</span>
+                <span className="text-sm text-slate-400">({product.review_count} reviews)</span>
+                <span className="text-slate-300">|</span>
+                <span className="text-sm text-slate-500 flex items-center gap-1">
+                  <ShoppingCart className="w-3.5 h-3.5" /> {product.sales_count} sales
+                </span>
+              </div>
+
+              {/* Price */}
+              <Card className="border-slate-200 bg-slate-50">
+                <CardContent className="p-5">
+                  <div className="flex items-baseline gap-3 mb-1">
+                    <span className="text-3xl font-bold text-slate-950">₹{price.toLocaleString()}</span>
+                    {originalPrice && (
+                      <span className="text-lg text-slate-400 line-through">₹{originalPrice.toLocaleString()}</span>
                     )}
                   </div>
-
-                  <div className="flex items-center gap-3 mb-4 pb-4 border-b border-slate-200">
-                    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-700">
-                      {product.seller?.avatar_url ? (
-                        <img src={product.seller.avatar_url} alt="" className="w-10 h-10 rounded-full object-cover" />
-                      ) : (
-                        product.seller?.full_name?.[0]?.toUpperCase() || "S"
-                      )}
-                    </div>
-                    <div>
-                      <div className="text-sm font-medium text-slate-950">{product.seller?.full_name || "Seller"}</div>
-                      {product.seller?.github_username && (
-                        <a
-                          href={`https://github.com/${product.seller.github_username}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-slate-500 hover:text-slate-700 flex items-center gap-1"
-                        >
-                          <GithubIcon className="w-3 h-3" />@{product.seller.github_username}
-                        </a>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 mb-4 pb-4 border-b border-slate-200">
-                    <div className="flex gap-0.5">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`w-4 h-4 ${
-                            i < Math.round(product.rating)
-                              ? "fill-amber-400 text-amber-400"
-                              : "text-slate-300"
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-sm font-medium text-slate-950">{product.rating.toFixed(1)}</span>
-                    <span className="text-sm text-slate-500">({product.review_count} reviews)</span>
-                  </div>
-
-                  <div className="flex items-center gap-4 mb-4 pb-4 border-b border-slate-200 text-sm text-slate-500">
-                    <div className="flex items-center gap-1">
-                      <ShoppingCart className="w-4 h-4" />
-                      <span>{product.sales_count} sales</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Eye className="w-4 h-4" />
-                      <span>{product.view_count} views</span>
-                    </div>
-                  </div>
+                  {discount > 0 && (
+                    <p className="text-sm text-emerald-600 font-medium">
+                      Save ₹{(originalPrice! - price).toLocaleString()} ({discount}% off)
+                    </p>
+                  )}
 
                   <Button
                     onClick={handleBuy}
                     disabled={buying}
-                    className="w-full h-12 bg-slate-950 text-white hover:bg-slate-800 text-base font-semibold"
+                    className="w-full h-12 mt-4 bg-slate-950 text-white hover:bg-slate-800 text-base font-semibold rounded-xl"
                   >
                     {buying ? (
                       <Loader2 className="w-5 h-5 animate-spin" />
@@ -335,40 +261,155 @@ export default function ProductDetailPage() {
                     )}
                   </Button>
 
-                  {product.github_repo_url && (
-                    <a
-                      href={product.github_repo_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-3 w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
-                    >
-                      <GithubIcon className="w-4 h-4" />
-                      View on GitHub
-                      <ExternalLink className="w-3 h-3" />
-                    </a>
-                  )}
-
-                  {product.demo_url && (
-                    <a
-                      href={product.demo_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      Live Demo
-                    </a>
-                  )}
-
-                  <div className="mt-4 pt-4 border-t border-slate-200 text-xs text-slate-500 space-y-1">
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      Listed {new Date(product.created_at).toLocaleDateString("en-IN")}
-                    </div>
+                  <div className="flex items-center gap-2 mt-3 justify-center text-xs text-slate-500">
+                    <Shield className="w-3.5 h-3.5" />
+                    <span>Secure payment via Razorpay</span>
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Seller Info */}
+              <Card className="border-slate-200">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <Link href={`/sellers/${product.seller_id}`} className="flex items-center gap-3 flex-1 hover:opacity-80 transition-opacity">
+                      <div className="w-10 h-10 rounded-full bg-slate-950 flex items-center justify-center text-sm font-bold text-white overflow-hidden flex-shrink-0">
+                        {seller?.avatar_url ? (
+                          <img src={seller.avatar_url} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          seller?.full_name?.[0]?.toUpperCase() || "S"
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium text-slate-950 truncate">{seller?.full_name || "Seller"}</div>
+                        {seller?.github_username && (
+                          <div className="text-xs text-slate-500 flex items-center gap-1">
+                            <GithubIcon className="w-3 h-3" />@{seller.github_username}
+                          </div>
+                        )}
+                      </div>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Quick Info */}
+              <div className="grid grid-cols-3 gap-3">
+                <div className="text-center p-3 rounded-xl bg-slate-50">
+                  <div className="text-lg font-bold text-slate-950">{product.sales_count}</div>
+                  <div className="text-xs text-slate-500">Sales</div>
+                </div>
+                <div className="text-center p-3 rounded-xl bg-slate-50">
+                  <div className="text-lg font-bold text-slate-950">{product.view_count}</div>
+                  <div className="text-xs text-slate-500">Views</div>
+                </div>
+                <div className="text-center p-3 rounded-xl bg-slate-50">
+                  <div className="text-lg font-bold text-slate-950">{product.review_count}</div>
+                  <div className="text-xs text-slate-500">Reviews</div>
+                </div>
+              </div>
+
+              {product.demo_url && (
+                <a
+                  href={product.demo_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-700 border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors w-full"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  Live Demo
+                </a>
+              )}
             </div>
+          </div>
+        </div>
+
+        {/* Details Section */}
+        <div className="grid lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-8">
+            {/* Description */}
+            <section>
+              <h2 className="text-xl font-bold text-slate-950 mb-3">Description</h2>
+              <p className="text-slate-600 leading-relaxed text-sm">
+                {product.description || "No description available."}
+              </p>
+            </section>
+
+            {product.long_description && (
+              <section>
+                <h2 className="text-xl font-bold text-slate-950 mb-3">Details</h2>
+                <div className="text-slate-600 leading-relaxed text-sm whitespace-pre-wrap bg-slate-50 rounded-xl p-5">
+                  {product.long_description}
+                </div>
+              </section>
+            )}
+
+            {/* Tags */}
+            {product.tags && product.tags.length > 0 && (
+              <section>
+                <h2 className="text-xl font-bold text-slate-950 mb-3">Tags</h2>
+                <div className="flex flex-wrap gap-2">
+                  {product.tags.map((tag) => (
+                    <Badge key={tag} variant="secondary" className="bg-slate-100 border-slate-200 text-slate-700 px-3 py-1">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Tech Stack */}
+            {product.tech_stack && product.tech_stack.length > 0 && (
+              <section>
+                <h2 className="text-xl font-bold text-slate-950 mb-3">Tech Stack</h2>
+                <div className="flex flex-wrap gap-2">
+                  {product.tech_stack.map((tech) => (
+                    <Badge key={tech} variant="secondary" className="bg-blue-50 border-blue-200 text-blue-700 px-3 py-1">
+                      {tech}
+                    </Badge>
+                  ))}
+                </div>
+              </section>
+            )}
+          </div>
+
+          {/* Reviews Sidebar */}
+          <div className="lg:col-span-1">
+            <section>
+              <h2 className="text-xl font-bold text-slate-950 mb-4">
+                Reviews ({product.review_count})
+              </h2>
+              {reviews.length === 0 ? (
+                <Card className="border-slate-200">
+                  <CardContent className="p-8 text-center">
+                    <Star className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                    <p className="text-sm text-slate-500">No reviews yet. Be the first to review!</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-4">
+                  {reviews.map((review) => (
+                    <Card key={review.id} className="border-slate-200">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <StarRating rating={review.rating} size="w-3.5 h-3.5" />
+                          <span className="text-xs text-slate-400">
+                            {new Date(review.created_at).toLocaleDateString("en-IN")}
+                          </span>
+                        </div>
+                        {review.title && (
+                          <h4 className="text-sm font-semibold text-slate-950 mb-1">{review.title}</h4>
+                        )}
+                        <p className="text-sm text-slate-600">{review.comment}</p>
+                        <div className="mt-2 text-xs text-slate-400">
+                          — {review.user?.full_name || "Anonymous"}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </section>
           </div>
         </div>
       </main>

@@ -18,9 +18,16 @@ jsonwebtoken = "9"
 thiserror = "2"
 env_logger = "0.11"
 log = "0.4"
-sqlx = { version = "0.8", features = ["runtime-tokio", "postgres", "uuid", "chrono"] }
+sqlx = { version = "0.8", features = ["runtime-tokio", "postgres", "uuid", "chrono", "rust_decimal"] }
+rust_decimal = { version = "1", features = ["serde-with-str"] }
 argon2 = "0.5"
 rand = "0.8"
 aws-sdk-s3 = "1"
 aws-credential-types = "1"
 aws-types = "1"
+# Payment + crypto (Razorpay signature verification)
+hmac = "0.12"
+sha2 = "0.10"
+hex = "0.4"
+# Rate limiting (X-Forwarded-For aware via SmartIpKeyExtractor)
+actix-governor = "0.7"

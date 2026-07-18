@@ -1,0 +1,14 @@
+{
+  "identities": [
+    {
+      "name": "codehaat",
+      "credentials": [
+        {
+          "accessKey": "REPLACE_WITH_YOUR_ACCESS_KEY",
+          "secretKey": "REPLACE_WITH_YOUR_SECRET_KEY"
+        }
+      ],
+      "actions": ["Read", "List", "Write", "Tagging"]
+    }
+  ]
+}

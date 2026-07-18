@@ -65,7 +65,7 @@ export default function ProfilePage() {
       setUserId(user.id);
 
       // Fetch profile from backend API
-      const result = await apiGet<any>(`/api/profile/${user.id}`);
+      const result = await apiGet<any>(`/profile/${user.id}`);
 
       if (result.success && result.data) {
         setFullName(result.data.full_name || user.full_name || "");
@@ -89,7 +89,7 @@ export default function ProfilePage() {
     setSaving(true);
     setError("");
 
-    const result = await apiPut("/api/profile", {
+    const result = await apiPut("/profile", {
       id: userId,
       full_name: fullName,
       bio,

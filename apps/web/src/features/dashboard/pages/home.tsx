@@ -1,49 +1,22 @@
-import { auth } from "@/shared/lib/auth";
+import { getServerUser } from "@/shared/lib/auth";
+import { serverApiGet } from "@/shared/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ShoppingCart, Package, Clock, ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
-
-async function fetchProfile(userId: string, token: string) {
-  try {
-    const res = await fetch(`${API_URL}/api/profile/${userId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    return data.success ? data.data : null;
-  } catch {
-    return null;
-  }
-}
-
-async function fetchOrders(userId: string, token: string) {
-  try {
-    const res = await fetch(`${API_URL}/api/orders?buyer_id=${userId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    return data.success ? data.data : [];
-  } catch {
-    return [];
-  }
-}
-
 export default async function DashboardHomePage() {
   // Auth handled by custom auth client
-  const user = await auth.getUser();
+  const user = await getServerUser();
   if (!user) redirect("/login");
 
-  const session = await auth.getSession();
-  const token = session?.token || "";
-
-  // Fetch data from backend API
-  const [profile, orders] = await Promise.all([
-    fetchProfile(user.id, token),
-    fetchOrders(user.id, token),
+  const [profileRes, ordersRes] = await Promise.all([
+    serverApiGet<any>(`/profile/${user.id}`),
+    serverApiGet<any[]>(`/orders?buyer_id=${user.id}`),
   ]);
+  const profile = profileRes.success ? profileRes.data : null;
+  const orders = ordersRes.success ? ordersRes.data : [];
 
   const fullName = profile?.full_name || user.full_name || "";
   const shortName = fullName ? fullName.split(" ")[0] : "there";

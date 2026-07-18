@@ -17,7 +17,7 @@ import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Badge } from "@/shared/ui/badge";
-import { auth } from "@/shared/lib/auth";
+import { apiPost } from "@/shared/lib/api";
 import { uploadFile } from "@/shared/lib/upload";
 
 const CATEGORIES = [
@@ -47,34 +47,33 @@ export default function NewProductPage() {
   const [imageUrl, setImageUrl] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  // Handle image selection
   async function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith("image/")) {
       setError("Please select an image file");
       return;
     }
-
-    // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       setError("Image must be less than 5MB");
       return;
     }
 
-    // Show local preview immediately
+    // Revoke previous preview URL to prevent memory leak
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
+
     const previewUrl = URL.createObjectURL(file);
     setImagePreview(previewUrl);
 
-    // Upload to SeaweedFS in background
     setUploading(true);
     setError("");
     try {
       const result = await uploadFile(file, "product");
       setImageUrl(result.public_url);
-    } catch (err) {
+    } catch {
       setError("Failed to upload image. Please try again.");
       setImagePreview(null);
       setImageUrl("");
@@ -83,8 +82,10 @@ export default function NewProductPage() {
     }
   }
 
-  // Remove image
   function handleRemoveImage() {
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
     setImagePreview(null);
     setImageUrl("");
     if (fileInputRef.current) {
@@ -97,34 +98,23 @@ export default function NewProductPage() {
     setLoading(true);
     setError("");
 
+    const pricePaise = Math.round(parseFloat(price) * 100);
+    if (isNaN(pricePaise) || pricePaise < 4900) {
+      setError("Price must be at least ₹49");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const session = await auth.getSession();
-
-      if (!session) {
-        setError("You must be logged in to create a product");
-        setLoading(false);
-        return;
-      }
-
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
-      const response = await fetch(`${apiUrl}/api/seller/products`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${session.token}`,
-        },
-        body: JSON.stringify({
-          title,
-          description,
-          price_paise: Math.round(parseFloat(price) * 100),
-          category_id: category || undefined,
-          github_repo_url: githubUrl || undefined,
-          image_url: imageUrl || undefined,
-          tags: tags ? tags.split(",").map((t) => t.trim()) : [],
-        }),
+      const result = await apiPost("/seller/products", {
+        title,
+        description,
+        price_paise: pricePaise,
+        category_id: category || undefined,
+        github_repo_url: githubUrl || undefined,
+        image_url: imageUrl || undefined,
+        tags: tags ? tags.split(",").map((t) => t.trim()).filter(Boolean) : [],
       });
-
-      const result = await response.json();
 
       if (result.success) {
         setSuccess(true);
@@ -132,7 +122,7 @@ export default function NewProductPage() {
       } else {
         setError(result.error || "Failed to create product");
       }
-    } catch (err) {
+    } catch {
       setError("Network error. Please try again.");
     } finally {
       setLoading(false);
@@ -170,7 +160,6 @@ export default function NewProductPage() {
       </div>
 
       <div className="grid lg:grid-cols-5 gap-8">
-        {/* Left: Form (3 cols) */}
         <div className="lg:col-span-3">
           <Card className="border-slate-200">
             <CardContent className="p-8">
@@ -232,6 +221,7 @@ export default function NewProductPage() {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     required
+                    maxLength={200}
                     className="h-11 border-slate-300 bg-white"
                   />
                 </div>
@@ -248,6 +238,7 @@ export default function NewProductPage() {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     required
+                    maxLength={5000}
                     className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-400"
                   />
                 </div>
@@ -256,7 +247,7 @@ export default function NewProductPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="price" className="block text-sm font-medium text-slate-700 mb-1.5">
-                      Price (₹)
+                      Price (INR)
                     </label>
                     <Input
                       id="price"
@@ -268,7 +259,7 @@ export default function NewProductPage() {
                       min="49"
                       className="h-11 border-slate-300 bg-white"
                     />
-                    <p className="text-xs text-slate-500 mt-1">Minimum ₹49. You keep 97.5%.</p>
+                    <p className="text-xs text-slate-500 mt-1">Minimum INR 49. You keep 97.5%.</p>
                   </div>
 
                   <div>
@@ -321,6 +312,7 @@ export default function NewProductPage() {
                     placeholder="React, Next.js, TypeScript (comma separated)"
                     value={tags}
                     onChange={(e) => setTags(e.target.value)}
+                    maxLength={500}
                     className="h-11 border-slate-300 bg-white"
                   />
                 </div>
@@ -348,7 +340,7 @@ export default function NewProductPage() {
           </Card>
         </div>
 
-        {/* Right: Live Preview (2 cols) */}
+        {/* Right: Live Preview */}
         <div className="lg:col-span-2">
           <div className="sticky top-24">
             <div className="flex items-center gap-2 mb-4">
@@ -360,26 +352,18 @@ export default function NewProductPage() {
             </div>
 
             <Card className="border-slate-200 overflow-hidden">
-              {/* Image Preview */}
               <div className="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center relative">
                 {imagePreview ? (
-                  <img
-                    src={imagePreview}
-                    alt="Product preview"
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={imagePreview} alt="Product preview" className="w-full h-full object-cover" />
                 ) : (
                   <GithubIcon className="w-10 h-10 text-slate-400" />
                 )}
                 {category && (
-                  <Badge
-                    variant="secondary"
-                    className="absolute top-3 left-3 text-[10px] px-2 py-0.5 bg-white/90 border border-slate-200"
-                  >
+                  <Badge variant="secondary" className="absolute top-3 left-3 text-[10px] px-2 py-0.5 bg-white/90 border border-slate-200">
                     {category}
                   </Badge>
                 )}
-                {price && parseInt(price) >= 49 && (
+                {price && parseFloat(price) >= 49 && (
                   <Badge className="absolute top-3 right-3 text-[10px] px-2 py-0.5 bg-emerald-500 text-white border-0">
                     Live
                   </Badge>
@@ -387,50 +371,40 @@ export default function NewProductPage() {
               </div>
 
               <CardContent className="p-4">
-                {/* Title */}
                 <h3 className="font-semibold text-slate-950 text-sm leading-snug line-clamp-2">
                   {title || "Product Title"}
                 </h3>
-
-                {/* Description */}
                 <p className="text-xs text-slate-500 mt-1 line-clamp-2">
                   {description || "Product description will appear here..."}
                 </p>
 
-                {/* Tags */}
                 {tags && (
                   <div className="flex flex-wrap gap-1 mt-2">
                     {tags.split(",").filter(t => t.trim()).slice(0, 3).map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-[10px] px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded"
-                      >
+                      <span key={tag} className="text-[10px] px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded">
                         {tag.trim()}
                       </span>
                     ))}
                   </div>
                 )}
 
-                {/* Rating Placeholder */}
                 <div className="flex items-center gap-1 mt-3">
                   <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                   <span className="text-xs font-medium text-slate-700">0.0</span>
                   <span className="text-xs text-slate-400">(0)</span>
                 </div>
 
-                {/* Price + Seller */}
                 <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
-                  <div className="flex items-center gap-2">
-                    <span className="text-base font-bold text-slate-950">
-                      {price ? `₹${parseInt(price).toLocaleString()}` : "₹0"}
-                    </span>
-                  </div>
+                  <span className="text-base font-bold text-slate-950">
+                    {price && !isNaN(parseFloat(price)) && parseFloat(price) >= 49
+                      ? `INR ${parseFloat(price).toLocaleString()}`
+                      : "INR 0"}
+                  </span>
                   <span className="text-[11px] text-slate-500">by You</span>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Preview Info */}
             <p className="text-xs text-slate-400 mt-3 text-center">
               This is how your product will appear to buyers on the marketplace.
             </p>

@@ -6,6 +6,7 @@ import { Loader2, CheckCircle } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Card, CardContent } from "@/shared/ui/card";
+import { apiPost } from "@/shared/lib/api";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -19,21 +20,14 @@ export default function ForgotPasswordPage() {
     setError("");
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
-      const response = await fetch(`${apiUrl}/api/auth/forgot-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-
-      const result = await response.json();
+      const result = await apiPost("/auth/forgot-password", { email });
 
       if (result.success) {
         setSuccess(true);
       } else {
         setError(result.error || "Failed to send reset link");
       }
-    } catch (err) {
+    } catch {
       setError("Network error. Please try again.");
     } finally {
       setLoading(false);

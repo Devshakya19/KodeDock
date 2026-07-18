@@ -8,7 +8,7 @@
           "secretKey": "codehaat_seaweed_secret"
         }
       ],
-      "actions": ["Read", "List", "Write", "Tagging"]
+      "actions": ["Read", "List", "Write", "Tagging", "CreateBucket"]
     }
   ]
 }

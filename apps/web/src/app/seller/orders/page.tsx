@@ -1,31 +1,17 @@
-import { auth } from "@/shared/lib/auth";
+import { getServerUser } from "@/shared/lib/auth";
+import { serverApiGet } from "@/shared/lib/auth";
 import { redirect } from "next/navigation";
 import { Package } from "lucide-react";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Badge } from "@/shared/ui/badge";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
-
-async function fetchSellerOrders(token: string, sellerId: string) {
-  try {
-    const res = await fetch(`${API_URL}/api/orders?seller_id=${sellerId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    return data.success ? data.data : [];
-  } catch {
-    return [];
-  }
-}
-
 export default async function SellerOrdersPage() {
   // Auth handled by custom auth client
-  const user = await auth.getUser();
+  const user = await getServerUser();
   if (!user) redirect("/login");
 
-  const session = await auth.getSession();
-  const token = session?.token || "";
-  const orders = await fetchSellerOrders(token, user.id);
+  const res = await serverApiGet<any[]>(`/orders?seller_id=${user.id}`);
+  const orders = res.data ?? [];
 
   const completedOrders = orders.filter((o: any) => o.status === "completed");
   const totalRevenue = completedOrders.reduce((sum: number, o: any) => sum + o.seller_amount_paise, 0);

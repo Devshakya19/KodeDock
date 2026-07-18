@@ -8,6 +8,8 @@ pub struct StorageClient {
     pub client: Client,
     pub bucket: String,
     pub public_url_base: String,
+    /// Internal Docker endpoint (e.g. http://seaweedfs:8333) — NOT accessible from browser
+    s3_endpoint: String,
 }
 
 impl Clone for StorageClient {
@@ -16,6 +18,7 @@ impl Clone for StorageClient {
             client: self.client.clone(),
             bucket: self.bucket.clone(),
             public_url_base: self.public_url_base.clone(),
+            s3_endpoint: self.s3_endpoint.clone(),
         }
     }
 }
@@ -49,7 +52,7 @@ impl StorageClient {
         let public_url_base = env::var("S3_PUBLIC_URL")
             .expect("S3_PUBLIC_URL must be set");
 
-        Self { client, bucket, public_url_base }
+        Self { client, bucket, public_url_base, s3_endpoint: endpoint }
     }
 
     pub async fn presign_put(
@@ -71,6 +74,9 @@ impl StorageClient {
             .await
             .map_err(|e| format!("Failed to presign: {}", e))?;
 
+        // Return presigned URL as-is (with internal Docker hostname).
+        // The Next.js upload proxy (/api/upload/file) rewrites localhost → seaweedfs
+        // internally, keeping the browser from needing direct SeaweedFS access.
         Ok(request.uri().to_string())
     }
 
@@ -86,8 +92,22 @@ impl StorageClient {
     }
 
     pub fn extract_key_from_url(&self, url: &str) -> Option<String> {
-        let prefix = format!("{}/", self.public_url_base);
-        url.strip_prefix(&prefix).map(|k| k.to_string())
+        // Handle new format: /api/images/products/uuid.jpg
+        let new_prefix = format!("{}/", self.public_url_base);
+        if let Some(key) = url.strip_prefix(&new_prefix) {
+            return Some(key.to_string());
+        }
+        // Handle old format: http://localhost:8333/codehaat-media/products/uuid.jpg
+        let old_prefix = "http://localhost:8333/codehaat-media/";
+        if let Some(key) = url.strip_prefix(old_prefix) {
+            return Some(key.to_string());
+        }
+        // Handle old format with seaweedfs hostname
+        let internal_prefix = "http://seaweedfs:8333/codehaat-media/";
+        if let Some(key) = url.strip_prefix(internal_prefix) {
+            return Some(key.to_string());
+        }
+        None
     }
 
     pub fn public_url(&self, key: &str) -> String {

@@ -29,6 +29,13 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
+# Service-level env files (may contain real secrets — never commit)
+services/*/.env
+services/*/.env.local
+apps/*/.env
+apps/*/.env.local
+# SeaweedFS S3 identity config contains credentials
+config/seaweedfs/s3.json
 
 # vercel
 .vercel

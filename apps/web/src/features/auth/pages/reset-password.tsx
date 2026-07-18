@@ -7,6 +7,7 @@ import { Eye, EyeOff, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Card, CardContent } from "@/shared/ui/card";
+import { apiPost } from "@/shared/lib/api";
 
 function ResetPasswordForm() {
   const router = useRouter();
@@ -69,21 +70,14 @@ function ResetPasswordForm() {
     }
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
-      const response = await fetch(`${apiUrl}/api/auth/reset-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, password }),
-      });
-
-      const result = await response.json();
+      const result = await apiPost("/auth/reset-password", { token, password });
 
       if (result.success) {
         setSuccess(true);
       } else {
         setError(result.error || "Failed to reset password");
       }
-    } catch (err) {
+    } catch {
       setError("Network error. Please try again.");
     } finally {
       setLoading(false);

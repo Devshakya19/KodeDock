@@ -4,20 +4,21 @@ import { useEffect, useState } from "react";
 import { BrowseNavbar } from "./components/browse-navbar";
 import { ProductGrid } from "./components/product-grid";
 import { Sparkles, TrendingUp, Zap } from "lucide-react";
-import { auth } from "@/shared/lib/auth";
+import { auth, type User } from "@/shared/lib/auth";
 
 interface BrowsePageProps {
-  searchParams?: Promise<{ search?: string; category?: string }> | { search?: string; category?: string };
+  searchParams?: { search?: string; category?: string };
 }
 
 export default function BrowsePage({ searchParams }: BrowsePageProps) {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadUser() {
       const userData = await auth.getUser();
       if (!userData) {
+        // Middleware already redirects, but as a safety net:
         window.location.href = "/login";
         return;
       }
@@ -37,13 +38,9 @@ export default function BrowsePage({ searchParams }: BrowsePageProps) {
 
   if (!user) return null;
 
-  // Handle both Promise and regular object for searchParams
-  const params = searchParams && typeof searchParams === 'object' && 'then' in searchParams
-    ? {} // Will be resolved by the parent
-    : searchParams || {};
-  const searchQuery = (params as any)?.search || "";
-  const categoryFilter = (params as any)?.category || "";
-  const fullName = user.full_name || "";
+  const searchQuery = searchParams?.search || "";
+  const categoryFilter = searchParams?.category || "";
+  const fullName = user.full_name || user.email.split("@")[0];
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -55,7 +52,6 @@ export default function BrowsePage({ searchParams }: BrowsePageProps) {
       />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Hero Banner */}
         <div className="bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl p-8 md:p-12 mb-8 text-white relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl" />
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-2xl" />
@@ -83,7 +79,6 @@ export default function BrowsePage({ searchParams }: BrowsePageProps) {
           </div>
         </div>
 
-        {/* Section Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-xl font-bold text-slate-950">
@@ -99,15 +94,13 @@ export default function BrowsePage({ searchParams }: BrowsePageProps) {
           </div>
         </div>
 
-        {/* Product Grid */}
         <ProductGrid searchQuery={searchQuery} categoryFilter={categoryFilter} />
       </main>
 
-      {/* Footer */}
       <footer className="border-t border-slate-200 bg-white mt-12 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-xs text-slate-500">
-            &copy; {new Date().getFullYear()} CodeHaat. All rights reserved. Made with ♥ in India.
+            &copy; {new Date().getFullYear()} CodeHaat. All rights reserved. Made with love in India.
           </p>
         </div>
       </footer>

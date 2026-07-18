@@ -1,4 +1,5 @@
-import { auth } from "@/shared/lib/auth";
+import { getServerUser } from "@/shared/lib/auth";
+import { serverApiGet } from "@/shared/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Package, TrendingUp, DollarSign, Plus, BarChart3, Settings, ShoppingCart } from "lucide-react";
@@ -6,32 +7,17 @@ import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { getUserRole, ROLES } from "@/shared/lib/roles";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
-
-async function fetchSellerStats(token: string) {
-  try {
-    const res = await fetch(`${API_URL}/api/seller/stats`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    return data.success ? data.data : { total_products: 0, active_products: 0, total_sales: 0, total_revenue_paise: 0, total_earned_paise: 0 };
-  } catch {
-    return { total_products: 0, active_products: 0, total_sales: 0, total_revenue_paise: 0, total_earned_paise: 0 };
-  }
-}
-
 export default async function DashboardPage() {
   // Auth handled by custom auth client
-  const user = await auth.getUser();
+  const user = await getServerUser();
   if (!user) redirect("/login");
 
   const role = getUserRole(user);
   if (role !== ROLES.DEVELOPER) redirect("/browse");
 
-  const session = await auth.getSession();
-  const token = session?.token || "";
-
-  const stats = await fetchSellerStats(token);
+  const defaultStats = { total_products: 0, active_products: 0, total_sales: 0, total_revenue_paise: 0, total_earned_paise: 0 };
+  const res = await serverApiGet<any>("/seller/stats");
+  const stats = res.success ? res.data : defaultStats;
 
   return (
     <>

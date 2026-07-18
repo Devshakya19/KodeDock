@@ -7,7 +7,9 @@ COPY . .
 RUN cargo build --release
 
 FROM debian:bookworm-slim
-RUN apt-get update && apt-get install -y ca-certificates curl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+RUN useradd -r -s /bin/false appuser
 COPY --from=builder /app/target/release/codehaat-core /usr/local/bin/
+USER appuser
 EXPOSE 4001
 CMD ["codehaat-core"]

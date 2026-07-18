@@ -1,4 +1,12 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
+/**
+ * Auth client for browser-side code.
+ *
+ * All calls go through same-origin `/api/auth/*` routes. The actual token is
+ * stored in an HttpOnly cookie set by the server — never exposed to JS.
+ * `localStorage` is NOT used, making XSS token theft impossible.
+ */
+
+const API_URL = process.env.CORE_ENGINE_URL || "http://localhost:4001";
 
 export interface User {
   id: string;
@@ -10,15 +18,116 @@ export interface User {
 
 export interface AuthResponse {
   user: User;
-  token: string;
 }
 
-// Store token in memory (for client-side)
-let currentToken: string | null = null;
+/**
+ * Server-side user fetch. Reads the JWT from cookies, verifies it,
+ * and fetches user data directly from the Rust backend.
+ * Use this in server components instead of auth.getUser().
+ */
+export async function getServerUser(): Promise<User | null> {
+  try {
+    const { cookies } = await import("next/headers");
+    const { verifyToken } = await import("@/shared/lib/server-auth");
+
+    const cookieStore = await cookies();
+    const token = cookieStore.get("codehaat_token")?.value;
+    if (!token) return null;
+
+    const claims = await verifyToken(token);
+    if (!claims) return null;
+
+    // Fetch full user data from backend
+    const res = await fetch(`${API_URL}/api/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return null;
+    const result = await res.json();
+    return result.data || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Get the JWT token from cookies server-side.
+ * Use this in server components for API calls.
+ */
+export async function getServerToken(): Promise<string | null> {
+  try {
+    const { cookies } = await import("next/headers");
+    const { verifyToken } = await import("@/shared/lib/server-auth");
+    const cookieStore = await cookies();
+    const token = cookieStore.get("codehaat_token")?.value;
+    if (!token) return null;
+    const claims = await verifyToken(token);
+    return claims ? token : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Server-side API fetch. Reads token from cookies and calls the Rust backend directly.
+ * Use this in server components instead of apiGet().
+ */
+export async function serverApiGet<T>(path: string): Promise<{ success: boolean; data?: T; error?: string }> {
+  try {
+    const token = await getServerToken();
+    if (!token) return { success: false, error: "Not authenticated" };
+
+    const res = await fetch(`${API_URL}/api${path}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return { success: false, error: `HTTP ${res.status}` };
+    return await res.json();
+  } catch {
+    return { success: false, error: "Network error" };
+  }
+}
+
+export async function serverApiPost<T>(path: string, body: unknown): Promise<{ success: boolean; data?: T; error?: string }> {
+  try {
+    const token = await getServerToken();
+    if (!token) return { success: false, error: "Not authenticated" };
+
+    const res = await fetch(`${API_URL}/api${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) return { success: false, error: `HTTP ${res.status}` };
+    return await res.json();
+  } catch {
+    return { success: false, error: "Network error" };
+  }
+}
+
+export async function serverApiPut<T>(path: string, body: unknown): Promise<{ success: boolean; data?: T; error?: string }> {
+  try {
+    const token = await getServerToken();
+    if (!token) return { success: false, error: "Not authenticated" };
+
+    const res = await fetch(`${API_URL}/api${path}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) return { success: false, error: `HTTP ${res.status}` };
+    return await res.json();
+  } catch {
+    return { success: false, error: "Network error" };
+  }
+}
 
 export const auth = {
-  async signUp(data: { email: string; password: string; fullName: string; role?: string }): Promise<AuthResponse> {
-    const response = await fetch(`${API_URL}/api/auth/register`, {
+  async signUp(data: {
+    email: string;
+    password: string;
+    fullName: string;
+    role?: string;
+  }): Promise<AuthResponse> {
+    const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -29,120 +138,43 @@ export const auth = {
       }),
     });
 
-    const result = await response.json();
+    const result = await res.json();
     if (!result.success) {
       throw new Error(result.error || "Registration failed");
-    }
-
-    currentToken = result.data.token;
-    if (typeof window !== "undefined") {
-      localStorage.setItem("codehaat_token", result.data.token);
-      document.cookie = `codehaat_token=${result.data.token}; path=/; max-age=86400; SameSite=Lax`;
     }
     return result.data;
   },
 
   async signIn(data: { email: string; password: string }): Promise<AuthResponse> {
-    const response = await fetch(`${API_URL}/api/auth/login`, {
+    const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
 
-    const result = await response.json();
+    const result = await res.json();
     if (!result.success) {
       throw new Error(result.error || "Login failed");
-    }
-
-    currentToken = result.data.token;
-    if (typeof window !== "undefined") {
-      localStorage.setItem("codehaat_token", result.data.token);
-      document.cookie = `codehaat_token=${result.data.token}; path=/; max-age=86400; SameSite=Lax`;
     }
     return result.data;
   },
 
   async signOut(): Promise<void> {
-    if (currentToken) {
-      await fetch(`${API_URL}/api/auth/logout`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${currentToken}`,
-        },
-      });
-    }
-    currentToken = null;
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("codehaat_token");
-      document.cookie = "codehaat_token=; path=/; max-age=0";
-    }
+    await fetch("/api/auth/logout", { method: "POST" });
   },
 
   async getUser(): Promise<User | null> {
-    if (!currentToken) {
-      // Try to get token from localStorage
-      if (typeof window !== "undefined") {
-        currentToken = localStorage.getItem("codehaat_token");
-      }
-    }
-
-    if (!currentToken) {
-      return null;
-    }
-
     try {
-      const response = await fetch(`${API_URL}/api/auth/me`, {
-        headers: {
-          "Authorization": `Bearer ${currentToken}`,
-        },
-      });
-
-      if (!response.ok) {
-        currentToken = null;
-        if (typeof window !== "undefined") {
-          localStorage.removeItem("codehaat_token");
-        }
-        return null;
-      }
-
-      const result = await response.json();
-      return result.data;
+      const res = await fetch("/api/auth/me", { credentials: "include" });
+      if (!res.ok) return null;
+      const result = await res.json();
+      return result.data || null;
     } catch {
       return null;
     }
   },
 
-  async getSession(): Promise<{ token: string } | null> {
-    if (!currentToken) {
-      if (typeof window !== "undefined") {
-        currentToken = localStorage.getItem("codehaat_token");
-      }
-    }
-
-    return currentToken ? { token: currentToken } : null;
-  },
-
-  setToken(token: string) {
-    currentToken = token;
-    if (typeof window !== "undefined") {
-      localStorage.setItem("codehaat_token", token);
-      // Also set cookie for Next.js middleware
-      document.cookie = `codehaat_token=${token}; path=/; max-age=86400; SameSite=Lax`;
-    }
-  },
-
-  getToken(): string | null {
-    if (!currentToken && typeof window !== "undefined") {
-      currentToken = localStorage.getItem("codehaat_token");
-    }
-    return currentToken;
-  },
-
-  clearToken() {
-    currentToken = null;
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("codehaat_token");
-    }
+  async requireAuth(): Promise<User | null> {
+    return this.getUser();
   },
 };

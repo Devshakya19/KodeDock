@@ -1,4 +1,5 @@
-import { auth } from "@/shared/lib/auth";
+import { getServerUser } from "@/shared/lib/auth";
+import { serverApiGet } from "@/shared/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ShoppingCart, ExternalLink, Package } from "lucide-react";
@@ -6,29 +7,13 @@ import { Card, CardContent } from "@/shared/ui/card";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
-
-async function fetchOrders(userId: string, token: string) {
-  try {
-    const res = await fetch(`${API_URL}/api/orders?buyer_id=${userId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    return data.success ? data.data : [];
-  } catch {
-    return [];
-  }
-}
-
 export default async function PurchasesPage() {
   // Auth handled by custom auth client
-  const user = await auth.getUser();
+  const user = await getServerUser();
   if (!user) redirect("/login");
 
-  const session = await auth.getSession();
-  const token = session?.token || "";
-
-  const orders = await fetchOrders(user.id, token);
+  const res = await serverApiGet<any[]>(`/orders?buyer_id=${user.id}`);
+  const orders = res.success ? res.data : [];
 
   return (
     <>

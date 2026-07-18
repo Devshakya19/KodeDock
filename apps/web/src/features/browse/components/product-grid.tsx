@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Package } from "lucide-react";
 import { ProductCard } from "./product-card";
+import { apiGet } from "@/shared/lib/api";
 
 interface Product {
   id: string;
@@ -11,11 +12,13 @@ interface Product {
   price_paise: number;
   original_price_paise?: number;
   category?: { name: string };
+  category_name?: string;
   seller?: { full_name: string };
   rating: number;
   review_count: number;
   tags: string[];
   sales_count: number;
+  image_url?: string;
 }
 
 interface ProductGridProps {
@@ -30,17 +33,15 @@ export function ProductGrid({ searchQuery = "", categoryFilter = "" }: ProductGr
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
         const params = new URLSearchParams();
         if (searchQuery) params.set("search", searchQuery);
         if (categoryFilter) params.set("category", categoryFilter);
 
-        const response = await fetch(`${apiUrl}/api/products?${params.toString()}`);
-        if (response.ok) {
-          const result = await response.json();
-          if (result.success && result.data) {
-            setProducts(result.data);
-          }
+        const qs = params.toString();
+        const path = `/products${qs ? `?${qs}` : ""}`;
+        const result = await apiGet<Product[]>(path);
+        if (result.success && result.data) {
+          setProducts(result.data);
         }
       } catch (error) {
         console.error("Failed to fetch products:", error);
@@ -89,10 +90,11 @@ export function ProductGrid({ searchQuery = "", categoryFilter = "" }: ProductGr
           description={product.description || ""}
           price={product.price_paise / 100}
           originalPrice={product.original_price_paise ? product.original_price_paise / 100 : undefined}
-          category={product.category?.name || "Uncategorized"}
+          category={product.category_name || "Uncategorized"}
           seller={product.seller?.full_name || "Unknown"}
           rating={product.rating}
           reviews={product.review_count}
+          image={product.image_url || undefined}
           tags={product.tags || []}
         />
       ))}

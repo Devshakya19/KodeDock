@@ -10,28 +10,18 @@ pub async fn get_profile(
     req: HttpRequest,
     path: web::Path<String>,
 ) -> HttpResponse {
-    let user_id = match extract_user_id(&req) {
-        Ok(id) => id,
-        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized")),
-    };
-
-    let user_uuid = match uuid::Uuid::parse_str(&user_id) {
-        Ok(uuid) => uuid,
-        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID")),
-    };
+    // Allow viewing any profile — the marketplace requires buyers to see seller profiles.
+    // Authentication is optional: if the caller is logged in, we use it for context;
+    // if not, we still serve the public profile fields.
+    let _user_id = extract_user_id(&req).ok(); // optional auth
 
     let id = match uuid::Uuid::parse_str(&path.into_inner()) {
         Ok(uuid) => uuid,
         Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid profile ID")),
     };
 
-    // Users can only view their own profile
-    if id != user_uuid {
-        return HttpResponse::Forbidden().json(ApiResponse::<()>::error("Cannot view another user's profile"));
-    }
-
     match sqlx::query_as::<_, Profile>("SELECT * FROM profiles WHERE id = $1")
-        .bind(user_uuid)
+        .bind(id)
         .fetch_optional(pool.get_ref())
         .await
     {

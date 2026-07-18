@@ -1,4 +1,5 @@
 pub mod auth;
+pub mod payment;
 
 use serde::{Deserialize, Serialize};
 

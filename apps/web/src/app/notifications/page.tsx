@@ -4,24 +4,15 @@ import Link from "next/link";
 import { Bell, Package, ShoppingCart, ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/shared/ui/card";
 import { CodeHaatLogo } from "@/shared/components/codehaat-logo";
+import { verifyToken } from "@/shared/lib/server-auth";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
-
-function decodeToken(token: string): { sub: string; email: string; role: string } | null {
-  try {
-    const payload = token.split(".")[1];
-    if (!payload) return null;
-    const decoded = JSON.parse(atob(payload));
-    return { sub: decoded.sub, email: decoded.email, role: decoded.role };
-  } catch {
-    return null;
-  }
-}
+const RUST_BACKEND = process.env.CORE_ENGINE_URL || "http://localhost:4001";
 
 async function fetchNotifications(token: string) {
   try {
-    const res = await fetch(`${API_URL}/api/notifications`, {
+    const res = await fetch(`${RUST_BACKEND}/api/notifications`, {
       headers: { Authorization: `Bearer ${token}` },
+      cache: "no-store",
     });
     const data = await res.json();
     return data.success ? data.data : [];
@@ -38,11 +29,25 @@ function getNotificationIcon(type: string) {
   }
 }
 
+interface Notification {
+  id: string;
+  type: string;
+  title: string;
+  message: string | null;
+  is_read: boolean;
+  created_at: string;
+}
+
 export default async function NotificationsPage() {
   const cookieStore = await cookies();
   const token = cookieStore.get("codehaat_token")?.value;
 
-  if (!token || !decodeToken(token)) {
+  if (!token) {
+    redirect("/login");
+  }
+
+  const claims = await verifyToken(token);
+  if (!claims) {
     redirect("/login");
   }
 
@@ -77,7 +82,7 @@ export default async function NotificationsPage() {
           </Card>
         ) : (
           <div className="space-y-3">
-            {notifications.map((notif: any) => {
+            {notifications.map((notif: Notification) => {
               const Icon = getNotificationIcon(notif.type);
               return (
                 <Card key={notif.id} className={`border-slate-200 ${!notif.is_read ? "bg-blue-50/50" : ""}`}>

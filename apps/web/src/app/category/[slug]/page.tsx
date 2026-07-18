@@ -1,18 +1,23 @@
-import { auth } from "@/shared/lib/auth";
 import Link from "next/link";
 import { Package, ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { CodeHaatLogo } from "@/shared/components/codehaat-logo";
+import { serverApiGet } from "@/shared/lib/auth";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
+interface Product {
+  id: string;
+  title: string;
+  description: string;
+  price_paise: number;
+  rating: number;
+}
 
-async function getCategoryProducts(slug: string) {
+async function getCategoryProducts(slug: string): Promise<Product[]> {
   try {
-    const res = await fetch(`${API_URL}/api/products?category=${slug}`);
-    const data = await res.json();
-    return data.success ? data.data : [];
+    const res = await serverApiGet<Product[]>(`/products?category=${slug}`);
+    return res.data ?? [];
   } catch {
     return [];
   }

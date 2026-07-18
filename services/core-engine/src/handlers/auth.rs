@@ -29,8 +29,11 @@ pub async fn register(
     pool: web::Data<PgPool>,
     body: web::Json<RegisterRequest>,
 ) -> HttpResponse {
-    // Only allow "user" role from self-registration — no privilege escalation
-    let role = "user";
+    // Allow "user" or "developer" role from self-registration — no other roles
+    let role = match body.role.as_deref() {
+        Some("developer") => "developer",
+        _ => "user",
+    };
 
     // Validate password strength
     if body.password.len() < 8 {
@@ -70,8 +73,8 @@ pub async fn register(
         Err(_) => {} // User doesn't exist, continue
     }
 
-    // Create user
-    let user = match auth::create_user(pool.get_ref(), &body.email, &body.password, &body.full_name, role).await {
+    // Create user — use lowercased email for consistency
+    let user = match auth::create_user(pool.get_ref(), &email, &body.password, &body.full_name, role).await {
         Ok(user) => user,
         Err(e) => {
             log::error!("Failed to create user: {}", e);
@@ -252,9 +255,10 @@ pub async fn forgot_password(
         return success_response; // Don't reveal internal errors
     }
 
-    // In production, send email here. For now, log the reset URL.
-    let reset_url = format!("http://localhost:3000/reset-password?token={}", token);
-    log::info!("Password reset link for {}: {}", body.email, reset_url);
+    // Build reset URL using APP_BASE_URL env var (no token in logs)
+    let base_url = std::env::var("APP_BASE_URL").unwrap_or_else(|_| "http://localhost:3000".to_string());
+    let _reset_url = format!("{}/reset-password?token={}", base_url, token);
+    log::info!("Password reset requested for {} (token generated)", body.email);
 
     success_response
 }
@@ -326,6 +330,160 @@ pub async fn reset_password(
         success: true,
         data: None,
         message: Some("Password updated successfully".to_string()),
+        error: None,
+    })
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ChangePasswordRequest {
+    pub current_password: String,
+    pub new_password: String,
+}
+
+pub async fn change_password(
+    pool: web::Data<PgPool>,
+    req: HttpRequest,
+    body: web::Json<ChangePasswordRequest>,
+) -> HttpResponse {
+    // Extract user ID from JWT
+    let auth_header = req.headers().get("Authorization");
+    let token = match auth_header {
+        Some(header) => {
+            let header_str = header.to_str().unwrap_or("");
+            header_str.strip_prefix("Bearer ").unwrap_or(header_str)
+        }
+        None => {
+            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Missing Authorization header"));
+        }
+    };
+
+    let secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+    let claims = match auth::verify_token(token, &secret) {
+        Ok(claims) => claims,
+        Err(_) => {
+            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid token"));
+        }
+    };
+
+    let user_id = match uuid::Uuid::parse_str(&claims.sub) {
+        Ok(id) => id,
+        Err(_) => {
+            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid user ID in token"));
+        }
+    };
+
+    // Validate new password strength
+    if body.new_password.len() < 8 {
+        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("New password must be at least 8 characters"));
+    }
+    if !body.new_password.chars().any(|c| c.is_uppercase()) {
+        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("New password must contain at least one uppercase letter"));
+    }
+    if !body.new_password.chars().any(|c| c.is_lowercase()) {
+        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("New password must contain at least one lowercase letter"));
+    }
+    if !body.new_password.chars().any(|c| c.is_numeric()) {
+        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("New password must contain at least one number"));
+    }
+
+    // Fetch current password hash
+    let (_, _, _, _, password_hash) = match auth::get_user_by_id_with_hash(pool.get_ref(), user_id).await {
+        Ok(user) => user,
+        Err(_) => {
+            return HttpResponse::NotFound().json(ApiResponse::<()>::error("User not found"));
+        }
+    };
+
+    let password_hash = match password_hash {
+        Some(hash) => hash,
+        None => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("User has no password set"));
+        }
+    };
+
+    // Verify current password
+    if !auth::verify_password(&body.current_password, &password_hash).unwrap_or(false) {
+        return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Current password is incorrect"));
+    }
+
+    // Update password
+    if let Err(e) = auth::update_password(pool.get_ref(), user_id, &body.new_password).await {
+        log::error!("Failed to update password: {}", e);
+        return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to update password"));
+    }
+
+    HttpResponse::Ok().json(ApiResponse::<()> {
+        success: true,
+        data: None,
+        message: Some("Password changed successfully".to_string()),
+        error: None,
+    })
+}
+
+pub async fn delete_account(
+    pool: web::Data<PgPool>,
+    req: HttpRequest,
+) -> HttpResponse {
+    // Extract user ID from JWT
+    let auth_header = req.headers().get("Authorization");
+    let token = match auth_header {
+        Some(header) => {
+            let header_str = header.to_str().unwrap_or("");
+            header_str.strip_prefix("Bearer ").unwrap_or(header_str)
+        }
+        None => {
+            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Missing Authorization header"));
+        }
+    };
+
+    let secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+    let claims = match auth::verify_token(token, &secret) {
+        Ok(claims) => claims,
+        Err(_) => {
+            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid token"));
+        }
+    };
+
+    let user_id = match uuid::Uuid::parse_str(&claims.sub) {
+        Ok(id) => id,
+        Err(_) => {
+            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid user ID in token"));
+        }
+    };
+
+    // Use a transaction for atomicity
+    let mut tx = match pool.begin().await {
+        Ok(tx) => tx,
+        Err(e) => {
+            log::error!("Failed to start transaction: {}", e);
+            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Database error"));
+        }
+    };
+
+    // All foreign keys use ON DELETE CASCADE:
+    // users -> profiles, wallets, notifications
+    // wallets -> wallet_transactions
+    // profiles -> products, orders, reviews, disputes
+    // So deleting the user cascades to everything.
+    if let Err(e) = sqlx::query("DELETE FROM users WHERE id = $1")
+        .bind(user_id)
+        .execute(&mut *tx)
+        .await
+    {
+        log::error!("Failed to delete user: {}", e);
+        return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to delete account"));
+    }
+
+    // Commit transaction
+    if let Err(e) = tx.commit().await {
+        log::error!("Failed to commit transaction: {}", e);
+        return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to delete account"));
+    }
+
+    HttpResponse::Ok().json(ApiResponse::<()> {
+        success: true,
+        data: None,
+        message: Some("Account deleted successfully".to_string()),
         error: None,
     })
 }

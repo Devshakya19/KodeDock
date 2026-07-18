@@ -24,7 +24,39 @@ pub async fn get_balance(
         .await
     {
         Ok(Some(wallet)) => HttpResponse::Ok().json(ApiResponse::success(wallet, "Balance fetched")),
-        Ok(None) => HttpResponse::NotFound().json(ApiResponse::<()>::error("Wallet not found")),
+        Ok(None) => {
+            // Auto-create wallet with 0 balance if it doesn't exist
+            match sqlx::query_as::<_, Wallet>(
+                r#"INSERT INTO wallets (user_id, balance_paise, pending_paise, total_earned_paise, total_spent_paise)
+                   VALUES ($1, 0, 0, 0, 0)
+                   ON CONFLICT (user_id) DO NOTHING
+                   RETURNING *"#
+            )
+            .bind(user_uuid)
+            .fetch_optional(pool.get_ref())
+            .await
+            {
+                Ok(Some(wallet)) => HttpResponse::Ok().json(ApiResponse::success(wallet, "Balance fetched")),
+                Ok(None) => {
+                    // CONFLICT happened — re-fetch existing wallet
+                    match sqlx::query_as::<_, Wallet>("SELECT * FROM wallets WHERE user_id = $1")
+                        .bind(user_uuid)
+                        .fetch_one(pool.get_ref())
+                        .await
+                    {
+                        Ok(wallet) => HttpResponse::Ok().json(ApiResponse::success(wallet, "Balance fetched")),
+                        Err(e) => {
+                            log::error!("Failed to fetch wallet after insert: {}", e);
+                            HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to fetch wallet"))
+                        }
+                    }
+                }
+                Err(e) => {
+                    log::error!("Failed to create wallet: {}", e);
+                    HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to create wallet"))
+                }
+            }
+        }
         Err(e) => {
             log::error!("Failed to fetch wallet: {}", e);
             HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to fetch wallet"))

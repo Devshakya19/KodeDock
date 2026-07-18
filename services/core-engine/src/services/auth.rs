@@ -17,6 +17,7 @@ pub struct User {
 pub struct Claims {
     pub sub: String,
     pub email: String,
+    pub full_name: Option<String>,
     pub role: String,
     pub exp: usize,
     pub iat: usize,
@@ -43,6 +44,7 @@ pub fn generate_token(user: &User, secret: &str) -> Result<String, String> {
     let claims = Claims {
         sub: user.id.to_string(),
         email: user.email.clone(),
+        full_name: user.full_name.clone(),
         role: user.role.clone(),
         exp: expires.timestamp() as usize,
         iat: now.timestamp() as usize,
@@ -119,4 +121,15 @@ pub async fn update_password(pool: &PgPool, user_id: Uuid, new_password: &str) -
         .await
         .map_err(|e| format!("Failed to update password: {}", e))?;
     Ok(())
+}
+
+pub async fn get_user_by_id_with_hash(pool: &PgPool, user_id: Uuid) -> Result<(Uuid, String, Option<String>, String, Option<String>), String> {
+    sqlx::query_as::<_, (Uuid, String, Option<String>, String, Option<String>)>(
+        "SELECT id, email, full_name, role, password_hash FROM users WHERE id = $1"
+    )
+    .bind(user_id)
+    .fetch_optional(pool)
+    .await
+    .map_err(|e| format!("Get user error: {}", e))?
+    .ok_or_else(|| "User not found".to_string())
 }
