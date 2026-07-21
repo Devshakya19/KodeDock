@@ -42,7 +42,7 @@ pub async fn create_order(
     };
 
     // Fetch the product to get seller_id and price
-    let product = match sqlx::query_as::<_, crate::models::Product>("SELECT * FROM products WHERE id = $1")
+    let product = match sqlx::query_as::<_, crate::models::Product>("SELECT p.id, p.seller_id, p.category_id, c.name as category_name, p.title, p.slug, p.description, p.long_description, p.price_paise, p.original_price_paise, p.tags, p.status, p.github_repo_url, p.github_repo_id, p.preview_url, p.image_url, p.demo_url, p.tech_stack, p.sales_count, p.view_count, p.rating, p.review_count, p.is_featured, p.created_at, p.updated_at FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.id = $1")
         .bind(body.product_id)
         .fetch_optional(pool.get_ref())
         .await

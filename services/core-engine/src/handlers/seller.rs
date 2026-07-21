@@ -331,30 +331,22 @@ pub async fn get_stats(
         Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID")),
     };
 
-    let total_products = sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM products WHERE seller_id = $1")
-        .bind(seller_uuid)
-        .fetch_one(pool.get_ref())
-        .await
-        .unwrap_or(0);
+    // Single query for all stats
+    let row = sqlx::query_as::<_, (i64, i64, i64, Option<i64>, i64, i64)>(r#"
+        SELECT
+            (SELECT COUNT(*)::bigint FROM products WHERE seller_id = $1) as total_products,
+            (SELECT COUNT(*)::bigint FROM products WHERE seller_id = $1 AND status = 'active') as active_products,
+            (SELECT COUNT(*)::bigint FROM orders WHERE seller_id = $1 AND status = 'completed') as total_sales,
+            (SELECT COALESCE(SUM(seller_amount_paise), 0)::bigint FROM orders WHERE seller_id = $1 AND status = 'completed') as total_revenue,
+            (SELECT COALESCE(SUM(view_count), 0)::bigint FROM products WHERE seller_id = $1) as total_views,
+            (SELECT COALESCE(SUM(review_count), 0)::bigint FROM products WHERE seller_id = $1) as total_reviews
+    "#)
+    .bind(seller_uuid)
+    .fetch_one(pool.get_ref())
+    .await;
 
-    let active_products = sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM products WHERE seller_id = $1 AND status = 'active'")
-        .bind(seller_uuid)
-        .fetch_one(pool.get_ref())
-        .await
-        .unwrap_or(0);
-
-    let total_sales = sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM orders WHERE seller_id = $1 AND status = 'completed'")
-        .bind(seller_uuid)
-        .fetch_one(pool.get_ref())
-        .await
-        .unwrap_or(0);
-
-    let total_revenue = sqlx::query_scalar::<_, Option<i64>>("SELECT COALESCE(SUM(seller_amount_paise), 0) FROM orders WHERE seller_id = $1 AND status = 'completed'")
-        .bind(seller_uuid)
-        .fetch_one(pool.get_ref())
-        .await
-        .unwrap_or(Some(0))
-        .unwrap_or(0);
+    let (total_products, active_products, total_sales, total_revenue, total_views, total_reviews) = row.unwrap_or((0, 0, 0, Some(0), 0, 0));
+    let total_revenue = total_revenue.unwrap_or(0);
 
     let stats = SellerStats {
         total_products,
@@ -362,6 +354,8 @@ pub async fn get_stats(
         total_sales,
         total_revenue_paise: total_revenue,
         total_earned_paise: total_revenue,
+        total_views,
+        total_reviews,
     };
 
     HttpResponse::Ok().json(ApiResponse::success(stats, "Stats fetched"))

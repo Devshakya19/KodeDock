@@ -250,4 +250,6 @@ pub struct SellerStats {
     pub total_sales: i64,
     pub total_revenue_paise: i64,
     pub total_earned_paise: i64,
+    pub total_views: i64,
+    pub total_reviews: i64,
 }
