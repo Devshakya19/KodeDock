@@ -26,8 +26,6 @@ export default function ProfilePage() {
   const [avatarUrl, setAvatarUrl] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
 
-  // Auth handled by custom auth client
-
   async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -47,7 +45,7 @@ export default function ProfilePage() {
     try {
       const result = await uploadFile(file, "avatar");
       setAvatarUrl(result.public_url);
-    } catch (err) {
+    } catch {
       setError("Failed to upload avatar. Please try again.");
     } finally {
       setUploadingAvatar(false);
@@ -64,7 +62,6 @@ export default function ProfilePage() {
 
       setUserId(user.id);
 
-      // Fetch profile from backend API
       const result = await apiGet<any>(`/profile/${user.id}`);
 
       if (result.success && result.data) {
@@ -117,29 +114,29 @@ export default function ProfilePage() {
 
   return (
     <>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-950">Profile</h1>
-        <p className="text-slate-600 mt-1">Manage your personal information</p>
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-xl md:text-2xl font-bold text-slate-950">Profile</h1>
+        <p className="text-slate-600 mt-1 text-sm">Manage your personal information</p>
       </div>
 
       <div className="max-w-2xl">
         <Card className="border-slate-200">
-          <CardContent className="p-8">
+          <CardContent className="p-4 sm:p-6 md:p-8">
             {success && (
-              <div className="mb-6 p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-sm text-emerald-700 flex items-center gap-2">
+              <div className="mb-4 md:mb-6 p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-sm text-emerald-700 flex items-center gap-2">
                 <CheckCircle className="w-4 h-4" />
                 Profile updated successfully
               </div>
             )}
 
             {error && (
-              <div className="mb-6 p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+              <div className="mb-4 md:mb-6 p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
                 {error}
               </div>
             )}
 
             {/* Avatar */}
-            <div className="flex items-center gap-4 mb-8">
+            <div className="flex flex-col sm:flex-row items-center gap-4 mb-6 md:mb-8">
               <div className="relative group">
                 <div className="w-20 h-20 rounded-full bg-slate-950 flex items-center justify-center overflow-hidden">
                   {avatarUrl ? (
@@ -170,13 +167,13 @@ export default function ProfilePage() {
                   )}
                 </button>
               </div>
-              <div>
+              <div className="text-center sm:text-left">
                 <div className="text-sm font-medium text-slate-950">{fullName || "User"}</div>
                 <div className="text-xs text-slate-500">Click to change photo</div>
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label htmlFor="fullName" className="block text-sm font-medium text-slate-700 mb-1.5">
                   Full Name
@@ -203,7 +200,7 @@ export default function ProfilePage() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="website" className="block text-sm font-medium text-slate-700 mb-1.5">
                     Website
@@ -231,11 +228,11 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 pt-4">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-4">
                 <Button
                   type="submit"
                   disabled={saving}
-                  className="bg-slate-950 text-white hover:bg-slate-800"
+                  className="bg-slate-950 text-white hover:bg-slate-800 w-full sm:w-auto"
                 >
                   {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                   Save Changes
@@ -244,7 +241,7 @@ export default function ProfilePage() {
                   type="button"
                   variant="outline"
                   onClick={() => router.back()}
-                  className="border-slate-300 text-slate-700"
+                  className="border-slate-300 text-slate-700 w-full sm:w-auto"
                 >
                   Cancel
                 </Button>

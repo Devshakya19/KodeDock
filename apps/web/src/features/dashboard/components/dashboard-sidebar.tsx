@@ -10,14 +10,20 @@ import {
   Settings,
   LogOut,
   Store,
-  Bell,
 } from "lucide-react";
 
 const NAV_ITEMS = [
   { label: "Browse Marketplace", href: "/browse", icon: Store },
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "My Purchases", href: "/dashboard/purchases", icon: ShoppingCart },
-  { label: "Notifications", href: "/notifications", icon: Bell },
+  { label: "Profile", href: "/dashboard/profile", icon: User },
+  { label: "Settings", href: "/dashboard/settings", icon: Settings },
+];
+
+// Only 4 items for mobile bottom nav
+const MOBILE_NAV_ITEMS = [
+  { label: "Home", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Purchases", href: "/dashboard/purchases", icon: ShoppingCart },
   { label: "Profile", href: "/dashboard/profile", icon: User },
   { label: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
@@ -25,7 +31,7 @@ const NAV_ITEMS = [
 function getShortName(fullName?: string, email?: string): string {
   if (fullName) {
     const parts = fullName.trim().split(/\s+/);
-    return parts[0]; // First name only
+    return parts[0];
   }
   if (email) {
     return email.split("@")[0];
@@ -104,21 +110,21 @@ export function DashboardSidebar({
         </div>
       </aside>
 
-      {/* Mobile Bottom Nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-50">
-        <div className="flex items-center justify-around h-16">
-          {NAV_ITEMS.map((item) => {
+      {/* Mobile Bottom Nav - only 4 items */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-50 safe-area-bottom">
+        <div className="flex items-center justify-around h-16 px-2">
+          {MOBILE_NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex flex-col items-center gap-1 px-3 py-2 text-xs font-medium ${
-                  isActive ? "text-slate-950" : "text-slate-500"
+                className={`flex flex-col items-center gap-1 px-3 py-2 min-w-0 ${
+                  isActive ? "text-slate-950" : "text-slate-400"
                 }`}
               >
-                <item.icon className="w-5 h-5" />
-                {item.label}
+                <item.icon className={`w-5 h-5 ${isActive ? "text-slate-950" : ""}`} />
+                <span className="text-[10px] font-medium leading-tight">{item.label}</span>
               </Link>
             );
           })}
