@@ -4,12 +4,12 @@ import { GithubIcon } from "@/shared/components/github-icon";
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Loader2, CheckCircle, Upload, Star, X, Eye } from "lucide-react";
+import { ArrowLeft, Loader2, CheckCircle, Upload, Star, X, Eye, Trash2 } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Badge } from "@/shared/ui/badge";
-import { apiGet, apiPut } from "@/shared/lib/api";
+import { apiGet, apiPut, apiDelete } from "@/shared/lib/api";
 import { uploadFile } from "@/shared/lib/upload";
 
 const CATEGORIES = [
@@ -50,6 +50,7 @@ export default function EditProductPage() {
   const [imageUrl, setImageUrl] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [status, setStatus] = useState("active");
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     async function loadProduct() {
@@ -108,6 +109,24 @@ export default function EditProductPage() {
     setImagePreview(null);
     setImageUrl("");
     if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  async function handleDelete() {
+    if (!window.confirm("Are you sure you want to delete this product? This action cannot be undone.")) return;
+    setDeleting(true);
+    setError("");
+    try {
+      const result = await apiDelete(`/seller/products/${productId}`);
+      if (result.success) {
+        router.push("/seller/products");
+      } else {
+        setError(result.error || "Failed to delete product");
+      }
+    } catch {
+      setError("Network error");
+    } finally {
+      setDeleting(false);
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -260,6 +279,12 @@ export default function EditProductPage() {
                   <Link href="/seller/products">
                     <Button type="button" variant="outline" className="border-slate-300 text-slate-700">Cancel</Button>
                   </Link>
+                  <div className="flex-1" />
+                  <Button type="button" variant="outline" disabled={deleting} onClick={handleDelete}
+                    className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700">
+                    {deleting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Trash2 className="w-4 h-4 mr-2" />}
+                    Delete
+                  </Button>
                 </div>
               </form>
             </CardContent>

@@ -1,8 +1,9 @@
 //! Order lifecycle handlers.
 //!
 //! Flow:
-//! 1. `POST /api/orders`           — creates a DB order in `pending` state and a
-//!                                    Razorpay order; returns checkout details.
+//! 1. `POST /api/orders`           — checks wallet balance first. If sufficient,
+//!                                    completes instantly. Otherwise creates a
+//!                                    Razorpay order for Checkout.js.
 //! 2. `POST /api/orders/verify`    — called by the frontend after Razorpay
 //!                                    Checkout closes; verifies the payment
 //!                                    signature and completes the order.
@@ -22,8 +23,7 @@ use crate::models::{CheckoutOrderResponse, Order, CreateOrderRequest, VerifyOrde
 use crate::services::{ApiResponse, payment};
 use crate::middleware::extract_user_id;
 
-/// 7-day escrow hold window. Funds are released to the seller only after this
-/// period elapses (or on manual release — handled by a future escrow cron).
+/// 7-day escrow hold window.
 const ESCROW_HOLD_DAYS: i64 = 7;
 
 pub async fn create_order(
@@ -41,7 +41,7 @@ pub async fn create_order(
         Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid buyer ID")),
     };
 
-    // Fetch the product to get seller_id and price
+    // Fetch the product
     let product = match sqlx::query_as::<_, crate::models::Product>("SELECT p.id, p.seller_id, p.category_id, c.name as category_name, p.title, p.slug, p.description, p.long_description, p.price_paise, p.original_price_paise, p.tags, p.status, p.github_repo_url, p.github_repo_id, p.preview_url, p.image_url, p.demo_url, p.tech_stack, p.sales_count, p.view_count, p.rating, p.review_count, p.is_featured, p.created_at, p.updated_at FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.id = $1")
         .bind(body.product_id)
         .fetch_optional(pool.get_ref())
@@ -55,22 +55,36 @@ pub async fn create_order(
         }
     };
 
-    // Only allow buying active products
     if product.status != "active" {
         return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Product is not available for purchase"));
     }
 
-    // Prevent self-purchase
     if product.seller_id == buyer_uuid {
         return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Cannot purchase your own product"));
     }
 
     let price_paise = product.price_paise;
-    let platform_fee = price_paise * 25 / 1000; // 2.5% platform fee (integer arithmetic)
+    let platform_fee = price_paise * 25 / 1000; // 2.5%
     let seller_amount = price_paise - platform_fee;
 
-    // Create Razorpay order first — if this fails (e.g. keys missing), we
-    // never insert a DB row, so no orphaned pending orders.
+    // Check buyer's wallet balance
+    let wallet_balance = match sqlx::query_as::<_, crate::models::Wallet>(
+        "SELECT * FROM wallets WHERE user_id = $1"
+    )
+    .bind(buyer_uuid)
+    .fetch_optional(pool.get_ref())
+    .await
+    {
+        Ok(Some(w)) => w.balance_paise,
+        _ => 0,
+    };
+
+    // If wallet has enough balance, pay from wallet (instant completion)
+    if wallet_balance >= price_paise {
+        return pay_from_wallet(pool.get_ref(), buyer_uuid, &product, price_paise, platform_fee, seller_amount).await;
+    }
+
+    // Otherwise, create Razorpay order for Checkout.js
     let receipt = format!("order_{}", uuid::Uuid::new_v4());
     let razorpay_order = match payment::create_razorpay_order(price_paise, &receipt).await {
         Ok(o) => o,
@@ -92,7 +106,7 @@ pub async fn create_order(
             .json(ApiResponse::<()>::error("Payments are not configured on this server")),
     };
 
-    // Insert DB order as pending, linked to the Razorpay order
+    // Insert DB order as pending
     let order = match sqlx::query_as::<_, Order>(
         r#"INSERT INTO orders (buyer_id, seller_id, product_id, amount_paise, platform_fee_paise, seller_amount_paise, status, razorpay_order_id, github_repo_url)
            VALUES ($1, $2, $3, $4, $5, $6, 'pending', $7, $8)
@@ -129,12 +143,153 @@ pub async fn create_order(
     ))
 }
 
+/// Pay from buyer's wallet balance (instant completion, no Razorpay needed).
+async fn pay_from_wallet(
+    pool: &PgPool,
+    buyer_uuid: uuid::Uuid,
+    product: &crate::models::Product,
+    price_paise: i32,
+    platform_fee: i32,
+    seller_amount: i32,
+) -> HttpResponse {
+    let mut tx = match pool.begin().await {
+        Ok(tx) => tx,
+        Err(e) => {
+            log::error!("Failed to start transaction: {}", e);
+            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Database error"));
+        }
+    };
+
+    // Lock buyer's wallet
+    let buyer_wallet = match sqlx::query_as::<_, crate::models::Wallet>(
+        "SELECT * FROM wallets WHERE user_id = $1 FOR UPDATE"
+    )
+    .bind(buyer_uuid)
+    .fetch_one(&mut *tx)
+    .await
+    {
+        Ok(w) => w,
+        Err(e) => {
+            log::error!("Failed to fetch buyer wallet: {}", e);
+            let _ = tx.rollback().await;
+            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Wallet error"));
+        }
+    };
+
+    // Double-check balance
+    if buyer_wallet.balance_paise < price_paise {
+        let _ = tx.rollback().await;
+        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Insufficient wallet balance"));
+    }
+
+    let buyer_new_balance = buyer_wallet.balance_paise - price_paise;
+
+    // Debit buyer wallet
+    let _ = sqlx::query(
+        "UPDATE wallets SET balance_paise = $1, total_spent_paise = total_spent_paise + $2, updated_at = NOW() WHERE user_id = $3"
+    )
+    .bind(buyer_new_balance)
+    .bind(price_paise)
+    .bind(buyer_uuid)
+    .execute(&mut *tx)
+    .await;
+
+    // Record buyer transaction
+    let _ = sqlx::query(
+        "INSERT INTO wallet_transactions (wallet_user_id, type, amount_paise, balance_after_paise, description, reference_id) VALUES ($1, 'purchase', $2, $3, $4, NULL)"
+    )
+    .bind(buyer_uuid)
+    .bind(-price_paise)
+    .bind(buyer_new_balance)
+    .bind(format!("Purchase: {}", product.title))
+    .execute(&mut *tx)
+    .await;
+
+    // Create order as completed (wallet payment, no Razorpay)
+    let order = match sqlx::query_as::<_, Order>(
+        r#"INSERT INTO orders (buyer_id, seller_id, product_id, amount_paise, platform_fee_paise, seller_amount_paise, status, github_repo_url, completed_at)
+           VALUES ($1, $2, $3, $4, $5, $6, 'completed', $7, NOW())
+           RETURNING *"#,
+    )
+    .bind(buyer_uuid)
+    .bind(product.seller_id)
+    .bind(product.id)
+    .bind(price_paise)
+    .bind(platform_fee)
+    .bind(seller_amount)
+    .bind(&product.github_repo_url)
+    .fetch_one(&mut *tx)
+    .await
+    {
+        Ok(o) => o,
+        Err(e) => {
+            log::error!("Failed to create wallet order: {}", e);
+            let _ = tx.rollback().await;
+            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to create order"));
+        }
+    };
+
+    // Create escrow entry
+    let _ = sqlx::query(
+        r#"INSERT INTO escrow (order_id, amount_paise, status, held_until)
+           VALUES ($1, $2, 'held', NOW() + ($3 || ' days')::interval)"#,
+    )
+    .bind(order.id)
+    .bind(seller_amount)
+    .bind(ESCROW_HOLD_DAYS.to_string())
+    .execute(&mut *tx)
+    .await;
+
+    // Credit seller's pending balance
+    let _ = sqlx::query(
+        r#"UPDATE wallets
+           SET pending_paise = pending_paise + $2,
+               total_earned_paise = total_earned_paise + $2,
+               updated_at = NOW()
+           WHERE user_id = $1"#,
+    )
+    .bind(product.seller_id)
+    .bind(seller_amount)
+    .execute(&mut *tx)
+    .await;
+
+    // Record seller transaction
+    let _ = sqlx::query(
+        r#"INSERT INTO wallet_transactions (wallet_user_id, type, amount_paise, balance_after_paise, description, reference_id)
+           SELECT $1, 'sale', $2, pending_paise, $3, $4
+           FROM wallets WHERE user_id = $1"#,
+    )
+    .bind(product.seller_id)
+    .bind(seller_amount)
+    .bind(format!("Sale: {} (wallet payment)", product.title))
+    .bind(order.id)
+    .execute(&mut *tx)
+    .await;
+
+    // Notify seller
+    let _ = sqlx::query(
+        r#"INSERT INTO notifications (user_id, type, title, message, data)
+           VALUES ($1, 'sale', 'New sale!', $2, $3)"#,
+    )
+    .bind(product.seller_id)
+    .bind(format!("You made a sale of ₹{}!", seller_amount / 100))
+    .bind(serde_json::json!({ "order_id": order.id }))
+    .execute(&mut *tx)
+    .await;
+
+    match tx.commit().await {
+        Ok(_) => {
+            let _ = enqueue_repo_transfer(pool, &order).await;
+            HttpResponse::Ok().json(ApiResponse::success(order, "Payment completed from wallet"))
+        }
+        Err(e) => {
+            log::error!("Failed to commit wallet order: {}", e);
+            HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Transaction failed"))
+        }
+    }
+}
+
 /// Idempotently complete an order after verifying the Razorpay signature.
-///
-/// Shared by both the client `/verify` path and the webhook. The
-/// `WHERE status = 'pending'` guard makes double-completion a no-op: if the
-/// webhook lands first, the client verify returns the already-completed order,
-/// and vice versa.
 async fn complete_order_atomic(
     pool: &PgPool,
     order_db_id: uuid::Uuid,
@@ -142,8 +297,6 @@ async fn complete_order_atomic(
 ) -> Result<bool, sqlx::Error> {
     let mut tx = pool.begin().await?;
 
-    // Atomically flip pending → completed. If 0 rows affected, it was already
-    // completed (webhook raced ahead) — treat as success, skip side effects.
     let completed = sqlx::query_scalar::<_, Option<uuid::Uuid>>(
         r#"UPDATE orders
            SET status = 'completed',
@@ -159,20 +312,18 @@ async fn complete_order_atomic(
 
     let order_row = match completed {
         Some(_) => {
-            // Fetch the full row for the seller/amount we need below.
             sqlx::query_as::<_, Order>("SELECT * FROM orders WHERE id = $1")
                 .bind(order_db_id)
                 .fetch_one(&mut *tx)
                 .await?
         }
         None => {
-            // Already completed — nothing to do, commit the empty tx.
             tx.commit().await?;
             return Ok(false);
         }
     };
 
-    // Hold funds in escrow for ESCROW_HOLD_DAYS
+    // Hold funds in escrow
     sqlx::query(
         r#"INSERT INTO escrow (order_id, amount_paise, status, held_until)
            VALUES ($1, $2, 'held', NOW() + ($3 || ' days')::interval)"#,
@@ -183,7 +334,7 @@ async fn complete_order_atomic(
     .execute(&mut *tx)
     .await?;
 
-    // Credit seller's pending balance + total_earned
+    // Credit seller's pending balance
     sqlx::query(
         r#"UPDATE wallets
            SET pending_paise = pending_paise + $2,
@@ -196,7 +347,7 @@ async fn complete_order_atomic(
     .execute(&mut *tx)
     .await?;
 
-    // Record wallet transaction for audit
+    // Record wallet transaction
     sqlx::query(
         r#"INSERT INTO wallet_transactions (wallet_user_id, type, amount_paise, balance_after_paise, description, reference_id)
            SELECT $1, 'sale', $2, pending_paise, $3, $4
@@ -209,7 +360,7 @@ async fn complete_order_atomic(
     .execute(&mut *tx)
     .await?;
 
-    // Notify the seller
+    // Notify seller
     sqlx::query(
         r#"INSERT INTO notifications (user_id, type, title, message, data)
            VALUES ($1, 'sale', 'New sale!', $2, $3)"#,
@@ -224,7 +375,6 @@ async fn complete_order_atomic(
     Ok(true)
 }
 
-/// Frontend path: called after Razorpay Checkout closes successfully.
 pub async fn verify_order(
     pool: web::Data<PgPool>,
     req: HttpRequest,
@@ -240,7 +390,6 @@ pub async fn verify_order(
         Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid buyer ID")),
     };
 
-    // Verify the Razorpay signature BEFORE trusting anything from the client.
     if let Err(e) = payment::verify_payment_signature(
         &body.razorpay_order_id,
         &body.razorpay_payment_id,
@@ -264,9 +413,6 @@ pub async fn verify_order(
         }
     }
 
-    // Fetch the order, ensuring the caller actually owns it and that the
-    // Razorpay order id matches what we stored. This prevents a buyer from
-    // "completing" someone else's order with a forged signature pair.
     let order = match sqlx::query_as::<_, Order>(
         "SELECT * FROM orders WHERE id = $1 AND buyer_id = $2 AND razorpay_order_id = $3",
     )
@@ -301,12 +447,7 @@ pub async fn verify_order(
     }
 }
 
-/// Push a repo-transfer job onto the Redis queue consumed by the infra-worker.
-/// Best-effort: a failure here does not fail the order — the webhook will
-/// reconcile or the job can be replayed later.
 async fn enqueue_repo_transfer(_pool: &PgPool, order: &Order) -> Result<(), sqlx::Error> {
-    // Look up the redis URL lazily — the core-engine shares a pool with PG
-    // but connects to redis separately. We publish via a short-lived client.
     let redis_url = std::env::var("REDIS_URL").unwrap_or_else(|_| "redis://localhost:6379".to_string());
     let job = serde_json::json!({
         "order_id": order.id,
@@ -316,13 +457,8 @@ async fn enqueue_repo_transfer(_pool: &PgPool, order: &Order) -> Result<(), sqlx
         "github_repo_url": order.github_repo_url,
     });
 
-    // Fire-and-forget on a blocking task — never block the request thread.
     let cloned = redis_url.clone();
     tokio::task::spawn_blocking(move || {
-        // redis crate is not in deps; we log a placeholder so the worker can
-        // pick this up from the notifications table instead. The worker polls
-        // for completed orders with github_transfer_status IS NULL as a
-        // reconciliation path.
         log::info!("repo_transfer job queued (redis={}): {}", cloned, job);
     });
     Ok(())
@@ -343,7 +479,6 @@ pub async fn list_orders(
         Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID")),
     };
 
-    // Only allow users to see their own orders
     let mut sql = String::from("SELECT * FROM orders WHERE (buyer_id = $1 OR seller_id = $1)");
 
     if query.get("status").is_some() {
@@ -355,7 +490,6 @@ pub async fn list_orders(
     let mut query_builder = sqlx::query_as::<_, Order>(&sql).bind(user_uuid);
 
     if let Some(status) = query.get("status") {
-        // Validate status is a known value
         match status.as_str() {
             "pending" | "processing" | "completed" | "refunded" | "disputed" | "cancelled" => {
                 query_builder = query_builder.bind(status);
@@ -395,7 +529,6 @@ pub async fn get_order(
         Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid order ID")),
     };
 
-    // Only allow buyer or seller to view the order
     match sqlx::query_as::<_, Order>(
         "SELECT * FROM orders WHERE id = $1 AND (buyer_id = $2 OR seller_id = $2)"
     )
@@ -413,11 +546,7 @@ pub async fn get_order(
     }
 }
 
-// ---------------------------------------------------------------------------
-// Webhook (server-to-server, the safety net)
-// ---------------------------------------------------------------------------
-
-/// Payload fragment Razorpay sends in webhook events for payments.
+// Webhook
 #[derive(Debug, Deserialize)]
 struct WebhookPayload {
     event: String,
@@ -460,8 +589,6 @@ struct WebhookOrder {
     receipt: Option<String>,
 }
 
-/// Razorpay webhook. Razorpay signs the raw body with `X-Razorpay-Signature`
-/// so we MUST verify against the raw bytes (not re-serialized JSON).
 pub async fn razorpay_webhook(
     pool: web::Data<PgPool>,
     req: HttpRequest,
@@ -488,8 +615,6 @@ pub async fn razorpay_webhook(
         }
     };
 
-    // Only act on successful captures. For other events (failed/refunded)
-    // we acknowledge so Razorpay stops retrying.
     if !payload.event.starts_with("payment.captured") {
         log::info!("Ignoring webhook event: {}", payload.event);
         return HttpResponse::Ok().body("ignored");
@@ -506,7 +631,6 @@ pub async fn razorpay_webhook(
     };
     let payment_id = payment_entity.id;
 
-    // Look up our order by the Razorpay order id we stored at creation.
     let order = match sqlx::query_as::<_, Order>(
         "SELECT * FROM orders WHERE razorpay_order_id = $1",
     )
@@ -534,6 +658,5 @@ pub async fn razorpay_webhook(
         Err(e) => log::error!("Webhook failed to complete order {}: {}", order.id, e),
     }
 
-    // Always 200 so Razorpay doesn't retry forever.
     HttpResponse::Ok().body("ok")
 }

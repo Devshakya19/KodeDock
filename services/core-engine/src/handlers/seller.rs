@@ -79,7 +79,7 @@ pub async fn create_product(
     match sqlx::query_as::<_, Product>(
         r#"INSERT INTO products (seller_id, title, slug, description, long_description, price_paise, original_price_paise, category_id, tags, github_repo_url, image_url, demo_url, tech_stack, status)
            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, 'active')
-           RETURNING *"#
+           RETURNING *, (SELECT name FROM categories WHERE id = category_id) as category_name"#
     )
     .bind(seller_uuid)
     .bind(&body.title)

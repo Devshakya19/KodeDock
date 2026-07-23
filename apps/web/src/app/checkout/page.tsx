@@ -3,7 +3,7 @@
 import { Suspense, useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Lock, CreditCard, Loader2, CheckCircle, Package, AlertCircle, Shield, Zap, Download } from "lucide-react";
+import { ArrowLeft, Lock, CreditCard, Loader2, CheckCircle, Package, AlertCircle, Shield, Zap, Download, Wallet } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { apiGet, apiPost } from "@/shared/lib/api";
@@ -15,6 +15,11 @@ interface Product {
   price_paise: number;
   image_url: string | null;
   category_name: string | null;
+}
+
+interface WalletBalance {
+  balance_paise: number;
+  pending_paise: number;
 }
 
 interface CheckoutOrderResponse {
@@ -76,20 +81,45 @@ function CheckoutContent() {
   const [error, setError] = useState("");
   const [product, setProduct] = useState<Product | null>(null);
   const [productLoading, setProductLoading] = useState(true);
+  const [walletBalance, setWalletBalance] = useState<number | null>(null);
 
   const loadProduct = useCallback(async () => {
     if (!productId) { setProductLoading(false); return; }
     try {
-      const result = await apiGet<Product>(`/products/${productId}`);
-      if (result.success && result.data) setProduct(result.data);
-      else setError(result.error || "Product not found");
+      const [productRes, walletRes] = await Promise.all([
+        apiGet<Product>(`/products/${productId}`),
+        apiGet<WalletBalance>("/wallet"),
+      ]);
+      if (productRes.success && productRes.data) setProduct(productRes.data);
+      else setError(productRes.error || "Product not found");
+      if (walletRes.success && walletRes.data) setWalletBalance(walletRes.data.balance_paise);
     } catch { setError("Failed to load product"); }
     finally { setProductLoading(false); }
   }, [productId]);
 
   useEffect(() => { loadProduct(); }, [loadProduct]);
 
-  async function handlePurchase() {
+  async function handleWalletPayment() {
+    if (!product || !productId) return;
+    setLoading(true);
+    setError("");
+    try {
+      const orderResult = await apiPost<CheckoutOrderResponse>("/orders", { product_id: productId });
+      if (!orderResult.success || !orderResult.data) {
+        setError(orderResult.error || "Failed to create order");
+        setLoading(false);
+        return;
+      }
+      // If wallet payment succeeded, order is already completed
+      setSuccess(true);
+      setTimeout(() => router.push("/dashboard/purchases"), 3000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Network error. Please try again.");
+      setLoading(false);
+    }
+  }
+
+  async function handleRazorpayPayment() {
     if (!product || !productId) return;
     setLoading(true);
     setError("");
@@ -168,6 +198,7 @@ function CheckoutContent() {
   }
 
   const price = product ? product.price_paise / 100 : 0;
+  const hasEnoughWallet = walletBalance !== null && walletBalance >= (product?.price_paise ?? 0);
 
   return (
     <div className="min-h-screen bg-white">
@@ -246,26 +277,46 @@ function CheckoutContent() {
           <CardContent className="p-5">
             <h2 className="text-sm font-extrabold text-slate-950 tracking-tight mb-4 uppercase">Payment</h2>
 
-            <div className="flex items-center gap-3 p-4 rounded-xl border-2 border-slate-950 bg-slate-50 mb-4">
-              <CreditCard className="w-5 h-5 text-slate-950" />
-              <div>
-                <div className="text-sm font-semibold text-slate-950">Razorpay</div>
-                <div className="text-xs text-slate-500">UPI, Cards, Netbanking, Wallets</div>
+            {/* Wallet Balance Display */}
+            {walletBalance !== null && (
+              <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 mb-4">
+                <div className="flex items-center gap-2">
+                  <Wallet className="w-4 h-4 text-slate-600" />
+                  <span className="text-sm text-slate-600">Wallet Balance</span>
+                </div>
+                <span className="text-sm font-semibold text-slate-950">₹{(walletBalance / 100).toLocaleString()}</span>
               </div>
-            </div>
+            )}
 
-            <div className="flex items-center gap-2 text-xs text-slate-400 mb-5">
+            {hasEnoughWallet ? (
+              <Button
+                onClick={handleWalletPayment}
+                disabled={loading || !product || !productId}
+                className="w-full h-13 bg-emerald-600 text-white hover:bg-emerald-700 rounded-xl text-base font-semibold shadow-lg shadow-emerald-600/20 transition-all hover:shadow-xl active:scale-[0.98] mb-3"
+              >
+                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : `Pay ₹${price.toLocaleString()} from Wallet`}
+              </Button>
+            ) : (
+              <>
+                {walletBalance !== null && (
+                  <p className="text-xs text-amber-600 mb-3 text-center">
+                    Insufficient wallet balance. Add ₹{((product?.price_paise ?? 0) - walletBalance) / 100} more or pay via Razorpay.
+                  </p>
+                )}
+                <Button
+                  onClick={handleRazorpayPayment}
+                  disabled={loading || !product || !productId}
+                  className="w-full h-13 bg-slate-950 text-white hover:bg-slate-800 rounded-xl text-base font-semibold shadow-lg shadow-slate-950/20 transition-all hover:shadow-xl active:scale-[0.98]"
+                >
+                  {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : `Pay ₹${price.toLocaleString()} via Razorpay`}
+                </Button>
+              </>
+            )}
+
+            <div className="flex items-center gap-2 text-xs text-slate-400 mt-3 justify-center">
               <Lock className="w-3.5 h-3.5" />
               <span>256-bit encrypted &middot; Secured by Razorpay</span>
             </div>
-
-            <Button
-              onClick={handlePurchase}
-              disabled={loading || !product || !productId}
-              className="w-full h-13 bg-slate-950 text-white hover:bg-slate-800 rounded-xl text-base font-semibold shadow-lg shadow-slate-950/20 transition-all hover:shadow-xl hover:shadow-slate-950/30 active:scale-[0.98]"
-            >
-              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : `Pay ₹${price.toLocaleString()}`}
-            </Button>
 
             <p className="text-[11px] text-slate-400 text-center mt-3">
               By purchasing, you agree to our <Link href="/terms" className="underline hover:text-slate-600">Terms of Service</Link>

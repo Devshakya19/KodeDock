@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LogOut, LayoutDashboard, Package, DollarSign, Settings, User, Store, ShoppingCart, Bell, Menu } from "lucide-react";
+import { LogOut, LayoutDashboard, Package, Settings, User, Store, ShoppingCart, Bell, Menu, Wallet } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { CodeHaatLogo } from "@/shared/components/codehaat-logo";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/shared/ui/sheet";
@@ -11,7 +11,7 @@ const SELLER_NAV_ITEMS = [
   { label: "Dashboard", href: "/seller", icon: LayoutDashboard },
   { label: "Products", href: "/seller/products", icon: Package },
   { label: "Orders", href: "/seller/orders", icon: ShoppingCart },
-  { label: "Earnings", href: "/seller/earnings", icon: DollarSign },
+  { label: "Wallet", href: "/seller/wallet", icon: Wallet },
   { label: "Profile", href: "/seller/profile", icon: User },
   { label: "Settings", href: "/seller/settings", icon: Settings },
 ];
@@ -19,7 +19,7 @@ const SELLER_NAV_ITEMS = [
 function getShortName(fullName?: string, email?: string): string {
   if (fullName) {
     const parts = fullName.trim().split(/\s+/);
-    return parts[0]; // First name only
+    return parts[0];
   }
   if (email) {
     return email.split("@")[0];

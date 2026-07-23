@@ -51,12 +51,6 @@ pub struct Product {
     pub updated_at: Option<DateTime<Utc>>,
 }
 
-/// Public-facing product representation.
-///
-/// `github_repo_url` is deliberately omitted: exposing the seller's source
-/// repo on the public product page would let anyone clone the paid product
-/// without purchasing. Purchased buyers receive repo access via the
-/// repo-transfer job (post-payment), never from this endpoint.
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct PublicProduct {
     pub id: Uuid,
@@ -86,7 +80,6 @@ pub struct PublicProduct {
 
 impl From<Product> for PublicProduct {
     fn from(p: Product) -> Self {
-        // Note: github_repo_url and github_repo_id are intentionally dropped.
         PublicProduct {
             id: p.id,
             seller_id: p.seller_id,
@@ -124,6 +117,50 @@ pub struct Wallet {
     pub total_spent_paise: i32,
     pub created_at: Option<DateTime<Utc>>,
     pub updated_at: Option<DateTime<Utc>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, FromRow)]
+pub struct WalletTransaction {
+    pub id: Uuid,
+    pub wallet_user_id: Uuid,
+    pub r#type: String,
+    pub amount_paise: i32,
+    pub balance_after_paise: i32,
+    pub description: Option<String>,
+    pub reference_id: Option<Uuid>,
+    pub metadata: Option<serde_json::Value>,
+    pub created_at: Option<DateTime<Utc>>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct TopupRequest {
+    pub amount_paise: i32,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct TopupVerifyRequest {
+    pub razorpay_order_id: String,
+    pub razorpay_payment_id: String,
+    pub razorpay_signature: String,
+}
+
+#[derive(Debug, Serialize)]
+pub struct TopupOrderResponse {
+    pub razorpay_order_id: String,
+    pub amount_paise: i32,
+    pub currency: String,
+    pub key_id: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct WithdrawRequest {
+    pub amount_paise: i32,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ListTransactionsQuery {
+    pub page: Option<u32>,
+    pub limit: Option<u32>,
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
@@ -212,7 +249,6 @@ pub struct CreateOrderRequest {
     pub product_id: Uuid,
 }
 
-/// Client request after Razorpay Checkout completes on the frontend.
 #[derive(Debug, Deserialize)]
 pub struct VerifyOrderRequest {
     pub order_id: Uuid,
@@ -221,15 +257,12 @@ pub struct VerifyOrderRequest {
     pub razorpay_signature: String,
 }
 
-/// Response for order creation — contains everything Razorpay Checkout.js
-/// needs to open the payment modal.
 #[derive(Debug, Serialize)]
 pub struct CheckoutOrderResponse {
     pub order_id: Uuid,
     pub razorpay_order_id: String,
     pub amount_paise: i32,
     pub currency: String,
-    /// Public key id for Razorpay Checkout.js initialization.
     pub key_id: String,
     pub product_title: String,
 }

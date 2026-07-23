@@ -46,7 +46,6 @@ async fn main() -> std::io::Result<()> {
     let port = env::var("PORT").unwrap_or_else(|_| "4001".to_string());
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
-    // Create PostgreSQL connection pool (tuned for production)
     let pool = PgPoolOptions::new()
         .min_connections(2)
         .max_connections(20)
@@ -60,11 +59,9 @@ async fn main() -> std::io::Result<()> {
     log::info!("Starting CodeHaat Core Engine on port {}", port);
     log::info!("Connected to PostgreSQL");
 
-    // Initialize S3-compatible storage client
     let storage = storage::StorageClient::new().await;
     log::info!("Storage client initialized");
 
-    // Load CORS origins from environment
     let cors_origins: Vec<String> = env::var("CORS_ORIGINS")
         .unwrap_or_else(|_| "http://localhost:3000,http://localhost:3001".to_string())
         .split(',')
@@ -72,12 +69,6 @@ async fn main() -> std::io::Result<()> {
         .filter(|s| !s.is_empty())
         .collect();
 
-    // --- Rate limiters ---
-    // ForwardedIpKeyExtractor reads the leftmost IP from X-Forwarded-For, falling
-    // back to the direct connection IP. This works correctly behind the Next.js
-    // reverse-proxy (which forwards the real user IP in X-Forwarded-For).
-
-    // Auth routes: 1 request per 12 seconds per IP (5/minute, prevents brute-force)
     let auth_limiter = GovernorConfigBuilder::default()
         .seconds_per_request(12)
         .burst_size(5)
@@ -85,7 +76,6 @@ async fn main() -> std::io::Result<()> {
         .finish()
         .expect("Failed to build auth rate limiter");
 
-    // Upload presign: 1 request per 6 seconds per IP (10/minute)
     let upload_limiter = GovernorConfigBuilder::default()
         .seconds_per_request(6)
         .burst_size(10)
@@ -93,7 +83,6 @@ async fn main() -> std::io::Result<()> {
         .finish()
         .expect("Failed to build upload rate limiter");
 
-    // Order verify: 1 request per 6 seconds per IP (10/minute, prevents replay storms)
     let verify_limiter = GovernorConfigBuilder::default()
         .seconds_per_request(6)
         .burst_size(10)
@@ -116,7 +105,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
             .app_data(web::Data::new(pool.clone()))
             .app_data(web::Data::new(storage.clone()))
-            // Health check (no auth, no rate limit)
+            // Health check
             .route("/health", web::get().to(handlers::health::health_check))
             // Auth (rate-limited)
             .route(
@@ -150,10 +139,10 @@ async fn main() -> std::io::Result<()> {
             // Profile
             .route("/api/profile/{id}", web::get().to(handlers::profile::get_profile))
             .route("/api/profile", web::put().to(handlers::profile::update_profile))
-            // Products (public, no auth)
+            // Products (public)
             .route("/api/products", web::get().to(handlers::products::list_products))
             .route("/api/products/{id}", web::get().to(handlers::products::get_product))
-            // Seller products (developer-only)
+            // Seller products
             .route("/api/seller/products", web::get().to(handlers::seller::list_seller_products))
             .route("/api/seller/products", web::post().to(handlers::seller::create_product))
             .route("/api/seller/products/{id}", web::put().to(handlers::seller::update_product))
@@ -161,7 +150,11 @@ async fn main() -> std::io::Result<()> {
             .route("/api/seller/stats", web::get().to(handlers::seller::get_stats))
             // Wallet
             .route("/api/wallet", web::get().to(handlers::wallet::get_balance))
-            .route("/api/wallet/topup", web::post().to(handlers::wallet::topup))
+            .route("/api/wallet/topup", web::post().to(handlers::wallet::create_topup))
+            .route("/api/wallet/topup/verify", web::post().to(handlers::wallet::verify_topup))
+            .route("/api/wallet/transactions", web::get().to(handlers::wallet::list_transactions))
+            .route("/api/wallet/withdraw", web::post().to(handlers::wallet::withdraw))
+            .route("/api/wallet/release-escrow", web::post().to(handlers::wallet::release_escrow))
             // Orders
             .route("/api/orders", web::post().to(handlers::orders::create_order))
             .route(
@@ -172,7 +165,7 @@ async fn main() -> std::io::Result<()> {
             )
             .route("/api/orders", web::get().to(handlers::orders::list_orders))
             .route("/api/orders/{id}", web::get().to(handlers::orders::get_order))
-            // Razorpay webhook (server-to-server, no rate limit)
+            // Razorpay webhook
             .route("/api/webhooks/razorpay", web::post().to(handlers::orders::razorpay_webhook))
             // Reviews
             .route("/api/reviews/{product_id}", web::get().to(handlers::reviews::list_reviews))
