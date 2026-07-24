@@ -34,6 +34,11 @@ function getShortName(fullName?: string, email?: string): string {
   return "User";
 }
 
+function getCartCount(): number {
+  if (typeof window === "undefined") return 0;
+  try { return JSON.parse(localStorage.getItem("codehaat_cart") || "[]").length; } catch { return 0; }
+}
+
 interface BrowseNavbarProps {
   email: string;
   fullName?: string;
@@ -55,11 +60,17 @@ export function BrowseNavbar({
   const [showNotifications, setShowNotifications] = useState(false);
   const [showCart, setShowCart] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
     apiGet<{ balance_paise: number }>("/wallet").then((res) => {
       if (res.data) setWalletBalance(res.data.balance_paise);
     });
+    setCartCount(getCartCount());
+
+    const handleCartUpdate = () => setCartCount(getCartCount());
+    window.addEventListener("cart-updated", handleCartUpdate);
+    return () => window.removeEventListener("cart-updated", handleCartUpdate);
   }, []);
 
   function handleSearch(e: React.FormEvent) {
@@ -78,9 +89,7 @@ export function BrowseNavbar({
     router.push(`/browse?${params.toString()}`);
   }
 
-  function closeMobile() {
-    setMobileOpen(false);
-  }
+  function closeMobile() { setMobileOpen(false); }
 
   return (
     <>
@@ -88,7 +97,6 @@ export function BrowseNavbar({
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 md:h-16 flex items-center gap-4 md:gap-6">
           <CodeHaatLogo href="/browse" />
 
-          {/* Desktop search */}
           <div className="hidden md:flex flex-1 max-w-xl">
             <form onSubmit={handleSearch} className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -98,127 +106,82 @@ export function BrowseNavbar({
                 onChange={(e) => setSearch(e.target.value)}
                 className="h-10 pl-10 pr-20 border-slate-300 bg-slate-50 text-sm"
               />
-              <Button
-                type="submit"
-                size="sm"
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 px-3 text-xs font-semibold"
-              >
-                Search
-              </Button>
+              <Button type="submit" size="sm" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 px-3 text-xs font-semibold">Search</Button>
             </form>
           </div>
 
-          {/* Desktop right icons */}
+          {/* Desktop icons */}
           <div className="hidden md:flex items-center gap-1">
-            <button
-              onClick={() => setShowCart(true)}
-              className="flex items-center justify-center w-9 h-9 rounded-lg text-slate-600 hover:text-slate-950 hover:bg-slate-100 transition-colors cursor-pointer"
-            >
+            <button onClick={() => setShowCart(true)}
+              className="relative flex items-center justify-center w-9 h-9 rounded-lg text-slate-600 hover:text-slate-950 hover:bg-slate-100 transition-colors cursor-pointer">
               <ShoppingCart className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setShowNotifications(true)}
-              className="flex items-center justify-center w-9 h-9 rounded-lg text-slate-600 hover:text-slate-950 hover:bg-slate-100 transition-colors cursor-pointer"
-            >
-              <Bell className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setShowWallet(true)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-950 hover:bg-slate-100 transition-colors cursor-pointer"
-            >
-              <Wallet className="w-4 h-4" />
-              {walletBalance !== null && (
-                <span className="text-xs font-semibold">₹{(walletBalance / 100).toLocaleString()}</span>
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-slate-950 text-white text-[10px] font-bold flex items-center justify-center">
+                  {cartCount}
+                </span>
               )}
             </button>
+            <button onClick={() => setShowNotifications(true)}
+              className="flex items-center justify-center w-9 h-9 rounded-lg text-slate-600 hover:text-slate-950 hover:bg-slate-100 transition-colors cursor-pointer">
+              <Bell className="w-4 h-4" />
+            </button>
+            <button onClick={() => setShowWallet(true)}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-950 hover:bg-slate-100 transition-colors cursor-pointer">
+              <Wallet className="w-4 h-4" />
+              {walletBalance !== null && <span className="text-xs font-semibold">₹{(walletBalance / 100).toLocaleString()}</span>}
+            </button>
             <div className="w-px h-6 bg-slate-200 mx-1" />
-            <Link
-              href="/dashboard/profile"
-              className="flex items-center justify-center w-9 h-9 rounded-full bg-slate-950 text-sm font-bold text-white hover:bg-slate-800 transition-colors"
-            >
+            <Link href="/dashboard/profile" className="flex items-center justify-center w-9 h-9 rounded-full bg-slate-950 text-sm font-bold text-white hover:bg-slate-800 transition-colors">
               {shortName[0]?.toUpperCase() || "U"}
             </Link>
           </div>
 
-          {/* Mobile: hamburger + wallet */}
+          {/* Mobile */}
           <div className="flex md:hidden items-center gap-2 ml-auto">
-            <button
-              onClick={() => setShowWallet(true)}
-              className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"
-            >
-              <Wallet className="w-4 h-4" />
-              {walletBalance !== null && (
-                <span className="text-xs font-semibold">₹{(walletBalance / 100).toLocaleString()}</span>
+            <button onClick={() => setShowCart(true)} className="relative flex items-center justify-center w-9 h-9 rounded-lg text-slate-600 hover:bg-slate-100">
+              <ShoppingCart className="w-4 h-4" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-slate-950 text-white text-[10px] font-bold flex items-center justify-center">
+                  {cartCount}
+                </span>
               )}
+            </button>
+            <button onClick={() => setShowWallet(true)} className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100">
+              <Wallet className="w-4 h-4" />
+              {walletBalance !== null && <span className="text-xs font-semibold">₹{(walletBalance / 100).toLocaleString()}</span>}
             </button>
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-9 w-9">
-                  <Menu className="h-5 w-5" />
-                </Button>
+                <Button variant="ghost" size="icon" className="h-9 w-9"><Menu className="h-5 w-5" /></Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-72 p-0">
                 <SheetTitle className="sr-only">Menu</SheetTitle>
                 <div className="flex flex-col h-full">
-                  {/* Profile header */}
-                  <Link
-                    href="/dashboard/profile"
-                    onClick={closeMobile}
-                    className="flex items-center gap-3 p-4 border-b border-slate-100 hover:bg-slate-50 transition-colors"
-                  >
-                    <div className="w-11 h-11 rounded-full bg-slate-950 flex items-center justify-center text-sm font-bold text-white flex-shrink-0">
-                      {shortName[0]?.toUpperCase() || "U"}
-                    </div>
+                  <Link href="/dashboard/profile" onClick={closeMobile} className="flex items-center gap-3 p-4 border-b border-slate-100 hover:bg-slate-50">
+                    <div className="w-11 h-11 rounded-full bg-slate-950 flex items-center justify-center text-sm font-bold text-white">{shortName[0]?.toUpperCase() || "U"}</div>
                     <div className="min-w-0">
                       <div className="text-sm font-semibold text-slate-950 truncate">{shortName}</div>
                       <div className="text-xs text-slate-500 truncate">{email}</div>
                     </div>
                   </Link>
-
-                  {/* Search */}
                   <div className="p-4 border-b border-slate-100">
                     <form onSubmit={handleSearch} className="relative">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                      <Input
-                        placeholder="Search products..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="h-10 pl-10 border-slate-300 bg-slate-50 text-sm"
-                      />
+                      <Input placeholder="Search products..." value={search} onChange={(e) => setSearch(e.target.value)} className="h-10 pl-10 border-slate-300 bg-slate-50 text-sm" />
                     </form>
                   </div>
-
-                  {/* Nav links */}
                   <div className="flex-1 overflow-y-auto p-4 space-y-1">
-                    <button
-                      onClick={() => { setShowCart(true); closeMobile(); }}
-                      className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:text-slate-950 hover:bg-slate-50 transition-colors text-left"
-                    >
-                      <ShoppingCart className="w-4 h-4" />
-                      Cart
+                    <button onClick={() => { setShowCart(true); closeMobile(); }} className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 text-left">
+                      <ShoppingCart className="w-4 h-4" /> Cart {cartCount > 0 && <span className="ml-auto bg-slate-950 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">{cartCount}</span>}
                     </button>
-                    <button
-                      onClick={() => { setShowNotifications(true); closeMobile(); }}
-                      className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:text-slate-950 hover:bg-slate-50 transition-colors text-left"
-                    >
-                      <Bell className="w-4 h-4" />
-                      Notifications
+                    <button onClick={() => { setShowNotifications(true); closeMobile(); }} className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 text-left">
+                      <Bell className="w-4 h-4" /> Notifications
                     </button>
-                    <Link
-                      href="/dashboard/purchases"
-                      onClick={closeMobile}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:text-slate-950 hover:bg-slate-50 transition-colors"
-                    >
-                      <Package className="w-4 h-4" />
-                      My Purchases
+                    <Link href="/dashboard/purchases" onClick={closeMobile} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
+                      <Package className="w-4 h-4" /> My Purchases
                     </Link>
-                    <Link
-                      href="/dashboard/profile"
-                      onClick={closeMobile}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:text-slate-950 hover:bg-slate-50 transition-colors"
-                    >
-                      <User className="w-4 h-4" />
-                      Profile
+                    <Link href="/dashboard/profile" onClick={closeMobile} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
+                      <User className="w-4 h-4" /> Profile
                     </Link>
                   </div>
                 </div>
@@ -227,20 +190,12 @@ export function BrowseNavbar({
           </div>
         </nav>
 
-        {/* Category tabs */}
         <div className="border-t border-slate-100 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-1 overflow-x-auto py-2 scrollbar-none">
               {CATEGORIES.map((cat) => (
-                <button
-                  key={cat.value}
-                  onClick={() => handleCategoryChange(cat.value)}
-                  className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${
-                    activeCategory === cat.value
-                      ? "bg-slate-950 text-white"
-                      : "text-slate-600 hover:text-slate-950 hover:bg-slate-100"
-                  }`}
-                >
+                <button key={cat.value} onClick={() => handleCategoryChange(cat.value)}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${activeCategory === cat.value ? "bg-slate-950 text-white" : "text-slate-600 hover:text-slate-950 hover:bg-slate-100"}`}>
                   {cat.label}
                 </button>
               ))}

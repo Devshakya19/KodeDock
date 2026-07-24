@@ -171,6 +171,15 @@ CREATE TABLE IF NOT EXISTS disputes (
   resolved_at TIMESTAMPTZ
 );
 
+-- Product views tracking (unique per user)
+CREATE TABLE IF NOT EXISTS product_views (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(product_id, user_id)
+);
+
 -- STEP 3: CREATE INDEXES
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_products_seller ON products(seller_id);
@@ -191,6 +200,8 @@ CREATE INDEX IF NOT EXISTS idx_reviews_product ON reviews(product_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_unread ON notifications(user_id, is_read) WHERE is_read = FALSE;
 CREATE INDEX IF NOT EXISTS idx_disputes_order ON disputes(order_id);
+CREATE INDEX IF NOT EXISTS idx_product_views_product ON product_views(product_id);
+CREATE INDEX IF NOT EXISTS idx_product_views_user ON product_views(user_id);
 
 -- Password reset tokens
 CREATE TABLE IF NOT EXISTS password_reset_tokens (

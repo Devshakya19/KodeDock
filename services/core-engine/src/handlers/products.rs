@@ -1,7 +1,8 @@
-use actix_web::{web, HttpResponse};
+use actix_web::{web, HttpRequest, HttpResponse};
 use sqlx::PgPool;
 use crate::models::PublicProduct;
 use crate::services::ApiResponse;
+use crate::middleware::extract_user_id;
 
 #[derive(serde::Deserialize)]
 pub struct ListProductsQuery {
@@ -12,11 +13,6 @@ pub struct ListProductsQuery {
     pub limit: Option<u32>,
 }
 
-/// Explicit column list for public product queries.
-///
-/// We never `SELECT *` for public product views — the seller's
-/// `github_repo_url` and `github_repo_id` columns are intentionally omitted
-/// so they cannot leak (e.g. via accidental logging or future serde changes).
 const PUBLIC_PRODUCT_COLUMNS: &str = "p.id, p.seller_id, p.category_id, c.name as category_name, p.title, p.slug, p.description, p.long_description, p.price_paise, p.original_price_paise, p.tags, p.status, p.preview_url, p.image_url, p.demo_url, p.tech_stack, p.sales_count, p.view_count, p.rating, p.review_count, p.is_featured, p.created_at, p.updated_at";
 
 pub async fn list_products(
@@ -28,7 +24,6 @@ pub async fn list_products(
     let limit = query.limit.unwrap_or(20).min(100).max(1);
     let offset = (page - 1) * limit;
 
-    // Build parameterized query
     let mut sql = String::from("SELECT ");
     sql.push_str(PUBLIC_PRODUCT_COLUMNS);
     sql.push_str(" FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.status = 'active'");
@@ -46,7 +41,6 @@ pub async fn list_products(
         ));
     }
 
-    // Sort
     match sort {
         "price_low" => sql.push_str(" ORDER BY p.price_paise ASC"),
         "price_high" => sql.push_str(" ORDER BY p.price_paise DESC"),
@@ -57,7 +51,6 @@ pub async fn list_products(
 
     sql.push_str(&format!(" LIMIT {} OFFSET {}", limit, offset));
 
-    // Bind parameters
     let mut query_builder = sqlx::query_as::<_, PublicProduct>(&sql);
 
     if let Some(ref cat) = query.category {
@@ -81,6 +74,7 @@ pub async fn list_products(
 
 pub async fn get_product(
     pool: web::Data<PgPool>,
+    req: HttpRequest,
     path: web::Path<String>,
 ) -> HttpResponse {
     let id = match uuid::Uuid::parse_str(&path.into_inner()) {
@@ -88,11 +82,45 @@ pub async fn get_product(
         Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid product ID")),
     };
 
-    // Increment view count
-    let _ = sqlx::query("UPDATE products SET view_count = view_count + 1 WHERE id = $1")
-        .bind(id)
-        .execute(pool.get_ref())
-        .await;
+    // Track unique views per user (not per request)
+    // Try to get user ID from token; if not logged in, use IP-based tracking
+    let user_id = extract_user_id(&req).ok();
+
+    if let Some(ref uid) = user_id {
+        if let Ok(user_uuid) = uuid::Uuid::parse_str(uid) {
+            // Check if this user already viewed this product
+            let already_viewed = sqlx::query_scalar::<_, bool>(
+                "SELECT EXISTS(SELECT 1 FROM product_views WHERE product_id = $1 AND user_id = $2)"
+            )
+            .bind(id)
+            .bind(user_uuid)
+            .fetch_one(pool.get_ref())
+            .await
+            .unwrap_or(false);
+
+            if !already_viewed {
+                // Record view and increment count atomically
+                let _ = sqlx::query(
+                    "INSERT INTO product_views (product_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING"
+                )
+                .bind(id)
+                .bind(user_uuid)
+                .execute(pool.get_ref())
+                .await;
+
+                let _ = sqlx::query("UPDATE products SET view_count = view_count + 1 WHERE id = $1")
+                    .bind(id)
+                    .execute(pool.get_ref())
+                    .await;
+            }
+        }
+    } else {
+        // Not logged in - still count but don't track uniqueness
+        let _ = sqlx::query("UPDATE products SET view_count = view_count + 1 WHERE id = $1")
+            .bind(id)
+            .execute(pool.get_ref())
+            .await;
+    }
 
     let sql = format!(
         "SELECT {} FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.id = $1",

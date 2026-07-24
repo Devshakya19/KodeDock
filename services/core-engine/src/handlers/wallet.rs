@@ -72,7 +72,7 @@ pub async fn create_topup(
         return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Amount must be between ₹1 and ₹50,000"));
     }
 
-    let receipt = format!("topup_{}_{}", user_id, uuid::Uuid::new_v4());
+    let receipt = format!("tp_{}_{}", &user_id[..8], &uuid::Uuid::new_v4().to_string()[..8]);
     match payment::create_razorpay_order(body.amount_paise, &receipt).await {
         Ok(razorpay_order) => {
             let key_id = payment::public_key_id().unwrap_or_default();
