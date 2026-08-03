@@ -216,6 +216,23 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
 CREATE INDEX IF NOT EXISTS idx_password_reset_token ON password_reset_tokens(token);
 CREATE INDEX IF NOT EXISTS idx_password_reset_user ON password_reset_tokens(user_id);
 
+-- Seller payout accounts (bank account or UPI for withdrawals)
+CREATE TABLE IF NOT EXISTS seller_payout_accounts (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  seller_id UUID NOT NULL UNIQUE REFERENCES profiles(id) ON DELETE CASCADE,
+  account_type TEXT NOT NULL CHECK (account_type IN ('bank_account', 'upi')),
+  account_holder_name TEXT,
+  account_number TEXT,
+  ifsc_code TEXT,
+  bank_name TEXT,
+  upi_id TEXT,
+  is_default BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_payout_accounts_seller ON seller_payout_accounts(seller_id);
+
 -- STEP 4: CREATE FUNCTIONS (PostgreSQL triggers)
 
 -- Auto-create profile when user is created

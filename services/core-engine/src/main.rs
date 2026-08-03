@@ -148,6 +148,10 @@ async fn main() -> std::io::Result<()> {
             .route("/api/seller/products/{id}", web::put().to(handlers::seller::update_product))
             .route("/api/seller/products/{id}", web::delete().to(handlers::seller::delete_product))
             .route("/api/seller/stats", web::get().to(handlers::seller::get_stats))
+            // Seller payout account
+            .route("/api/seller/payout-account", web::get().to(handlers::payout::get_payout_account))
+            .route("/api/seller/payout-account", web::post().to(handlers::payout::create_or_update_payout_account))
+            .route("/api/seller/payout-account", web::delete().to(handlers::payout::delete_payout_account))
             // Wallet
             .route("/api/wallet", web::get().to(handlers::wallet::get_balance))
             .route("/api/wallet/topup", web::post().to(handlers::wallet::create_topup))

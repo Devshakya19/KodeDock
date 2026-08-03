@@ -29,4 +29,14 @@ impl<T> ApiResponse<T> {
             error: Some(error.to_string()),
         }
     }
+
+    /// Success response with only a message (no data payload).
+    pub fn success_msg(message: &str) -> Self {
+        Self {
+            success: true,
+            data: None,
+            message: Some(message.to_string()),
+            error: None,
+        }
+    }
 }

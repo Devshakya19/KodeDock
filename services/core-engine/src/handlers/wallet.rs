@@ -222,6 +222,26 @@ pub async fn withdraw(
         return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Minimum withdrawal is ₹500"));
     }
 
+    // Require a payout account (bank account or UPI) before allowing withdrawal
+    let payout = match sqlx::query_scalar::<_, String>(
+        "SELECT account_type FROM seller_payout_accounts WHERE seller_id = $1"
+    )
+    .bind(user_uuid)
+    .fetch_optional(pool.get_ref())
+    .await
+    {
+        Ok(Some(t)) => t,
+        Ok(None) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+                "Please add a bank account or UPI ID before withdrawing funds"
+            ));
+        }
+        Err(e) => {
+            log::error!("Failed to fetch payout account: {}", e);
+            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Database error"));
+        }
+    };
+
     let mut tx = match pool.begin().await {
         Ok(tx) => tx,
         Err(e) => {
@@ -269,12 +289,13 @@ pub async fn withdraw(
     }
 
     match sqlx::query(
-        "INSERT INTO wallet_transactions (wallet_user_id, type, amount_paise, balance_after_paise, description) VALUES ($1, 'withdrawal', $2, $3, $4)"
+        "INSERT INTO wallet_transactions (wallet_user_id, type, amount_paise, balance_after_paise, description, metadata) VALUES ($1, 'withdrawal', $2, $3, $4, $5)"
     )
     .bind(user_uuid)
     .bind(-body.amount_paise)
     .bind(new_balance)
     .bind("Withdrawal requested")
+    .bind(serde_json::json!({ "payout_type": payout }))
     .execute(&mut *tx)
     .await
     {

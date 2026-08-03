@@ -3,3 +3,4 @@ export { default as DashboardPage } from "./pages/dashboard";
 export { default as ProductsPage } from "./pages/products";
 export { default as NewProductPage } from "./pages/new-product";
 export { default as SettingsPage } from "./pages/settings";
+export { default as EarningsPage } from "./pages/earnings";

@@ -255,6 +255,33 @@ CREATE TABLE disputes (
 );
 ```
 
+### Table: seller_payout_accounts
+
+Sellers must add a payout method (bank account or UPI) before they can withdraw earnings. One payout account per seller (UNIQUE constraint).
+
+```sql
+CREATE TABLE seller_payout_accounts (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  seller_id UUID NOT NULL UNIQUE REFERENCES profiles(id) ON DELETE CASCADE,
+  account_type TEXT NOT NULL CHECK (account_type IN ('bank_account', 'upi')),
+  account_holder_name TEXT,         -- Required for bank_account
+  account_number TEXT,              -- Required for bank_account (9-18 digits)
+  ifsc_code TEXT,                   -- Required for bank_account (11 chars: e.g. SBIN0001234)
+  bank_name TEXT,                   -- Required for bank_account
+  upi_id TEXT,                      -- Required for upi (format: name@provider)
+  is_default BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_payout_accounts_seller ON seller_payout_accounts(seller_id);
+```
+
+**Validation Rules (enforced server-side in Rust):**
+- Bank account: holder name (1-100 chars), account number (9-18 digits), IFSC (`^[A-Z]{4}0[A-Z0-9]{6}$`), bank name
+- UPI: must match `name@provider` format, max 100 chars
+- Account numbers are **masked** in API responses — only last 4 digits are returned (e.g. `••••1234`)
+
 ---
 
 ## 3. Row-Level Security Policies
@@ -308,24 +335,62 @@ CREATE TABLE disputes (
 ### Core Engine (Rust) — Port 4001
 
 ```
-POST   /api/auth/verify              # Verify JWT, return user
-GET    /api/products                 # List products (with filters)
+# Health
+GET    /health                       # Health check
+
+# Auth (rate-limited: 5 req / 12s)
+POST   /api/auth/register            # Register (user or developer)
+POST   /api/auth/login               # Login
+POST   /api/auth/forgot-password     # Request password reset
+POST   /api/auth/reset-password      # Reset password with token
+POST   /api/auth/logout              # Logout
+GET    /api/auth/me                  # Get current user
+POST   /api/auth/change-password     # Change password (auth required)
+DELETE /api/auth/delete-account      # Delete account (auth required)
+
+# Profile
+GET    /api/profile/:id              # Get profile
+PUT    /api/profile                  # Update own profile (auth required)
+
+# Products (public)
+GET    /api/products                 # List products (search/filter)
 GET    /api/products/:id             # Get product detail
-POST   /api/orders                   # Create order (purchase)
-GET    /api/orders                   # List user orders
-GET    /api/orders/:id               # Get order detail
-GET    /api/wallet                   # Get wallet balance
-POST   /api/wallet/topup             # Top up wallet (paper money)
-POST   /api/wallet/withdraw          # Request withdrawal
+
+# Seller (developer-only, all require auth + role check)
+GET    /api/seller/products          # List seller's products
 POST   /api/seller/products          # Create product
-PUT    /api/seller/products/:id      # Update product
-DELETE /api/seller/products/:id      # Delete product
-GET    /api/seller/stats             # Get seller statistics
-GET    /api/reviews/:productId       # Get product reviews
-POST   /api/reviews                  # Create review
-POST   /api/disputes                 # Raise dispute
-GET    /api/notifications            # Get user notifications
-PUT    /api/notifications/:id/read   # Mark notification read
+PUT    /api/seller/products/:id      # Update product (owner only)
+DELETE /api/seller/products/:id      # Delete product (owner only)
+GET    /api/seller/stats             # Seller dashboard stats
+GET    /api/seller/payout-account    # Get payout method (bank/UPI)
+POST   /api/seller/payout-account    # Add/update payout method
+DELETE /api/seller/payout-account    # Remove payout method
+
+# Wallet (auth required)
+GET    /api/wallet                   # Get wallet balance
+POST   /api/wallet/topup             # Create Razorpay top-up order
+POST   /api/wallet/topup/verify      # Verify top-up signature
+GET    /api/wallet/transactions      # Transaction history (paginated)
+POST   /api/wallet/withdraw          # Withdraw (developer only, requires payout method)
+POST   /api/wallet/release-escrow    # Release expired escrow funds
+
+# Orders (auth required)
+POST   /api/orders                   # Create order (wallet or Razorpay)
+POST   /api/orders/verify            # Verify Razorpay payment (rate-limited: 10/6s)
+GET    /api/orders                   # List orders (buyer or seller)
+GET    /api/orders/:id               # Get order detail
+POST   /api/webhooks/razorpay        # Razorpay webhook (signature-verified)
+
+# Reviews
+GET    /api/reviews/:productId       # List product reviews
+POST   /api/reviews                  # Create review (verified purchase only)
+
+# Notifications
+GET    /api/notifications            # List notifications
+PUT    /api/notifications/:id/read   # Mark as read
+
+# Upload (rate-limited: 10 req / 6s)
+POST   /api/upload/presign           # Get presigned S3 upload URL
 ```
 
 ### AI Service (Python) — Port 4002
@@ -370,14 +435,31 @@ GET    /health                       # Health check
 
 ## 7. Rate Limiting
 
-| Endpoint | Limit | Window |
-|----------|-------|--------|
-| `/api/auth/*` | 10 requests | 1 minute |
-| `/api/products` | 100 requests | 1 minute |
-| `/api/orders` | 10 requests | 1 minute |
-| `/api/wallet/*` | 20 requests | 1 minute |
-| Global | 1000 requests | 1 minute |
+Implemented via `actix-governor` with custom `ForwardedIpKeyExtractor` that reads `X-Forwarded-For` (set by Next.js proxy) to rate-limit per real client IP.
+
+| Endpoint Group | Limit | Window |
+|----------------|-------|--------|
+| `/api/auth/register, login, forgot/reset-password` | 5 requests | 12 seconds |
+| `/api/upload/presign` | 10 requests | 6 seconds |
+| `/api/orders/verify` | 10 requests | 6 seconds |
 
 ---
 
-*Document Version: 1.0 | Last Updated: July 2026*
+## 8. Storage (SeaweedFS)
+
+Self-hosted S3-compatible object storage for product images and avatars.
+
+| Config | Value |
+|--------|-------|
+| Docker image | `chrislusf/seaweedfs:3.76` |
+| S3 API | Port 8333 |
+| Filer API | Port 8888 |
+| Bucket | `codehaat-media` |
+| Allowed paths | `products/`, `avatars/` |
+| Allowed types | JPEG, PNG, GIF, WebP |
+
+**Upload flow:** Client requests presigned PUT URL → uploads directly to SeaweedFS via Next.js proxy → image served through `/api/images/[...path]` proxy with 24h cache headers.
+
+---
+
+*Document Version: 2.0 | Last Updated: August 2026*
