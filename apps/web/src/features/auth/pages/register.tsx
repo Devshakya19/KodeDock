@@ -47,10 +47,15 @@ export default function RegisterPage() {
   }
 
   async function handleGithubLogin() {
-    setLoading(true);
-    // TODO: Implement GitHub OAuth
-    setError("GitHub login coming soon");
-    setLoading(false);
+    setError("");
+    const clientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID;
+    if (!clientId || clientId === "your_github_client_id") {
+      setError("GitHub login is not configured");
+      return;
+    }
+    // Register page → role is "user", redirect to /browse after auth.
+    const state = btoa("user|/browse");
+    window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${window.location.origin}/api/auth/callback&state=${state}`;
   }
 
   if (success) {

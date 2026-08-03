@@ -487,3 +487,133 @@ pub async fn delete_account(
         error: None,
     })
 }
+
+// ─── GitHub OAuth ───────────────────────────────────────────────────
+
+#[derive(Debug, Deserialize)]
+pub struct GithubAuthRequest {
+    pub code: String,
+    /// Intended role ("user" or "developer"). Default "user".
+    pub role: Option<String>,
+}
+
+/// POST /api/auth/github
+///
+/// The Next.js callback route sends the GitHub authorization `code` here.
+/// The backend exchanges it for an access token, fetches the GitHub user
+/// profile, then either:
+///   1. Logs in an existing GitHub-linked user,
+///   2. Links GitHub to an existing email-matched user, or
+///   3. Creates a brand-new account.
+pub async fn github_oauth(
+    pool: web::Data<PgPool>,
+    body: web::Json<GithubAuthRequest>,
+) -> HttpResponse {
+    // 1. Exchange code for GitHub access token
+    let access_token = match auth::exchange_github_code(&body.code).await {
+        Ok(token) => token,
+        Err(e) => {
+            log::error!("GitHub code exchange failed: {}", e);
+            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("GitHub authentication failed"));
+        }
+    };
+
+    // 2. Fetch GitHub user profile
+    let gh_user = match auth::fetch_github_user(&access_token).await {
+        Ok(user) => user,
+        Err(e) => {
+            log::error!("GitHub user fetch failed: {}", e);
+            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Failed to fetch GitHub profile"));
+        }
+    };
+
+    // Determine role — only "developer" is accepted, everything else defaults to "user"
+    let role = match body.role.as_deref() {
+        Some("developer") => "developer",
+        _ => "user",
+    };
+
+    // Derive email and name from GitHub profile
+    let email = gh_user.email.clone().unwrap_or_else(|| {
+        format!("{}@github.codehaat.app", gh_user.login)
+    });
+    let full_name = gh_user.name.clone().unwrap_or_else(|| gh_user.login.clone());
+
+    // 3. Check if a user is already linked to this GitHub ID
+    let user = match auth::get_user_by_github_id(pool.get_ref(), gh_user.id).await {
+        Ok(existing) => existing,
+        Err(_) => {
+            // 4. No GitHub-linked user — try to match by email
+            match auth::get_user_by_email(pool.get_ref(), &email).await {
+                Ok((user_id, _, existing_name, existing_role, _)) => {
+                    // Link GitHub to this existing account
+                    if let Err(e) = auth::link_github_to_user(pool.get_ref(), user_id, gh_user.id, &gh_user.login).await {
+                        log::error!("Failed to link GitHub to user: {}", e);
+                        return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to link GitHub account"));
+                    }
+
+                    // If the user registered with a role different from what they're
+                    // requesting now via GitHub, keep their original role.
+                    auth::User {
+                        id: user_id,
+                        email,
+                        full_name: existing_name.or(Some(full_name)),
+                        role: existing_role,
+                    }
+                }
+                Err(_) => {
+                    // 5. Brand-new user — create account
+                    let new_user = match auth::create_github_user(
+                        pool.get_ref(),
+                        gh_user.id,
+                        &gh_user.login,
+                        &email,
+                        &full_name,
+                        role,
+                    ).await {
+                        Ok(u) => u,
+                        Err(e) => {
+                            log::error!("Failed to create GitHub user: {}", e);
+                            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to create account"));
+                        }
+                    };
+
+                    // Create profile and wallet for the new user
+                    let _ = sqlx::query("INSERT INTO profiles (id, full_name, role, github_username, github_access_token) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (id) DO NOTHING")
+                        .bind(new_user.id)
+                        .bind(&full_name)
+                        .bind(role)
+                        .bind(&gh_user.login)
+                        .bind(&access_token)
+                        .execute(pool.get_ref())
+                        .await;
+
+                    let _ = sqlx::query("INSERT INTO wallets (user_id, balance_paise) VALUES ($1, 0) ON CONFLICT (user_id) DO NOTHING")
+                        .bind(new_user.id)
+                        .execute(pool.get_ref())
+                        .await;
+
+                    new_user
+                }
+            }
+        }
+    };
+
+    // Store (or update) the GitHub access token in the profile
+    let _ = auth::store_github_token(pool.get_ref(), user.id, &access_token).await;
+
+    // 6. Generate JWT
+    let secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+    let token = match auth::generate_token(&user, &secret) {
+        Ok(token) => token,
+        Err(e) => {
+            log::error!("Failed to generate token: {}", e);
+            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to generate token"));
+        }
+    };
+
+    HttpResponse::Ok().json(ApiResponse::success(
+        AuthResponse { user, token },
+        "GitHub authentication successful",
+    ))
+}

@@ -1,7 +1,7 @@
 "use client";
 import { GithubIcon } from "@/shared/components/github-icon";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
@@ -17,6 +17,17 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Show OAuth error from callback redirect (?error=...).
+  // Read from window.location in the browser so the page stays statically
+  // renderable (useSearchParams() would force a Suspense boundary / CSR).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const oauthError = params.get("error");
+    if (oauthError) {
+      setError(decodeURIComponent(oauthError));
+    }
+  }, []);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -34,10 +45,16 @@ export default function LoginPage() {
   }
 
   async function handleGithubLogin() {
-    setLoading(true);
-    // TODO: Implement GitHub OAuth
-    setError("GitHub login coming soon");
-    setLoading(false);
+    setError("");
+    const clientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID;
+    if (!clientId || clientId === "your_github_client_id") {
+      setError("GitHub login is not configured");
+      return;
+    }
+    // State encodes role + next URL so the callback knows where to redirect.
+    // Login page: role stays whatever the backend returns, go to /browse.
+    const state = btoa("user|/browse");
+    window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${window.location.origin}/api/auth/callback&state=${state}`;
   }
 
   return (

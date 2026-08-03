@@ -133,3 +133,136 @@ pub async fn get_user_by_id_with_hash(pool: &PgPool, user_id: Uuid) -> Result<(U
     .map_err(|e| format!("Get user error: {}", e))?
     .ok_or_else(|| "User not found".to_string())
 }
+
+// ─── GitHub OAuth helpers ────────────────────────────────────────────
+
+/// GitHub user profile returned by the GitHub API /user endpoint.
+#[derive(Debug, serde::Deserialize)]
+pub struct GithubUser {
+    pub id: i64,
+    pub login: String,
+    pub name: Option<String>,
+    pub email: Option<String>,
+    #[allow(dead_code)]
+    pub avatar_url: Option<String>,
+}
+
+/// Exchange an authorization `code` for an access token via GitHub's
+/// "web application" OAuth flow (RFC 6749).
+pub async fn exchange_github_code(code: &str) -> Result<String, String> {
+    let client_id = std::env::var("GITHUB_CLIENT_ID").map_err(|_| "GITHUB_CLIENT_ID not set".to_string())?;
+    let client_secret = std::env::var("GITHUB_CLIENT_SECRET").map_err(|_| "GITHUB_CLIENT_SECRET not set".to_string())?;
+
+    let client = reqwest::Client::new();
+    let resp = client
+        .post("https://github.com/login/oauth/access_token")
+        .header("Accept", "application/json")
+        .json(&serde_json::json!({
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "code": code,
+        }))
+        .send()
+        .await
+        .map_err(|e| format!("GitHub token request failed: {}", e))?;
+
+    if !resp.status().is_success() {
+        return Err(format!("GitHub returned status {}", resp.status()));
+    }
+
+    let body: serde_json::Value = resp
+        .json()
+        .await
+        .map_err(|e| format!("Failed to parse GitHub token response: {}", e))?;
+
+    body["access_token"]
+        .as_str()
+        .map(|s| s.to_string())
+        .ok_or_else(|| "No access_token in GitHub response".to_string())
+}
+
+/// Fetch the authenticated GitHub user's profile.
+pub async fn fetch_github_user(access_token: &str) -> Result<GithubUser, String> {
+    let client = reqwest::Client::new();
+    client
+        .get("https://api.github.com/user")
+        .header("Authorization", format!("Bearer {}", access_token))
+        .header("User-Agent", "CodeHaat")
+        .send()
+        .await
+        .map_err(|e| format!("GitHub user request failed: {}", e))?
+        .json()
+        .await
+        .map_err(|e| format!("Failed to parse GitHub user: {}", e))
+}
+
+/// Find an existing user linked to this GitHub ID.
+pub async fn get_user_by_github_id(pool: &PgPool, github_id: i64) -> Result<User, String> {
+    sqlx::query_as::<_, User>(
+        "SELECT id, email, full_name, role FROM users WHERE github_id = $1"
+    )
+    .bind(github_id)
+    .fetch_optional(pool)
+    .await
+    .map_err(|e| format!("Get user by github_id error: {}", e))?
+    .ok_or_else(|| "User not found".to_string())
+}
+
+/// Create a new user from GitHub profile data.
+/// The user has `password_hash = NULL` (OAuth-only account).
+pub async fn create_github_user(
+    pool: &PgPool,
+    github_id: i64,
+    github_username: &str,
+    email: &str,
+    full_name: &str,
+    role: &str,
+) -> Result<User, String> {
+    let id = Uuid::new_v4();
+    sqlx::query_as::<_, User>(
+        r#"INSERT INTO users (id, email, full_name, role, github_id, github_username)
+           VALUES ($1, $2, $3, $4, $5, $6)
+           RETURNING id, email, full_name, role"#
+    )
+    .bind(id)
+    .bind(email)
+    .bind(full_name)
+    .bind(role)
+    .bind(github_id)
+    .bind(github_username)
+    .fetch_one(pool)
+    .await
+    .map_err(|e| format!("Create GitHub user error: {}", e))
+}
+
+/// Link GitHub credentials to an existing user account (matched by email).
+pub async fn link_github_to_user(
+    pool: &PgPool,
+    user_id: Uuid,
+    github_id: i64,
+    github_username: &str,
+) -> Result<(), String> {
+    sqlx::query("UPDATE users SET github_id = $1, github_username = $2 WHERE id = $3")
+        .bind(github_id)
+        .bind(github_username)
+        .bind(user_id)
+        .execute(pool)
+        .await
+        .map_err(|e| format!("Failed to link GitHub: {}", e))?;
+    Ok(())
+}
+
+/// Store the GitHub access token in the user's profile (for future repo operations).
+pub async fn store_github_token(
+    pool: &PgPool,
+    user_id: Uuid,
+    access_token: &str,
+) -> Result<(), String> {
+    sqlx::query("INSERT INTO profiles (id, github_access_token) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET github_access_token = $2")
+        .bind(user_id)
+        .bind(access_token)
+        .execute(pool)
+        .await
+        .map_err(|e| format!("Failed to store GitHub token: {}", e))?;
+    Ok(())
+}

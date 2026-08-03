@@ -136,6 +136,12 @@ async fn main() -> std::io::Result<()> {
             .route("/api/auth/me", web::get().to(handlers::auth::me))
             .route("/api/auth/change-password", web::post().to(handlers::auth::change_password))
             .route("/api/auth/delete-account", web::delete().to(handlers::auth::delete_account))
+            .route(
+                "/api/auth/github",
+                web::post()
+                    .to(handlers::auth::github_oauth)
+                    .wrap(Governor::new(&auth_limiter)),
+            )
             // Profile
             .route("/api/profile/{id}", web::get().to(handlers::profile::get_profile))
             .route("/api/profile", web::put().to(handlers::profile::update_profile))

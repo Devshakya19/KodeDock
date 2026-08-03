@@ -54,6 +54,24 @@ if [ -z "$RZP_KEY_ID" ] || [ -z "$RZP_KEY_SECRET" ]; then
     echo ""
 fi
 
+# ── Ask for GitHub OAuth keys ──
+echo -e "${CYAN}┌─────────────────────────────────────────┐${NC}"
+echo -e "${CYAN}│  GitHub OAuth Setup                     │${NC}"
+echo -e "${CYAN}│  Create app: github.com/settings/apps   │${NC}"
+echo -e "${CYAN}│  Callback URL: localhost:3000/api/auth/ │${NC}"
+echo -e "${CYAN}│                callback                 │${NC}"
+echo -e "${CYAN}└─────────────────────────────────────────┘${NC}"
+echo ""
+read -p "  GitHub Client ID (Ov23li...): " GH_CLIENT_ID
+read -p "  GitHub Client Secret: " GH_CLIENT_SECRET
+echo ""
+
+# ── Validate GitHub keys ──
+if [ -z "$GH_CLIENT_ID" ] || [ -z "$GH_CLIENT_SECRET" ]; then
+    echo -e "${YELLOW}⚠ No GitHub keys provided. GitHub login will be disabled.${NC}"
+    echo ""
+fi
+
 # ── Generate secure random secrets ──
 JWT_SECRET=$(openssl rand -hex 32 2>/dev/null || head -c 64 /dev/urandom | base64 | tr -d '\n/+=' | head -c 64)
 POSTGRES_PASSWORD=$(openssl rand -hex 16 2>/dev/null || head -c 32 /dev/urandom | base64 | tr -d '\n/+=' | head -c 32)
@@ -67,6 +85,12 @@ cat > .env << EOF
 # Razorpay Payment Gateway
 RAZORPAY_KEY_ID=${RZP_KEY_ID}
 RAZORPAY_KEY_SECRET=${RZP_KEY_SECRET}
+
+# GitHub OAuth
+# (NEXT_PUBLIC_GITHUB_CLIENT_ID = same as GITHUB_CLIENT_ID; it's public, baked at build time)
+GITHUB_CLIENT_ID=${GH_CLIENT_ID}
+GITHUB_CLIENT_SECRET=${GH_CLIENT_SECRET}
+NEXT_PUBLIC_GITHUB_CLIENT_ID=${GH_CLIENT_ID}
 
 # Database
 POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
