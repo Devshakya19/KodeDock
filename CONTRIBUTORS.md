@@ -9,7 +9,3 @@ Thanks to these wonderful people who have contributed to CodeHaat:
   </tr>
 </table>
 
-<!--
-| [<img src="https://avatars.githubusercontent.com/u/Devshakya19?v=4&s=100" width="100px;"/><br /><sub><b>Dev Shakya</b></sub>](https://github.com/Devshakya19) | [<img src="https://avatars.githubusercontent.com/u/Deekshajain28?v=4&s=100" width="100px;"/><br /><sub><b>Deeksha Jain</b></sub>](https://github.com/Deekshajain28) |
-|:---:|:---:|
--->
