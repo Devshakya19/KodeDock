@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Documentation
-    url: https://github.com/codehaat/codehaat/tree/main/docs
+    url: https://github.com/Devshakya19/CodeHaat/tree/main/docs
     about: Check the documentation first
   - name: Discussions
-    url: https://github.com/codehaat/codehaat/discussions
+    url: https://github.com/Devshakya19/CodeHaat/discussions
     about: Ask questions or discuss ideas
