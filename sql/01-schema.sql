@@ -90,6 +90,23 @@ CREATE TABLE IF NOT EXISTS wallets (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Wallet topup orders (to track Razorpay orders for topups)
+CREATE TABLE IF NOT EXISTS wallet_topups (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  razorpay_order_id TEXT NOT NULL UNIQUE,
+  razorpay_payment_id TEXT,
+  razorpay_signature TEXT,
+  amount_paise INTEGER NOT NULL CHECK (amount_paise >= 0),
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'success', 'failed')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_wallet_topups_user ON wallet_topups(user_id);
+CREATE INDEX IF NOT EXISTS idx_wallet_topups_status ON wallet_topups(status);
+CREATE INDEX IF NOT EXISTS idx_wallet_topups_razorpay_order ON wallet_topups(razorpay_order_id);
+
 CREATE TABLE IF NOT EXISTS wallet_transactions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   wallet_user_id UUID NOT NULL REFERENCES wallets(user_id) ON DELETE CASCADE,

@@ -584,7 +584,7 @@ pub async fn github_oauth(
                         .bind(&full_name)
                         .bind(role)
                         .bind(&gh_user.login)
-                        .bind(&access_token)
+                        .bind(&auth::encrypt_github_token(&access_token))
                         .execute(pool.get_ref())
                         .await;
 

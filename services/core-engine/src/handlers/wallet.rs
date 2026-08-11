@@ -1,6 +1,7 @@
 use actix_web::{web, HttpRequest, HttpResponse};
+use serde::Deserialize;
 use sqlx::PgPool;
-use crate::models::{Wallet, WalletTransaction, TopupRequest, TopupVerifyRequest, TopupOrderResponse, WithdrawRequest, ListTransactionsQuery};
+use crate::models::{Wallet, WalletTransaction, TopupRequest, TopupVerifyRequest, TopupOrderResponse, WithdrawRequest, ListTransactionsQuery, WalletTopup};
 use crate::services::ApiResponse;
 use crate::services::payment;
 use crate::middleware::{extract_user_id, require_developer};
@@ -59,7 +60,7 @@ pub async fn get_balance(
 }
 
 pub async fn create_topup(
-    _pool: web::Data<PgPool>,
+    pool: web::Data<PgPool>,
     req: HttpRequest,
     body: web::Json<TopupRequest>,
 ) -> HttpResponse {
@@ -72,9 +73,24 @@ pub async fn create_topup(
         return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Amount must be between ₹1 and ₹50,000"));
     }
 
+    let user_uuid = match uuid::Uuid::parse_str(&user_id) {
+        Ok(uuid) => uuid,
+        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID")),
+    };
+
     let receipt = format!("tp_{}_{}", &user_id[..8], &uuid::Uuid::new_v4().to_string()[..8]);
     match payment::create_razorpay_order(body.amount_paise, &receipt).await {
         Ok(razorpay_order) => {
+            // Store the topup order in our database
+            let _ = sqlx::query(
+                "INSERT INTO wallet_topups (user_id, razorpay_order_id, amount_paise) VALUES ($1, $2, $3)"
+            )
+            .bind(user_uuid)
+            .bind(&razorpay_order.id)
+            .bind(body.amount_paise)
+            .execute(pool.get_ref())
+            .await;
+
             let key_id = payment::public_key_id().unwrap_or_default();
             let response = TopupOrderResponse {
                 razorpay_order_id: razorpay_order.id,
@@ -106,6 +122,7 @@ pub async fn verify_topup(
         Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID")),
     };
 
+    // Verify payment signature first
     if let Err(e) = payment::verify_payment_signature(
         &body.razorpay_order_id,
         &body.razorpay_payment_id,
@@ -123,11 +140,44 @@ pub async fn verify_topup(
         }
     };
 
+    // Ensure wallet exists
     let _ = sqlx::query("INSERT INTO wallets (user_id) VALUES ($1) ON CONFLICT (user_id) DO NOTHING")
         .bind(user_uuid)
         .execute(&mut *tx)
         .await;
 
+    // Find the topup order and verify it belongs to the user and is pending
+    let topup = match sqlx::query_as::<_, WalletTopup>(
+        "SELECT * FROM wallet_topups WHERE user_id = $1 AND razorpay_order_id = $2 AND status = 'pending'"
+    )
+    .bind(user_uuid)
+    .bind(&body.razorpay_order_id)
+    .fetch_optional(&mut *tx)
+    .await
+    {
+        Ok(Some(t)) => t,
+        Ok(None) => {
+            let _ = tx.rollback().await;
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid or already processed topup order"));
+        }
+        Err(e) => {
+            log::error!("Failed to fetch topup order: {}", e);
+            let _ = tx.rollback().await;
+            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Database error"));
+        }
+    };
+
+    // Update the topup order as successful
+    let _ = sqlx::query(
+        "UPDATE wallet_topups SET status = 'success', razorpay_payment_id = $1, razorpay_signature = $2, updated_at = NOW() WHERE id = $3"
+    )
+    .bind(&body.razorpay_payment_id)
+    .bind(&body.razorpay_signature)
+    .bind(topup.id)
+    .execute(&mut *tx)
+    .await;
+
+    // Get current wallet balance
     let wallet = match sqlx::query_as::<_, Wallet>("SELECT * FROM wallets WHERE user_id = $1")
         .bind(user_uuid)
         .fetch_one(&mut *tx)
@@ -141,24 +191,37 @@ pub async fn verify_topup(
         }
     };
 
-    let new_balance = wallet.balance_paise;
+    // Calculate new balance
+    let new_balance = wallet.balance_paise + topup.amount_paise;
 
+    // Update wallet balance
     let _ = sqlx::query(
-        "INSERT INTO wallet_transactions (wallet_user_id, type, amount_paise, balance_after_paise, description, reference_id) VALUES ($1, 'topup', $2, $3, $4, NULL)"
+        "UPDATE wallets SET balance_paise = $1, updated_at = NOW() WHERE user_id = $2"
+    )
+    .bind(new_balance)
+    .bind(user_uuid)
+    .execute(&mut *tx)
+    .await;
+
+    // Record the transaction
+    let _ = sqlx::query(
+        "INSERT INTO wallet_transactions (wallet_user_id, type, amount_paise, balance_after_paise, description, reference_id) VALUES ($1, 'topup', $2, $3, $4, $5)"
     )
     .bind(user_uuid)
-    .bind(0)
+    .bind(topup.amount_paise)
     .bind(new_balance)
-    .bind(format!("Razorpay topup verified - {}", body.razorpay_payment_id))
+    .bind(format!("Razorpay topup successful - {}", body.razorpay_payment_id))
+    .bind(topup.id)
     .execute(&mut *tx)
     .await;
 
     match tx.commit().await {
         Ok(_) => {
             HttpResponse::Ok().json(ApiResponse::success(serde_json::json!({
-                "status": "verified",
-                "message": "Payment verified. Amount will be credited shortly."
-            }), "Topup verified"))
+                "status": "success",
+                "message": "Topup successful",
+                "new_balance": new_balance
+            }), "Topup verified and credited"))
         }
         Err(e) => {
             log::error!("Failed to commit transaction: {}", e);
@@ -412,4 +475,166 @@ pub async fn release_escrow(
         "released_count": released_count,
         "total_released_paise": total_released,
     }), &format!("Released {} escrow entries", released_count)))
+}
+
+/// Webhook payload structures for Razorpay wallet topup webhooks
+#[derive(Debug, Deserialize)]
+struct WalletTopupWebhookPayload {
+    event: String,
+    payload: WalletTopupWebhookPayloadInner,
+}
+
+#[derive(Debug, Deserialize)]
+struct WalletTopupWebhookPayloadInner {
+    payment: WalletTopupWebhookPaymentEntity,
+}
+
+#[derive(Debug, Deserialize)]
+struct WalletTopupWebhookPaymentEntity {
+    entity: WalletTopupWebhookPayment,
+}
+
+#[derive(Debug, Deserialize)]
+struct WalletTopupWebhookPayment {
+    id: String,
+    order_id: Option<String>,
+    status: String,
+    #[allow(dead_code)]
+    amount: u64,
+    #[allow(dead_code)]
+    currency: String,
+}
+
+/// Handle Razorpay webhook for wallet topups (server-to-server confirmation)
+pub async fn wallet_topup_webhook(
+    pool: web::Data<PgPool>,
+    req: HttpRequest,
+    body: web::Bytes,
+) -> HttpResponse {
+    let signature = match req.headers().get("X-Razorpay-Signature").and_then(|v| v.to_str().ok()) {
+        Some(s) => s,
+        None => return HttpResponse::BadRequest().body("missing signature"),
+    };
+
+    if let Err(payment::Error::NotConfigured) = payment::verify_webhook_signature(&body, signature) {
+        log::warn!("Webhook received but RAZORPAY_WEBHOOK_SECRET not configured");
+        return HttpResponse::ServiceUnavailable().body("webhook secret not configured");
+    } else if let Err(e) = payment::verify_webhook_signature(&body, signature) {
+        log::warn!("Webhook signature verification failed: {}", e);
+        return HttpResponse::BadRequest().body("invalid signature");
+    }
+
+    let payload: WalletTopupWebhookPayload = match serde_json::from_slice(&body) {
+        Ok(p) => p,
+        Err(e) => {
+            log::error!("Failed to parse webhook body: {}", e);
+            return HttpResponse::BadRequest().body("invalid payload");
+        }
+    };
+
+    // We only process payment.captured events for topups
+    if !payload.event.starts_with("payment.captured") {
+        log::info!("Ignoring webhook event: {}", payload.event);
+        return HttpResponse::Ok().body("ignored");
+    }
+
+    let payment_entity = payload.payload.payment.entity;
+    if payment_entity.status != "captured" {
+        return HttpResponse::Ok().body("not captured");
+    }
+
+    let razorpay_order_id = match payment_entity.order_id {
+        Some(id) => id,
+        None => return HttpResponse::Ok().body("no order id"),
+    };
+    let payment_id = payment_entity.id;
+
+    // Find the topup order by razorpay_order_id
+    let topup = match sqlx::query_as::<_, WalletTopup>(
+        "SELECT * FROM wallet_topups WHERE razorpay_order_id = $1 AND status = 'pending'"
+    )
+    .bind(&razorpay_order_id)
+    .fetch_optional(pool.get_ref())
+    .await
+    {
+        Ok(Some(t)) => t,
+        Ok(None) => {
+            log::warn!("Webhook for unknown or already processed razorpay order {}", razorpay_order_id);
+            return HttpResponse::Ok().body("topup not found or already processed");
+        }
+        Err(e) => {
+            log::error!("Webhook DB lookup failed: {}", e);
+            return HttpResponse::InternalServerError().body("db error");
+        }
+    };
+
+    let user_id = topup.user_id;
+    let amount_paise = topup.amount_paise;
+
+    // Process the topup in a transaction
+    let mut tx = match pool.begin().await {
+        Ok(tx) => tx,
+        Err(e) => {
+            log::error!("Failed to start transaction: {}", e);
+            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Database error"));
+        }
+    };
+
+    // Update the topup order as successful
+    let _ = sqlx::query(
+        "UPDATE wallet_topups SET status = 'success', razorpay_payment_id = $1, updated_at = NOW() WHERE id = $2"
+    )
+    .bind(&payment_id)
+    .bind(topup.id)
+    .execute(&mut *tx)
+    .await;
+
+    // Get current wallet balance
+    let wallet = match sqlx::query_as::<_, Wallet>("SELECT * FROM wallets WHERE user_id = $1")
+        .bind(user_id)
+        .fetch_one(&mut *tx)
+        .await
+    {
+        Ok(w) => w,
+        Err(e) => {
+            log::error!("Failed to fetch wallet: {}", e);
+            let _ = tx.rollback().await;
+            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Wallet error"));
+        }
+    };
+
+    // Calculate new balance
+    let new_balance = wallet.balance_paise + amount_paise;
+
+    // Update wallet balance
+    let _ = sqlx::query(
+        "UPDATE wallets SET balance_paise = $1, updated_at = NOW() WHERE user_id = $2"
+    )
+    .bind(new_balance)
+    .bind(user_id)
+    .execute(&mut *tx)
+    .await;
+
+    // Record the transaction
+    let _ = sqlx::query(
+        "INSERT INTO wallet_transactions (wallet_user_id, type, amount_paise, balance_after_paise, description, reference_id) VALUES ($1, 'topup', $2, $3, $4, $5)"
+    )
+    .bind(user_id)
+    .bind(amount_paise)
+    .bind(new_balance)
+    .bind(format!("Razorpay topup successful (webhook) - {}", payment_id))
+    .bind(topup.id)
+    .execute(&mut *tx)
+    .await;
+
+    match tx.commit().await {
+        Ok(_) => {
+            log::info!("Wallet topup {} completed via webhook for user {}", razorpay_order_id, user_id);
+            HttpResponse::Ok().body("ok")
+        }
+        Err(e) => {
+            log::error!("Failed to commit wallet topup transaction: {}", e);
+            HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Transaction failed"))
+        }
+    }
 }

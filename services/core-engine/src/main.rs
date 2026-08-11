@@ -175,8 +175,9 @@ async fn main() -> std::io::Result<()> {
             )
             .route("/api/orders", web::get().to(handlers::orders::list_orders))
             .route("/api/orders/{id}", web::get().to(handlers::orders::get_order))
-            // Razorpay webhook
+            // Razorpay webhooks
             .route("/api/webhooks/razorpay", web::post().to(handlers::orders::razorpay_webhook))
+            .route("/api/webhooks/wallet-topup", web::post().to(handlers::wallet::wallet_topup_webhook))
             // Reviews
             .route("/api/reviews/{product_id}", web::get().to(handlers::reviews::list_reviews))
             .route("/api/reviews", web::post().to(handlers::reviews::create_review))

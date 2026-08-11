@@ -1,6 +1,6 @@
 //! Server-side JWT verification.
 //!
-//! Used by Next.js middleware (Edge Runtime) and server components / route
+//! Used by Next.js proxy (Edge Runtime) and server components / route
 //! handlers to cryptographically verify the auth token. The secret is read from
 //! a server-side env var (`JWT_SECRET`) that is **never** exposed to the browser
 //! (no `NEXT_PUBLIC_` prefix).

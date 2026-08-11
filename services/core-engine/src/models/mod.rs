@@ -164,6 +164,19 @@ pub struct ListTransactionsQuery {
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
+pub struct WalletTopup {
+    pub id: Uuid,
+    pub user_id: Uuid,
+    pub razorpay_order_id: String,
+    pub razorpay_payment_id: Option<String>,
+    pub razorpay_signature: Option<String>,
+    pub amount_paise: i32,
+    pub status: String,
+    pub created_at: Option<DateTime<Utc>>,
+    pub updated_at: Option<DateTime<Utc>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Order {
     pub id: Uuid,
     pub buyer_id: Uuid,

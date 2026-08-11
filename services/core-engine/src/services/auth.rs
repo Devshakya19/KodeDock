@@ -1,9 +1,12 @@
 use argon2::{password_hash::{rand_core::OsRng, PasswordHasher, SaltString}, Argon2, PasswordHash, PasswordVerifier};
-use jsonwebtoken::{encode, decode, Header, EncodingKey, DecodingKey, Validation, Algorithm};
+use jsonwebtoken::{encode as jwt_encode, decode as jwt_decode, Header, EncodingKey, DecodingKey, Validation, Algorithm};
 use serde::{Deserialize, Serialize};
 use sqlx::{PgPool, FromRow};
 use uuid::Uuid;
 use chrono::{Utc, Duration};
+use std::env;
+use hex::encode as hex_encode;
+use sha2::{Sha256, Digest};
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct User {
@@ -50,7 +53,7 @@ pub fn generate_token(user: &User, secret: &str) -> Result<String, String> {
         iat: now.timestamp() as usize,
     };
 
-    encode(
+    jwt_encode(
         &Header::default(),
         &claims,
         &EncodingKey::from_secret(secret.as_bytes()),
@@ -59,7 +62,7 @@ pub fn generate_token(user: &User, secret: &str) -> Result<String, String> {
 }
 
 pub fn verify_token(token: &str, secret: &str) -> Result<Claims, String> {
-    let token_data = decode::<Claims>(
+    let token_data = jwt_decode::<Claims>(
         token,
         &DecodingKey::from_secret(secret.as_bytes()),
         &Validation::new(Algorithm::HS256),
@@ -67,6 +70,27 @@ pub fn verify_token(token: &str, secret: &str) -> Result<Claims, String> {
     .map_err(|e| format!("Token verification error: {}", e))?;
 
     Ok(token_data.claims)
+}
+
+/// Encrypt a GitHub token using a simple XOR-based encryption with the JWT secret.
+/// This provides basic obfuscation to avoid storing tokens in plaintext.
+pub fn encrypt_github_token(token: &str) -> String {
+    let secret = env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+    // Create a key by hashing the secret
+    let mut hasher = Sha256::new();
+    hasher.update(secret.as_bytes());
+    let key_result = hasher.finalize();
+    let key = key_result.as_slice();
+    
+    // XOR the token with the key (repeating if necessary)
+    let token_bytes = token.as_bytes();
+    let mut encrypted = Vec::with_capacity(token_bytes.len());
+    for (i, byte) in token_bytes.iter().enumerate() {
+        encrypted.push(byte ^ key[i % key.len()]);
+    }
+    
+    // Return as hex string for storage
+    hex_encode(encrypted)
 }
 
 pub async fn create_user(pool: &PgPool, email: &str, password: &str, full_name: &str, role: &str) -> Result<User, String> {
@@ -258,9 +282,10 @@ pub async fn store_github_token(
     user_id: Uuid,
     access_token: &str,
 ) -> Result<(), String> {
+    let encrypted_token = encrypt_github_token(access_token);
     sqlx::query("INSERT INTO profiles (id, github_access_token) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET github_access_token = $2")
         .bind(user_id)
-        .bind(access_token)
+        .bind(&encrypted_token)
         .execute(pool)
         .await
         .map_err(|e| format!("Failed to store GitHub token: {}", e))?;
