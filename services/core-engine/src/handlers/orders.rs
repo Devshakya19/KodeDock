@@ -42,7 +42,7 @@ pub async fn create_order(
     };
 
     // Fetch the product
-    let product = match sqlx::query_as::<_, crate::models::Product>("SELECT p.id, p.seller_id, p.category_id, c.name as category_name, p.title, p.slug, p.description, p.long_description, p.price_paise, p.original_price_paise, p.tags, p.status, p.github_repo_url, p.github_repo_id, p.preview_url, p.image_url, p.demo_url, p.tech_stack, p.sales_count, p.view_count, p.rating, p.review_count, p.is_featured, p.created_at, p.updated_at FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.id = $1")
+    let product = match sqlx::query_as::<_, crate::models::Product>("SELECT p.id, p.seller_id, p.category_id, c.name as category_name, p.title, p.slug, p.description, p.long_description, p.price_paise, p.original_price_paise, p.tags, p.status, p.stock_limit, p.github_repo_url, p.github_repo_id, p.preview_url, p.image_url, p.demo_url, p.tech_stack, p.sales_count, p.view_count, p.rating, p.review_count, p.is_featured, p.created_at, p.updated_at FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.id = $1")
         .bind(body.product_id)
         .fetch_optional(pool.get_ref())
         .await
@@ -55,8 +55,17 @@ pub async fn create_order(
         }
     };
 
-    if product.status != "active" {
+    if product.status != "active" && product.status != "limited" {
         return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Product is not available for purchase"));
+    }
+
+    if product.status == "limited" {
+        if let Some(limit) = product.stock_limit {
+            let sales = product.sales_count.unwrap_or(0);
+            if sales >= limit {
+                return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Product is out of stock"));
+            }
+        }
     }
 
     if product.seller_id == buyer_uuid {
@@ -160,9 +169,9 @@ async fn pay_from_wallet(
         }
     };
 
-    // Lock buyer's wallet
+    // Ensure buyer's wallet exists and lock it
     let buyer_wallet = match sqlx::query_as::<_, crate::models::Wallet>(
-        "SELECT * FROM wallets WHERE user_id = $1 FOR UPDATE"
+        "INSERT INTO wallets (user_id, balance_paise) VALUES ($1, 0) ON CONFLICT (user_id) DO UPDATE SET updated_at = NOW() RETURNING *"
     )
     .bind(buyer_uuid)
     .fetch_one(&mut *tx)
@@ -277,6 +286,12 @@ async fn pay_from_wallet(
     .execute(&mut *tx)
     .await;
 
+    // Increment product sales_count
+    let _ = sqlx::query("UPDATE products SET sales_count = COALESCE(sales_count, 0) + 1 WHERE id = $1")
+        .bind(product.id)
+        .execute(&mut *tx)
+        .await;
+
     match tx.commit().await {
         Ok(_) => {
             let _ = enqueue_repo_transfer(pool, &order).await;
@@ -370,6 +385,12 @@ async fn complete_order_atomic(
     .bind(serde_json::json!({ "order_id": order_row.id }))
     .execute(&mut *tx)
     .await?;
+
+    // Increment product sales_count
+    sqlx::query("UPDATE products SET sales_count = COALESCE(sales_count, 0) + 1 WHERE id = $1")
+        .bind(order_row.product_id)
+        .execute(&mut *tx)
+        .await?;
 
     tx.commit().await?;
     Ok(true)

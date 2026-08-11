@@ -13,7 +13,7 @@ pub struct ListProductsQuery {
     pub limit: Option<u32>,
 }
 
-const PUBLIC_PRODUCT_COLUMNS: &str = "p.id, p.seller_id, p.category_id, c.name as category_name, p.title, p.slug, p.description, p.long_description, p.price_paise, p.original_price_paise, p.tags, p.status, p.preview_url, p.image_url, p.demo_url, p.tech_stack, p.sales_count, p.view_count, p.rating, p.review_count, p.is_featured, p.created_at, p.updated_at";
+const PUBLIC_PRODUCT_COLUMNS: &str = "p.id, p.seller_id, u.full_name as seller_name, p.category_id, c.name as category_name, p.title, p.slug, p.description, p.long_description, p.price_paise, p.original_price_paise, p.tags, p.status, p.stock_limit, p.preview_url, p.image_url, p.demo_url, p.tech_stack, p.sales_count, p.view_count, p.rating, p.review_count, p.is_featured, p.created_at, p.updated_at";
 
 pub async fn list_products(
     pool: web::Data<PgPool>,
@@ -26,7 +26,7 @@ pub async fn list_products(
 
     let mut sql = String::from("SELECT ");
     sql.push_str(PUBLIC_PRODUCT_COLUMNS);
-    sql.push_str(" FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.status = 'active'");
+    sql.push_str(" FROM products p LEFT JOIN categories c ON p.category_id = c.id LEFT JOIN users u ON p.seller_id = u.id WHERE (p.status = 'active' OR p.status = 'limited')");
     let mut bind_index = 1;
 
     if query.category.is_some() {
@@ -123,7 +123,7 @@ pub async fn get_product(
     }
 
     let sql = format!(
-        "SELECT {} FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.id = $1",
+        "SELECT {} FROM products p LEFT JOIN categories c ON p.category_id = c.id LEFT JOIN users u ON p.seller_id = u.id WHERE p.id = $1",
         PUBLIC_PRODUCT_COLUMNS
     );
     match sqlx::query_as::<_, PublicProduct>(&sql)

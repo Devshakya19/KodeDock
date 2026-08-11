@@ -3,10 +3,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Loader2, CheckCircle, Shield, Trash2, ArrowLeft } from "lucide-react";
+import { Loader2, CheckCircle, Shield, Trash2, ArrowLeft, KeyRound, AlertTriangle } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
-import { Card, CardContent } from "@/shared/ui/card";
 import { auth } from "@/shared/lib/auth";
 import { apiPost, apiDelete } from "@/shared/lib/api";
 
@@ -66,14 +65,14 @@ export default function SellerSettingsPage() {
         setError(result.error || "Failed to update password");
       }
     } catch {
-      setError("Network error");
+      setError("Network error occurred while updating password.");
     } finally {
       setSaving(false);
     }
   }
 
   async function handleDeleteAccount() {
-    if (!confirm("Are you sure you want to delete your seller account? This action cannot be undone.")) {
+    if (!confirm("Are you absolutely sure you want to delete your seller account? This action cannot be undone and will permanently remove all your products and data.")) {
       return;
     }
 
@@ -86,68 +85,76 @@ export default function SellerSettingsPage() {
         alert(result.error || "Failed to delete account");
       }
     } catch {
-      alert("Network error");
+      alert("Network error occurred.");
     }
   }
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-6 h-6 text-slate-400 animate-spin" />
+      <div className="flex items-center justify-center py-20 min-h-[60vh]">
+        <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
       </div>
     );
   }
 
   return (
-    <>
+    <div className="max-w-3xl mx-auto py-8">
       <div className="mb-8">
-        <Link href="/seller" className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-slate-950 mb-4">
+        <Link href="/seller" className="inline-flex items-center gap-2 text-[13px] font-semibold text-slate-500 hover:text-slate-900 mb-4 transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back to Dashboard
         </Link>
-        <h1 className="text-2xl font-bold text-slate-950">Settings</h1>
-        <p className="text-slate-600 mt-1">Manage your account security</p>
+        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Account Settings</h1>
+        <p className="text-slate-500 mt-1 text-[15px]">Manage your security preferences and account status</p>
       </div>
 
-      <div className="max-w-2xl space-y-6">
-        {success && (
-          <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-sm text-emerald-700 flex items-center gap-2">
-            <CheckCircle className="w-4 h-4" />
-            {success}
+      <div className="space-y-8">
+        
+        {/* Security Section */}
+        <div className="bg-white rounded-[24px] p-6 sm:p-8 border border-slate-100 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.03)]">
+          <div className="flex items-center gap-3 mb-8 border-b border-slate-100 pb-4">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+              <Shield className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-slate-900">Security & Password</h2>
+              <p className="text-[13px] text-slate-500 font-medium mt-0.5">Keep your account secure by updating your password regularly</p>
+            </div>
           </div>
-        )}
 
-        {error && (
-          <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
-            {error}
-          </div>
-        )}
+          {success && (
+            <div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-100/50 text-sm font-medium text-emerald-800 flex items-center gap-3">
+              <CheckCircle className="w-5 h-5 text-emerald-500" />
+              {success}
+            </div>
+          )}
 
-        {/* Change Password */}
-        <Card className="border-slate-200">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Shield className="w-5 h-5 text-slate-600" />
-              <h2 className="text-lg font-semibold text-slate-950">Change Password</h2>
+          {error && (
+            <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-100/50 text-sm font-medium text-red-800 flex items-center gap-3">
+              <AlertTriangle className="w-5 h-5 text-red-500" />
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handlePasswordChange} className="space-y-6 max-w-xl">
+            <div className="space-y-2">
+              <label htmlFor="currentPassword" className="flex items-center gap-2 text-[14px] font-semibold text-slate-900">
+                <KeyRound className="w-4 h-4 text-slate-400" />
+                Current Password
+              </label>
+              <Input
+                id="currentPassword"
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder="Enter current password"
+                required
+                className="h-12 border-slate-200 bg-slate-50/50 focus-visible:bg-white rounded-xl text-[15px]"
+              />
             </div>
 
-            <form onSubmit={handlePasswordChange} className="space-y-4">
-              <div>
-                <label htmlFor="currentPassword" className="block text-sm font-medium text-slate-700 mb-1.5">
-                  Current Password
-                </label>
-                <Input
-                  id="currentPassword"
-                  type="password"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  placeholder="Enter current password"
-                  required
-                  className="h-11 border-slate-300 bg-white"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="newPassword" className="block text-sm font-medium text-slate-700 mb-1.5">
+            <div className="grid sm:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label htmlFor="newPassword" className="block text-[14px] font-semibold text-slate-900">
                   New Password
                 </label>
                 <Input
@@ -155,57 +162,72 @@ export default function SellerSettingsPage() {
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Enter new password"
+                  placeholder="Min 8 characters"
                   required
-                  className="h-11 border-slate-300 bg-white"
+                  className="h-12 border-slate-200 bg-slate-50/50 focus-visible:bg-white rounded-xl text-[15px]"
                 />
               </div>
 
-              <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-700 mb-1.5">
-                  Confirm New Password
+              <div className="space-y-2">
+                <label htmlFor="confirmPassword" className="block text-[14px] font-semibold text-slate-900">
+                  Confirm Password
                 </label>
                 <Input
                   id="confirmPassword"
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Confirm new password"
+                  placeholder="Repeat new password"
                   required
-                  className="h-11 border-slate-300 bg-white"
+                  className="h-12 border-slate-200 bg-slate-50/50 focus-visible:bg-white rounded-xl text-[15px]"
                 />
               </div>
+            </div>
 
+            <div className="pt-4">
               <Button
                 type="submit"
                 disabled={saving}
-                className="bg-slate-950 text-white hover:bg-slate-800"
+                className="h-12 px-8 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-[14px] font-semibold shadow-md transition-all"
               >
-                {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                Update Password
+                {saving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    Updating...
+                  </>
+                ) : (
+                  "Update Password"
+                )}
               </Button>
-            </form>
-          </CardContent>
-        </Card>
+            </div>
+          </form>
+        </div>
 
         {/* Danger Zone */}
-        <Card className="border-red-200">
-          <CardContent className="p-6">
-            <h2 className="text-lg font-semibold text-red-700 mb-2">Danger Zone</h2>
-            <p className="text-sm text-slate-600 mb-4">
-              Permanently delete your seller account and all associated data.
-            </p>
+        <div className="bg-red-50/30 rounded-[24px] p-6 sm:p-8 border border-red-100">
+          <div className="flex items-start justify-between gap-6 flex-col sm:flex-row">
+            <div>
+              <h2 className="text-lg font-bold text-red-700 flex items-center gap-2 mb-2">
+                <AlertTriangle className="w-5 h-5" />
+                Danger Zone
+              </h2>
+              <p className="text-[14px] text-slate-600 font-medium max-w-md">
+                Permanently delete your seller account, all active product listings, and remove all associated data. This action cannot be undone.
+              </p>
+            </div>
+            
             <Button
               variant="outline"
               onClick={handleDeleteAccount}
-              className="border-red-300 text-red-700 hover:bg-red-50"
+              className="h-12 px-6 rounded-xl border-red-200 bg-white text-red-600 font-bold hover:bg-red-50 hover:text-red-700 hover:border-red-300 transition-all shadow-sm shrink-0"
             >
               <Trash2 className="w-4 h-4 mr-2" />
               Delete Account
             </Button>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+
       </div>
-    </>
+    </div>
   );
 }

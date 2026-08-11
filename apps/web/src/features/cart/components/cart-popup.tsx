@@ -75,14 +75,16 @@ export function CartPopup({ onClose }: Props) {
                 <div key={item.id} className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
                     {item.image_url ? (
-                      <img src={item.image_url} alt="" className="w-full h-full object-cover" />
+                      <img src={item.image_url} alt="" className="w-full h-full object-contain" />
                     ) : (
                       <ShoppingCart className="w-4 h-4 text-slate-400" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-slate-950 truncate">{item.title}</p>
-                    <p className="text-xs text-slate-500">₹{(item.price_paise / 100).toLocaleString()}</p>
+                    <p className={`text-xs ${item.price_paise === 0 ? "text-emerald-600 font-semibold" : "text-slate-500"}`}>
+                      {item.price_paise === 0 ? "Free" : `₹${(item.price_paise / 100).toLocaleString()}`}
+                    </p>
                   </div>
                   <button onClick={() => removeItem(item.id)} className="text-slate-400 hover:text-red-500 transition-colors p-1">
                     <Trash2 className="w-3.5 h-3.5" />
@@ -94,7 +96,9 @@ export function CartPopup({ onClose }: Props) {
             <div className="border-t border-slate-100 px-4 py-3">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm font-medium text-slate-600">Total</span>
-                <span className="text-base font-bold text-slate-950">₹{(total / 100).toLocaleString()}</span>
+                <span className={`text-base font-bold ${total === 0 ? "text-emerald-600 font-extrabold" : "text-slate-950"}`}>
+                  {total === 0 ? "Free" : `₹${(total / 100).toLocaleString()}`}
+                </span>
               </div>
               <Link href={`/checkout?product_id=${items[0]?.id}`} onClick={onClose}>
                 <Button className="w-full bg-slate-950 text-white hover:bg-slate-800 rounded-lg text-sm h-10">

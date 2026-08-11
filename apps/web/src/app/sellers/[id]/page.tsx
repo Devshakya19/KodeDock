@@ -139,7 +139,7 @@ export default async function SellerPublicPage({ params }: { params: Promise<{ i
                 <Card className="group border border-slate-200 hover:border-slate-950 hover:shadow-lg transition-all cursor-pointer h-full">
                   <div className="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center overflow-hidden">
                     {product.image_url ? (
-                      <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
+                      <img src={product.image_url} alt={product.title} className="w-full h-full object-contain" />
                     ) : (
                       <Package className="w-8 h-8 text-slate-400" />
                     )}
@@ -148,8 +148,8 @@ export default async function SellerPublicPage({ params }: { params: Promise<{ i
                     <h3 className="font-semibold text-slate-950 text-sm line-clamp-2">{product.title}</h3>
                     <p className="text-xs text-slate-500 mt-1 line-clamp-2">{product.description}</p>
                     <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
-                      <span className="text-base font-bold text-slate-950">
-                        INR {(product.price_paise / 100).toLocaleString()}
+                      <span className={`text-base font-bold ${product.price_paise === 0 ? "text-emerald-600 font-extrabold" : "text-slate-950"}`}>
+                        {product.price_paise === 0 ? "Free" : `INR ${(product.price_paise / 100).toLocaleString()}`}
                       </span>
                       <span className="text-[11px] text-slate-500">
                         {product.rating?.toFixed(1) || "0.0"} stars ({product.review_count})

@@ -78,6 +78,7 @@ export async function serverApiGet<T>(path: string): Promise<{ success: boolean;
 
     const res = await fetch(`${API_URL}/api${path}`, {
       headers: { Authorization: `Bearer ${token}` },
+      cache: "no-store",
     });
     if (!res.ok) return { success: false, error: `HTTP ${res.status}` };
     return await res.json();

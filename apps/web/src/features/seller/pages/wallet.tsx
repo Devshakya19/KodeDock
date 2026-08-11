@@ -13,10 +13,13 @@ import {
   Plus,
   Pencil,
   ShieldCheck,
+  Clock,
+  TrendingUp,
+  AlertCircle,
+  CheckCircle2
 } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
-import { Card, CardContent } from "@/shared/ui/card";
 import { apiGet, apiPost } from "@/shared/lib/api";
 import AddPayoutMethod, { type PayoutAccountData } from "@/features/wallet/components/add-payout-method";
 
@@ -37,35 +40,51 @@ interface Transaction {
   created_at: string;
 }
 
+const POLL_INTERVAL = 15000;
+
 export default function SellerWalletPage() {
   const [wallet, setWallet] = useState<WalletData | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [payoutAccount, setPayoutAccount] = useState<PayoutAccountData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [withdrawing, setWithdrawing] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [payoutSheetOpen, setPayoutSheetOpen] = useState(false);
+  const [txFilter, setTxFilter] = useState("all");
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
+  const fetchData = useCallback(async (isManual = false) => {
+    if (isManual) setRefreshing(true);
     try {
       const [walletRes, txRes, payoutRes] = await Promise.all([
         apiGet<WalletData>("/wallet"),
         apiGet<Transaction[]>("/wallet/transactions"),
         apiGet<PayoutAccountData>("/seller/payout-account"),
       ]);
+
       if (walletRes.data) setWallet(walletRes.data);
       if (txRes.data) setTransactions(txRes.data);
-      // 404 is expected when no payout account exists
       setPayoutAccount(payoutRes.success && payoutRes.data ? payoutRes.data : null);
-    } catch {}
-    setLoading(false);
+      setLastUpdated(new Date());
+    } catch {
+      // Silently handle poll errors
+    } finally {
+      setLoading(false);
+      if (isManual) setRefreshing(false);
+    }
   }, []);
 
   useEffect(() => {
     fetchData();
+  }, [fetchData]);
+
+  // Auto-refresh every 15s
+  useEffect(() => {
+    const timer = setInterval(() => fetchData(), POLL_INTERVAL);
+    return () => clearInterval(timer);
   }, [fetchData]);
 
   async function handleWithdraw() {
@@ -109,17 +128,33 @@ export default function SellerWalletPage() {
     setTimeout(() => setSuccess(""), 3000);
   }
 
+  const setPresetAmount = (amt: number) => {
+    setWithdrawAmount(amt.toString());
+  };
+
+  const setMaxAmount = () => {
+    if (wallet) {
+      setWithdrawAmount((wallet.balance_paise / 100).toString());
+    }
+  };
+
+  const filteredTransactions = transactions.filter((tx) => {
+    if (txFilter === "sales") return tx.type === "sale";
+    if (txFilter === "withdrawals") return tx.type === "withdrawal";
+    return true;
+  });
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
+      <div className="max-w-6xl mx-auto px-4 py-16 flex items-center justify-center">
         <Loader2 className="w-6 h-6 text-slate-400 animate-spin" />
       </div>
     );
   }
 
   return (
-    <>
-      {/* Add Payout Method Sheet */}
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 font-sans">
+      {/* Payout Sheet */}
       <AddPayoutMethod
         open={payoutSheetOpen}
         onOpenChange={setPayoutSheetOpen}
@@ -127,222 +162,378 @@ export default function SellerWalletPage() {
         onSaved={handlePayoutSaved}
       />
 
-      <div className="mb-8 flex items-center justify-between">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-slate-950">Wallet</h1>
-          <p className="text-slate-600 mt-1">Your earnings and withdrawals</p>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold uppercase tracking-wider mb-2">
+            <WalletIcon className="w-3.5 h-3.5" />
+            Payout & Balances
+          </div>
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+            Seller Wallet
+          </h1>
+          <p className="text-slate-500 text-sm mt-1">
+            Manage your store earnings, escrow holds, and withdrawal methods
+          </p>
         </div>
-        <Button onClick={fetchData} variant="outline" className="border-slate-300">
-          <RefreshCw className="w-4 h-4 mr-2" /> Refresh
-        </Button>
+
+        <div className="flex items-center gap-3">
+          {lastUpdated && (
+            <span className="text-[11px] text-slate-400">
+              Updated {lastUpdated.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+            </span>
+          )}
+          <button
+            onClick={() => fetchData(true)}
+            disabled={refreshing}
+            className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-white border border-slate-200/80 rounded-xl px-3 py-2 shadow-sm transition-all hover:bg-slate-50"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} />
+            Refresh
+          </button>
+          <span className="flex items-center gap-1.5 text-xs text-emerald-600 font-bold bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            Live
+          </span>
+        </div>
       </div>
 
-      {/* Balance Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <Card className="border-slate-200">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
-                <WalletIcon className="w-5 h-5 text-emerald-600" />
+      {/* 3 Metric Balance Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {/* Available Balance */}
+        <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-[24px] p-6 shadow-xl relative overflow-hidden flex flex-col justify-between h-[170px]">
+          <div className="absolute right-0 top-0 translate-x-4 -translate-y-4 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl pointer-events-none" />
+          
+          <div className="flex justify-between items-start">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center border border-white/10">
+                <WalletIcon className="w-4 h-4 text-emerald-400" />
               </div>
-              <div>
-                <p className="text-xs text-slate-500">Available Balance</p>
-                <p className="text-2xl font-bold text-slate-950">₹{((wallet?.balance_paise ?? 0) / 100).toLocaleString()}</p>
-              </div>
+              <span className="text-xs font-semibold text-slate-300">Available Balance</span>
             </div>
-          </CardContent>
-        </Card>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              Ready to withdraw
+            </span>
+          </div>
 
-        <Card className="border-slate-200">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
-                <ArrowUpRight className="w-5 h-5 text-amber-600" />
-              </div>
-              <div>
-                <p className="text-xs text-slate-500">Pending (in escrow)</p>
-                <p className="text-2xl font-bold text-slate-950">₹{((wallet?.pending_paise ?? 0) / 100).toLocaleString()}</p>
-                <p className="text-[10px] text-slate-400">Released after 7 days</p>
-              </div>
+          <div>
+            <div className="text-3xl font-extrabold tracking-tight">
+              ₹{((wallet?.balance_paise ?? 0) / 100).toLocaleString()}
             </div>
-          </CardContent>
-        </Card>
+            <p className="text-[11px] text-slate-400 mt-1">
+              Available for instant payout transfer
+            </p>
+          </div>
+        </div>
 
-        <Card className="border-slate-200">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                <ArrowDownLeft className="w-5 h-5 text-blue-600" />
+        {/* Pending Escrow Balance */}
+        <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] flex flex-col justify-between h-[170px]">
+          <div className="flex justify-between items-start">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center border border-amber-100">
+                <Clock className="w-4 h-4 text-amber-600" />
               </div>
-              <div>
-                <p className="text-xs text-slate-500">Total Earned</p>
-                <p className="text-2xl font-bold text-slate-950">₹{((wallet?.total_earned_paise ?? 0) / 100).toLocaleString()}</p>
-              </div>
+              <span className="text-xs font-semibold text-slate-500">Pending (Escrow)</span>
             </div>
-          </CardContent>
-        </Card>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+              7-Day Hold
+            </span>
+          </div>
+
+          <div>
+            <div className="text-3xl font-extrabold text-slate-900 tracking-tight">
+              ₹{((wallet?.pending_paise ?? 0) / 100).toLocaleString()}
+            </div>
+            <p className="text-[11px] text-slate-400 mt-1">
+              Auto-releases to available balance after 7 days
+            </p>
+          </div>
+        </div>
+
+        {/* Total Earned */}
+        <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] flex flex-col justify-between h-[170px]">
+          <div className="flex justify-between items-start">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center border border-blue-100">
+                <TrendingUp className="w-4 h-4 text-blue-600" />
+              </div>
+              <span className="text-xs font-semibold text-slate-500">Lifetime Revenue</span>
+            </div>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+              Gross Earned
+            </span>
+          </div>
+
+          <div>
+            <div className="text-3xl font-extrabold text-slate-900 tracking-tight">
+              ₹{((wallet?.total_earned_paise ?? 0) / 100).toLocaleString()}
+            </div>
+            <p className="text-[11px] text-slate-400 mt-1">
+              Total earned across all sold products
+            </p>
+          </div>
+        </div>
       </div>
 
-      {/* Payout Method Card */}
-      <Card className="border-slate-200 mb-6">
-        <CardContent className="p-6">
-          <div className="flex items-start justify-between gap-4 flex-wrap">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
-                {payoutAccount?.account_type === "upi" ? (
-                  <Smartphone className="w-5 h-5 text-slate-600" />
-                ) : (
-                  <Landmark className="w-5 h-5 text-slate-600" />
-                )}
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold text-slate-950">Payout Method</h3>
-                {payoutAccount ? (
-                  <div className="mt-1">
-                    {payoutAccount.account_type === "upi" ? (
-                      <p className="text-sm text-slate-700">
-                        UPI: <span className="font-medium">{payoutAccount.upi_id}</span>
-                      </p>
-                    ) : (
-                      <div className="space-y-0.5">
-                        <p className="text-sm text-slate-700">
-                          {payoutAccount.account_holder_name}
-                        </p>
-                        <p className="text-sm text-slate-500">
-                          {payoutAccount.bank_name} ••••{payoutAccount.masked_account_number?.slice(-4)}
-                        </p>
-                        <p className="text-xs text-slate-400">IFSC: {payoutAccount.ifsc_code}</p>
-                      </div>
-                    )}
+      <div className="grid lg:grid-cols-3 gap-6 mb-8">
+        
+        {/* Payout Method Card (1 Col) */}
+        <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <Landmark className="w-4 h-4 text-slate-500" />
+                Payout Account
+              </h3>
+              {payoutAccount && (
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                  <CheckCircle2 className="w-3 h-3" /> Active
+                </span>
+              )}
+            </div>
+
+            {payoutAccount ? (
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/60 mb-4">
+                {payoutAccount.account_type === "upi" ? (
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center flex-shrink-0">
+                      <Smartphone className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">UPI ID</p>
+                      <p className="text-sm font-bold text-slate-900 mt-0.5">{payoutAccount.upi_id}</p>
+                    </div>
                   </div>
                 ) : (
-                  <p className="text-sm text-slate-500 mt-1">
-                    No payout method added. Add a bank account or UPI ID to withdraw funds.
-                  </p>
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+                      <Landmark className="w-5 h-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider truncate">
+                        {payoutAccount.bank_name}
+                      </p>
+                      <p className="text-sm font-bold text-slate-900 mt-0.5">
+                        {payoutAccount.account_holder_name}
+                      </p>
+                      <p className="text-xs font-medium text-slate-500 mt-1 font-mono">
+                        •••• {payoutAccount.masked_account_number?.slice(-4)} • {payoutAccount.ifsc_code}
+                      </p>
+                    </div>
+                  </div>
                 )}
               </div>
-            </div>
-            <Button
-              variant={payoutAccount ? "outline" : "default"}
-              onClick={() => setPayoutSheetOpen(true)}
-              className={
-                payoutAccount
-                  ? "border-slate-300"
-                  : "bg-slate-950 text-white hover:bg-slate-800"
-              }
-            >
-              {payoutAccount ? (
-                <>
-                  <Pencil className="w-4 h-4 mr-2" /> Change
-                </>
-              ) : (
-                <>
-                  <Plus className="w-4 h-4 mr-2" /> Add Bank Account / UPI
-                </>
-              )}
-            </Button>
+            ) : (
+              <div className="p-4 rounded-2xl bg-amber-50/60 border border-amber-200/60 mb-4 text-center">
+                <AlertCircle className="w-6 h-6 text-amber-600 mx-auto mb-2" />
+                <p className="text-xs font-bold text-slate-900">No payout method added</p>
+                <p className="text-[11px] text-slate-500 mt-1">
+                  Add your bank account or UPI ID to enable earnings withdrawal.
+                </p>
+              </div>
+            )}
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Withdraw Section */}
-      <Card className="border-slate-200 mb-6">
-        <CardContent className="p-6">
-          <h3 className="text-lg font-semibold text-slate-950 mb-4">Withdraw Funds</h3>
-          <p className="text-sm text-slate-500 mb-4">
-            Minimum withdrawal: ₹500.{" "}
+          <Button
+            variant={payoutAccount ? "outline" : "default"}
+            onClick={() => setPayoutSheetOpen(true)}
+            className={`w-full h-11 rounded-xl font-bold transition-all ${
+              payoutAccount
+                ? "border-slate-200 text-slate-700 hover:bg-slate-50"
+                : "bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-900/20"
+            }`}
+          >
             {payoutAccount ? (
               <>
-                Funds will be sent to your{" "}
-                {payoutAccount.account_type === "upi"
-                  ? `UPI (${payoutAccount.upi_id})`
-                  : `bank account ••••${payoutAccount.masked_account_number?.slice(-4)}`}.
+                <Pencil className="w-4 h-4 mr-2" /> Update Payout Details
               </>
             ) : (
-              <span className="text-amber-600 font-medium">
-                Add a payout method first to enable withdrawals.
-              </span>
+              <>
+                <Plus className="w-4 h-4 mr-2" /> Add Bank Account / UPI
+              </>
             )}
-          </p>
+          </Button>
+        </div>
 
-          {error && <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">{error}</div>}
-          {success && <div className="mb-4 p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-sm text-emerald-700">{success}</div>}
+        {/* Withdraw Request Section (2 Cols) */}
+        <div className="lg:col-span-2 bg-white rounded-[24px] p-6 border border-slate-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)]">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <Banknote className="w-4 h-4 text-slate-500" />
+              Request Withdrawal
+            </h3>
+            <span className="text-xs text-slate-400 font-medium">Min: ₹500</span>
+          </div>
 
-          <div className="flex items-end gap-4">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Amount (INR)</label>
-              <Input
-                type="number"
-                value={withdrawAmount}
-                onChange={(e) => setWithdrawAmount(e.target.value)}
-                placeholder="Min ₹500"
-                min="500"
-                className="h-11"
-                disabled={!payoutAccount}
-              />
+          {error && (
+            <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-700 flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              {error}
             </div>
+          )}
+          {success && (
+            <div className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-700 flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+              {success}
+            </div>
+          )}
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
+                Withdrawal Amount (₹)
+              </label>
+              
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-lg">₹</span>
+                <Input
+                  type="number"
+                  value={withdrawAmount}
+                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                  placeholder="500"
+                  min="500"
+                  className="h-12 pl-9 pr-20 text-base font-bold text-slate-900 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white"
+                  disabled={!payoutAccount}
+                />
+                <button
+                  type="button"
+                  onClick={setMaxAmount}
+                  disabled={!payoutAccount || !wallet || wallet.balance_paise <= 0}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-lg transition-colors"
+                >
+                  MAX
+                </button>
+              </div>
+            </div>
+
+            {/* Presets */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-slate-400 font-medium mr-1">Quick:</span>
+              {[500, 1000, 2500, 5000].map((amt) => (
+                <button
+                  key={amt}
+                  type="button"
+                  onClick={() => setPresetAmount(amt)}
+                  disabled={!payoutAccount}
+                  className="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 transition-colors"
+                >
+                  ₹{amt}
+                </button>
+              ))}
+            </div>
+
             <Button
               onClick={handleWithdraw}
               disabled={withdrawing || !withdrawAmount || !payoutAccount}
-              className="bg-slate-950 text-white hover:bg-slate-800 h-11"
+              className="w-full h-12 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 shadow-lg shadow-slate-900/20 transition-all hover:-translate-y-0.5 mt-2"
             >
-              {withdrawing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Banknote className="w-4 h-4 mr-2" />}
-              Withdraw
+              {withdrawing ? (
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+              ) : (
+                <Banknote className="w-4 h-4 mr-2 text-emerald-400" />
+              )}
+              Confirm Withdrawal
             </Button>
+
+            {!payoutAccount && (
+              <p className="text-xs text-slate-400 text-center flex items-center justify-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
+                Withdrawals disabled until payout method is configured.
+              </p>
+            )}
           </div>
+        </div>
 
-          {!payoutAccount && (
-            <p className="text-xs text-slate-400 mt-3 flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              Withdrawals are disabled until you add a payout method
-            </p>
-          )}
-        </CardContent>
-      </Card>
+      </div>
 
-      {/* Transaction History */}
-      <Card className="border-slate-200">
-        <CardContent className="p-6">
-          <h3 className="text-lg font-semibold text-slate-950 mb-4">Transaction History</h3>
-          {transactions.length === 0 ? (
-            <p className="text-sm text-slate-500 text-center py-8">No transactions yet</p>
-          ) : (
-            <div className="space-y-3">
-              {transactions.map((tx) => (
-                <div key={tx.id} className="flex items-center justify-between py-3 border-b border-slate-100 last:border-0">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      tx.amount_paise > 0 ? "bg-emerald-100" : "bg-red-100"
-                    }`}>
-                      {tx.amount_paise > 0 ? (
-                        <ArrowDownLeft className="w-4 h-4 text-emerald-600" />
+      {/* Transaction History Table Redesign */}
+      <div className="bg-white rounded-[24px] p-6 border border-slate-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <h3 className="text-lg font-bold text-slate-900">Wallet Transactions</h3>
+          
+          <div className="flex items-center gap-1.5 bg-slate-100/80 p-1.5 rounded-2xl border border-slate-200/50">
+            {[
+              { id: "all", label: "All" },
+              { id: "sales", label: "Sales" },
+              { id: "withdrawals", label: "Payouts" },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setTxFilter(tab.id)}
+                className={`px-3 py-1 rounded-xl text-xs font-bold transition-all ${
+                  txFilter === tab.id
+                    ? "bg-slate-900 text-white shadow-sm"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-white/60"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {filteredTransactions.length === 0 ? (
+          <div className="py-12 text-center bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
+            <WalletIcon className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+            <p className="text-sm font-bold text-slate-900">No transactions recorded</p>
+            <p className="text-xs text-slate-400 mt-1">Your wallet activity will show up here.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {filteredTransactions.map((tx) => {
+              const isPositive = tx.amount_paise > 0;
+              const formattedDate = new Date(tx.created_at).toLocaleDateString("en-IN", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+
+              return (
+                <div
+                  key={tx.id}
+                  className="flex items-center justify-between p-4 rounded-2xl border border-slate-100 hover:bg-slate-50/60 transition-all"
+                >
+                  <div className="flex items-center gap-3.5">
+                    <div
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                        isPositive ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"
+                      }`}
+                    >
+                      {isPositive ? (
+                        <ArrowDownLeft className="w-5 h-5" />
                       ) : (
-                        <ArrowUpRight className="w-4 h-4 text-red-600" />
+                        <ArrowUpRight className="w-5 h-5" />
                       )}
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-slate-950">
-                        {tx.description || tx.type}
+                      <p className="text-sm font-bold text-slate-900">
+                        {tx.description || (isPositive ? "Sale Credit" : "Withdrawal Payout")}
                       </p>
-                      <p className="text-xs text-slate-500">
-                        {new Date(tx.created_at).toLocaleDateString("en-IN", {
-                          day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit"
-                        })}
+                      <p className="text-xs text-slate-400 font-medium mt-0.5">
+                        {formattedDate}
                       </p>
                     </div>
                   </div>
+
                   <div className="text-right">
-                    <p className={`text-sm font-semibold ${tx.amount_paise > 0 ? "text-emerald-600" : "text-red-600"}`}>
-                      {tx.amount_paise > 0 ? "+" : ""}₹{(Math.abs(tx.amount_paise) / 100).toLocaleString()}
+                    <p className={`text-sm font-extrabold ${isPositive ? "text-emerald-600" : "text-slate-900"}`}>
+                      {isPositive ? "+" : "-"}₹{(Math.abs(tx.amount_paise) / 100).toLocaleString()}
                     </p>
-                    <p className="text-xs text-slate-400">Balance: ₹{(tx.balance_after_paise / 100).toLocaleString()}</p>
+                    <p className="text-[11px] text-slate-400 font-medium mt-0.5">
+                      Balance: ₹{(tx.balance_after_paise / 100).toLocaleString()}
+                    </p>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

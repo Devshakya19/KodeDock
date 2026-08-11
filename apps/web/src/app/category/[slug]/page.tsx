@@ -74,8 +74,8 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                     <h3 className="font-semibold text-slate-950 text-sm line-clamp-2">{product.title}</h3>
                     <p className="text-xs text-slate-500 mt-1 line-clamp-2">{product.description}</p>
                     <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
-                      <span className="text-base font-bold text-slate-950">
-                        ₹{(product.price_paise / 100).toLocaleString()}
+                      <span className={`text-base font-bold ${product.price_paise === 0 ? "text-emerald-600 font-extrabold" : "text-slate-950"}`}>
+                        {product.price_paise === 0 ? "Free" : `₹${(product.price_paise / 100).toLocaleString()}`}
                       </span>
                       <span className="text-[11px] text-slate-500">
                         {product.rating?.toFixed(1) || "0.0"} ★

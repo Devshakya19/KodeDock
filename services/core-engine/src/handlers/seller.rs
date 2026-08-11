@@ -76,9 +76,11 @@ pub async fn create_product(
         None => None,
     };
 
+    let product_status = body.status.clone().unwrap_or_else(|| "active".to_string());
+
     match sqlx::query_as::<_, Product>(
-        r#"INSERT INTO products (seller_id, title, slug, description, long_description, price_paise, original_price_paise, category_id, tags, github_repo_url, image_url, demo_url, tech_stack, status)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, 'active')
+        r#"INSERT INTO products (seller_id, title, slug, description, long_description, price_paise, original_price_paise, category_id, tags, github_repo_url, image_url, demo_url, tech_stack, status, stock_limit)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
            RETURNING *, (SELECT name FROM categories WHERE id = category_id) as category_name"#
     )
     .bind(seller_uuid)
@@ -94,6 +96,8 @@ pub async fn create_product(
     .bind(&body.image_url)
     .bind(&body.demo_url)
     .bind(&body.tech_stack)
+    .bind(&product_status)
+    .bind(body.stock_limit)
     .fetch_one(pool.get_ref())
     .await
     {
@@ -120,7 +124,7 @@ pub async fn list_seller_products(
     };
 
     match sqlx::query_as::<_, Product>(
-        "SELECT p.id, p.seller_id, p.category_id, c.name as category_name, p.title, p.slug, p.description, p.long_description, p.price_paise, p.original_price_paise, p.tags, p.status, p.github_repo_url, p.github_repo_id, p.preview_url, p.image_url, p.demo_url, p.tech_stack, p.sales_count, p.view_count, p.rating, p.review_count, p.is_featured, p.created_at, p.updated_at FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.seller_id = $1 ORDER BY p.created_at DESC"
+        "SELECT p.id, p.seller_id, p.category_id, c.name as category_name, p.title, p.slug, p.description, p.long_description, p.price_paise, p.original_price_paise, p.tags, p.status, p.stock_limit, p.github_repo_url, p.github_repo_id, p.preview_url, p.image_url, p.demo_url, p.tech_stack, p.sales_count, p.view_count, p.rating, p.review_count, p.is_featured, p.created_at, p.updated_at FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.seller_id = $1 ORDER BY p.created_at DESC"
     )
         .bind(seller_uuid)
         .fetch_all(pool.get_ref())
@@ -204,6 +208,7 @@ pub async fn update_product(
            image_url = COALESCE($11, image_url),
            demo_url = COALESCE($12, demo_url),
            tech_stack = COALESCE($13, tech_stack),
+           stock_limit = COALESCE($14, stock_limit),
            updated_at = NOW()
            WHERE id = $1 RETURNING id"#,
     )
@@ -220,6 +225,7 @@ pub async fn update_product(
     .bind(&body.image_url)
     .bind(&body.demo_url)
     .bind(&body.tech_stack)
+    .bind(body.stock_limit)
     .fetch_optional(pool.get_ref())
     .await;
 
@@ -227,7 +233,7 @@ pub async fn update_product(
         Ok(Some(_)) => {
             // Now fetch the updated product with category name via JOIN
             match sqlx::query_as::<_, Product>(
-                "SELECT p.id, p.seller_id, p.category_id, c.name as category_name, p.title, p.slug, p.description, p.long_description, p.price_paise, p.original_price_paise, p.tags, p.status, p.github_repo_url, p.github_repo_id, p.preview_url, p.image_url, p.demo_url, p.tech_stack, p.sales_count, p.view_count, p.rating, p.review_count, p.is_featured, p.created_at, p.updated_at FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.id = $1"
+                "SELECT p.id, p.seller_id, p.category_id, c.name as category_name, p.title, p.slug, p.description, p.long_description, p.price_paise, p.original_price_paise, p.tags, p.status, p.stock_limit, p.github_repo_url, p.github_repo_id, p.preview_url, p.image_url, p.demo_url, p.tech_stack, p.sales_count, p.view_count, p.rating, p.review_count, p.is_featured, p.created_at, p.updated_at FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.id = $1"
             )
             .bind(id)
             .fetch_optional(pool.get_ref())

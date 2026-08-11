@@ -13,7 +13,7 @@ interface Product {
   original_price_paise?: number;
   category?: { name: string };
   category_name?: string;
-  seller?: { full_name: string };
+  seller_name?: string | null;
   rating: number;
   review_count: number;
   tags: string[];
@@ -91,7 +91,7 @@ export function ProductGrid({ searchQuery = "", categoryFilter = "" }: ProductGr
           price={product.price_paise / 100}
           originalPrice={product.original_price_paise ? product.original_price_paise / 100 : undefined}
           category={product.category_name || "Uncategorized"}
-          seller={product.seller?.full_name || "Unknown"}
+          seller={product.seller_name || "Unknown"}
           rating={product.rating}
           reviews={product.review_count}
           image={product.image_url || undefined}

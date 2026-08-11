@@ -238,7 +238,7 @@ function CheckoutContent() {
                 <div className="flex items-center gap-4 mb-5">
                   <div className="w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0 border border-slate-200">
                     {product.image_url ? (
-                      <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
+                      <img src={product.image_url} alt={product.title} className="w-full h-full object-contain" />
                     ) : (
                       <Package className="w-5 h-5 text-slate-400" />
                     )}
@@ -247,15 +247,17 @@ function CheckoutContent() {
                     <div className="text-sm font-semibold text-slate-950 truncate">{product.title}</div>
                     <div className="text-xs text-slate-500 mt-0.5">{product.category_name || "Uncategorized"}</div>
                   </div>
-                  <div className="text-sm font-bold text-slate-950 flex-shrink-0">
-                    ₹{price.toLocaleString()}
+                  <div className={`text-sm font-bold flex-shrink-0 ${price === 0 ? "text-emerald-600 font-extrabold" : "text-slate-950"}`}>
+                    {price === 0 ? "Free" : `₹${price.toLocaleString()}`}
                   </div>
                 </div>
 
                 <div className="border-t border-slate-100 pt-4 space-y-2.5">
                   <div className="flex justify-between text-sm">
                     <span className="text-slate-500">Product Price</span>
-                    <span className="text-slate-700 font-medium">₹{price.toLocaleString()}</span>
+                    <span className={`font-medium ${price === 0 ? "text-emerald-600 font-bold" : "text-slate-700"}`}>
+                      {price === 0 ? "Free" : `₹${price.toLocaleString()}`}
+                    </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-slate-500">Platform Fee</span>
@@ -263,7 +265,9 @@ function CheckoutContent() {
                   </div>
                   <div className="border-t border-slate-100 pt-3 flex justify-between">
                     <span className="font-extrabold text-slate-950 text-base">Total</span>
-                    <span className="font-extrabold text-slate-950 text-base">₹{price.toLocaleString()}</span>
+                    <span className={`font-extrabold text-base ${price === 0 ? "text-emerald-600" : "text-slate-950"}`}>
+                      {price === 0 ? "Free" : `₹${price.toLocaleString()}`}
+                    </span>
                   </div>
                 </div>
               </>
@@ -278,7 +282,7 @@ function CheckoutContent() {
             <h2 className="text-sm font-extrabold text-slate-950 tracking-tight mb-4 uppercase">Payment</h2>
 
             {/* Wallet Balance Display */}
-            {walletBalance !== null && (
+            {walletBalance !== null && price > 0 && (
               <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 mb-4">
                 <div className="flex items-center gap-2">
                   <Wallet className="w-4 h-4 text-slate-600" />
@@ -294,7 +298,7 @@ function CheckoutContent() {
                 disabled={loading || !product || !productId}
                 className="w-full h-13 bg-emerald-600 text-white hover:bg-emerald-700 rounded-xl text-base font-semibold shadow-lg shadow-emerald-600/20 transition-all hover:shadow-xl active:scale-[0.98] mb-3"
               >
-                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : `Pay ₹${price.toLocaleString()} from Wallet`}
+                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : price === 0 ? "Get Free Code" : `Pay ₹${price.toLocaleString()} from Wallet`}
               </Button>
             ) : (
               <>
@@ -308,7 +312,7 @@ function CheckoutContent() {
                   disabled={loading || !product || !productId}
                   className="w-full h-13 bg-slate-950 text-white hover:bg-slate-800 rounded-xl text-base font-semibold shadow-lg shadow-slate-950/20 transition-all hover:shadow-xl active:scale-[0.98]"
                 >
-                  {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : `Pay ₹${price.toLocaleString()} via Razorpay`}
+                  {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : price === 0 ? "Get Free Code" : `Pay ₹${price.toLocaleString()} via Razorpay`}
                 </Button>
               </>
             )}

@@ -221,7 +221,7 @@ export default function ProductDetailPage() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent z-10 pointer-events-none" />
               <div className="transition-transform duration-500 group-hover:scale-[1.015]">
                 {product.image_url ? (
-                  <img src={product.image_url} alt={product.title} className="w-full aspect-[16/10] object-cover" />
+                  <img src={product.image_url} alt={product.title} className="w-full aspect-[16/10] object-contain bg-slate-50 rounded-xl border border-slate-100" />
                 ) : (
                   <div className="aspect-[16/10] flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-200">
                     <GithubIcon className="w-24 h-24 text-slate-200" />
@@ -261,17 +261,19 @@ export default function ProductDetailPage() {
 
               <div className="rounded-2xl border border-slate-200 p-5 space-y-3">
                 <div className="flex items-baseline gap-3">
-                  <span className="text-[36px] font-extrabold text-slate-950 tracking-tight leading-none">₹{price.toLocaleString()}</span>
-                  {origPrice && <span className="text-base text-slate-400 line-through">₹{origPrice.toLocaleString()}</span>}
+                  <span className={`text-[36px] font-extrabold tracking-tight leading-none ${price === 0 ? "text-emerald-600" : "text-slate-950"}`}>
+                    {price === 0 ? "Free" : `₹${price.toLocaleString()}`}
+                  </span>
+                  {origPrice && price > 0 && <span className="text-base text-slate-400 line-through">₹{origPrice.toLocaleString()}</span>}
                 </div>
                 {discount > 0 && (
                   <p className="text-sm font-medium text-emerald-600">You save ₹{(origPrice! - price).toLocaleString()}</p>
                 )}
 
-                {/* Buy Now */}
+                {/* Buy Now / Get Free Code */}
                 <Button onClick={handleBuy} disabled={buying}
                   className="w-full h-12 bg-slate-950 text-white hover:bg-slate-800 text-[15px] font-semibold rounded-xl shadow-lg shadow-slate-950/20 transition-all hover:shadow-xl active:scale-[0.98]">
-                  {buying ? <Loader2 className="w-5 h-5 animate-spin" /> : <>Buy Now</>}
+                  {buying ? <Loader2 className="w-5 h-5 animate-spin" /> : <>{price === 0 ? "Get Free Code" : "Buy Now"}</>}
                 </Button>
 
                 {/* Add to Cart */}

@@ -38,7 +38,7 @@ export function ProductCard({
       <Card className="group border border-slate-200 hover:border-slate-950 hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden h-full">
         <div className="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center relative overflow-hidden">
           {image ? (
-            <img src={image} alt={title} className="w-full h-full object-cover" />
+            <img src={image} alt={title} className="w-full h-full object-contain" />
           ) : (
             <GithubIcon className="w-10 h-10 text-slate-400" />
           )}
@@ -79,8 +79,10 @@ export function ProductCard({
 
           <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
             <div className="flex items-center gap-2">
-              <span className="text-base font-bold text-slate-950">₹{price}</span>
-              {originalPrice && originalPrice > price && (
+              <span className={`text-base font-bold ${price === 0 ? "text-emerald-600 font-extrabold" : "text-slate-950"}`}>
+                {price === 0 ? "Free" : `₹${price}`}
+              </span>
+              {originalPrice && originalPrice > price && price > 0 && (
                 <span className="text-xs text-slate-400 line-through">₹{originalPrice}</span>
               )}
             </div>
