@@ -1,9 +1,7 @@
 "use client";
-import { GithubIcon } from "@/shared/components/github-icon";
 
 import Link from "next/link";
-import { Star } from "lucide-react";
-import { Card, CardContent } from "@/shared/ui/card";
+import { Star, Code, ArrowRight } from "lucide-react";
 import { Badge } from "@/shared/ui/badge";
 
 interface ProductCardProps {
@@ -34,62 +32,86 @@ export function ProductCard({
   tags = [],
 }: ProductCardProps) {
   return (
-    <Link href={`/products/${id}`}>
-      <Card className="group border border-slate-200 hover:border-slate-950 hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden h-full">
-        <div className="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center relative overflow-hidden">
+    <Link href={`/products/${id}`} className="group h-full flex flex-col relative">
+      <div className="bg-white rounded-[20px] p-2 sm:p-2.5 border border-slate-200/80 hover:border-blue-200 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_-4px_rgba(59,130,246,0.1)] transition-all duration-300 h-full flex flex-col relative z-10 hover:-translate-y-1">
+        
+        {/* Image Container */}
+        <div className="relative aspect-[4/3] rounded-[14px] bg-slate-50 overflow-hidden mb-4 border border-slate-100">
           {image ? (
-            <img src={image} alt={title} className="w-full h-full object-contain" />
+            <img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" />
           ) : (
-            <GithubIcon className="w-10 h-10 text-slate-400" />
+            <div className="w-full h-full bg-gradient-to-tr from-slate-100 to-slate-200 flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
+              <Code className="w-10 h-10 text-slate-300" />
+            </div>
           )}
+          
           <Badge
             variant="secondary"
-            className="absolute top-3 left-3 text-[10px] px-2 py-0.5 bg-white/90 border border-slate-200"
+            className="absolute top-2.5 left-2.5 text-[10px] font-bold px-2.5 py-1 bg-white/95 backdrop-blur-md border border-white/20 text-slate-700 shadow-sm"
           >
             {category}
           </Badge>
+          
           {originalPrice && originalPrice > price && (
-            <Badge className="absolute top-3 right-3 text-[10px] px-2 py-0.5 bg-emerald-500 text-white border-0">
-              {Math.round(((originalPrice - price) / originalPrice) * 100)}% OFF
+            <Badge className="absolute top-2.5 right-2.5 text-[10px] font-bold px-2 py-1 bg-emerald-500 text-white border-0 shadow-md shadow-emerald-500/20">
+              -{Math.round(((originalPrice - price) / originalPrice) * 100)}%
             </Badge>
           )}
+
+          {/* Hover Overlay */}
+          <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
+            <div className="translate-y-4 group-hover:translate-y-0 transition-all duration-300 bg-white text-slate-900 text-xs font-bold px-4 py-2 rounded-full shadow-lg flex items-center gap-1.5">
+              View Details <ArrowRight className="w-3.5 h-3.5" />
+            </div>
+          </div>
         </div>
 
-        <CardContent className="p-4">
-          <h3 className="font-semibold text-slate-950 text-sm leading-snug group-hover:text-slate-700 transition-colors line-clamp-2">
+        {/* Content */}
+        <div className="px-1.5 flex-1 flex flex-col">
+          <h3 className="font-bold text-slate-900 text-[15px] leading-snug group-hover:text-blue-600 transition-colors line-clamp-2 mb-1">
             {title}
           </h3>
-          <p className="text-xs text-slate-500 mt-1 line-clamp-2">{description}</p>
+          <p className="text-[13px] text-slate-500 line-clamp-2 leading-relaxed flex-1">
+            {description}
+          </p>
 
+          {/* Tags */}
           {tags.length > 0 && (
-            <div className="flex flex-wrap gap-1 mt-2">
+            <div className="flex flex-wrap gap-1.5 mt-3 mb-1">
               {tags.slice(0, 3).map((tag) => (
-                <span key={tag} className="text-[10px] px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded">
+                <span key={tag} className="text-[10px] font-medium px-2 py-0.5 bg-slate-100 text-slate-600 rounded-md">
                   {tag}
                 </span>
               ))}
             </div>
           )}
 
-          <div className="flex items-center gap-1 mt-3">
-            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-            <span className="text-xs font-medium text-slate-700">{rating}</span>
-            <span className="text-xs text-slate-400">({reviews})</span>
-          </div>
-
-          <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
-            <div className="flex items-center gap-2">
-              <span className={`text-base font-bold ${price === 0 ? "text-emerald-600 font-extrabold" : "text-slate-950"}`}>
-                {price === 0 ? "Free" : `₹${price}`}
+          {/* Footer details */}
+          <div className="mt-auto pt-4 border-t border-slate-100">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-1">
+                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                <span className="text-[12px] font-bold text-slate-700">{rating}</span>
+                <span className="text-[11px] font-medium text-slate-400">({reviews})</span>
+              </div>
+              <span className="text-[11px] font-medium text-slate-500 truncate max-w-[100px]">
+                by {seller}
               </span>
-              {originalPrice && originalPrice > price && price > 0 && (
-                <span className="text-xs text-slate-400 line-through">₹{originalPrice}</span>
-              )}
             </div>
-            <span className="text-[11px] text-slate-500">by {seller}</span>
+
+            <div className="flex items-end justify-between">
+              <div className="flex items-center gap-2">
+                <span className={`text-lg font-black tracking-tight ${price === 0 ? "text-emerald-600" : "text-slate-900"}`}>
+                  {price === 0 ? "Free" : `₹${price}`}
+                </span>
+                {originalPrice && originalPrice > price && price > 0 && (
+                  <span className="text-[13px] font-semibold text-slate-400 line-through">₹{originalPrice}</span>
+                )}
+              </div>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </Link>
   );
 }

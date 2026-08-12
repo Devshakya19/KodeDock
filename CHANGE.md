@@ -43,5 +43,49 @@ All notable changes to the CodeHaat Seller Dashboard and UI/UX have been documen
 - **Component Conversion:** Migrated several server components to `"use client"` where real-time polling and interactivity were required, eliminating hydration mismatches.
 - **Build Quality:** Validated zero TypeScript errors and a fully successful Next.js production build (`npm run build`).
 
+## [v1.3.0] - 2026-08-12
+
+### 💳 Wallet & Payment UI Overhaul
+- **Buyer Wallet (`/dashboard/wallet`):**
+  - Completely redesigned using a premium "CodeHaat Black" theme.
+  - Implemented an interactive 3D Flip Credit Card showcasing the buyer's name, "BUYER ACCT" format, and an "ACTIVE" status.
+  - Added "Silent Refresh" for fetching balance in the background without full-page reloads.
+- **Seller Wallet (`/seller/wallet`):**
+  - Unified with the premium aesthetic, featuring a 3D "CODEHAAT PRO" Creator Card.
+  - Split earnings view into "Escrow" (Pending) and "All Time" (Total Earned) metrics.
+  - Revamped withdrawal interface with a MAX button and streamlined transaction history tabs (Sales vs. Payouts).
+- **Checkout Page (`/checkout`):**
+  - Upgraded to a modern, split 2-column layout (Order Details on left, Payment Method on right).
+  - Integrated a premium Wallet Payment card with clear indicators for insufficient balance vs available balance.
+  - Redesigned the "Success Screen" as a centered, elegant floating pop-up.
+  - Neatly managed Terms of Service & Privacy Policy into a secure information block.
+
+### 🛍️ Storefront & Browse Enhancements
+- **Product Details Page (`/products/[id]`):**
+  - Redesigned using a clean, light-slate background (`bg-slate-50`) with white floating content cards.
+  - Re-arranged layout: Hero image takes center stage at the top, followed by cleanly structured Title, Badges, and Description.
+  - Upgraded the "Reviews" section with separated, elegant review cards and a refined submission form.
+  - Sticky pricing/action card now highlights secure payments, source code access, and instant delivery beautifully.
+- **Browse Page (`/browse`):**
+  - Redesigned `product-card.tsx` for a premium grid layout.
+  - Added `browse-filters.tsx` (new component) for enhanced searching and categorization.
+  - Replaced the standard navbar with the new `browse-navbar.tsx`.
+
+### 🎛️ Dashboards & Global UI
+- **Buyer Dashboard (`/dashboard`):**
+  - Completely redesigned `page.tsx` for cleaner stats and recent activity presentation.
+  - Upgraded layout strategy: Deleted the old sidebar (`dashboard-sidebar.tsx`) and replaced it with a modern unified `dashboard-navbar.tsx` acting as the global top navigation.
+  - Redesigned "My Purchases" (`/dashboard/purchases`) with sleek purchase history cards.
+  - Transformed Buyer Profile (`/dashboard/profile`) and Settings (`/dashboard/settings`) into premium slate-themed pages.
+- **Seller Dashboard (`/seller`):**
+  - Updated `dashboard.tsx` with a refined UI, matching the new "CodeHaat Premium" minimal aesthetic.
+  - Enhanced Seller Settings (`/seller/settings.tsx`).
+- **Shared Components:**
+  - Added `account-settings.tsx` for reusable, standardized security and danger-zone configurations across buyer and seller profiles.
+
+### ⚙️ Backend & Engine Improvements
+- **Core Engine (`services/core-engine/src/handlers/products.rs`):**
+  - Updated the Rust backend products handler to support new filtering logic, optimized query execution for the redesigned browse grid, and improved real-time tracking for sales/view counts.
+
 ---
 *End of Changelog.*

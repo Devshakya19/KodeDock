@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Package } from "lucide-react";
+import { SearchX } from "lucide-react";
 import { ProductCard } from "./product-card";
 import { apiGet } from "@/shared/lib/api";
 
@@ -55,14 +55,14 @@ export function ProductGrid({ searchQuery = "", categoryFilter = "" }: ProductGr
 
   if (loading) {
     return (
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-8">
         {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="animate-pulse">
-            <div className="aspect-video bg-slate-200 rounded-t-xl" />
-            <div className="p-4 space-y-3 border border-t-0 border-slate-200 rounded-b-xl">
-              <div className="h-4 bg-slate-200 rounded w-3/4" />
-              <div className="h-3 bg-slate-200 rounded w-full" />
-              <div className="h-3 bg-slate-200 rounded w-1/2" />
+          <div key={i} className="animate-pulse bg-white p-2 rounded-[20px] border border-slate-100">
+            <div className="aspect-[4/3] bg-slate-100 rounded-[14px] mb-4" />
+            <div className="px-2 space-y-3 pb-2">
+              <div className="h-4 bg-slate-100 rounded w-3/4" />
+              <div className="h-3 bg-slate-100 rounded w-full" />
+              <div className="h-3 bg-slate-100 rounded w-1/2" />
             </div>
           </div>
         ))}
@@ -72,16 +72,20 @@ export function ProductGrid({ searchQuery = "", categoryFilter = "" }: ProductGr
 
   if (products.length === 0) {
     return (
-      <div className="text-center py-16">
-        <Package className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-        <p className="text-slate-500 text-lg">No products found</p>
-        <p className="text-slate-400 text-sm mt-2">Be the first to list a product!</p>
+      <div className="flex flex-col items-center justify-center py-24 text-center bg-white rounded-[24px] border border-slate-100 border-dashed">
+        <div className="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center mb-6">
+          <SearchX className="w-10 h-10 text-slate-300" />
+        </div>
+        <p className="text-slate-900 text-xl font-bold mb-2">No templates found</p>
+        <p className="text-slate-500 text-[15px] max-w-sm">
+          We couldn't find any products matching your current search filters. Try adjusting your search terms.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-8">
       {products.map((product) => (
         <ProductCard
           key={product.id}

@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { DashboardSidebar } from "@/features/dashboard/components/dashboard-sidebar";
+import { DashboardNavbar } from "@/features/dashboard/components/dashboard-navbar";
 import { verifyToken } from "@/shared/lib/server-auth";
 
 export default async function DashboardLayout({
@@ -25,15 +25,13 @@ export default async function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <DashboardSidebar
+      <DashboardNavbar
         email={email}
         fullName={fullName}
       />
-      <div className="md:ml-64">
-        <main className="p-4 md:p-8 pb-24 md:pb-8">
-          {children}
-        </main>
-      </div>
+      <main className="max-w-7xl mx-auto p-4 md:p-8">
+        {children}
+      </main>
     </div>
   );
 }

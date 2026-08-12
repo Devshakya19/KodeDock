@@ -2,13 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, CheckCircle, Camera } from "lucide-react";
+import { Loader2, CheckCircle, Camera, ArrowLeft, User, AlignLeft, MapPin } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
-import { Card, CardContent } from "@/shared/ui/card";
 import { auth } from "@/shared/lib/auth";
 import { apiGet, apiPut } from "@/shared/lib/api";
 import { uploadFile } from "@/shared/lib/upload";
+import Link from "next/link";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -21,7 +21,6 @@ export default function ProfilePage() {
 
   const [fullName, setFullName] = useState("");
   const [bio, setBio] = useState("");
-  const [website, setWebsite] = useState("");
   const [location, setLocation] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
@@ -61,13 +60,11 @@ export default function ProfilePage() {
       }
 
       setUserId(user.id);
-
       const result = await apiGet<any>(`/profile/${user.id}`);
 
       if (result.success && result.data) {
         setFullName(result.data.full_name || user.full_name || "");
         setBio(result.data.bio || "");
-        setWebsite(result.data.website || "");
         setLocation(result.data.location || "");
         setAvatarUrl(result.data.avatar_url || "");
       } else {
@@ -75,9 +72,8 @@ export default function ProfilePage() {
       }
       setLoading(false);
     }
-
     loadProfile();
-  }, [router, auth]);
+  }, [router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -90,7 +86,6 @@ export default function ProfilePage() {
       id: userId,
       full_name: fullName,
       bio,
-      website,
       location,
       avatar_url: avatarUrl,
     });
@@ -106,150 +101,157 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-6 h-6 text-slate-400 animate-spin" />
+      <div className="flex items-center justify-center py-20 min-h-[60vh]">
+        <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
       </div>
     );
   }
 
   return (
-    <>
-      <div className="mb-6 md:mb-8">
-        <h1 className="text-xl md:text-2xl font-bold text-slate-950">Profile</h1>
-        <p className="text-slate-600 mt-1 text-sm">Manage your personal information</p>
+    <div className="max-w-4xl mx-auto py-8 font-sans">
+      <div className="mb-8">
+        <Link href="/dashboard" className="inline-flex items-center gap-2 text-[13px] font-semibold text-slate-500 hover:text-slate-900 mb-4 transition-colors">
+          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+        </Link>
+        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Personal Details</h1>
+        <p className="text-slate-500 mt-1 text-[15px]">Manage your buyer profile and identity</p>
       </div>
 
-      <div className="max-w-2xl">
-        <Card className="border-slate-200">
-          <CardContent className="p-4 sm:p-6 md:p-8">
-            {success && (
-              <div className="mb-4 md:mb-6 p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-sm text-emerald-700 flex items-center gap-2">
-                <CheckCircle className="w-4 h-4" />
-                Profile updated successfully
-              </div>
-            )}
+      <div className="bg-white rounded-[24px] p-6 sm:p-10 border border-slate-100 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.06)] relative overflow-hidden">
+        
+        {/* Decorative background shape */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-slate-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-60 pointer-events-none" />
 
-            {error && (
-              <div className="mb-4 md:mb-6 p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
-                {error}
-              </div>
-            )}
+        {success && (
+          <div className="mb-8 p-4 rounded-2xl bg-emerald-50 border border-emerald-100/50 text-sm font-medium text-emerald-800 flex items-center gap-3 relative z-10">
+            <CheckCircle className="w-5 h-5 text-emerald-500" />
+            Profile updated successfully.
+          </div>
+        )}
 
-            {/* Avatar */}
-            <div className="flex flex-col sm:flex-row items-center gap-4 mb-6 md:mb-8">
-              <div className="relative group">
-                <div className="w-20 h-20 rounded-full bg-slate-950 flex items-center justify-center overflow-hidden">
-                  {avatarUrl ? (
-                    <img src={avatarUrl} alt="" className="w-20 h-20 object-cover" />
-                  ) : (
-                    <span className="text-2xl font-bold text-white">
-                      {(fullName || "U").charAt(0).toUpperCase()}
-                    </span>
-                  )}
-                </div>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleAvatarUpload}
-                  className="hidden"
-                />
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploadingAvatar}
-                  className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                >
-                  {uploadingAvatar ? (
-                    <Loader2 className="w-5 h-5 text-white animate-spin" />
-                  ) : (
-                    <Camera className="w-5 h-5 text-white" />
-                  )}
-                </button>
-              </div>
-              <div className="text-center sm:text-left">
-                <div className="text-sm font-medium text-slate-950">{fullName || "User"}</div>
-                <div className="text-xs text-slate-500">Click to change photo</div>
-              </div>
+        {error && (
+          <div className="mb-8 p-4 rounded-2xl bg-red-50 border border-red-100/50 text-sm font-medium text-red-800 flex items-center gap-3 relative z-10">
+            {error}
+          </div>
+        )}
+
+        {/* Avatar Upload Section - Circular and soft for buyer */}
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-10 pb-8 border-b border-slate-100/60 relative z-10">
+          <div className="relative group shrink-0">
+            <div className="w-28 h-28 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden shadow-sm border-[4px] border-white ring-1 ring-slate-200">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-4xl font-extrabold text-slate-400">
+                  {(fullName || "U").charAt(0).toUpperCase()}
+                </span>
+              )}
             </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleAvatarUpload}
+              className="hidden"
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadingAvatar}
+              className="absolute inset-0 rounded-full bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all cursor-pointer backdrop-blur-sm"
+            >
+              {uploadingAvatar ? (
+                <Loader2 className="w-6 h-6 text-white animate-spin" />
+              ) : (
+                <Camera className="w-6 h-6 text-white" />
+              )}
+            </button>
+          </div>
+          <div className="text-center sm:text-left mt-2">
+            <h3 className="text-lg font-bold text-slate-900">Your Photo</h3>
+            <p className="text-sm text-slate-500 mt-1 max-w-sm">
+              Upload a recognizable photo. Max size 2MB.
+            </p>
+            <button 
+              onClick={() => fileInputRef.current?.click()}
+              className="mt-4 px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-[13px] font-bold hover:bg-slate-200 transition-colors"
+            >
+              Change Picture
+            </button>
+          </div>
+        </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label htmlFor="fullName" className="block text-sm font-medium text-slate-700 mb-1.5">
-                  Full Name
-                </label>
-                <Input
-                  id="fullName"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="h-11 border-slate-300 bg-white"
-                />
-              </div>
+        <form onSubmit={handleSubmit} className="space-y-8 relative z-10 max-w-2xl">
+          
+          <div className="space-y-2">
+            <label htmlFor="fullName" className="flex items-center gap-2 text-[14px] font-bold text-slate-900">
+              <User className="w-4 h-4 text-slate-400" />
+              Full Name
+            </label>
+            <Input
+              id="fullName"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="e.g. Sarah Smith"
+              className="h-12 border-slate-200 bg-slate-50 focus-visible:bg-white rounded-xl text-[15px]"
+            />
+          </div>
 
-              <div>
-                <label htmlFor="bio" className="block text-sm font-medium text-slate-700 mb-1.5">
-                  Bio
-                </label>
-                <textarea
-                  id="bio"
-                  rows={3}
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                  placeholder="Tell us about yourself..."
-                  className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-400"
-                />
-              </div>
+          <div className="space-y-2">
+            <label htmlFor="bio" className="flex items-center gap-2 text-[14px] font-bold text-slate-900">
+              <AlignLeft className="w-4 h-4 text-slate-400" />
+              A little about you
+            </label>
+            <textarea
+              id="bio"
+              rows={3}
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              placeholder="Software Engineer, designer, learner..."
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 focus-visible:bg-white px-4 py-3 text-[15px] shadow-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600/20 focus-visible:border-blue-600 transition-all"
+            />
+          </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="website" className="block text-sm font-medium text-slate-700 mb-1.5">
-                    Website
-                  </label>
-                  <Input
-                    id="website"
-                    value={website}
-                    onChange={(e) => setWebsite(e.target.value)}
-                    placeholder="https://yoursite.com"
-                    className="h-11 border-slate-300 bg-white"
-                  />
-                </div>
+          <div className="space-y-2">
+            <label htmlFor="location" className="flex items-center gap-2 text-[14px] font-bold text-slate-900">
+              <MapPin className="w-4 h-4 text-slate-400" />
+              Location
+            </label>
+            <Input
+              id="location"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder="e.g. New York, USA"
+              className="h-12 border-slate-200 bg-slate-50 focus-visible:bg-white rounded-xl text-[15px]"
+            />
+          </div>
 
-                <div>
-                  <label htmlFor="location" className="block text-sm font-medium text-slate-700 mb-1.5">
-                    Location
-                  </label>
-                  <Input
-                    id="location"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    placeholder="Bangalore, India"
-                    className="h-11 border-slate-300 bg-white"
-                  />
-                </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-4">
-                <Button
-                  type="submit"
-                  disabled={saving}
-                  className="bg-slate-950 text-white hover:bg-slate-800 w-full sm:w-auto"
-                >
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                  Save Changes
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => router.back()}
-                  className="border-slate-300 text-slate-700 w-full sm:w-auto"
-                >
-                  Cancel
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+          <div className="pt-6 mt-6 border-t border-slate-100 flex items-center justify-start gap-4">
+            <Button
+              type="submit"
+              disabled={saving}
+              className="h-12 px-8 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-[14px] font-bold shadow-sm transition-all"
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  Saving...
+                </>
+              ) : (
+                "Save Profile"
+              )}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => router.back()}
+              className="h-12 px-6 rounded-xl text-[14px] font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-100"
+            >
+              Discard
+            </Button>
+          </div>
+        </form>
       </div>
-    </>
+    </div>
   );
 }

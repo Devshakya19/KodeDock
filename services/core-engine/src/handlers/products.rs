@@ -30,7 +30,7 @@ pub async fn list_products(
     let mut bind_index = 1;
 
     if query.category.is_some() {
-        sql.push_str(&format!(" AND p.category_id::text LIKE ${}", bind_index));
+        sql.push_str(&format!(" AND c.slug = ${}", bind_index));
         bind_index += 1;
     }
 
@@ -54,8 +54,7 @@ pub async fn list_products(
     let mut query_builder = sqlx::query_as::<_, PublicProduct>(&sql);
 
     if let Some(ref cat) = query.category {
-        let pattern = format!("%{}%", cat);
-        query_builder = query_builder.bind(pattern);
+        query_builder = query_builder.bind(cat.clone());
     }
 
     if let Some(ref s) = query.search {

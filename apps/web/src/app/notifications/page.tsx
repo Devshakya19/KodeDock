@@ -96,7 +96,7 @@ export default async function NotificationsPage() {
   const unreadCount = notifications.filter((n: Notification) => !n.is_read).length;
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] font-sans">
+    <div className="min-h-screen bg-[#F8FAFC] font-sans">
       <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.03)]">
         <nav className="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">

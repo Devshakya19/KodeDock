@@ -65,7 +65,7 @@ export default async function DashboardPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-[#f8f9fa] min-h-screen font-sans">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-[#F8FAFC] min-h-screen font-sans">
       
       {/* Header */}
       <div className="mb-8">
