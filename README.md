@@ -290,7 +290,7 @@ To report a security vulnerability, please email **security@codehaat.com**. See 
 | [API_REFERENCE.md](API_REFERENCE.md) | Full REST API documentation |
 | [SECURITY](SECURITY) | Detailed security architecture & threat mitigations |
 | [CHANGE.md](CHANGE.md) | Project changelog |
-| [CONTRIBUTORS](CONTRIBUTORS) | Core team & contributors |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Core team & contributors |
 | [docs/01-PRD.md](docs/01-PRD.md) | Product Requirements Document |
 | [docs/02-ARCHITECTURE.md](docs/02-ARCHITECTURE.md) | System Architecture |
 | [docs/03-RULES.md](docs/03-RULES.md) | Engineering Rules & Conventions |
@@ -349,14 +349,14 @@ npm audit                        # Node.js
   <tr>
     <td align="center">
       <a href="https://github.com/Devshakya19">
-        <img src="https://avatars.githubusercontent.com/Devshakya19?v=4&s=100" width="80px" style="border-radius:50%" alt="Dev Shakya"/><br/>
+        <img src="assets/contributors/founder.png" width="80px" alt="Dev Shakya"/><br/>
         <sub><b>Dev Shakya</b></sub>
       </a><br/>
       <sub>Founder · Lead Engineer</sub>
     </td>
     <td align="center">
       <a href="https://github.com/Deekshajain28">
-        <img src="https://avatars.githubusercontent.com/Deekshajain28?v=4&s=100" width="80px" style="border-radius:50%" alt="Deeksha Jain"/><br/>
+        <img src="assets/contributors/marketing.png" width="80px" alt="Deeksha Jain"/><br/>
         <sub><b>Deeksha Jain</b></sub>
       </a><br/>
       <sub>Marketing</sub>
