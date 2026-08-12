@@ -1,0 +1,475 @@
+# CodeHaat — Security Policy
+
+This document defines CodeHaat's security architecture, threat mitigations, responsible disclosure process, and operational security guidelines. All implementations described are grounded in the actual codebase.
+
+---
+
+## Table of Contents
+
+1. [Reporting a Vulnerability](#reporting-a-vulnerability)
+2. [Supported Versions](#supported-versions)
+3. [Authentication & Authorization](#authentication--authorization)
+4. [Data Protection](#data-protection)
+5. [Network & Infrastructure Security](#network--infrastructure-security)
+6. [Application Security](#application-security)
+7. [Payment Security](#payment-security)
+8. [Threat Mitigations](#threat-mitigations)
+9. [Secure Development Practices](#secure-development-practices)
+10. [Compliance & Privacy](#compliance--privacy)
+11. [Monitoring & Incident Response](#monitoring--incident-response)
+12. [Known Limitations & Roadmap](#known-limitations--roadmap)
+
+---
+
+## Reporting a Vulnerability
+
+**Do not open public GitHub issues for security vulnerabilities.**
+
+If you discover a security vulnerability in CodeHaat, please disclose it responsibly:
+
+| Channel | Details |
+|---------|---------|
+| 📧 **Email** | security@codehaat.com |
+| 🔐 **Encryption** | PGP key available on request |
+| ⏱️ **Response SLA** | Initial acknowledgement within **48 hours** |
+| 🏁 **Resolution Target** | Critical issues patched within **7 days** |
+
+### What to Include
+
+- A clear description of the vulnerability and its potential impact
+- Step-by-step reproduction instructions
+- Affected service(s), file(s), or endpoint(s)
+- Any proof-of-concept code or screenshots
+
+### Disclosure Policy
+
+We follow a **coordinated disclosure** model. We ask that you:
+
+1. Give us reasonable time to investigate and patch before public disclosure
+2. Avoid accessing, modifying, or deleting user data during testing
+3. Refrain from automated scanning that degrades service availability
+
+We will publicly credit researchers who report valid, previously unknown vulnerabilities (unless anonymity is preferred).
+
+---
+
+## Supported Versions
+
+| Version | Status | Security Updates |
+|---------|--------|-----------------|
+| **v1.3.x** (current) | ✅ Active | Yes |
+| v1.2.x | ⚠️ Maintenance | Critical fixes only |
+| < v1.2.0 | ❌ End-of-life | No |
+
+---
+
+## Authentication & Authorization
+
+### JWT Token Handling
+
+- **Algorithm**: HS256 (HMAC-SHA256)
+- **Storage**: HttpOnly cookies — never exposed to browser JavaScript
+- **Flags**: `Secure` (HTTPS-only) + `SameSite` (CSRF mitigation)
+- **Expiry**: Configurable (default 24 hours)
+- **Relevant files**:
+  - `apps/web/src/shared/lib/auth.ts` — client-side auth service
+  - `apps/web/src/app/api/proxy/[...path]/route.ts` — cookie extraction & forwarding
+  - `services/core-engine/src/main.rs` — token validation middleware
+
+### Password Security
+
+- **Algorithm**: Argon2 (memory-hard, ASIC/GPU-resistant)
+- **Applied at**: Registration and login verification
+- **File**: `services/core-engine/src/handlers/auth.rs`
+- Argon2 parameters (memory cost, time cost, parallelism) are tuned for the server hardware and reviewed periodically.
+
+### Role-Based Access Control (RBAC)
+
+| Role | Permissions |
+|------|------------|
+| `user` | Browse, purchase, manage own profile and wallet |
+| `developer` | All user permissions + list products, manage payouts |
+| `admin` | Full platform access |
+
+- Roles are stored in `profiles.role` (database column)
+- Every protected route handler verifies the role extracted from the validated JWT
+- Seller-specific endpoints (product management, payouts) require the `developer` role
+
+### GitHub OAuth
+
+- State parameter (cryptographically random) used to prevent CSRF on the OAuth callback
+- Authorization code exchanged server-side; client secret never reaches the frontend
+- GitHub access tokens are encrypted at rest in `profiles.github_access_token`
+- Callback endpoint: `/api/auth/github/callback`
+
+---
+
+## Data Protection
+
+### SQL Injection Prevention
+
+CodeHaat's Rust backend uses **SQLx** with compile-time query validation. Every database query is a parameterised statement checked at compile time — string-concatenated SQL is structurally impossible in this codebase.
+
+- **Scope**: All handlers in `services/core-engine/src/handlers/` and `services/core-engine/src/services/`
+- **Guarantee**: If a query compiles, it cannot be SQL-injected
+
+### Sensitive Data Masking
+
+| Data Type | API Behaviour |
+|-----------|-------------|
+| Bank account numbers | Only last 4 digits returned (`XXXX XXXX XXXX 1234`) |
+| UPI IDs | Masked on retrieval |
+| GitHub access tokens | Encrypted in DB; never returned in API responses |
+| Payment card data | Never stored — handled exclusively by Razorpay |
+
+- Implementation: `services/core-engine/src/handlers/payout.rs`
+
+### File Upload Security
+
+Uploads follow a **presigned URL** flow that keeps large payloads off application servers entirely:
+
+```
+1. Client → Core Engine: Request presigned PUT URL  (/api/upload/presign)
+2. Core Engine: Validates JWT → generates SeaweedFS presigned URL
+3. Client → SeaweedFS: Direct upload (bypasses application layer)
+4. Images served via: /api/images/[...path] (proxied with cache headers)
+```
+
+- Rate limiting on presign requests prevents upload abuse
+- File type enforcement is applied at the presign validation stage
+- Relevant files: `apps/web/src/app/api/upload/file/route.ts`, `services/core-engine/src/handlers/upload.rs`
+
+### Encryption at Rest
+
+- GitHub OAuth tokens stored encrypted in PostgreSQL
+- Database volume encrypted at the host level (recommended for production deployments)
+- SeaweedFS volume data should be encrypted at the block device level in production
+
+---
+
+## Network & Infrastructure Security
+
+### Rate Limiting
+
+Implemented via `actix-governor` middleware with a custom IP extractor:
+
+| Endpoint Category | Limit |
+|-------------------|-------|
+| Authentication (`/api/auth/*`) | 5 requests / 12 seconds |
+| Upload presign (`/api/upload/presign`) | 10 requests / 6 seconds |
+| Order verification (`/api/orders/verify`) | 10 requests / 6 seconds |
+
+- IP extracted from `X-Forwarded-For` (set by trusted reverse proxy), with fallback to direct connection IP
+- File: `services/core-engine/src/main.rs` (lines 72–91)
+
+### CORS Policy
+
+- Configured via the `CORS_ORIGINS` environment variable
+- Default (development): `http://localhost:3000,http://localhost:3001`
+- Dynamic origin validation — no wildcard origins permitted in production
+- Files: `services/core-engine/src/main.rs`, `apps/web/src/app/api/proxy/[...path]/route.ts`
+
+### Network Isolation (Docker)
+
+```
+External Traffic
+      │
+      ▼
+ [frontend network]   ← Next.js, Core Engine, Real-Time
+      │
+      ▼
+ [backend network]    ← PostgreSQL, Redis, SeaweedFS, AI Service, Worker
+  (internal: true)    ← NOT reachable from the host network
+```
+
+- PostgreSQL and Redis are **never** exposed to the host
+- All inter-service traffic stays within the Docker bridge network
+- Redis connections require password authentication (`REDIS_URL` with credentials)
+
+### TLS / HTTPS
+
+- TLS termination is handled by an external reverse proxy (NGINX, Caddy, or Cloudflare)
+- The application layer expects HTTPS connections in production
+- `Secure` cookie flag is set, preventing cookie transmission over plain HTTP
+- HSTS is recommended for production — see [Known Limitations](#known-limitations--roadmap)
+
+### SSRF Protection
+
+- API proxy routes enforce an allowlist via the `isAllowedPath()` function
+- Allowed prefixes: `products`, `seller/`, `orders`, `reviews`, `notifications`, `wallet`, `upload/`, `profile`, `auth/`, `search`
+- All outbound calls to external services (GitHub API, Razorpay) use hardcoded, predefined endpoints — no user-controlled URLs
+- File: `apps/web/src/app/api/proxy/[...path]/route.ts`
+
+---
+
+## Application Security
+
+### Security Headers
+
+| Header | Value | Purpose |
+|--------|-------|---------|
+| `X-Frame-Options` | `DENY` | Prevent clickjacking |
+| `X-Content-Type-Options` | `nosniff` | Block MIME-type sniffing |
+| `X-XSS-Protection` | `1; mode=block` | Legacy XSS filter |
+| `Cache-Control` | Configured per-route | Prevent sensitive data caching |
+
+> **Roadmap**: `Content-Security-Policy`, `Referrer-Policy`, and `Permissions-Policy` headers are planned — see [Known Limitations](#known-limitations--roadmap).
+
+### Input Validation
+
+All API request bodies are validated through Rust's type system and explicit handler-level checks:
+
+- **Self-purchase prevention**: Order creation validates that buyer ≠ seller
+- **Price constraints**: `CHECK` constraint enforces minimum product price (₹49) at the database level
+- **Wallet operations**: Balance verified before any debit
+- **URL validation**: GitHub repository URLs validated via allowlist pattern matching
+- **JSON schema**: Payloads rejected on type mismatch or missing required fields
+
+### Session Management
+
+| Property | Detail |
+|----------|--------|
+| Strategy | Stateless JWT |
+| Expiry | Configurable (default: 24 h) |
+| Logout | Cookie cleared client-side |
+| Revocation | Not currently instantaneous (stateless) — see [Known Limitations](#known-limitations--roadmap) |
+
+---
+
+## Payment Security
+
+### Razorpay Integration
+
+CodeHaat's payment layer is designed to eliminate card data from our infrastructure entirely.
+
+| Mechanism | Implementation |
+|-----------|---------------|
+| **Signature Verification** | HMAC-SHA256 + constant-time comparison (`subtle::ConstantTimeEq`) |
+| **Webhook Authenticity** | Signature verified before any state mutation |
+| **Webhook Idempotency** | "Pending" guard prevents duplicate order completions |
+| **Event Filtering** | Only `payment.captured` events are processed |
+| **Amount Validation** | Expected amount fetched from DB and compared to reported amount |
+| **Platform Fee** | 2.5% calculated entirely server-side — never trusted from the client |
+
+- **File**: `services/core-engine/src/services/payment.rs`
+
+### PCI DSS Scope
+
+- Card data **never** touches CodeHaat servers
+- Processing, storage, and transmission of cardholder data is fully delegated to Razorpay
+- SAQ A-EP scope applies (outsourced payment page with server-to-server webhook)
+
+### Escrow System
+
+Buyer funds are held in escrow for **7 days** post-purchase before being released to the seller. This is enforced at the database level using PostgreSQL `FOR UPDATE` row locks, preventing race conditions on wallet balances.
+
+---
+
+## Threat Mitigations
+
+### Cross-Site Scripting (XSS)
+
+| Control | Mechanism |
+|---------|-----------|
+| Token isolation | JWT in HttpOnly cookie — inaccessible to `document.cookie` |
+| Output encoding | React's built-in encoding for all rendered user content |
+| Security headers | `X-XSS-Protection`, `X-Content-Type-Options: nosniff` |
+| Upcoming | Content-Security-Policy (roadmap) |
+
+### Cross-Site Request Forgery (CSRF)
+
+| Control | Mechanism |
+|---------|-----------|
+| SameSite cookies | Set on the JWT cookie |
+| OAuth state | Cryptographically random state parameter per flow |
+| Content-Type enforcement | API endpoints reject non-JSON requests |
+
+### SQL Injection
+
+Structurally prevented by SQLx compile-time query checking. No raw string interpolation of user input into SQL queries exists in the codebase.
+
+### Brute Force & Credential Stuffing
+
+| Control | Mechanism |
+|---------|-----------|
+| Rate limiting | 5 auth requests per 12 seconds per IP |
+| Password hashing | Argon2 — computationally expensive per attempt |
+| Monitoring | Logging of authentication failures (recommended alert thresholds: >20 failures/min per IP) |
+
+> Account lockout is intentionally not implemented to prevent denial-of-service via lockout attacks on known email addresses.
+
+### Man-in-the-Middle (MITM)
+
+| Control | Mechanism |
+|---------|-----------|
+| TLS | Enforced at reverse proxy layer |
+| Secure cookies | `Secure` flag prevents cookie transmission over HTTP |
+| HSTS | Recommended for production (see roadmap) |
+
+### Server-Side Request Forgery (SSRF)
+
+- API proxy uses an allowlist of permitted path prefixes
+- No user-provided URLs are fetched server-side without allowlist validation
+- External integrations (GitHub, Razorpay) use statically defined endpoint constants
+
+---
+
+## Secure Development Practices
+
+### Secret Management
+
+| Secret | Generation Method |
+|--------|------------------|
+| `JWT_SECRET` | `setup.sh` → 32-byte cryptographically random hex |
+| `POSTGRES_PASSWORD` | `setup.sh` → 16-byte random hex |
+| `REDIS_PASSWORD` | `setup.sh` → 16-byte random hex |
+| `RAZORPAY_*` | Provided by Razorpay dashboard |
+| `GITHUB_CLIENT_*` | Provided by GitHub OAuth app settings |
+
+- All secrets are passed via environment variables — never hardcoded
+- `.env` files are listed in `.gitignore` and must never be committed
+- For production, use a secrets manager (AWS Secrets Manager, HashiCorp Vault, Docker Secrets)
+
+### Dependency Management
+
+| Runtime | Lock File | Audit Tool |
+|---------|-----------|-----------|
+| Rust | `Cargo.lock` | `cargo audit` |
+| Node.js | `package-lock.json` | `npm audit` |
+| Python | `requirements.txt` | `pip-audit` / `safety` |
+| Go | `go.mod` + `go.sum` | `govulncheck` |
+
+Run vulnerability scans regularly and before every production release.
+
+### Error Handling
+
+- **Client-facing errors**: Generic messages only (`Unauthorized`, `Not Found`, `Internal Server Error`)
+- **Server-side errors**: Full context logged internally with structured logging
+- **Stack traces**: Never included in API responses
+- **Incident IDs**: Returned with 5xx errors for support correlation
+
+### Docker Security
+
+| Practice | Status |
+|----------|--------|
+| Official base images only | ✅ Implemented |
+| Resource limits (CPU, memory) | ✅ Configured in `docker-compose.yml` |
+| Internal network isolation | ✅ `backend` network is `internal: true` |
+| Non-root container users | ⚠️ Partially implemented — see roadmap |
+| Image vulnerability scanning | ⚠️ Recommended (Trivy, Grype) |
+
+---
+
+## Compliance & Privacy
+
+### Data Minimisation
+
+- Only data strictly necessary for platform operation is collected
+- Optional profile fields are clearly labelled as optional
+- Marketing consent is tracked separately from account creation
+
+### User Rights
+
+| Right | Mechanism |
+|-------|-----------|
+| Account deletion | `DELETE /api/auth/delete-account` |
+| Data access | Export endpoint — planned |
+| Consent withdrawal | Marketing preferences manageable from account settings |
+
+### Audit Logging
+
+Financial and critical business events are logged in the database:
+
+| Table | Logged Events |
+|-------|--------------|
+| `wallet_transactions` | All credits, debits, escrow holds, releases |
+| `orders` | Order creation, verification, completion |
+| `escrow` | Hold creation, release, dispute flags |
+| `notifications` | User-visible system events |
+
+---
+
+## Monitoring & Incident Response
+
+### Health Checks
+
+Every service exposes a `/health` endpoint monitored by Docker Compose:
+
+| Service | Health Check Command |
+|---------|---------------------|
+| PostgreSQL | `pg_isready -U codehaat -d codehaat` |
+| Redis | `redis-cli ping` |
+| Core Engine | `GET http://localhost:4001/health` |
+| AI Service | `GET http://localhost:4002/health` |
+| Real-Time | `GET http://localhost:4004/health` |
+| SeaweedFS | `GET http://localhost:8333/` |
+
+### Structured Logging
+
+Security-relevant events are logged by every service:
+
+- Authentication successes and failures
+- Authorization rejections
+- Rate limiting triggers
+- Validation failures
+- System errors with correlation IDs
+
+| Service | Logger |
+|---------|--------|
+| Core Engine (Rust) | `env_logger` |
+| Real-Time (Node.js) | `console` + structured JSON |
+| AI Service (Python) | Python `logging` module |
+| Infra Worker (Go) | `log.Println` / `log.Printf` |
+
+### Recommended Alert Thresholds
+
+| Metric | Threshold | Action |
+|--------|-----------|--------|
+| Auth failures | > 20/min per IP | Investigate + consider block |
+| 5xx error rate | > 1% of requests | Page on-call |
+| Rate limit triggers | Sustained > 50/min | Investigate for automated attack |
+| Unusual withdrawal amounts | Configurable threshold | Manual review |
+
+---
+
+## Known Limitations & Roadmap
+
+### Current Limitations
+
+| # | Limitation | Risk Level | Mitigation |
+|---|-----------|------------|------------|
+| 1 | No Web Application Firewall (WAF) | Medium | Rely on application-level rate limiting; Cloudflare WAF recommended for production |
+| 2 | Missing CSP, Referrer-Policy, Permissions-Policy headers | Medium | Legacy security headers present; modern headers on roadmap |
+| 3 | No automated SAST/DAST pipeline | Medium | Manual code review; `cargo audit` and `npm audit` run manually |
+| 4 | Stateless JWT — no instant revocation | Low–Medium | Short token TTL mitigates; refresh token + blacklist on roadmap |
+| 5 | No MFA on sensitive operations | Medium | Planned: TOTP for withdrawals and account changes |
+| 6 | Non-root containers partially implemented | Low | Service containers should run as non-root in production |
+
+### Security Roadmap
+
+- [ ] **Content Security Policy (CSP)** — restrict script, style, and media sources
+- [ ] **HTTP Strict Transport Security (HSTS)** — enforce HTTPS, prevent SSL-stripping
+- [ ] **JWT refresh token + blacklist** — enable instant session revocation
+- [ ] **Multi-Factor Authentication (MFA)** — TOTP for withdrawals and critical account changes
+- [ ] **Automated dependency scanning** — CI-integrated `cargo audit`, `npm audit`, `pip-audit`
+- [ ] **Container image scanning** — Trivy or Grype in CI pipeline
+- [ ] **Structured security event logging** — centralised log aggregation with alerting
+- [ ] **Non-root Docker users** — enforce `USER nonroot` in all service Dockerfiles
+- [ ] **API versioning** — `/api/v1/` prefix for forward compatibility
+
+---
+
+## Conclusion
+
+CodeHaat implements a defence-in-depth security architecture covering authentication, authorisation, data protection, network security, payment integrity, and application hardening. Core guarantees include:
+
+- **No SQL injection** — structurally impossible via SQLx compile-time query checking
+- **No XSS token theft** — JWT lives exclusively in HttpOnly cookies
+- **No card data exposure** — PCI scope fully delegated to Razorpay
+- **No race conditions on financial data** — PostgreSQL `FOR UPDATE` row locks + escrow
+
+Security is treated as an ongoing engineering discipline, not a one-time configuration. This document is reviewed and updated with each platform release.
+
+---
+
+*Security policy accurate as of **v1.3.0** (2026-08-12). For implementation details, refer directly to the source code. To report a vulnerability, contact **security@codehaat.com**.*

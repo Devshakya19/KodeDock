@@ -388,29 +388,18 @@ CodeHaat is India's first developer-focused digital marketplace that delivers co
 # 10. Team & Advisors
 
 ## Founding Team
-### Rajesh Sharma - CEO & Co-Founder
-- **Background**: Ex-Google (Payments), Ex-Flipkart (Marketplace)
-- **Expertise**: Payments systems, marketplace dynamics, scaling tech platforms
-- **Education**: IIT Delhi (CS), IIM Bangalore (MBA)
-- **Previous**: Built Paytm Payment Gateway (₹5000 CR volume)
 
-### Priya Mehta - CTO & Co-Founder  
-- **Background**: Ex-Microsoft (Azure), Ex-Amazon (AWS)
-- **Expertise**: Distributed systems, cloud architecture, devtools
-- **Education**: BITS Pilani (CS), Stanford (MS CS)
-- **Previous**: Led Azure Functions platform (10M+ executions/day)
+### Dev Shakya — Founder & Lead Engineer
+- **Role**: Founder, full-stack architect, and sole engineering lead
+- **Expertise**: Systems programming (Rust), distributed systems, payments, cloud infrastructure
+- **Builds**: Core Engine (Rust/Actix-Web), Next.js Frontend, PostgreSQL schema, Go Worker, Python AI Service, Node.js Real-Time Service, Docker orchestration
+- **GitHub**: [github.com/Devshakya19](https://github.com/Devshakya19)
 
-### Amit Singh - COO & Co-Founder
-- **Background**: Ex-Zomato (Growth), Ex-Swiggy (Operations)
-- **Expertise**: Growth hacking, operations, marketplace logistics
-- **Education**: NSIT (EE), ISB (Hyderabad)
-- **Previous**: Scaled Zomato Gold to 2M+ subscribers
-
-### Neha Kapoor - Head of Product
-- **Background**: Ex-Adobe (Creative Cloud), Ex-Canvas (Design Tools)
-- **Expertise**: Product design, developer experience, UX research
-- **Education**: NID (Design), Carnegie Mellon (HCI)
-- **Previous**: Led Adobe Marketplace for extensions/plugins
+### Deeksha Jain — Marketing
+- **Role**: Marketing lead responsible for brand growth and developer community
+- **Expertise**: Brand strategy, social media, developer community building, market research
+- **Focus**: Growing CodeHaat's presence in the Indian developer ecosystem
+- **GitHub**: [github.com/Deekshajain28](https://github.com/Deekshajain28)
 
 ## Advisory Board
 ### Technical Advisors
@@ -574,10 +563,9 @@ CodeHaat is India's first developer-focused digital marketplace that delivers co
 6. **Post-Closing**: Board observer seat, monthly updates
 
 ## Contact for Investment Inquiries
-**Rajesh Sharma - CEO & Co-Founder**  
+**Dev Shakya — Founder, CodeHaat**  
 Email: investors@codehaat.com  
-Phone: +91-98XXXXXXXX  
-LinkedIn: linkedin.com/in/rajeshsharmaco  
+GitHub: [github.com/Devshakya19](https://github.com/Devshakya19)  
 Calendly: calendly.com/codehaat/invest
 
 ---

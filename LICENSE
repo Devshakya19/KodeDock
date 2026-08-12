@@ -1,101 +1,244 @@
 PROPRIETARY SOFTWARE LICENSE AGREEMENT
 
-Copyright (c) 2026 CodeHaat. All rights reserved.
+Copyright (c) 2024–2026 CodeHaat. All rights reserved.
 
-IMPORTANT: THIS SOFTWARE AND ASSOCIATED DOCUMENTATION IS PROPRIETARY AND
-CONFIDENTIAL TO CODEHAAT. READ THIS LICENSE CAREFULLY BEFORE USING THIS SOFTWARE.
-BY USING THIS SOFTWARE, YOU AGREE TO BE BOUND BY THE TERMS OF THIS LICENSE.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+IMPORTANT — PLEASE READ CAREFULLY
+
+This Proprietary Software License Agreement ("Agreement") is a legally binding
+contract between you ("User") and CodeHaat ("Company") governing your access
+to and use of the CodeHaat software platform and all associated documentation,
+source code, algorithms, data structures, APIs, designs, user interfaces, and
+derivative works (collectively, the "Software").
+
+BY ACCESSING, CLONING, DOWNLOADING, OR USING ANY PORTION OF THIS SOFTWARE,
+YOU ACKNOWLEDGE THAT YOU HAVE READ THIS AGREEMENT, UNDERSTAND IT, AND AGREE
+TO BE LEGALLY BOUND BY ITS TERMS. IF YOU DO NOT AGREE TO THESE TERMS, DO NOT
+ACCESS OR USE THE SOFTWARE.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 1. DEFINITIONS
 
-   "Software" refers to the CodeHaat platform, including but not limited to all
-   source code, object code, algorithms, data structures, APIs, designs, user
-   interfaces, documentation, and any derivative works thereof.
+   1.1  "Software" means the CodeHaat platform in its entirety, including but
+        not limited to all source code, object code, compiled binaries,
+        algorithms, data structures, database schemas, APIs, user interfaces,
+        design assets, configuration files, scripts, and associated
+        documentation, whether in human-readable or machine-readable form.
 
-   "CodeHaat" refers to the company/individual(s) that own the intellectual
-   property rights to this Software.
+   1.2  "CodeHaat" or "Company" means the legal entity and individual(s) that
+        own all intellectual property rights to the Software.
 
-   "User" refers to any individual or entity that accesses or uses the Software.
+   1.3  "User" means any individual, company, organisation, or other legal
+        entity that accesses, downloads, clones, or otherwise uses the
+        Software in any form.
 
-2. GRANT OF RIGHTS
+   1.4  "Authorised Personnel" means employees, contractors, or consultants
+        of CodeHaat who have been granted explicit written permission to
+        access and work with the Software.
 
-   This License grants User a limited, non-exclusive, non-transferable, and
-   revocable license to view and reference the Software for informational and
-   educational purposes only. This License does NOT grant any rights to:
+   1.5  "Confidential Information" means the Software and any non-public
+        information disclosed by CodeHaat in connection with this Agreement,
+        including technical, financial, business, and product information.
 
-   (a) Copy, reproduce, or duplicate the Software or any portion thereof;
-   (b) Modify, adapt, translate, or create derivative works of the Software;
-   (c) Distribute, publish, sublicense, sell, or otherwise transfer the Software;
-   (d) Reverse engineer, decompile, disassemble, or attempt to derive the source
-       code of the Software;
-   (e) Remove, alter, or obscure any proprietary notices or labels on the Software;
-   (f) Use the Software for any commercial purpose, including but not limited to
-       building competing products or services;
-   (g) Host, rent, lease, or timeshare the Software.
+2. GRANT OF LIMITED RIGHTS
 
-3. INTELLECTUAL PROPERTY
+   Subject to your full compliance with this Agreement, CodeHaat grants you
+   a limited, non-exclusive, non-transferable, non-sublicensable, and
+   revocable licence to view the Software solely for the following permitted
+   purposes:
 
-   The Software and all copies thereof, and all patents, copyrights, trade secrets,
-   and other intellectual property rights therein, are and shall remain the
-   exclusive property of CodeHaat. This License does not convey any ownership
-   rights in or to the Software.
+   (a) Internal review and evaluation by Authorised Personnel;
+   (b) Security research conducted under a written authorisation from
+       CodeHaat; or
+   (c) Such other purposes as CodeHaat may expressly authorise in writing.
+
+   ALL OTHER USES ARE EXPRESSLY PROHIBITED. This Agreement does NOT grant
+   any right to:
+
+   (a) Copy, reproduce, or duplicate the Software or any portion thereof,
+       in whole or in part, by any means or in any medium;
+   (b) Modify, adapt, translate, localise, or create derivative works based
+       on the Software;
+   (c) Distribute, publish, sublicense, sell, resell, rent, lease, lend,
+       transfer, or otherwise make the Software available to any third party;
+   (d) Reverse-engineer, decompile, disassemble, decrypt, or attempt to
+       derive source code from any compiled portion of the Software;
+   (e) Remove, alter, obscure, or tamper with any copyright notice, trademark,
+       or other proprietary marking on or within the Software;
+   (f) Use the Software or any part thereof to build, train, or improve any
+       competing product, service, or machine-learning model;
+   (g) Host, deploy, operate, rent, or otherwise make the Software available
+       as a service or product to any third party;
+   (h) Use any automated system (bots, crawlers, scrapers, or similar tools)
+       to extract, index, or copy any portion of the Software.
+
+3. INTELLECTUAL PROPERTY RIGHTS
+
+   3.1  Ownership. The Software and all copies thereof, together with all
+        patents (pending or granted), copyrights, trade secrets, trademarks,
+        and other intellectual property rights embodied therein, are and shall
+        remain the sole and exclusive property of CodeHaat. This Agreement
+        does not convey, transfer, or assign any ownership interest in or to
+        the Software.
+
+   3.2  No Implied Licences. No licence is granted by implication, estoppel,
+        or otherwise. Any rights not expressly granted in this Agreement are
+        reserved by CodeHaat.
+
+   3.3  Feedback. Any suggestions, ideas, or feedback you provide regarding
+        the Software are voluntarily given and become the exclusive property
+        of CodeHaat, which may use such feedback without any obligation to you.
 
 4. CONFIDENTIALITY
 
-   User agrees to treat the Software as confidential information and shall not
-   disclose the Software or any portion thereof to any third party without the
-   prior written consent of CodeHaat.
+   4.1  The Software constitutes valuable Confidential Information of CodeHaat.
+        You agree to:
 
-5. RESTRICTIONS
+        (a) Hold the Software in strict confidence using at least the same
+            degree of care you use to protect your own confidential information
+            (and in no event less than reasonable care);
+        (b) Not disclose, share, publish, or make the Software available to
+            any third party without the prior written consent of CodeHaat;
+        (c) Limit access to the Software to Authorised Personnel who have a
+            legitimate need to know and are bound by confidentiality obligations
+            no less restrictive than those in this Agreement;
+        (d) Immediately notify CodeHaat in writing upon discovering any
+            unauthorised use, disclosure, or breach of this Agreement.
 
-   User shall not:
+   4.2  These confidentiality obligations survive the termination or expiry
+        of this Agreement for a period of five (5) years, or indefinitely
+        with respect to information that qualifies as a trade secret.
 
-   (a) Use the Software in any manner that violates any applicable law or regulation;
-   (b) Use the Software to infringe upon the intellectual property rights of others;
-   (c) Attempt to gain unauthorized access to the Software or related systems;
-   (d) Interfere with or disrupt the Software or servers connected to the Software;
-   (e) Use automated systems (bots, scrapers) to access or copy the Software;
-   (f) Publish, publicly display, or publicly perform the Software or derivative works.
+5. RESTRICTIONS & ACCEPTABLE USE
+
+   In addition to the prohibitions in Section 2, you shall not:
+
+   (a) Use the Software in any manner that violates any applicable local,
+       national, or international law, regulation, or treaty;
+   (b) Use the Software to infringe, misappropriate, or violate any
+       intellectual property or other rights of any person or entity;
+   (c) Attempt to gain unauthorised access to the Software or any system,
+       network, or database related to it;
+   (d) Interfere with, disrupt, or degrade the performance or security of
+       the Software or any infrastructure connected to it;
+   (e) Conduct penetration testing, fuzzing, or security assessments of any
+       CodeHaat production systems without prior written authorisation.
 
 6. TERMINATION
 
-   This License is effective until terminated. CodeHaat may terminate this License
-   at any time if User fails to comply with any term of this License. Upon
-   termination, User must immediately cease all use of the Software and destroy
-   all copies thereof.
+   6.1  Automatic Termination. This Agreement and all rights granted hereunder
+        terminate automatically and immediately, without notice, if you fail to
+        comply with any term or condition of this Agreement.
+
+   6.2  Termination by CodeHaat. CodeHaat may terminate this Agreement at any
+        time, for any reason, upon written notice to you.
+
+   6.3  Effect of Termination. Upon termination, you must immediately:
+
+        (a) Cease all access to and use of the Software;
+        (b) Destroy all copies of the Software in your possession or control,
+            whether in whole or in part, in any format or medium;
+        (c) Certify in writing to CodeHaat that you have done so, if requested.
+
+   6.4  Survival. Sections 3 (Intellectual Property), 4 (Confidentiality),
+        5 (Restrictions), 7 (Disclaimer of Warranties), 8 (Limitation of
+        Liability), 9 (Indemnification), 10 (Governing Law), and 12 (General)
+        survive any termination of this Agreement.
 
 7. DISCLAIMER OF WARRANTIES
 
-   THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. CODEHAAT DOES NOT
-   WARRANT THAT THE SOFTWARE WILL BE UNINTERRUPTED OR ERROR-FREE.
+   THE SOFTWARE IS PROVIDED "AS IS" AND "AS AVAILABLE," WITHOUT WARRANTY OF
+   ANY KIND, EXPRESS OR IMPLIED. TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE
+   LAW, CODEHAAT EXPRESSLY DISCLAIMS ALL WARRANTIES, INCLUDING BUT NOT LIMITED
+   TO THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+   PURPOSE, TITLE, AND NON-INFRINGEMENT. CODEHAAT DOES NOT WARRANT THAT THE
+   SOFTWARE WILL MEET YOUR REQUIREMENTS, OPERATE WITHOUT INTERRUPTION, OR BE
+   FREE OF ERRORS, DEFECTS, VIRUSES, OR OTHER HARMFUL COMPONENTS.
 
 8. LIMITATION OF LIABILITY
 
-   IN NO EVENT SHALL CODEHAAT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL,
-   CONSEQUENTIAL, OR PUNITIVE DAMAGES ARISING OUT OF OR RELATED TO THE USE OF
-   THE SOFTWARE, EVEN IF CODEHAAT HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
-   DAMAGES.
+   8.1  IN NO EVENT SHALL CODEHAAT, ITS DIRECTORS, OFFICERS, EMPLOYEES,
+        AGENTS, LICENSORS, OR SERVICE PROVIDERS BE LIABLE FOR ANY INDIRECT,
+        INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES
+        OF ANY KIND, INCLUDING BUT NOT LIMITED TO LOSS OF REVENUE, LOSS OF
+        PROFITS, LOSS OF BUSINESS, LOSS OF DATA, OR LOSS OF GOODWILL, ARISING
+        OUT OF OR RELATED TO THIS AGREEMENT OR YOUR USE OF OR INABILITY TO
+        USE THE SOFTWARE, EVEN IF CODEHAAT HAS BEEN ADVISED OF THE POSSIBILITY
+        OF SUCH DAMAGES.
 
-9. GOVERNING LAW
+   8.2  TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, CODEHAAT'S TOTAL
+        CUMULATIVE LIABILITY ARISING OUT OF OR RELATED TO THIS AGREEMENT SHALL
+        NOT EXCEED ONE HUNDRED INDIAN RUPEES (INR 100).
 
-   This License shall be governed by and construed in accordance with the laws
-   of India, without regard to its conflict of laws principles. Any disputes
-   arising under this License shall be subject to the exclusive jurisdiction of
-   the courts in India.
+9. INDEMNIFICATION
 
-10. ENTIRE AGREEMENT
+   You agree to indemnify, defend, and hold harmless CodeHaat and its officers,
+   directors, employees, agents, and successors from and against any claims,
+   liabilities, damages, losses, costs, and expenses (including reasonable
+   legal fees) arising from or related to: (a) your breach of this Agreement;
+   (b) your use or misuse of the Software; or (c) your violation of any
+   applicable law or the rights of any third party.
 
-    This License constitutes the entire agreement between User and CodeHaat with
-    respect to the subject matter hereof and supersedes all prior or contemporaneous
-    communications, representations, or agreements, whether written or oral.
+10. GOVERNING LAW & DISPUTE RESOLUTION
 
-11. CONTACT
+    10.1  This Agreement shall be governed by and construed in accordance with
+          the laws of India, without regard to its conflict of laws provisions.
 
-    For licensing inquiries, contact: legal@codehaat.com
+    10.2  Any dispute, controversy, or claim arising out of or relating to this
+          Agreement, including its validity, breach, or termination, shall be
+          subject to the exclusive jurisdiction of the competent courts located
+          in India.
 
----
+    10.3  Before initiating formal proceedings, the parties agree to attempt to
+          resolve any dispute in good faith through direct negotiations for a
+          period of thirty (30) days following written notice of the dispute.
 
-UNAUTHORIZED USE, COPYING, OR DISTRIBUTION OF THIS SOFTWARE IS STRICTLY PROHIBITED
-AND MAY RESULT IN CIVIL AND CRIMINAL PENALTIES.
+11. CONTACT INFORMATION
+
+    For licensing inquiries, commercial arrangements, or general legal matters:
+
+        Email:   legal@codehaat.com
+        Subject: [LICENSE INQUIRY] <brief description>
+
+    For security vulnerability reports:
+
+        Email:   security@codehaat.com
+
+12. GENERAL PROVISIONS
+
+    12.1  Entire Agreement. This Agreement constitutes the entire agreement
+          between the parties with respect to its subject matter and supersedes
+          all prior and contemporaneous understandings, agreements,
+          representations, and warranties, whether written or oral.
+
+    12.2  Amendments. CodeHaat may update this Agreement at any time. Continued
+          access to the Software after such update constitutes acceptance of the
+          revised Agreement.
+
+    12.3  Severability. If any provision of this Agreement is held to be invalid
+          or unenforceable, that provision shall be modified to the minimum extent
+          necessary to make it enforceable, and the remaining provisions shall
+          remain in full force and effect.
+
+    12.4  No Waiver. CodeHaat's failure to enforce any right or provision of
+          this Agreement shall not constitute a waiver of such right or provision.
+
+    12.5  Assignment. You may not assign or transfer any rights or obligations
+          under this Agreement without CodeHaat's prior written consent. Any
+          purported assignment in violation of this section is void.
+
+    12.6  Notices. All legal notices under this Agreement shall be in writing
+          and delivered to legal@codehaat.com or the address provided by
+          CodeHaat at the time of engagement.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+UNAUTHORIZED USE, COPYING, DISTRIBUTION, OR DISCLOSURE OF THIS SOFTWARE IS
+STRICTLY PROHIBITED AND MAY RESULT IN SEVERE CIVIL AND CRIMINAL PENALTIES
+UNDER THE COPYRIGHT ACT, 1957 (INDIA) AND OTHER APPLICABLE LAWS.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Copyright (c) 2024–2026 CodeHaat. All rights reserved.
