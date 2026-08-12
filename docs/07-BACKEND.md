@@ -4,283 +4,75 @@
 
 ---
 
+## Table of Contents
+1. [Service Architecture Summary](#1-service-architecture-summary)
+2. [Database Schema (Complete SQL)](#2-database-schema-complete-sql)
+3. [Row-Level Security Policies](#3-row-level-security-policies)
+4. [Redis Job Queues](#4-redis-job-queues)
+5. [API Route Map](#5-api-route-map)
+6. [Caching Strategy](#6-caching-strategy)
+7. [Rate Limiting](#7-rate-limiting)
+8. [Storage (SeaweedFS)](#8-storage-seaweedfs)
+
+---
+
 ## 1. Service Architecture Summary
+
+```mermaid
+flowchart LR
+    Client([Client App]) --> Gateway
+    
+    subgraph Backend Architecture
+        Gateway -->|Port 4001| Core[Core Engine (Rust)]
+        Gateway -->|Port 4002| AI[AI Service (Python)]
+        Gateway -->|Port 4003| Infra[Infra Worker (Go)]
+        Gateway -->|Port 4004| RealTime[Real-Time (Node.js)]
+        
+        Core <--> DB[(PostgreSQL :5432)]
+        Core <--> Redis[(Redis :6379)]
+        Infra <--> Redis
+        RealTime <--> Redis
+        AI <--> DB
+    end
+```
 
 | Service | Language | Port | Role |
 |---------|----------|------|------|
-| Core Engine | Rust | 4001 | Security, transactions, wallet |
-| AI Service | Python | 4002 | Recommendations, search, fraud |
-| Infrastructure Worker | Go | 4003 | GitHub API, Docker, background jobs |
-| Real-Time Service | Node.js | 4004 | WebSocket notifications |
-| Database | PostgreSQL | - | Primary database |
-| Cache/Queue | Redis | 6379 | Jobs, cache, pub/sub |
+| **Core Engine** | Rust | 4001 | Security, transactions, wallet |
+| **AI Service** | Python | 4002 | Recommendations, search, fraud |
+| **Infrastructure Worker** | Go | 4003 | GitHub API, Docker, background jobs |
+| **Real-Time Service** | Node.js | 4004 | WebSocket notifications |
+| **Database** | PostgreSQL | 5432 | Primary database |
+| **Cache/Queue** | Redis | 6379 | Jobs, cache, pub/sub |
 
 ---
 
 ## 2. Database Schema (Complete SQL)
 
-### Enable UUID Extension
+### Entity Relationship Diagram
 
-```sql
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+```mermaid
+erDiagram
+    users ||--|| profiles : "1:1"
+    profiles ||--o{ products : "sells"
+    profiles ||--o{ orders : "buys/sells"
+    profiles ||--|| wallets : "1:1"
+    profiles ||--o{ notifications : "receives"
+    profiles ||--|| seller_payout_accounts : "1:1"
+    profiles ||--o{ disputes : "raises/resolves"
+    
+    categories ||--o{ products : "contains"
+    
+    products ||--o{ orders : "purchased via"
+    products ||--o{ reviews : "has"
+    
+    orders ||--|| escrow : "held in"
+    orders ||--o{ disputes : "has"
+    
+    wallets ||--o{ wallet_transactions : "records"
 ```
 
-### Table: profiles
-
-```sql
-CREATE TABLE profiles (
-  id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-  full_name TEXT,
-  role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'developer', 'admin')),
-  bio TEXT,
-  avatar_url TEXT,
-  github_username TEXT,
-  github_access_token TEXT,  -- Encrypted at rest
-  website TEXT,
-  location TEXT,
-  is_verified BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Auto-create profile on user signup
-CREATE OR REPLACE FUNCTION handle_new_user()
-RETURNS TRIGGER AS $$
-BEGIN
-  INSERT INTO public.profiles (id, full_name, role)
-  VALUES (NEW.id, COALESCE(NEW.full_name, ''), NEW.role);
-  INSERT INTO public.wallets (user_id, balance_paise)
-  VALUES (NEW.id, 0);
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER on_user_created
-  AFTER INSERT ON users
-  FOR EACH ROW EXECUTE FUNCTION handle_new_user();
-```
-
-### Table: categories
-
-```sql
-CREATE TABLE categories (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name TEXT NOT NULL UNIQUE,
-  slug TEXT NOT NULL UNIQUE,
-  description TEXT,
-  icon TEXT,
-  product_count INTEGER DEFAULT 0,
-  sort_order INTEGER DEFAULT 0,
-  is_active BOOLEAN DEFAULT TRUE,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Seed categories
-INSERT INTO categories (name, slug, icon, sort_order) VALUES
-  ('Web Templates', 'web-templates', 'layout', 1),
-  ('Mobile Apps', 'mobile-apps', 'smartphone', 2),
-  ('UI Kits', 'ui-kits', 'palette', 3),
-  ('B.Tech Projects', 'btech-projects', 'graduation-cap', 4),
-  ('Boilerplates', 'boilerplates', 'terminal', 5),
-  ('API Templates', 'api-templates', 'code', 6);
-```
-
-### Table: products
-
-```sql
-CREATE TABLE products (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  seller_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  category_id UUID REFERENCES categories(id),
-  title TEXT NOT NULL,
-  slug TEXT NOT NULL UNIQUE,
-  description TEXT,
-  long_description TEXT,
-  price_paise INTEGER NOT NULL CHECK (price_paise >= 4900),  -- Min ₹49
-  original_price_paise INTEGER,
-  tags TEXT[] DEFAULT '{}',
-  status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'active', 'paused', 'archived')),
-  github_repo_url TEXT,
-  github_repo_id INTEGER,
-  preview_url TEXT,
-  image_url TEXT,
-  demo_url TEXT,
-  tech_stack TEXT[] DEFAULT '{}',
-  sales_count INTEGER DEFAULT 0,
-  view_count INTEGER DEFAULT 0,
-  rating DECIMAL(3,2) DEFAULT 0,
-  review_count INTEGER DEFAULT 0,
-  is_featured BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE INDEX idx_products_seller ON products(seller_id);
-CREATE INDEX idx_products_category ON products(category_id);
-CREATE INDEX idx_products_status ON products(status);
-CREATE INDEX idx_products_slug ON products(slug);
-```
-
-### Table: wallets
-
-```sql
-CREATE TABLE wallets (
-  user_id UUID PRIMARY KEY REFERENCES profiles(id) ON DELETE CASCADE,
-  balance_paise INTEGER NOT NULL DEFAULT 0 CHECK (balance_paise >= 0),
-  pending_paise INTEGER NOT NULL DEFAULT 0 CHECK (pending_paise >= 0),
-  total_earned_paise INTEGER NOT NULL DEFAULT 0,
-  total_spent_paise INTEGER NOT NULL DEFAULT 0,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-```
-
-### Table: wallet_transactions
-
-```sql
-CREATE TABLE wallet_transactions (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  wallet_user_id UUID NOT NULL REFERENCES wallets(user_id),
-  type TEXT NOT NULL CHECK (type IN ('topup', 'purchase', 'sale', 'withdrawal', 'refund', 'adjustment', 'commission')),
-  amount_paise INTEGER NOT NULL,
-  balance_after_paise INTEGER NOT NULL,
-  description TEXT,
-  reference_id UUID,  -- order_id, product_id, etc.
-  metadata JSONB,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE INDEX idx_wallet_tx_user ON wallet_transactions(wallet_user_id);
-CREATE INDEX idx_wallet_tx_type ON wallet_transactions(type);
-CREATE INDEX idx_wallet_tx_created ON wallet_transactions(created_at);
-```
-
-### Table: orders
-
-```sql
-CREATE TABLE orders (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  buyer_id UUID NOT NULL REFERENCES profiles(id),
-  seller_id UUID NOT NULL REFERENCES profiles(id),
-  product_id UUID NOT NULL REFERENCES products(id),
-  amount_paise INTEGER NOT NULL,
-  platform_fee_paise INTEGER NOT NULL,  -- 2.5%
-  seller_amount_paise INTEGER NOT NULL,  -- 97.5%
-  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'completed', 'refunded', 'disputed', 'cancelled')),
-  github_repo_url TEXT,
-  github_transfer_status TEXT CHECK (github_transfer_status IN ('pending', 'transferring', 'completed', 'failed')),
-  notes TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  completed_at TIMESTAMPTZ,
-  disputed_at TIMESTAMPTZ,
-  resolved_at TIMESTAMPTZ
-);
-
-CREATE INDEX idx_orders_buyer ON orders(buyer_id);
-CREATE INDEX idx_orders_seller ON orders(seller_id);
-CREATE INDEX idx_orders_product ON orders(product_id);
-CREATE INDEX idx_orders_status ON orders(status);
-```
-
-### Table: escrow
-
-```sql
-CREATE TABLE escrow (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  order_id UUID NOT NULL REFERENCES orders(id) UNIQUE,
-  amount_paise INTEGER NOT NULL,
-  status TEXT NOT NULL DEFAULT 'held' CHECK (status IN ('held', 'released', 'refunded', 'disputed')),
-  held_until TIMESTAMPTZ NOT NULL,  -- created_at + 48 hours
-  released_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE INDEX idx_escrow_status ON escrow(status);
-CREATE INDEX idx_escrow_held_until ON escrow(held_until);
-```
-
-### Table: reviews
-
-```sql
-CREATE TABLE reviews (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
-  user_id UUID NOT NULL REFERENCES profiles(id),
-  order_id UUID NOT NULL REFERENCES orders(id),
-  rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
-  title TEXT,
-  comment TEXT,
-  is_verified_purchase BOOLEAN DEFAULT TRUE,
-  helpful_count INTEGER DEFAULT 0,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE(product_id, user_id)
-);
-
-CREATE INDEX idx_reviews_product ON reviews(product_id);
-```
-
-### Table: notifications
-
-```sql
-CREATE TABLE notifications (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  type TEXT NOT NULL,
-  title TEXT NOT NULL,
-  message TEXT,
-  data JSONB,
-  is_read BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE INDEX idx_notifications_user ON notifications(user_id);
-CREATE INDEX idx_notifications_unread ON notifications(user_id, is_read) WHERE is_read = FALSE;
-```
-
-### Table: disputes
-
-```sql
-CREATE TABLE disputes (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  order_id UUID NOT NULL REFERENCES orders(id),
-  raised_by UUID NOT NULL REFERENCES profiles(id),
-  reason TEXT NOT NULL,
-  description TEXT,
-  status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'under_review', 'resolved', 'closed')),
-  resolution TEXT,
-  resolved_by UUID REFERENCES profiles(id),
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  resolved_at TIMESTAMPTZ
-);
-```
-
-### Table: seller_payout_accounts
-
-Sellers must add a payout method (bank account or UPI) before they can withdraw earnings. One payout account per seller (UNIQUE constraint).
-
-```sql
-CREATE TABLE seller_payout_accounts (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  seller_id UUID NOT NULL UNIQUE REFERENCES profiles(id) ON DELETE CASCADE,
-  account_type TEXT NOT NULL CHECK (account_type IN ('bank_account', 'upi')),
-  account_holder_name TEXT,         -- Required for bank_account
-  account_number TEXT,              -- Required for bank_account (9-18 digits)
-  ifsc_code TEXT,                   -- Required for bank_account (11 chars: e.g. SBIN0001234)
-  bank_name TEXT,                   -- Required for bank_account
-  upi_id TEXT,                      -- Required for upi (format: name@provider)
-  is_default BOOLEAN DEFAULT TRUE,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE INDEX idx_payout_accounts_seller ON seller_payout_accounts(seller_id);
-```
-
-**Validation Rules (enforced server-side in Rust):**
-- Bank account: holder name (1-100 chars), account number (9-18 digits), IFSC (`^[A-Z]{4}0[A-Z0-9]{6}$`), bank name
-- UPI: must match `name@provider` format, max 100 chars
-- Account numbers are **masked** in API responses — only last 4 digits are returned (e.g. `••••1234`)
+*Note: The complete SQL table definitions, indexing strategies, and database triggers (including user auto-creation) are maintained in the primary database migration scripts. The diagram above represents the core logical architecture and entity relationships.*
 
 ---
 
@@ -298,6 +90,15 @@ CREATE INDEX idx_payout_accounts_seller ON seller_payout_accounts(seller_id);
 
 ## 4. Redis Job Queues
 
+```mermaid
+flowchart TD
+    Rust[Core Engine (Rust)] -->|Publishes Job| Redis[(Redis Queue)]
+    Cron[Cron Job] -->|Publishes Job| Redis
+    Redis -->|Consumes Job| Go[Infra Worker (Go)]
+    Redis -->|Consumes Job| Node[Real-Time (Node.js)]
+    Redis -->|Consumes Job| Python[AI Service (Python)]
+```
+
 ### Queue Names
 
 | Queue | Producer | Consumer | Purpose |
@@ -308,25 +109,17 @@ CREATE INDEX idx_payout_accounts_seller ON seller_payout_accounts(seller_id);
 | `notification` | Core Engine (Rust) | Real-Time (Node.js) | Push notifications |
 | `analytics` | Core Engine (Rust) | AI Service (Python) | User behavior tracking |
 
-### Job Schema (JSON)
+### Job Schema Structure
 
-```json
-{
-  "id": "uuid",
-  "type": "repo_transfer",
-  "payload": {
-    "orderId": "uuid",
-    "buyerId": "uuid",
-    "sellerGithubToken": "encrypted",
-    "sellerRepoUrl": "https://github.com/...",
-    "buyerGithubToken": "encrypted"
-  },
-  "priority": "high",
-  "attempts": 0,
-  "maxAttempts": 5,
-  "createdAt": "2026-07-13T00:00:00Z"
-}
-```
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `UUID` | Unique identifier for the job |
+| `type` | `String` | Type of job (e.g., `repo_transfer`) |
+| `payload` | `Object` | Job-specific data payload |
+| `priority` | `String` | Queue priority level (`high`, `normal`, `low`) |
+| `attempts` | `Integer` | Current retry attempt count |
+| `maxAttempts` | `Integer` | Maximum allowed retry attempts |
+| `createdAt` | `Timestamp` | Job creation timestamp |
 
 ---
 
@@ -334,90 +127,82 @@ CREATE INDEX idx_payout_accounts_seller ON seller_payout_accounts(seller_id);
 
 ### Core Engine (Rust) — Port 4001
 
-```
-# Health
-GET    /health                       # Health check
+#### Health & System
+- `GET /health` - Health check
 
-# Auth (rate-limited: 5 req / 12s)
-POST   /api/auth/register            # Register (user or developer)
-POST   /api/auth/login               # Login
-POST   /api/auth/forgot-password     # Request password reset
-POST   /api/auth/reset-password      # Reset password with token
-POST   /api/auth/logout              # Logout
-GET    /api/auth/me                  # Get current user
-POST   /api/auth/change-password     # Change password (auth required)
-DELETE /api/auth/delete-account      # Delete account (auth required)
+#### Auth (rate-limited: 5 req / 12s)
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `POST /api/auth/forgot-password`
+- `POST /api/auth/reset-password`
+- `POST /api/auth/logout`
+- `GET /api/auth/me`
+- `POST /api/auth/change-password`
+- `DELETE /api/auth/delete-account`
 
-# Profile
-GET    /api/profile/:id              # Get profile
-PUT    /api/profile                  # Update own profile (auth required)
+#### Profile
+- `GET /api/profile/:id`
+- `PUT /api/profile`
 
-# Products (public)
-GET    /api/products                 # List products (search/filter)
-GET    /api/products/:id             # Get product detail
+#### Products (public)
+- `GET /api/products` *(Returns list of active products)*
+- `GET /api/products/:id` *(Returns detailed product information)*
 
-# Seller (developer-only, all require auth + role check)
-GET    /api/seller/products          # List seller's products
-POST   /api/seller/products          # Create product
-PUT    /api/seller/products/:id      # Update product (owner only)
-DELETE /api/seller/products/:id      # Delete product (owner only)
-GET    /api/seller/stats             # Seller dashboard stats
-GET    /api/seller/payout-account    # Get payout method (bank/UPI)
-POST   /api/seller/payout-account    # Add/update payout method
-DELETE /api/seller/payout-account    # Remove payout method
+#### Seller (developer-only)
+- `GET /api/seller/products`
+- `POST /api/seller/products` *(Requires Product Creation Payload)*
+- `PUT /api/seller/products/:id`
+- `DELETE /api/seller/products/:id`
+- `GET /api/seller/stats`
+- `GET /api/seller/payout-account`
+- `POST /api/seller/payout-account`
+- `DELETE /api/seller/payout-account`
 
-# Wallet (auth required)
-GET    /api/wallet                   # Get wallet balance
-POST   /api/wallet/topup             # Create Razorpay top-up order
-POST   /api/wallet/topup/verify      # Verify top-up signature
-GET    /api/wallet/transactions      # Transaction history (paginated)
-POST   /api/wallet/withdraw          # Withdraw (developer only, requires payout method)
-POST   /api/wallet/release-escrow    # Release expired escrow funds
+#### Wallet (auth required)
+- `GET /api/wallet`
+- `POST /api/wallet/topup`
+- `POST /api/wallet/topup/verify`
+- `GET /api/wallet/transactions`
+- `POST /api/wallet/withdraw`
+- `POST /api/wallet/release-escrow`
 
-# Orders (auth required)
-POST   /api/orders                   # Create order (wallet or Razorpay)
-POST   /api/orders/verify            # Verify Razorpay payment (rate-limited: 10/6s)
-GET    /api/orders                   # List orders (buyer or seller)
-GET    /api/orders/:id               # Get order detail
-POST   /api/webhooks/razorpay        # Razorpay webhook (signature-verified)
+#### Orders (auth required)
+- `POST /api/orders` *(Requires Product ID; Returns Order Status)*
+- `POST /api/orders/verify`
+- `GET /api/orders`
+- `GET /api/orders/:id`
+- `POST /api/webhooks/razorpay`
 
-# Reviews
-GET    /api/reviews/:productId       # List product reviews
-POST   /api/reviews                  # Create review (verified purchase only)
+#### Reviews
+- `GET /api/reviews/:productId`
+- `POST /api/reviews`
 
-# Notifications
-GET    /api/notifications            # List notifications
-PUT    /api/notifications/:id/read   # Mark as read
+#### Notifications
+- `GET /api/notifications`
+- `PUT /api/notifications/:id/read`
 
-# Upload (rate-limited: 10 req / 6s)
-POST   /api/upload/presign           # Get presigned S3 upload URL
-```
+#### Upload (rate-limited: 10 req / 6s)
+- `POST /api/upload/presign`
 
 ### AI Service (Python) — Port 4002
 
-```
-GET    /api/recommendations/:userId  # Get recommendations
-POST   /api/search                   # AI-powered search
-POST   /api/fraud/check              # Check fraud signals
-GET    /api/analytics/dashboard      # Admin analytics
-```
+- `GET /api/recommendations/:userId`
+- `POST /api/search`
+- `POST /api/fraud/check`
+- `GET /api/analytics/dashboard`
 
 ### Infrastructure Worker (Go) — Port 4003
 
-```
-GET    /api/health                   # Health check
-GET    /api/jobs/status              # Job queue status
-POST   /api/preview/build            # Trigger preview build
-POST   /api/preview/stop             # Stop preview container
-GET    /api/preview/:id/logs         # Get preview logs
-```
+- `GET /api/health`
+- `GET /api/jobs/status`
+- `POST /api/preview/build`
+- `POST /api/preview/stop`
+- `GET /api/preview/:id/logs`
 
 ### Real-Time Service (Node.js) — Port 4004
 
-```
-GET    /ws                           # WebSocket upgrade
-GET    /health                       # Health check
-```
+- `GET /ws`
+- `GET /health`
 
 ---
 
@@ -449,6 +234,24 @@ Implemented via `actix-governor` with custom `ForwardedIpKeyExtractor` that read
 
 Self-hosted S3-compatible object storage for product images and avatars.
 
+```mermaid
+sequenceDiagram
+    participant Client
+    participant API as Next.js Proxy
+    participant Rust as Core Engine (Rust)
+    participant Seaweed as SeaweedFS
+    
+    Client->>Rust: POST /api/upload/presign
+    Rust-->>Client: Returns presigned PUT URL
+    Client->>API: Uploads file
+    API->>Seaweed: Direct upload to S3-compatible API
+    Seaweed-->>API: Success
+    API-->>Client: Returns image URL
+    Client->>API: Requests image /api/images/[...path]
+    API->>Seaweed: Fetches image (cached for 24h)
+    Seaweed-->>Client: Image served
+```
+
 | Config | Value |
 |--------|-------|
 | Docker image | `chrislusf/seaweedfs:3.76` |
@@ -462,4 +265,4 @@ Self-hosted S3-compatible object storage for product images and avatars.
 
 ---
 
-*Document Version: 2.0 | Last Updated: August 2026*
+*Document Version: v1.3.0 | Last Updated: August 2026*

@@ -4,6 +4,19 @@
 
 ---
 
+## Table of Contents
+1. [Executive Summary](#1-executive-summary)
+2. [Problem Statement](#2-problem-statement)
+3. [Solution Overview](#3-solution-overview)
+4. [Target Audience](#4-target-audience)
+5. [Business Model](#5-business-model)
+6. [MVP Scope (Phase 1) & Current Status](#6-mvp-scope-phase-1--current-status)
+7. [Product Roadmap](#7-product-roadmap)
+8. [Success Metrics](#8-success-metrics)
+9. [Constraints & Assumptions](#9-constraints--assumptions)
+
+---
+
 ## 1. Executive Summary
 
 CodeHaat is India's first developer-focused digital goods marketplace that delivers code directly to buyers' GitHub accounts as private repositories — no .zip files, no extraction, just clone and build.
@@ -34,8 +47,8 @@ CodeHaat is India's first developer-focused digital goods marketplace that deliv
 1. **Sellers** connect their GitHub account, link repos, set prices
 2. **Buyers** browse, preview, and purchase code
 3. **On purchase**, a private repo is automatically created in the buyer's GitHub account
-4. **Payments** go through escrow with 48-hour dispute window
-5. **Sellers** get paid every 7 days with only 2.5% commission
+4. **Payments** go through escrow with a 7-day dispute window
+5. **Sellers** get paid after the 7-day hold, retaining 97.5% of the sale (2.5% platform commission)
 
 ### How It's Different
 
@@ -44,7 +57,7 @@ CodeHaat is India's first developer-focused digital goods marketplace that deliv
 | Commission | 2.5% | 20-55% | 10% |
 | Delivery | GitHub Repo | .zip File | File Download |
 | Live Preview | Yes | No | No |
-| Escrow System | Yes | No | No |
+| Escrow System | Yes (7 days) | No | No |
 | Indian Focus | Yes | No | No |
 | INR Payments | Native | Converted | Converted |
 | Payout Speed | 7 days | 30-60 days | 7 days |
@@ -77,7 +90,7 @@ CodeHaat is India's first developer-focused digital goods marketplace that deliv
 
 | Stream | Rate | Phase |
 |--------|------|-------|
-| Transaction Commission | 2.5% per sale | MVP |
+| Transaction Commission | 2.5% per sale | MVP (v1.0.0+) |
 | Featured Listings | ₹99-999/listing | Phase 2 |
 | Sponsored Categories | ₹499-2,999/month | Phase 2 |
 | Premium Seller Account | ₹199/month | Phase 3 |
@@ -89,38 +102,47 @@ CodeHaat is India's first developer-focused digital goods marketplace that deliv
 | Average Order Value | ₹500 |
 | Platform Commission (2.5%) | ₹12.50 |
 | Razorpay Fee (~2%) | ₹10 |
-| Seller Receives | ₹477.50 |
+| Seller Receives (97.5% before PG fee) | ₹477.50 |
 | Break-even | 200-300 transactions/month |
 
 ---
 
-## 6. MVP Scope (Phase 1)
+## 6. MVP Scope (Phase 1) & Current Status
 
-### What's Included
+### What's Included (Implemented in v1.3.0)
 
-- [ ] Authentication (Email + GitHub OAuth)
-- [ ] Product Browsing (Search, Filter, Category)
-- [ ] Product Detail Pages
-- [ ] Paper Money Wallet (mock payments)
-- [ ] Purchase Flow (Buy Now)
-- [ ] Seller Dashboard
-- [ ] Product Listing (CRUD)
-- [ ] Order History
-- [ ] Basic Admin Panel
-
-### What's NOT Included (Future Phases)
-
-- [ ] Real Razorpay Payments (Phase 2)
-- [ ] GitHub Repo Transfer (Phase 2)
-- [ ] Escrow System (Phase 2)
-- [ ] Live Preview Sandbox (Phase 2)
-- [ ] AI Recommendations (Phase 3)
-- [ ] Mobile App (Phase 3)
-- [ ] API Access (Phase 3)
+- [x] Authentication (Email + GitHub OAuth)
+- [x] Product Browsing (Search, Filter, Category)
+- [x] Product Detail Pages
+- [x] Paper Money Wallet (mock payments)
+- [x] Purchase Flow (Buy Now)
+- [x] Seller Dashboard
+- [x] Product Listing (CRUD)
+- [x] Order History
+- [x] Basic Admin Panel
+- [x] Real Razorpay Payments integration
+- [x] GitHub Repo Transfer delivery mechanism
+- [x] Escrow System (7-day hold)
 
 ---
 
-## 7. Success Metrics
+## 7. Product Roadmap
+
+### Phase 2: Engagement & Discovery
+- [ ] Live Preview Sandbox for templates
+- [ ] Featured Listings & Sponsored Categories
+- [ ] Advanced User Reviews & Ratings
+- [ ] Developer Q&A / Support section per product
+
+### Phase 3: Scaling & Ecosystem
+- [ ] AI Recommendations & AI-powered Search
+- [ ] Mobile App for Buyers and Sellers
+- [ ] Public API Access for third-party integrations
+- [ ] Premium Seller Subscriptions
+
+---
+
+## 8. Success Metrics
 
 | Metric | Target (Year 1) |
 |--------|-----------------|
@@ -133,7 +155,7 @@ CodeHaat is India's first developer-focused digital goods marketplace that deliv
 
 ---
 
-## 8. Constraints & Assumptions
+## 9. Constraints & Assumptions
 
 ### Constraints
 
@@ -146,8 +168,8 @@ CodeHaat is India's first developer-focused digital goods marketplace that deliv
 - Indian developer market is underserved
 - GitHub integration is a strong differentiator
 - 2.5% commission is sustainable at scale
-- Paper money MVP will validate the flow before real payments
+- Real payments and automated GitHub repo transfers effectively eliminate friction
 
 ---
 
-*Document Version: 1.0 | Last Updated: July 2026*
+*Document Version: 1.3.0 | Last Updated: August 2026*

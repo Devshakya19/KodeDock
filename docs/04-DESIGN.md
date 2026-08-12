@@ -4,10 +4,25 @@
 
 ---
 
+## Table of Contents
+1. [Design Philosophy](#1-design-philosophy)
+2. [Color System](#2-color-system)
+3. [Typography](#3-typography)
+4. [Spacing System](#4-spacing-system)
+5. [Z-Index Scale](#5-z-index-scale)
+6. [Iconography](#6-iconography)
+7. [Component Library](#7-component-library)
+8. [Page Designs](#8-page-designs)
+9. [Responsive Breakpoints](#9-responsive-breakpoints)
+10. [Animation Guidelines](#10-animation-guidelines)
+
+---
+
 ## 1. Design Philosophy
 
 - **Developer-first:** Clean, functional, no unnecessary decorations
 - **Light theme:** White backgrounds, slate text, subtle borders
+- **Dark Theme Note:** The main application is Light theme, but the CodeHaat Wallet interface uses a specialized **CodeHaat Black** dark theme for a premium financial feel.
 - **Minimal animations:** Smooth but not distracting
 - **Mobile-first:** Responsive design, works on all devices
 - **Accessible:** Proper contrast, focus states, keyboard navigation
@@ -91,7 +106,30 @@
 
 ---
 
-## 5. Component Library
+## 5. Z-Index Scale
+
+| Level | Class | Value | Usage |
+|-------|-------|-------|-------|
+| Base | `z-0` | 0 | Default content |
+| Elevated | `z-10` | 10 | Sticky headers, active cards |
+| Dropdown | `z-20` | 20 | Dropdown menus, tooltips |
+| Overlay | `z-30` | 30 | Modal backdrops, slide-overs |
+| Modal | `z-40` | 40 | Dialogs, command palettes |
+| Toast | `z-50` | 50 | Notifications, alerts |
+
+---
+
+## 6. Iconography
+
+We use **Lucide React** for all system icons to maintain a consistent, sharp, and clean appearance.
+
+- Use stroke-width of `2` for most icons (Lucide default).
+- Always ensure icons are sized appropriately using standard classes (`w-4 h-4`, `w-5 h-5`).
+- For brand logos (e.g., GitHub, Next.js), use custom SVGs in `shared/components`.
+
+---
+
+## 7. Component Library
 
 ### shadcn/ui Components (New York Style)
 
@@ -101,9 +139,14 @@
 | Card | `shared/ui/card.tsx` | Product cards, dashboards |
 | Badge | `shared/ui/badge.tsx` | Labels, categories |
 | Input | `shared/ui/input.tsx` | Forms, search |
+| Textarea | `shared/ui/textarea.tsx` | Multi-line input fields |
 | Sheet | `shared/ui/sheet.tsx` | Mobile navigation |
+| Dialog | `shared/ui/dialog.tsx` | Modals, confirmations |
+| Dropdown Menu | `shared/ui/dropdown-menu.tsx` | Context menus, user profiles |
+| Avatar | `shared/ui/avatar.tsx` | User profile images |
 | Separator | `shared/ui/separator.tsx` | Dividers |
 | Toaster | `shared/ui/toaster.tsx` | Toast notifications |
+| Tabs | `shared/ui/tabs.tsx` | Tabbed interfaces |
 
 ### Custom Components
 
@@ -112,10 +155,11 @@
 | CodeHaatLogo | `shared/components/codehaat-logo.tsx` | Navigation, footer |
 | FadeIn | `shared/components/fade-in.tsx` | Scroll animations |
 | GithubIcon | `shared/components/github-icon.tsx` | GitHub branding (custom SVG) |
+| EmptyState | `shared/components/empty-state.tsx` | Fallback for empty lists |
 
 ---
 
-## 6. Page Designs
+## 8. Page Designs
 
 ### Landing Page (`/`)
 
@@ -209,7 +253,7 @@
 
 ---
 
-## 7. Responsive Breakpoints
+## 9. Responsive Breakpoints
 
 | Breakpoint | Width | Usage |
 |------------|-------|-------|
@@ -219,7 +263,7 @@
 
 ---
 
-## 8. Animation Guidelines
+## 10. Animation Guidelines
 
 - **Duration:** 300-500ms for most animations
 - **Easing:** `[0.22, 1, 0.36, 1]` (smooth ease-out)
@@ -229,4 +273,4 @@
 
 ---
 
-*Document Version: 1.0 | Last Updated: July 2026*
+*Document Version: 1.3.0 | Last Updated: August 2026*

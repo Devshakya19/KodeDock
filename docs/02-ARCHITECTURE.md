@@ -4,81 +4,71 @@
 
 ---
 
+## Table of Contents
+1. [Architecture Overview](#1-architecture-overview)
+2. [Service Responsibilities](#2-service-responsibilities)
+3. [Service Communication](#3-service-communication)
+4. [Purchase Flow (End-to-End)](#4-purchase-flow-end-to-end)
+5. [Deployment Architecture](#5-deployment-architecture)
+6. [Network Isolation & Security](#6-network-isolation--security)
+7. [Scalability Strategy](#7-scalability-strategy)
+
+---
+
 ## 1. Architecture Overview
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         USERS (Browser)                         │
-└─────────────────────────┬───────────────────────────────────────┘
-                          │ HTTPS
-                          ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    1. UI LAYER (Next.js)                        │
-│                    TypeScript + React 19                         │
-│                    Port: 3000                                   │
-│                                                                 │
-│  • Landing page, Browse, Product detail                         │
-│  • Seller dashboard, Auth pages                                 │
-│  • Server-Side Rendering for SEO                                │
-│  • No direct DB access — calls backend services                 │
-└─────────────────────────┬───────────────────────────────────────┘
-                          │ REST / gRPC + JWT
-                          ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                2. CORE ENGINE (Rust)                             │
-│                Actix-Web 4                                       │
-│                Port: 4001                                       │
-│                                                                 │
-│  • JWT token verification                                       │
-│  • Request validation & authorization                           │
-│  • Wallet balance management                                    │
-│  • Escrow system (hold/release/refund)                          │
-│  • Transaction processing                                       │
-│  • Database read/write (SQLx client)                              │
-│                                                                 │
-│  NOTE: Redis integration planned for Phase 2                    │
-└───────┬─────────────────────────┬───────────────────────────────┘
-        │ (future: Redis)         │ Redis
-        ▼                         ▼
-┌───────────────────┐   ┌─────────────────────────────────────────┐
-│  3. AI SERVICE    │   │     4. INFRASTRUCTURE WORKER (Go)       │
-│  Python + FastAPI │   │     Port: 4003                          │
-│  Port: 4002       │   │                                         │
-│                   │   │  • Picks jobs from Redis queue           │
-│  • Recommendations│   │  • GitHub API integration               │
-│  • AI search      │   │  • Repo cloning & transfer              │
-│  • Fraud detection│   │  • Docker container management          │
-│  • User profiling │   │  • Live preview sandbox                 │
-│                   │   │  • Background automation                 │
-└───────────────────┘   └───────────┬─────────────────────────────┘
-                                    │ WebSocket
-                                    ▼
-                    ┌─────────────────────────────────────────────┐
-                    │     5. REAL-TIME SERVICE (Node.js)          │
-                    │     Port: 4004                              │
-                    │                                             │
-                    │  • WebSocket connections                    │
-                    │  • Live notifications                       │
-                    │  • Preview terminal streaming                │
-                    │  • Instant status updates                   │
-                    └─────────────────┬───────────────────────────┘
-                                      │
-                                      ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    6. DATA LAYER                                │
-│                                                                 │
-│  ┌─────────────────────┐    ┌─────────────────────────────┐    │
-│  │  PostgreSQL (Postgres)│    │  Redis                       │    │
-│  │                     │    │                              │    │
-│  │  • Users & Profiles │    │  • Job queues (BullMQ)       │    │
-│  │  • Products         │    │  • Session cache             │    │
-│  │  • Orders           │    │  • Rate limiting             │    │
-│  │  • Wallets          │    │  • Pub/Sub messaging         │    │
-│  │  • Escrow           │    │  • Real-time state           │    │
-│  │  • Reviews          │    │                              │    │
-│  │  • Triggers/RLS     │    │                              │    │
-│  └─────────────────────┘    └─────────────────────────────┘    │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Users((USERS<br>Browser))
+    
+    subgraph UI_Layer [1. UI LAYER]
+        UI[Next.js<br>TypeScript + React 19<br>Port: 3000]
+    end
+    
+    subgraph Core_Engine [2. CORE ENGINE]
+        Core[Rust Actix-Web<br>Port: 4001]
+    end
+    
+    subgraph Services [Supporting Services]
+        AI[3. AI SERVICE<br>Python FastAPI<br>Port: 4002]
+        Worker[4. INFRASTRUCTURE WORKER<br>Go<br>Port: 4003]
+        RealTime[5. REAL-TIME SERVICE<br>Node.js<br>Port: 4004]
+    end
+    
+    subgraph Storage [6. DATA & STORAGE LAYER]
+        DB[(PostgreSQL)]
+        Cache[(Redis)]
+        ObjectStore[(SeaweedFS)]
+    end
+
+    Users -- HTTPS --> UI
+    UI -- REST / gRPC + JWT --> Core
+    
+    Core -- SQLx Client --> DB
+    Core -- Pub/Sub & Sessions --> Cache
+    Core -- File Uploads --> ObjectStore
+    
+    Core -- Events --> Cache
+    AI -- Subscribe --> Cache
+    Worker -- Jobs --> Cache
+    
+    Worker -- WebSocket --> RealTime
+    RealTime -- Notifications --> Users
+    
+    classDef default fill:#f9f9f9,stroke:#333,stroke-width:2px;
+    classDef ui fill:#e1f5fe,stroke:#0288d1;
+    classDef core fill:#fce4ec,stroke:#c2185b;
+    classDef ai fill:#f3e5f5,stroke:#7b1fa2;
+    classDef worker fill:#e8f5e9,stroke:#388e3c;
+    classDef realtime fill:#fff3e0,stroke:#f57c00;
+    classDef db fill:#e0f7fa,stroke:#0097a7;
+    
+    class UI ui;
+    class Core core;
+    class AI ai;
+    class Worker worker;
+    class RealTime realtime;
+    class DB,Cache,ObjectStore db;
 ```
 
 ---
@@ -86,29 +76,26 @@
 ## 2. Service Responsibilities
 
 ### Service 1: UI Layer (Next.js)
-
 | Aspect | Detail |
 |--------|--------|
 | **Language** | TypeScript |
-| **Framework** | Next.js 15 (App Router) |
+| **Framework** | Next.js 15 (App Router) + React 19 |
 | **Port** | 3000 |
 | **Role** | Render user interfaces, handle SSR/SEO |
 | **Database Access** | None — calls backend services only |
 | **Auth** | JWT-based (custom auth) |
 
 ### Service 2: Core Engine (Rust)
-
 | Aspect | Detail |
 |--------|--------|
 | **Language** | Rust |
-| **Framework** | Actix-Web or Axum |
+| **Framework** | Actix-Web |
 | **Port** | 4001 |
-| **Role** | Main gateway, security, transactions |
+| **Role** | Main gateway, security, transactions, Razorpay Integration |
 | **Database Access** | PostgreSQL (service-role connection) |
 | **Responsibilities** | JWT verification, wallet management, escrow, transactions |
 
 ### Service 3: AI Service (Python)
-
 | Aspect | Detail |
 |--------|--------|
 | **Language** | Python |
@@ -119,7 +106,6 @@
 | **Responsibilities** | Recommendations, AI search, fraud detection |
 
 ### Service 4: Infrastructure Worker (Go)
-
 | Aspect | Detail |
 |--------|--------|
 | **Language** | Go |
@@ -130,7 +116,6 @@
 | **Responsibilities** | Job processing, GitHub API, Docker management |
 
 ### Service 5: Real-Time Service (Node.js)
-
 | Aspect | Detail |
 |--------|--------|
 | **Language** | TypeScript |
@@ -140,12 +125,12 @@
 | **Database Access** | Redis (pub/sub) |
 | **Responsibilities** | WebSocket connections, notifications, streaming |
 
-### Service 6: Data Layer
-
+### Service 6: Data & Storage Layer
 | Component | Purpose |
 |-----------|---------|
-| **PostgreSQL** | Primary database — users, products, orders, wallets |
-| **Redis** | Job queues, caching, rate limiting, pub/sub |
+| **PostgreSQL 16** | Primary database — users, products, orders, wallets, escrow |
+| **Redis 7** | Job queues (BullMQ), caching, rate limiting, pub/sub |
+| **SeaweedFS 3.76** | Fast, distributed object storage for images, product assets |
 
 ---
 
@@ -155,7 +140,8 @@
 |------|----|----------|---------|
 | Next.js | Rust Core | REST + JWT | All API calls |
 | Rust Core | PostgreSQL | TCP | Database operations |
-| Rust Core | Redis | TCP | Publish events |
+| Rust Core | Redis | TCP | Publish events, Cache |
+| Rust Core | SeaweedFS | HTTP | Store/Retrieve Assets |
 | Go Worker | Redis | TCP | Consume jobs |
 | Go Worker | GitHub API | HTTPS | Repo operations |
 | Go Worker | Docker | TCP | Container management |
@@ -168,79 +154,76 @@
 
 ## 4. Purchase Flow (End-to-End)
 
-```
-1. Buyer clicks "Buy Now" on product page
-   ↓
-2. Next.js sends request to Rust Core with JWT
-   ↓
-3. Rust Core verifies JWT token
-   ↓
-4. Rust Core checks buyer's wallet balance
-   ↓
-5. Rust Core deducts amount from buyer's wallet
-   ↓
-6. Rust Core creates escrow record (amount held)
-   ↓
-7. Rust Core publishes "repo_transfer_needed" event to Redis
-   ↓
-8. Rust Core publishes "user_activity" to Python AI service
-   ↓
-9. Go Worker picks up "repo_transfer_needed" job
-   ↓
-10. Go Worker bare-clones seller's GitHub repo
-    ↓
-11. Go Worker creates new private repo in buyer's GitHub
-    ↓
-12. Go Worker pushes code + history to buyer's repo
-    ↓
-13. Go Worker updates order status to "completed"
-    ↓
-14. Go Worker fires event to Node.js Realtime
-    ↓
-15. Node.js sends WebSocket notification to buyer's browser
-    ↓
-16. Buyer sees: "Success! Code delivered to your GitHub!"
-    ↓
-17. After 48 hours (no dispute), escrow auto-releases
-    ↓
-18. Seller receives 95.5% (after 2.5% platform fee)
+```mermaid
+sequenceDiagram
+    participant Buyer
+    participant NextJS as 1. UI Layer (Next.js)
+    participant Rust as 2. Core (Rust)
+    participant Redis as Redis (Pub/Sub)
+    participant Go as 4. Worker (Go)
+    participant Node as 5. Real-Time (Node)
+    participant GitHub
+    
+    Buyer->>NextJS: Clicks "Buy Now"
+    NextJS->>Rust: Request with JWT
+    Rust->>Rust: Verify JWT & Process Payment
+    Rust->>Rust: Create Escrow Record (7 days hold)
+    Rust->>Redis: Publish "repo_transfer_needed"
+    Rust->>Redis: Publish "user_activity"
+    Redis-->>Go: Pick up "repo_transfer_needed"
+    Go->>GitHub: Bare-clone seller's repo
+    Go->>GitHub: Create private repo for buyer
+    Go->>GitHub: Push code to buyer's repo
+    Go->>Rust: Update order status to "completed"
+    Go->>Node: Fire "order_completed" event
+    Node->>Buyer: WebSocket Notification
+    Note over Buyer: "Success! Code delivered to your GitHub!"
+    Note over Rust: After 7 days, auto-release Escrow
 ```
 
 ---
 
 ## 5. Deployment Architecture
 
-```
-┌─────────────────────────────────────────────┐
-│              Cloudflare (CDN + Tunnel)       │
-│              DDoS protection, SSL            │
-└──────────────────┬──────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────────┐
-│              Docker Compose                  │
-│              (Single VPS or Cluster)         │
-│                                             │
-│  ┌─────────┐ ┌─────────┐ ┌─────────┐       │
-│  │ Next.js │ │  Rust   │ │ Python  │       │
-│  │ :3000   │ │ :4001   │ │ :4002   │       │
-│  └─────────┘ └─────────┘ └─────────┘       │
-│                                             │
-│  ┌─────────┐ ┌─────────┐ ┌─────────┐       │
-│  │   Go    │ │ Node.js │ │  Redis  │       │
-│  │ :4003   │ │ :4004   │ │ :6379   │       │
-│  └─────────┘ └─────────┘ └─────────┘       │
-│                                             │
-└──────────────────┬──────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────────┐
-│              PostgreSQL (Managed)            │
-│              Primary Database               │
-└─────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    CDN[Cloudflare<br>CDN + Tunnel / DDoS / SSL]
+    
+    subgraph Docker_Compose [Docker Compose - Single VPS or Cluster]
+        UI[Next.js :3000]
+        Core[Rust :4001]
+        AI[Python :4002]
+        Worker[Go :4003]
+        RealTime[Node.js :4004]
+        Storage[SeaweedFS :8333]
+    end
+    
+    DB[(Managed PostgreSQL<br>Primary Database)]
+    
+    CDN --> Docker_Compose
+    Docker_Compose --> DB
+    
+    classDef cdn fill:#ffcc80,stroke:#e65100;
+    classDef container fill:#b3e5fc,stroke:#0288d1;
+    classDef db fill:#c8e6c9,stroke:#2e7d32;
+    
+    class CDN cdn;
+    class UI,Core,AI,Worker,RealTime,Storage container;
+    class DB db;
 ```
 
 ---
 
-## 6. Scalability Strategy
+## 6. Network Isolation & Security
+
+To ensure maximum security and prevent unauthorized cross-service communication, services are isolated using **Docker Bridge Networks**:
+- **`public_net`**: Only Next.js is exposed to the outside world via reverse proxy (Cloudflare Tunnels or Nginx).
+- **`internal_api_net`**: Next.js communicates with Rust Core over this internal network.
+- **`data_net`**: Rust Core, Go Worker, and Python AI communicate with PostgreSQL, Redis, and SeaweedFS over a strictly internal database network. UI layers and external connections cannot reach this network directly.
+
+---
+
+## 7. Scalability Strategy
 
 | Level | Strategy |
 |-------|----------|
@@ -248,9 +231,10 @@
 | **Database** | PostgreSQL handles connection pooling + read replicas |
 | **Caching** | Redis caches frequent queries (products, categories) |
 | **Queue** | Redis + BullMQ handles job processing asynchronously |
+| **Object Storage** | SeaweedFS distributes files across nodes highly efficiently |
 | **CDN** | Cloudflare serves static assets globally |
 | **Rate Limiting** | Redis-based rate limiting per user/IP |
 
 ---
 
-*Document Version: 1.0 | Last Updated: July 2026*
+*Document Version: 1.3.0 | Last Updated: August 2026*
