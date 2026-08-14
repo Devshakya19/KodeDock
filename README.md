@@ -181,8 +181,9 @@ To report a security vulnerability, please email **security@codehaat.com**. See 
 
 ## Contributors
 
-<!-- readme: contributors -start -->
-<!-- readme: contributors -end -->
+<a href="https://github.com/Devshakya19/CodeHaat/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Devshakya19/CodeHaat" alt="CodeHaat Contributors" />
+</a>
 
 ---
 
