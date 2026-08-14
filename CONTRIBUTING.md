@@ -7,42 +7,8 @@
 
 ## Core Team
 
-<table>
-  <tr>
-    <td align="center" width="200">
-      <a href="https://github.com/Devshakya19">
-        <img src="assets/contributors/founder.png" width="96px" alt="Dev Shakya"/>
-        <br/><br/>
-        <b>Dev Shakya</b>
-      </a>
-      <br/>
-      <sub>Founder &amp; Lead Engineer</sub>
-      <br/><br/>
-      <sub>
-        🦀 Rust · Core Engine<br/>
-        ⚛️ Next.js · Frontend<br/>
-        🐘 PostgreSQL · Schema<br/>
-        🐳 Docker · DevOps
-      </sub>
-    </td>
-    <td align="center" width="200">
-      <a href="https://github.com/Deekshajain28">
-        <img src="assets/contributors/marketing.png" width="96px" alt="Deeksha Jain"/>
-        <br/><br/>
-        <b>Deeksha Jain</b>
-      </a>
-      <br/>
-      <sub>Marketing</sub>
-      <br/><br/>
-      <sub>
-        📣 Brand &amp; Marketing Strategy<br/>
-        📱 Social Media &amp; Growth<br/>
-        🤝 Developer Community<br/>
-        📊 Market Research
-      </sub>
-    </td>
-  </tr>
-</table>
+<!-- readme: contributors -start -->
+<!-- readme: contributors -end -->
 
 ---
 

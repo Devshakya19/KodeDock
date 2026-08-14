@@ -1,0 +1,23 @@
+name: Update Contributors
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs daily at midnight
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  update-contributors:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Update README.md and CONTRIBUTING.md with contributors
+        uses: akhilmhdh/contributors-readme-action@v2.3.6
+        with:
+          readme_path: "README.md,CONTRIBUTING.md"
+          commit_message: "chore: auto-update contributors list"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
