@@ -29,7 +29,15 @@ import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { apiGet, apiPost } from "@/shared/lib/api";
 import { auth } from "@/shared/lib/auth";
-import AddPayoutMethod, { type PayoutAccountData } from "@/features/wallet/components/add-payout-method";
+export interface PayoutAccountData {
+  id: string;
+  account_type: string;
+  account_holder_name: string | null;
+  masked_account_number: string | null;
+  ifsc_code: string | null;
+  bank_name: string | null;
+  upi_id: string | null;
+}
 
 interface WalletData {
   user_id: string;
@@ -63,7 +71,7 @@ export default function SellerWalletPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   
-  const [payoutSheetOpen, setPayoutSheetOpen] = useState(false);
+
   const [txFilter, setTxFilter] = useState("all");
   const [isFlipped, setIsFlipped] = useState(false);
 
@@ -136,11 +144,7 @@ export default function SellerWalletPage() {
     }
   }
 
-  function handlePayoutSaved(account: PayoutAccountData) {
-    setPayoutAccount(account);
-    setSuccess("Payout method saved successfully");
-    setTimeout(() => setSuccess(""), 3000);
-  }
+
 
   const setPresetAmount = (amt: number) => {
     setWithdrawAmount(amt.toString());
@@ -169,12 +173,7 @@ export default function SellerWalletPage() {
 
   return (
     <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6">
-      <AddPayoutMethod
-        open={payoutSheetOpen}
-        onOpenChange={setPayoutSheetOpen}
-        existing={payoutAccount}
-        onSaved={handlePayoutSaved}
-      />
+
 
       {/* Page Header */}
       <div className="mb-10">
@@ -391,9 +390,9 @@ export default function SellerWalletPage() {
                  
                  <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-100">
                     <span className="text-slate-500 font-medium">Payout Method:</span>
-                    <button onClick={() => setPayoutSheetOpen(true)} className="font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
+                    <Link href="/seller/settings/payouts" className="font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
                       {payoutAccount ? (payoutAccount.account_type === 'upi' ? `UPI: ${payoutAccount.upi_id}` : `Bank: ••••${payoutAccount.masked_account_number?.slice(-4)}`) : "Setup Account"} <Pencil className="w-3 h-3" />
-                    </button>
+                    </Link>
                  </div>
               </div>
 
