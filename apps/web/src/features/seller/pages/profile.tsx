@@ -3,7 +3,7 @@ import { GithubIcon } from "@/shared/components/github-icon";
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, CheckCircle, ExternalLink, Camera, ArrowLeft, User, Link as LinkIcon, MapPin, AlignLeft, Info } from "lucide-react";
+import { Loader2, CheckCircle, ExternalLink, Camera, ArrowLeft, User, Link as LinkIcon, MapPin, AlignLeft, Info, LocateFixed } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { auth } from "@/shared/lib/auth";
@@ -24,6 +24,7 @@ export default function SellerProfilePage() {
   const [bio, setBio] = useState("");
   const [website, setWebsite] = useState("");
   const [location, setLocation] = useState("");
+  const [fetchingLocation, setFetchingLocation] = useState(false);
   const [githubUsername, setGithubUsername] = useState("");
   const [isGithubConnected, setIsGithubConnected] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState("");
@@ -52,6 +53,42 @@ export default function SellerProfilePage() {
     } finally {
       setUploadingAvatar(false);
     }
+  }
+
+  async function handleAutoFetchLocation() {
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    setFetchingLocation(true);
+    setError("");
+    
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}&zoom=10`);
+          const data = await res.json();
+          if (data && data.address) {
+            const city = data.address.city || data.address.town || data.address.state_district || data.address.county;
+            const country = data.address.country;
+            if (city && country) {
+              setLocation(`${city}, ${country}`);
+            } else if (data.display_name) {
+              setLocation(data.display_name.split(",").slice(0, 2).join(", "));
+            }
+          }
+        } catch (err) {
+          setError("Failed to resolve location automatically.");
+        } finally {
+          setFetchingLocation(false);
+        }
+      },
+      (err) => {
+        setFetchingLocation(false);
+        setError("Permission to access location was denied or failed.");
+      }
+    );
   }
 
   useEffect(() => {
@@ -261,10 +298,21 @@ export default function SellerProfilePage() {
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="location" className="flex items-center gap-2 text-[14px] font-semibold text-slate-900">
-                <MapPin className="w-4 h-4 text-slate-400" />
-                Location
-              </label>
+              <div className="flex items-center justify-between">
+                <label htmlFor="location" className="flex items-center gap-2 text-[14px] font-semibold text-slate-900">
+                  <MapPin className="w-4 h-4 text-slate-400" />
+                  Location
+                </label>
+                <button
+                  type="button"
+                  onClick={handleAutoFetchLocation}
+                  disabled={fetchingLocation}
+                  className="flex items-center gap-1.5 text-[12px] font-semibold text-blue-600 hover:text-blue-700 transition-colors disabled:opacity-50"
+                >
+                  {fetchingLocation ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <LocateFixed className="w-3.5 h-3.5" />}
+                  Auto Detect
+                </button>
+              </div>
               <Input
                 id="location"
                 value={location}
