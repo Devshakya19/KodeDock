@@ -181,6 +181,10 @@ async fn main() -> std::io::Result<()> {
             .route("/api/seller/payout-account", web::get().to(handlers::payout::get_payout_account))
             .route("/api/seller/payout-account", web::post().to(handlers::payout::create_or_update_payout_account))
             .route("/api/seller/payout-account", web::delete().to(handlers::payout::delete_payout_account))
+            
+            // Seller Notification Preferences
+            .route("/api/seller/notification-preferences", web::get().to(handlers::notifications::get_preferences))
+            .route("/api/seller/notification-preferences", web::post().to(handlers::notifications::update_preferences))
             // Wallet
             .route("/api/wallet", web::get().to(handlers::wallet::get_balance))
             .route("/api/wallet/topup", web::post().to(handlers::wallet::create_topup))

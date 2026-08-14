@@ -1,13 +1,30 @@
 -- =============================================================================
 -- CODEHAAT — PostgreSQL Database Setup
 -- =============================================================================
--- Compatible with standard PostgreSQL
+-- Compatible with standard PostgreSQL 16+
 -- =============================================================================
 
--- STEP 1: CREATE EXTENSION
+-- =============================================================================
+-- STEP 1: EXTENSIONS
+-- =============================================================================
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- STEP 2: CREATE TABLES
+-- =============================================================================
+-- STEP 2: CORE FUNCTIONS
+-- =============================================================================
+
+-- Generic function to automatically update 'updated_at' column
+CREATE OR REPLACE FUNCTION set_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- =============================================================================
+-- STEP 3: TABLES
+-- =============================================================================
 
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
@@ -41,6 +58,7 @@ CREATE TABLE IF NOT EXISTS profiles (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Categories table
 CREATE TABLE IF NOT EXISTS categories (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name TEXT NOT NULL UNIQUE,
@@ -50,9 +68,11 @@ CREATE TABLE IF NOT EXISTS categories (
   product_count INTEGER DEFAULT 0,
   sort_order INTEGER DEFAULT 0,
   is_active BOOLEAN DEFAULT TRUE,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Products table
 CREATE TABLE IF NOT EXISTS products (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   seller_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
@@ -81,6 +101,7 @@ CREATE TABLE IF NOT EXISTS products (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Wallets table
 CREATE TABLE IF NOT EXISTS wallets (
   user_id UUID PRIMARY KEY REFERENCES profiles(id) ON DELETE CASCADE,
   balance_paise INTEGER NOT NULL DEFAULT 0 CHECK (balance_paise >= 0),
@@ -91,7 +112,7 @@ CREATE TABLE IF NOT EXISTS wallets (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Wallet topup orders (to track Razorpay orders for topups)
+-- Wallet topups table
 CREATE TABLE IF NOT EXISTS wallet_topups (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
@@ -104,10 +125,7 @@ CREATE TABLE IF NOT EXISTS wallet_topups (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_wallet_topups_user ON wallet_topups(user_id);
-CREATE INDEX IF NOT EXISTS idx_wallet_topups_status ON wallet_topups(status);
-CREATE INDEX IF NOT EXISTS idx_wallet_topups_razorpay_order ON wallet_topups(razorpay_order_id);
-
+-- Wallet transactions table
 CREATE TABLE IF NOT EXISTS wallet_transactions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   wallet_user_id UUID NOT NULL REFERENCES wallets(user_id) ON DELETE CASCADE,
@@ -120,6 +138,7 @@ CREATE TABLE IF NOT EXISTS wallet_transactions (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Orders table
 CREATE TABLE IF NOT EXISTS orders (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   buyer_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
@@ -137,9 +156,11 @@ CREATE TABLE IF NOT EXISTS orders (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   completed_at TIMESTAMPTZ,
   disputed_at TIMESTAMPTZ,
-  resolved_at TIMESTAMPTZ
+  resolved_at TIMESTAMPTZ,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Escrow table
 CREATE TABLE IF NOT EXISTS escrow (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   order_id UUID NOT NULL REFERENCES orders(id) UNIQUE,
@@ -147,9 +168,11 @@ CREATE TABLE IF NOT EXISTS escrow (
   status TEXT NOT NULL DEFAULT 'held' CHECK (status IN ('held', 'released', 'refunded', 'disputed')),
   held_until TIMESTAMPTZ NOT NULL,
   released_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Reviews table
 CREATE TABLE IF NOT EXISTS reviews (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
@@ -165,6 +188,7 @@ CREATE TABLE IF NOT EXISTS reviews (
   UNIQUE(product_id, user_id)
 );
 
+-- Notifications table
 CREATE TABLE IF NOT EXISTS notifications (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
@@ -176,6 +200,7 @@ CREATE TABLE IF NOT EXISTS notifications (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Disputes table
 CREATE TABLE IF NOT EXISTS disputes (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
@@ -186,7 +211,8 @@ CREATE TABLE IF NOT EXISTS disputes (
   resolution TEXT,
   resolved_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  resolved_at TIMESTAMPTZ
+  resolved_at TIMESTAMPTZ,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- Product views tracking (unique per user)
@@ -198,7 +224,48 @@ CREATE TABLE IF NOT EXISTS product_views (
   UNIQUE(product_id, user_id)
 );
 
--- STEP 3: CREATE INDEXES
+-- Password reset tokens
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  token TEXT NOT NULL UNIQUE,
+  expires_at TIMESTAMPTZ NOT NULL,
+  used BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Seller payout accounts (bank account or UPI for withdrawals)
+CREATE TABLE IF NOT EXISTS seller_payout_accounts (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  seller_id UUID NOT NULL UNIQUE REFERENCES profiles(id) ON DELETE CASCADE,
+  account_type TEXT NOT NULL CHECK (account_type IN ('bank_account', 'upi')),
+  account_holder_name TEXT,
+  account_number TEXT,
+  ifsc_code TEXT,
+  bank_name TEXT,
+  upi_id TEXT,
+  is_default BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Seller notification preferences
+CREATE TABLE IF NOT EXISTS seller_notification_preferences (
+  seller_id UUID PRIMARY KEY REFERENCES profiles(id) ON DELETE CASCADE,
+  email_sales BOOLEAN DEFAULT TRUE,
+  email_reviews BOOLEAN DEFAULT TRUE,
+  email_updates BOOLEAN DEFAULT TRUE,
+  push_sales BOOLEAN DEFAULT TRUE,
+  push_reviews BOOLEAN DEFAULT TRUE,
+  push_updates BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- =============================================================================
+-- STEP 4: INDEXES
+-- =============================================================================
+
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_products_seller ON products(seller_id);
 CREATE INDEX IF NOT EXISTS idx_products_category ON products(category_id);
@@ -220,40 +287,18 @@ CREATE INDEX IF NOT EXISTS idx_notifications_unread ON notifications(user_id, is
 CREATE INDEX IF NOT EXISTS idx_disputes_order ON disputes(order_id);
 CREATE INDEX IF NOT EXISTS idx_product_views_product ON product_views(product_id);
 CREATE INDEX IF NOT EXISTS idx_product_views_user ON product_views(user_id);
-
--- Password reset tokens
-CREATE TABLE IF NOT EXISTS password_reset_tokens (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  token TEXT NOT NULL UNIQUE,
-  expires_at TIMESTAMPTZ NOT NULL,
-  used BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
+CREATE INDEX IF NOT EXISTS idx_wallet_topups_user ON wallet_topups(user_id);
+CREATE INDEX IF NOT EXISTS idx_wallet_topups_status ON wallet_topups(status);
+CREATE INDEX IF NOT EXISTS idx_wallet_topups_razorpay_order ON wallet_topups(razorpay_order_id);
 CREATE INDEX IF NOT EXISTS idx_password_reset_token ON password_reset_tokens(token);
 CREATE INDEX IF NOT EXISTS idx_password_reset_user ON password_reset_tokens(user_id);
-
--- Seller payout accounts (bank account or UPI for withdrawals)
-CREATE TABLE IF NOT EXISTS seller_payout_accounts (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  seller_id UUID NOT NULL UNIQUE REFERENCES profiles(id) ON DELETE CASCADE,
-  account_type TEXT NOT NULL CHECK (account_type IN ('bank_account', 'upi')),
-  account_holder_name TEXT,
-  account_number TEXT,
-  ifsc_code TEXT,
-  bank_name TEXT,
-  upi_id TEXT,
-  is_default BOOLEAN DEFAULT TRUE,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
 CREATE INDEX IF NOT EXISTS idx_payout_accounts_seller ON seller_payout_accounts(seller_id);
 
--- STEP 4: CREATE FUNCTIONS (PostgreSQL triggers)
+-- =============================================================================
+-- STEP 5: BUSINESS LOGIC FUNCTIONS
+-- =============================================================================
 
--- Auto-create profile when user is created
+-- Auto-create profile and wallet when user is created
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -306,29 +351,33 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- STEP 5: CREATE TRIGGERS
+-- =============================================================================
+-- STEP 6: TRIGGERS
+-- =============================================================================
 
--- Trigger: Auto-create profile when user is created
-CREATE TRIGGER on_user_created
-  AFTER INSERT ON users
-  FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+-- Updated_at triggers for ALL relevant tables
+CREATE TRIGGER set_updated_at_users BEFORE UPDATE ON users FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE TRIGGER set_updated_at_profiles BEFORE UPDATE ON profiles FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE TRIGGER set_updated_at_categories BEFORE UPDATE ON categories FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE TRIGGER set_updated_at_products BEFORE UPDATE ON products FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE TRIGGER set_updated_at_wallets BEFORE UPDATE ON wallets FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE TRIGGER set_updated_at_wallet_topups BEFORE UPDATE ON wallet_topups FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE TRIGGER set_updated_at_orders BEFORE UPDATE ON orders FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE TRIGGER set_updated_at_escrow BEFORE UPDATE ON escrow FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE TRIGGER set_updated_at_reviews BEFORE UPDATE ON reviews FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE TRIGGER set_updated_at_disputes BEFORE UPDATE ON disputes FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE TRIGGER set_updated_at_seller_payout_accounts BEFORE UPDATE ON seller_payout_accounts FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE TRIGGER set_updated_at_seller_notification_preferences BEFORE UPDATE ON seller_notification_preferences FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
--- Trigger: Update category count on product changes
-CREATE TRIGGER on_product_category_change
-  AFTER INSERT OR UPDATE OR DELETE ON products
-  FOR EACH ROW EXECUTE FUNCTION update_category_product_count();
+-- Business Logic Triggers
+CREATE TRIGGER on_user_created AFTER INSERT ON users FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+CREATE TRIGGER on_product_category_change AFTER INSERT OR UPDATE OR DELETE ON products FOR EACH ROW EXECUTE FUNCTION update_category_product_count();
+CREATE TRIGGER on_order_status_change AFTER UPDATE ON orders FOR EACH ROW EXECUTE FUNCTION update_product_sales_count();
+CREATE TRIGGER on_review_change AFTER INSERT OR UPDATE OR DELETE ON reviews FOR EACH ROW EXECUTE FUNCTION update_product_rating();
 
--- Trigger: Update sales count on order status change
-CREATE TRIGGER on_order_status_change
-  AFTER UPDATE ON orders
-  FOR EACH ROW EXECUTE FUNCTION update_product_sales_count();
-
--- Trigger: Update rating on review change
-CREATE TRIGGER on_review_change
-  AFTER INSERT OR UPDATE OR DELETE ON reviews
-  FOR EACH ROW EXECUTE FUNCTION update_product_rating();
-
--- STEP 6: SEED CATEGORIES
+-- =============================================================================
+-- STEP 7: SEED DATA
+-- =============================================================================
 INSERT INTO categories (name, slug, icon, sort_order) VALUES
   ('Web Templates', 'web-templates', 'layout', 1),
   ('Mobile Apps', 'mobile-apps', 'smartphone', 2),
@@ -338,5 +387,4 @@ INSERT INTO categories (name, slug, icon, sort_order) VALUES
   ('API Templates', 'api-templates', 'code', 6)
 ON CONFLICT (name) DO NOTHING;
 
--- DONE!
--- All tables created, triggers working, categories seeded.
+-- DONE

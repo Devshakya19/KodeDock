@@ -367,3 +367,24 @@ pub struct CreatePayoutAccountRequest {
     pub bank_name: Option<String>,
     pub upi_id: Option<String>,
 }
+
+#[derive(Debug, Serialize, Deserialize, FromRow)]
+pub struct SellerNotificationPreferences {
+    pub seller_id: Uuid,
+    pub email_sales: bool,
+    pub email_reviews: bool,
+    pub email_updates: bool,
+    pub push_sales: bool,
+    pub push_reviews: bool,
+    pub push_updates: bool,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct UpdateNotificationPreferencesRequest {
+    pub email_sales: bool,
+    pub email_reviews: bool,
+    pub email_updates: bool,
+    pub push_sales: bool,
+    pub push_reviews: bool,
+    pub push_updates: bool,
+}
