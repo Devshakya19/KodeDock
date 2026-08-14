@@ -56,6 +56,24 @@ export function AccountSettings({ backLink, backText, deleteWarningText, hideHea
       return;
     }
 
+    if (!/[A-Z]/.test(newPassword)) {
+      setError("Password must contain at least one uppercase letter");
+      setSaving(false);
+      return;
+    }
+
+    if (!/[a-z]/.test(newPassword)) {
+      setError("Password must contain at least one lowercase letter");
+      setSaving(false);
+      return;
+    }
+
+    if (!/\d/.test(newPassword)) {
+      setError("Password must contain at least one number");
+      setSaving(false);
+      return;
+    }
+
     try {
       const result = await apiPost("/auth/change-password", {
         current_password: currentPassword,
