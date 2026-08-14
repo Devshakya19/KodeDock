@@ -3,6 +3,7 @@ services:
   postgres:
     image: postgres:16-alpine
     environment:
+      TZ: Asia/Kolkata
       POSTGRES_DB: codehaat
       POSTGRES_USER: codehaat
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-codehaat_secret}
@@ -54,6 +55,7 @@ services:
     ports:
       - "3000:3000"
     environment:
+      - TZ=Asia/Kolkata
       - NEXT_PUBLIC_API_URL=http://localhost:4001
       - CORE_ENGINE_URL=http://core-engine:4001
       - JWT_SECRET=${JWT_SECRET:-codehaat-super-secret-jwt-key-change-in-production-2024}
@@ -78,6 +80,7 @@ services:
     ports:
       - "4001:4001"
     environment:
+      - TZ=Asia/Kolkata
       - PORT=4001
       - DATABASE_URL=postgres://codehaat:${POSTGRES_PASSWORD:-codehaat_secret}@postgres:5432/codehaat
       - REDIS_URL=redis://:${REDIS_PASSWORD:-codehaat_redis_secret}@redis:6379
@@ -120,6 +123,7 @@ services:
       context: ./services/ai-service
       dockerfile: Dockerfile
     environment:
+      - TZ=Asia/Kolkata
       - PORT=4002
       - REDIS_URL=redis://:${REDIS_PASSWORD:-codehaat_redis_secret}@redis:6379
       - ALLOWED_ORIGINS=http://localhost:3000
@@ -146,6 +150,7 @@ services:
       context: ./services/infra-worker
       dockerfile: Dockerfile
     environment:
+      - TZ=Asia/Kolkata
       - REDIS_URL=redis://:${REDIS_PASSWORD:-codehaat_redis_secret}@redis:6379
     depends_on:
       redis:
@@ -165,6 +170,7 @@ services:
       context: ./services/realtime-service
       dockerfile: Dockerfile
     environment:
+      - TZ=Asia/Kolkata
       - PORT=4004
       - REDIS_URL=redis://:${REDIS_PASSWORD:-codehaat_redis_secret}@redis:6379
       - JWT_SECRET=${JWT_SECRET:-codehaat-super-secret-jwt-key-change-in-production-2024}
@@ -186,11 +192,13 @@ services:
   seaweedfs:
     image: chrislusf/seaweedfs:3.76
     ports:
-      - "8333:8333"
+      - "8333:8333" # S3 API
+      - "9333:9333" # Master Web UI
+      - "8888:8888" # Filer Web UI (File Browser)
     volumes:
       - seaweedfs_data:/data
       - ./config/seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
-    command: "server -s3 -s3.port=8333 -s3.config /etc/seaweedfs/s3.json -volume.max=100 -volume.fileSizeLimitMB=64"
+    command: "server -ip.bind=0.0.0.0 -s3 -s3.port=8333 -s3.config /etc/seaweedfs/s3.json -volume.max=100 -volume.fileSizeLimitMB=64"
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:8333"]
       interval: 10s
@@ -203,6 +211,7 @@ services:
           cpus: "0.5"
     networks:
       - backend
+      - frontend
     restart: unless-stopped
 
 networks:

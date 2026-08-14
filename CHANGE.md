@@ -1,6 +1,7 @@
 # Changelog
 
-All notable changes to the CodeHaat Seller Dashboard and UI/UX have been documented in this file.
+All notable changes to the CodeHaat backend project will be documented in this file.
+
 
 ## [v1.2.0] - 2026-08-11
 
@@ -86,6 +87,40 @@ All notable changes to the CodeHaat Seller Dashboard and UI/UX have been documen
 ### ⚙️ Backend & Engine Improvements
 - **Core Engine (`services/core-engine/src/handlers/products.rs`):**
   - Updated the Rust backend products handler to support new filtering logic, optimized query execution for the redesigned browse grid, and improved real-time tracking for sales/view counts.
+
+
+
+
+## [2026-08-11 / 2026-08-12] - Core Engine Initial Fixes & Rate Limiting
+
+### Fixed
+- **Type Mismatch (`auth.rs`)**: Fixed fatal GitHub OAuth runtime crash by correctly casting `github_id` to `String` so it matches the PostgreSQL database schema.
+- **Race Conditions (`wallet.rs`, `orders.rs`)**: Implemented atomic `UPDATE ... WHERE status = 'held'` for financial state changes. This ensures transactions are processed safely and prevents double-crediting exploits.
+- **Server Panics (`products.rs`, `wallet.rs`)**: Cast pagination offsets to `i64` to prevent overflow-related server panics during large query offsets.
+
+### Security
+- **Rate Limiting (`main.rs`, `orders.rs`)**: Implemented `actix-governor` rate-limiting on high-risk endpoints, including `POST /api/orders`, `POST /api/seller/products`, and `POST /api/auth/*` to mitigate DoS (Denial of Service) attacks.
+
+
+## [2026-08-13] - Core Engine Security & Deep Audit Fixes
+
+### Fixed
+- **Critical (Escrow Exploit)**: Fixed `release_escrow` in `wallet.rs` which was completely unauthenticated and publicly accessible, allowing anyone to trigger escrow releases. Now correctly requires developer/admin authentication (`require_developer`).
+- **Critical (Silent Failures)**: Fixed silent error swallowing in `release_escrow`. Previously, if the wallet update failed, it would silently ignore it, causing escrow funds to vanish without being credited to the seller. Now properly logs and rolls back the transaction.
+- **High (Data Loss on Deletion)**: Fixed `delete_account` in `auth.rs`. Deleting an account previously failed with a generic 500 error due to database foreign key constraints (or cascaded deletes wiping out order history). Now, it safely checks if the user has any active wallet balance, pending/held escrow, or order history before allowing deletion, returning a clean 400 error to prevent catastrophic financial data loss.
+- **Medium (Double Increment)**: Fixed a bug in `complete_order_atomic` (`orders.rs`) where `sales_count` was being incremented manually in Rust, despite a PostgreSQL database trigger (`on_order_status_change`) already incrementing it automatically when an order's status changes to 'completed'. This was causing Razorpay orders to count as 2 sales.
+- **Medium (SQL Injection Prevention)**: Refactored `list_products` query building in `products.rs` to fully parameterize `LIMIT` and `OFFSET` clauses instead of using string interpolation.
+- **Code Quality**: Fixed unused variables and dead code warnings across `wallet.rs` and `orders.rs`.
+
+
+## [2026-08-14] - Core Engine Final Deep Scan & Refinements
+
+### Fixed
+- **Medium (Double Update)**: Fixed redundant `rating` and `review_count` manual `UPDATE` queries in `reviews.rs`. PostgreSQL was already handling this precisely through the `on_review_change` trigger. This saves unnecessary CPU and DB I/O cycles.
+- **Medium (Validation Logic)**: Fixed a bug in `update_product` (`seller.rs`) where `original_price` was validated against a fallback `0` instead of the current existing product price if the `price_paise` was not included in the update payload. Now it properly queries the DB to safely enforce the rule `original_price >= current_price`.
+- **Code Cleanliness**: Removed excessive production debug logging from category resolution in `seller.rs`. Codebase continues to pass `cargo clippy` perfectly with zero warnings.
+
+
 
 ---
 *End of Changelog.*
