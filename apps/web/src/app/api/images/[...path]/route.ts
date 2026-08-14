@@ -17,7 +17,7 @@ export async function GET(
     return NextResponse.json({ error: "Invalid path" }, { status: 403 });
   }
 
-  const imageUrl = `${SEAWEEDFS_FILER}/codehaat-media/${key}`;
+  const imageUrl = `${SEAWEEDFS_FILER}/buckets/codehaat-media/${key}`;
 
   try {
     const res = await fetch(imageUrl);

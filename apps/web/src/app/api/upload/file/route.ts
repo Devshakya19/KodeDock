@@ -28,7 +28,7 @@ export async function PUT(request: NextRequest) {
     const fileBody = await request.arrayBuffer();
     const contentType = request.headers.get("content-type") || "application/octet-stream";
 
-    const filerUrl = `${SEAWEEDFS_FILER}/codehaat-media/${key}`;
+    const filerUrl = `${SEAWEEDFS_FILER}/buckets/codehaat-media/${key}`;
     const filerRes = await fetch(filerUrl, {
       method: "PUT",
       headers: { "Content-Type": contentType },
