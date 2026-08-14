@@ -1,6 +1,6 @@
 #!/bin/bash
 # =============================================================================
-# CodeHaat - Interactive Setup (AGUI / TUI Edition)
+# CodeHaat - Interactive Setup (CLI Edition)
 # =============================================================================
 set -e
 
@@ -11,8 +11,17 @@ CYAN='\033[0;36m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-# Clear screen and show ASCII Art
+# ── Boot Animation ──
 clear
+echo -e "${CYAN}Initializing CodeHaat Core Subsystems${NC}"
+printf "Starting"
+for i in {1..4}; do
+    printf "."
+    sleep 0.4
+done
+clear
+
+# ── AGUI Logo ──
 echo -e "${CYAN}"
 cat << "EOF"
    ____          _      _   _             _   
@@ -23,67 +32,100 @@ cat << "EOF"
                                               
 EOF
 echo -e "${NC}"
-echo -e "${GREEN}  🚀 Starting AGUI Setup Environment...${NC}\n"
+echo -e "${GREEN}  🚀 Starting CLI Setup Environment...${NC}\n"
+sleep 1
 
 # ── Check Docker ──
 if ! command -v docker &> /dev/null; then
-    if command -v whiptail &> /dev/null; then
-        whiptail --title "Error" --msgbox "Docker not found! Please install Docker first." 8 45
-    else
-        echo -e "${RED}✗ Docker not found. Install Docker first.${NC}"
-    fi
+    echo -e "${RED}✗ Docker not found. Please install Docker first.${NC}"
     exit 1
 fi
 
 if ! docker compose version &> /dev/null; then
-    if command -v whiptail &> /dev/null; then
-        whiptail --title "Error" --msgbox "Docker Compose not found!" 8 45
-    else
-        echo -e "${RED}✗ Docker Compose not found.${NC}"
-    fi
+    echo -e "${RED}✗ Docker Compose not found.${NC}"
     exit 1
 fi
 
-# Function for GUI Input
-get_input() {
-    local title="$1"
-    local text="$2"
-    local var_name="$3"
-    
-    if command -v whiptail &> /dev/null; then
-        local result=$(whiptail --title "$title" --inputbox "$text" 10 60 3>&1 1>&2 2>&3)
-        eval $var_name="'$result'"
-    else
-        read -p "$text: " result
-        eval $var_name="'$result'"
-    fi
-}
+# ── Smart Env Loading & Prompts ──
+RZP_KEY_ID=""
+RZP_KEY_SECRET=""
+GH_CLIENT_ID=""
+GH_CLIENT_SECRET=""
+OLD_JWT=""
+OLD_PG=""
+OLD_REDIS=""
 
-# ── Ask for API Keys using GUI ──
-if command -v whiptail &> /dev/null; then
-    whiptail --title "CodeHaat Setup" --msgbox "Welcome to CodeHaat!\nWe need to configure a few API keys to get your environment ready." 10 60
+if [ -f .env ]; then
+    # Safely extract existing keys
+    EXISTING_RZP_ID=$(grep -oP '^RAZORPAY_KEY_ID=\K.*' .env || true)
+    EXISTING_RZP_SECRET=$(grep -oP '^RAZORPAY_KEY_SECRET=\K.*' .env || true)
+    EXISTING_GH_ID=$(grep -oP '^GITHUB_CLIENT_ID=\K.*' .env || true)
+    EXISTING_GH_SECRET=$(grep -oP '^GITHUB_CLIENT_SECRET=\K.*' .env || true)
+    OLD_JWT=$(grep -oP '^JWT_SECRET=\K.*' .env || true)
+    OLD_PG=$(grep -oP '^POSTGRES_PASSWORD=\K.*' .env || true)
+    OLD_REDIS=$(grep -oP '^REDIS_PASSWORD=\K.*' .env || true)
+
+    # Razorpay Logic
+    if [ -n "$EXISTING_RZP_ID" ]; then
+        echo -e "${CYAN}▶ Razorpay keys are already configured in .env${NC}"
+        read -p "  Do you want to update them? (y/N): " UPDATE_RZP
+        if [[ "$UPDATE_RZP" =~ ^[Yy]$ ]]; then
+            read -p "  Enter NEW Razorpay Key ID (rzp_test_xxxxx): " RZP_KEY_ID
+            read -p "  Enter NEW Razorpay Key Secret: " RZP_KEY_SECRET
+        else
+            echo "  Skipping Razorpay update."
+            RZP_KEY_ID=$EXISTING_RZP_ID
+            RZP_KEY_SECRET=$EXISTING_RZP_SECRET
+        fi
+    else
+        echo -e "${CYAN}▶ Razorpay Config${NC}"
+        read -p "  Enter Razorpay Key ID (rzp_test_xxxxx): " RZP_KEY_ID
+        read -p "  Enter Razorpay Key Secret: " RZP_KEY_SECRET
+    fi
+    echo ""
+
+    # GitHub Logic
+    if [ -n "$EXISTING_GH_ID" ]; then
+        echo -e "${CYAN}▶ GitHub OAuth keys are already configured in .env${NC}"
+        read -p "  Do you want to update them? (y/N): " UPDATE_GH
+        if [[ "$UPDATE_GH" =~ ^[Yy]$ ]]; then
+            read -p "  Enter NEW GitHub Client ID: " GH_CLIENT_ID
+            read -p "  Enter NEW GitHub Client Secret: " GH_CLIENT_SECRET
+        else
+            echo "  Skipping GitHub OAuth update."
+            GH_CLIENT_ID=$EXISTING_GH_ID
+            GH_CLIENT_SECRET=$EXISTING_GH_SECRET
+        fi
+    else
+        echo -e "${CYAN}▶ GitHub OAuth Config${NC}"
+        read -p "  Enter GitHub Client ID: " GH_CLIENT_ID
+        read -p "  Enter GitHub Client Secret: " GH_CLIENT_SECRET
+    fi
+    echo ""
+else
+    # No .env found, ask for everything
+    echo -e "${CYAN}Welcome to CodeHaat! We need to configure a few API keys.${NC}\n"
+    
+    echo -e "${CYAN}▶ Razorpay Config${NC}"
+    read -p "  Enter Razorpay Key ID (rzp_test_xxxxx): " RZP_KEY_ID
+    read -p "  Enter Razorpay Key Secret: " RZP_KEY_SECRET
+    echo ""
+
+    echo -e "${CYAN}▶ GitHub OAuth Config${NC}"
+    read -p "  Enter GitHub Client ID (Ov23li...): " GH_CLIENT_ID
+    read -p "  Enter GitHub Client Secret: " GH_CLIENT_SECRET
+    echo ""
 fi
 
-get_input "Razorpay Config" "Enter Razorpay Key ID (rzp_test_xxxxx):" RZP_KEY_ID
-get_input "Razorpay Config" "Enter Razorpay Key Secret:" RZP_KEY_SECRET
-
-get_input "GitHub OAuth Config" "Enter GitHub Client ID (Ov23li...):" GH_CLIENT_ID
-get_input "GitHub OAuth Config" "Enter GitHub Client Secret:" GH_CLIENT_SECRET
-
-# ── Generate secure random secrets ──
-JWT_SECRET=$(openssl rand -hex 32 2>/dev/null || head -c 64 /dev/urandom | base64 | tr -d '\n/+=' | head -c 64)
-POSTGRES_PASSWORD=$(openssl rand -hex 16 2>/dev/null || head -c 32 /dev/urandom | base64 | tr -d '\n/+=' | head -c 32)
-REDIS_PASSWORD=$(openssl rand -hex 16 2>/dev/null || head -c 32 /dev/urandom | base64 | tr -d '\n/+=' | head -c 32)
+# ── Generate secure random secrets (preserve old ones if they exist) ──
+JWT_SECRET=${OLD_JWT:-$(openssl rand -hex 32 2>/dev/null || head -c 64 /dev/urandom | base64 | tr -d '\n/+=' | head -c 64)}
+POSTGRES_PASSWORD=${OLD_PG:-$(openssl rand -hex 16 2>/dev/null || head -c 32 /dev/urandom | base64 | tr -d '\n/+=' | head -c 32)}
+REDIS_PASSWORD=${OLD_REDIS:-$(openssl rand -hex 16 2>/dev/null || head -c 32 /dev/urandom | base64 | tr -d '\n/+=' | head -c 32)}
 
 # ── Write .env ──
-if command -v whiptail &> /dev/null; then
-    whiptail --title "Configuration" --infobox "Generating secure secrets and writing .env file..." 8 60
-else
-    echo -e "${CYAN}Generating secure secrets and writing .env file...${NC}"
-fi
-
+echo -e "${CYAN}Generating secure secrets and writing .env file...${NC}"
 cat > .env << EOF
-# CodeHaat Environment - Generated by Setup AGUI
+# CodeHaat Environment - Generated by Setup CLI
 # Generated: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 # Razorpay Payment Gateway
@@ -106,44 +148,62 @@ JWT_SECRET=${JWT_SECRET}
 EOF
 
 sleep 1
-
-# ── Build and start Docker ──
-if command -v whiptail &> /dev/null; then
-    whiptail --title "Docker Initialization" --infobox "Building and starting Docker services.\nThis will run in the background, please wait..." 10 60
-else
-    echo -e "${CYAN}Building and starting services...${NC}"
-fi
-
-# Run docker compose
-docker compose up -d --build
-
-# ── Wait for services ──
-echo -e "${CYAN}Waiting for backend to be ready...${NC}"
-MAX_WAIT=60
-WAITED=0
-while [ $WAITED -lt $MAX_WAIT ]; do
-    if curl -sf http://localhost:4001/health > /dev/null 2>&1; then
-        break
-    fi
-    sleep 2
-    WAITED=$((WAITED + 2))
-    printf "."
-done
 echo ""
 
-# ── Finish Setup ──
-if command -v whiptail &> /dev/null; then
-    whiptail --title "Setup Complete!" --msgbox "CodeHaat is successfully running!\n\n🌐 Frontend: http://localhost:3000\n⚙️  Backend:  http://localhost:4001" 10 50
-else
-    echo ""
-    echo -e "${GREEN}  ╔══════════════════════════════════════════╗${NC}"
-    echo -e "${GREEN}  ║         ✅ Setup Complete!               ║${NC}"
-    echo -e "${GREEN}  ╠══════════════════════════════════════════╣${NC}"
-    echo -e "${GREEN}  ║                                          ║${NC}"
-    echo -e "${GREEN}  ║  Frontend:  http://localhost:3000         ║${NC}"
-    echo -e "${GREEN}  ║  Backend:   http://localhost:4001         ║${NC}"
-    echo -e "${GREEN}  ║                                          ║${NC}"
-    echo -e "${GREEN}  ╚══════════════════════════════════════════╝${NC}"
-    echo ""
-fi
+# ── Hidden Docker Processing with Native CLI Progress Bar ──
+echo -e "${CYAN}Building and starting Docker services in background...${NC}"
+docker compose up -d --build > /dev/null 2>&1 &
+DOCKER_PID=$!
+
+# Function to draw the progress bar
+draw_progress_bar() {
+    local percent=$1
+    local width=40
+    local filled=$((percent * width / 100))
+    local empty=$((width - filled))
+    
+    local bar_filled=$(printf "%${filled}s" | tr ' ' '█')
+    local bar_empty=$(printf "%${empty}s" | tr ' ' '-')
+    
+    printf "\r${GREEN}[%s%s] %d%%${NC} Initializing Engine..." "$bar_filled" "$bar_empty" "$percent"
+}
+
+PROGRESS=5
+while kill -0 $DOCKER_PID 2>/dev/null; do
+    if [ $PROGRESS -lt 80 ]; then
+        PROGRESS=$((PROGRESS + 2))
+    fi
+    draw_progress_bar $PROGRESS
+    sleep 1.5
+done
+
+# Docker process completed, wait for health check
+PROGRESS=85
+while ! curl -sf http://localhost:4001/health > /dev/null 2>&1; do
+    if [ $PROGRESS -lt 99 ]; then
+        PROGRESS=$((PROGRESS + 1))
+    fi
+    draw_progress_bar $PROGRESS
+    sleep 1
+done
+
+draw_progress_bar 100
+echo -e "\n"
+sleep 1
+
+# ── Final 'System is Live' AGUI ──
+clear
+echo -e "${GREEN}"
+cat << "EOF"
+   ____          _      _   _             _      _     _           
+  / ___|___   __| | ___| | | | __ _  __ _| |_   | |   (_)__   _____ 
+ | |   / _ \ / _` |/ _ \ |_| |/ _` |/ _` | __|  | |   | |\ \ / / _ \
+ | |__| (_) | (_| |  __/  _  | (_| | (_| | |_   | |___| | \ V /  __/
+  \____\___/ \__,_|\___|_| |_|\__,_|\__,_|\__|  |_____|_|  \_/ \___|
+EOF
+echo -e "${NC}"
+echo -e "  ✅ CodeHaat is now successfully running!\n"
+echo -e "  🌐 Frontend Access: http://localhost:3000"
+echo -e "  ⚙️  Backend Core:   http://localhost:4001\n"
+echo -e "  ${CYAN}You can now safely close this terminal or access the links above.${NC}\n"
 
