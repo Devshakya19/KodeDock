@@ -35,6 +35,21 @@ pub async fn create_product(
         }
     }
 
+    // Validate numerical boundaries (Security Fix)
+    if body.price_paise < 0 {
+        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Price cannot be negative"));
+    }
+    if let Some(orig_price) = body.original_price_paise {
+        if orig_price < body.price_paise {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Original price must be greater than or equal to current price"));
+        }
+    }
+    if let Some(stock) = body.stock_limit {
+        if stock < 1 {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Stock limit must be at least 1"));
+        }
+    }
+
     // Generate unique slug: strip special chars, replace spaces, append UUID suffix
     let base_slug: String = body.title
         .to_lowercase()
@@ -124,7 +139,7 @@ pub async fn list_seller_products(
     };
 
     match sqlx::query_as::<_, Product>(
-        "SELECT p.id, p.seller_id, p.category_id, c.name as category_name, p.title, p.slug, p.description, p.long_description, p.price_paise, p.original_price_paise, p.tags, p.status, p.stock_limit, p.github_repo_url, p.github_repo_id, p.preview_url, p.image_url, p.demo_url, p.tech_stack, p.sales_count, p.view_count, p.rating, p.review_count, p.is_featured, p.created_at, p.updated_at FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.seller_id = $1 ORDER BY p.created_at DESC"
+        "SELECT p.id, p.seller_id, p.category_id, c.name as category_name, p.title, p.slug, p.description, p.long_description, p.price_paise, p.original_price_paise, p.tags, p.status, p.stock_limit, p.github_repo_url, p.github_repo_id, p.preview_url, p.image_url, p.demo_url, p.tech_stack, p.sales_count, p.view_count, p.rating, p.review_count, p.is_featured, p.created_at, p.updated_at FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.seller_id = $1 AND p.status != 'archived' ORDER BY p.created_at DESC"
     )
         .bind(seller_uuid)
         .fetch_all(pool.get_ref())
@@ -159,39 +174,54 @@ pub async fn update_product(
         Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid product ID")),
     };
 
-    // Verify ownership
-    match sqlx::query_scalar::<_, uuid::Uuid>("SELECT seller_id FROM products WHERE id = $1")
+    // Verify ownership and fetch current price
+    let current_price = match sqlx::query_scalar::<_, i32>("SELECT price_paise FROM products WHERE id = $1 AND seller_id = $2")
         .bind(id)
+        .bind(seller_uuid)
         .fetch_optional(pool.get_ref())
         .await
     {
-        Ok(Some(owner_id)) if owner_id == seller_uuid => {}
-        Ok(_) => return HttpResponse::NotFound().json(ApiResponse::<()>::error("Product not found")),
+        Ok(Some(price)) => price,
+        Ok(None) => return HttpResponse::NotFound().json(ApiResponse::<()>::error("Product not found or not owned by you")),
         Err(e) => {
             log::error!("Failed to verify ownership: {}", e);
             return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Database error"));
+        }
+    };
+
+    // Validate numerical boundaries (Security Fix)
+    if let Some(price) = body.price_paise {
+        if price < 0 {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Price cannot be negative"));
+        }
+    }
+    if let Some(orig_price) = body.original_price_paise {
+        let reference_price = body.price_paise.unwrap_or(current_price);
+        if orig_price < reference_price {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Original price cannot be less than current price"));
+        }
+    }
+    if let Some(stock) = body.stock_limit {
+        if stock < 1 {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Stock limit must be at least 1"));
         }
     }
 
     // Resolve category_id: support both UUID and name lookup (same as create_product)
     let resolved_category_id = match &body.category_id {
         Some(val) => {
-            log::info!("Looking up category: '{}'", val);
             if let Ok(uuid) = uuid::Uuid::parse_str(val) {
-                log::info!("Category is UUID: {}", uuid);
                 Some(uuid)
             } else {
-                let result = sqlx::query_scalar::<_, uuid::Uuid>("SELECT id FROM categories WHERE name = $1")
+                sqlx::query_scalar::<_, uuid::Uuid>("SELECT id FROM categories WHERE name = $1")
                     .bind(val)
                     .fetch_optional(pool.get_ref())
-                    .await;
-                log::info!("Category lookup result: {:?}", result);
-                result.unwrap_or(None)
+                    .await
+                    .unwrap_or(None)
             }
         }
         None => None,
     };
-    log::info!("Resolved category_id: {:?}", resolved_category_id);
 
     // Do the UPDATE first (can't return category_name from UPDATE since it's not a column)
     let update_result = sqlx::query(
@@ -290,35 +320,61 @@ pub async fn delete_product(
         }
     }
 
-    // Fetch product to get image_url before deletion
-    if let Ok(Some(image_url)) = sqlx::query_scalar::<_, String>(
-        "SELECT image_url FROM products WHERE id = $1 AND image_url IS NOT NULL"
-    )
-    .bind(id)
-    .fetch_optional(pool.get_ref())
-    .await
-    {
-        if let Some(key) = storage.extract_key_from_url(&image_url) {
-            if let Err(e) = storage.delete_object(&key).await {
-                log::warn!("Failed to delete product image from storage: {}", e);
+    let order_count = sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM orders WHERE product_id = $1")
+        .bind(id)
+        .fetch_one(pool.get_ref())
+        .await
+        .unwrap_or(0);
+
+    if order_count > 0 {
+        // Soft delete (archive) because there are existing orders
+        match sqlx::query("UPDATE products SET status = 'archived' WHERE id = $1")
+            .bind(id)
+            .execute(pool.get_ref())
+            .await
+        {
+            Ok(_) => HttpResponse::Ok().json(ApiResponse::<()> {
+                success: true,
+                data: None,
+                message: Some("Product archived".to_string()),
+                error: None,
+            }),
+            Err(e) => {
+                log::error!("Failed to archive product: {}", e);
+                HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to archive product"))
             }
         }
-    }
-
-    match sqlx::query("DELETE FROM products WHERE id = $1")
+    } else {
+        // Hard delete and clean up image
+        if let Ok(Some(image_url)) = sqlx::query_scalar::<_, String>(
+            "SELECT image_url FROM products WHERE id = $1 AND image_url IS NOT NULL"
+        )
         .bind(id)
-        .execute(pool.get_ref())
+        .fetch_optional(pool.get_ref())
         .await
-    {
-        Ok(_) => HttpResponse::Ok().json(ApiResponse::<()> {
-            success: true,
-            data: None,
-            message: Some("Product deleted".to_string()),
-            error: None,
-        }),
-        Err(e) => {
-            log::error!("Failed to delete product: {}", e);
-            HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to delete product"))
+        {
+            if let Some(key) = storage.extract_key_from_url(&image_url) {
+                if let Err(e) = storage.delete_object(&key).await {
+                    log::warn!("Failed to delete product image from storage: {}", e);
+                }
+            }
+        }
+
+        match sqlx::query("DELETE FROM products WHERE id = $1")
+            .bind(id)
+            .execute(pool.get_ref())
+            .await
+        {
+            Ok(_) => HttpResponse::Ok().json(ApiResponse::<()> {
+                success: true,
+                data: None,
+                message: Some("Product deleted".to_string()),
+                error: None,
+            }),
+            Err(e) => {
+                log::error!("Failed to delete product: {}", e);
+                HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to delete product"))
+            }
         }
     }
 }

@@ -21,8 +21,8 @@ pub async fn list_products(
 ) -> HttpResponse {
     let sort = query.sort.as_deref().unwrap_or("newest");
     let page = query.page.unwrap_or(1).max(1);
-    let limit = query.limit.unwrap_or(20).min(100).max(1);
-    let offset = (page - 1) * limit;
+    let limit = query.limit.unwrap_or(20).clamp(1, 100);
+    let offset = (page as u64 - 1) * (limit as u64);
 
     let mut sql = String::from("SELECT ");
     sql.push_str(PUBLIC_PRODUCT_COLUMNS);
@@ -39,6 +39,7 @@ pub async fn list_products(
             " AND (title ILIKE ${} OR description ILIKE ${})",
             bind_index, bind_index + 1
         ));
+        bind_index += 2;
     }
 
     match sort {
@@ -49,7 +50,7 @@ pub async fn list_products(
         _ => sql.push_str(" ORDER BY p.created_at DESC"),
     }
 
-    sql.push_str(&format!(" LIMIT {} OFFSET {}", limit, offset));
+    sql.push_str(&format!(" LIMIT ${} OFFSET ${}", bind_index, bind_index + 1));
 
     let mut query_builder = sqlx::query_as::<_, PublicProduct>(&sql);
 
@@ -58,9 +59,11 @@ pub async fn list_products(
     }
 
     if let Some(ref s) = query.search {
-        let pattern = format!("%{}%", s);
-        query_builder = query_builder.bind(pattern.clone()).bind(pattern);
+        let search_pattern = format!("%{}%", s);
+        query_builder = query_builder.bind(search_pattern.clone()).bind(search_pattern);
     }
+
+    query_builder = query_builder.bind(limit as i64).bind(offset as i64);
 
     match query_builder.fetch_all(pool.get_ref()).await {
         Ok(products) => HttpResponse::Ok().json(ApiResponse::success(products, "Products fetched")),
@@ -87,38 +90,25 @@ pub async fn get_product(
 
     if let Some(ref uid) = user_id {
         if let Ok(user_uuid) = uuid::Uuid::parse_str(uid) {
-            // Check if this user already viewed this product
-            let already_viewed = sqlx::query_scalar::<_, bool>(
-                "SELECT EXISTS(SELECT 1 FROM product_views WHERE product_id = $1 AND user_id = $2)"
+            // Atomically record view — INSERT ON CONFLICT DO NOTHING returns
+            // rows_affected=1 only for genuinely new views, preventing double-counting.
+            let inserted = sqlx::query(
+                "INSERT INTO product_views (product_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING"
             )
             .bind(id)
             .bind(user_uuid)
-            .fetch_one(pool.get_ref())
-            .await
-            .unwrap_or(false);
-
-            if !already_viewed {
-                // Record view and increment count atomically
-                let _ = sqlx::query(
-                    "INSERT INTO product_views (product_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING"
-                )
-                .bind(id)
-                .bind(user_uuid)
-                .execute(pool.get_ref())
-                .await;
-
-                let _ = sqlx::query("UPDATE products SET view_count = view_count + 1 WHERE id = $1")
-                    .bind(id)
-                    .execute(pool.get_ref())
-                    .await;
-            }
-        }
-    } else {
-        // Not logged in - still count but don't track uniqueness
-        let _ = sqlx::query("UPDATE products SET view_count = view_count + 1 WHERE id = $1")
-            .bind(id)
             .execute(pool.get_ref())
             .await;
+
+            if let Ok(result) = inserted {
+                if result.rows_affected() > 0 {
+                    let _ = sqlx::query("UPDATE products SET view_count = view_count + 1 WHERE id = $1")
+                        .bind(id)
+                        .execute(pool.get_ref())
+                        .await;
+                }
+            }
+        }
     }
 
     let sql = format!(

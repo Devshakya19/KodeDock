@@ -66,11 +66,8 @@ pub async fn register(
     }
 
     // Check if user already exists
-    match auth::get_user_by_email(pool.get_ref(), &body.email).await {
-        Ok(_) => {
-            return HttpResponse::Conflict().json(ApiResponse::<()>::error("User with this email already exists"));
-        }
-        Err(_) => {} // User doesn't exist, continue
+    if auth::get_user_by_email(pool.get_ref(), &email).await.is_ok() {
+        return HttpResponse::Conflict().json(ApiResponse::<()>::error("User with this email already exists"));
     }
 
     // Create user — use lowercased email for consistency
@@ -116,8 +113,10 @@ pub async fn login(
     pool: web::Data<PgPool>,
     body: web::Json<LoginRequest>,
 ) -> HttpResponse {
+    let cleaned_email = body.email.trim().to_lowercase();
+
     // Get user by email
-    let (user_id, email, full_name, role, password_hash) = match auth::get_user_by_email(pool.get_ref(), &body.email).await {
+    let (user_id, email, full_name, role, password_hash) = match auth::get_user_by_email(pool.get_ref(), &cleaned_email).await {
         Ok(user) => user,
         Err(_) => {
             return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid email or password"));
@@ -141,6 +140,7 @@ pub async fn login(
         email,
         full_name,
         role,
+        github_username: None,
     };
 
     // Generate token
@@ -227,7 +227,8 @@ pub async fn forgot_password(
     });
 
     // Try to find user by email
-    let user_id = match auth::get_user_by_email(pool.get_ref(), &body.email).await {
+    let cleaned_email = body.email.trim().to_lowercase();
+    let user_id = match auth::get_user_by_email(pool.get_ref(), &cleaned_email).await {
         Ok((id, _, _, _, _)) => id,
         Err(_) => return success_response, // Don't reveal if user exists
     };
@@ -287,44 +288,33 @@ pub async fn reset_password(
         return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Password must contain at least one number"));
     }
 
-    // Find the token
-    let token_record = sqlx::query_as::<_, (uuid::Uuid, uuid::Uuid, chrono::DateTime<chrono::Utc>, bool)>(
-        "SELECT id, user_id, expires_at, used FROM password_reset_tokens WHERE token = $1"
+    // Atomically claim the token: mark it used in one query.
+    // This prevents TOCTOU race conditions where two concurrent requests
+    // could both read used=false before either sets it to true.
+    let token_record = sqlx::query_as::<_, (uuid::Uuid,)>(
+        r#"UPDATE password_reset_tokens 
+           SET used = TRUE 
+           WHERE token = $1 AND used = FALSE AND expires_at > NOW() 
+           RETURNING user_id"#
     )
     .bind(&body.token)
     .fetch_optional(pool.get_ref())
     .await;
 
-    let (_, user_id, expires_at, used) = match token_record {
-        Ok(Some(record)) => record,
-        Ok(None) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid or expired reset token")),
+    let user_id = match token_record {
+        Ok(Some((uid,))) => uid,
+        Ok(None) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid, expired, or already used reset token")),
         Err(e) => {
-            log::error!("Failed to fetch reset token: {}", e);
+            log::error!("Failed to claim reset token: {}", e);
             return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Database error"));
         }
     };
-
-    // Check if token is already used
-    if used {
-        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Reset token has already been used"));
-    }
-
-    // Check if token is expired
-    if chrono::Utc::now() > expires_at {
-        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Reset token has expired"));
-    }
 
     // Update the password
     if let Err(e) = auth::update_password(pool.get_ref(), user_id, &body.password).await {
         log::error!("Failed to update password: {}", e);
         return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to update password"));
     }
-
-    // Mark token as used
-    let _ = sqlx::query("UPDATE password_reset_tokens SET used = TRUE WHERE token = $1")
-        .bind(&body.token)
-        .execute(pool.get_ref())
-        .await;
 
     HttpResponse::Ok().json(ApiResponse::<()> {
         success: true,
@@ -460,11 +450,38 @@ pub async fn delete_account(
         }
     };
 
-    // All foreign keys use ON DELETE CASCADE:
-    // users -> profiles, wallets, notifications
-    // wallets -> wallet_transactions
-    // profiles -> products, orders, reviews, disputes
-    // So deleting the user cascades to everything.
+    // 1. Check wallet balance
+    let balance = sqlx::query_scalar::<_, i32>("SELECT balance_paise FROM wallets WHERE user_id = $1")
+        .bind(user_id)
+        .fetch_optional(&mut *tx)
+        .await
+        .unwrap_or(Some(0))
+        .unwrap_or(0);
+
+    if balance > 0 {
+        let _ = tx.rollback().await;
+        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Cannot delete account with a non-zero wallet balance. Please withdraw your funds first."));
+    }
+
+    // 2. Check for held escrow or any order history
+    // Since `escrow` table references `orders` without ON DELETE CASCADE,
+    // deleting a user with ANY order history will cause a foreign key violation.
+    // For a production app, we would soft-delete or anonymize the user, but for now we block it.
+    let order_count = sqlx::query_scalar::<_, i64>(
+        "SELECT COUNT(*) FROM orders WHERE buyer_id = $1 OR seller_id = $1"
+    )
+    .bind(user_id)
+    .fetch_one(&mut *tx)
+    .await
+    .unwrap_or(0);
+
+    if order_count > 0 {
+        let _ = tx.rollback().await;
+        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Cannot delete account with existing order history."));
+    }
+
+    // 3. Delete the user
+    // All foreign keys use ON DELETE CASCADE for profiles, wallets, notifications, etc.
     if let Err(e) = sqlx::query("DELETE FROM users WHERE id = $1")
         .bind(user_id)
         .execute(&mut *tx)
@@ -559,6 +576,7 @@ pub async fn github_oauth(
                         email,
                         full_name: existing_name.or(Some(full_name)),
                         role: existing_role,
+                        github_username: Some(gh_user.login.clone()),
                     }
                 }
                 Err(_) => {
@@ -584,7 +602,7 @@ pub async fn github_oauth(
                         .bind(&full_name)
                         .bind(role)
                         .bind(&gh_user.login)
-                        .bind(&auth::encrypt_github_token(&access_token))
+                        .bind(auth::encrypt_github_token(&access_token))
                         .execute(pool.get_ref())
                         .await;
 
@@ -616,4 +634,122 @@ pub async fn github_oauth(
         AuthResponse { user, token },
         "GitHub authentication successful",
     ))
+}
+
+#[derive(Debug, Deserialize)]
+pub struct GithubLinkRequest {
+    pub code: String,
+}
+
+pub async fn github_link(
+    pool: web::Data<PgPool>,
+    req: HttpRequest,
+    body: web::Json<GithubLinkRequest>,
+) -> HttpResponse {
+    // 1. Authenticate user
+    let auth_header = req.headers().get("Authorization");
+    let token = match auth_header {
+        Some(header) => header.to_str().unwrap_or("").strip_prefix("Bearer ").unwrap_or(header.to_str().unwrap_or("")),
+        None => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Missing Authorization header")),
+    };
+
+    let secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+    let claims = match auth::verify_token(token, &secret) {
+        Ok(claims) => claims,
+        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid token")),
+    };
+
+    let user_id = match uuid::Uuid::parse_str(&claims.sub) {
+        Ok(id) => id,
+        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid user ID in token")),
+    };
+
+    // 2. Exchange code for GitHub access token
+    let access_token = match auth::exchange_github_code(&body.code).await {
+        Ok(token) => token,
+        Err(e) => {
+            log::error!("GitHub code exchange failed: {}", e);
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("GitHub authentication failed"));
+        }
+    };
+
+    // 3. Fetch GitHub user profile
+    let gh_user = match auth::fetch_github_user(&access_token).await {
+        Ok(user) => user,
+        Err(e) => {
+            log::error!("GitHub user fetch failed: {}", e);
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Failed to fetch GitHub profile"));
+        }
+    };
+
+    // 4. Check if GitHub ID is already linked to another account
+    match auth::get_user_by_github_id(pool.get_ref(), gh_user.id).await {
+        Ok(existing) => {
+            if existing.id != user_id {
+                return HttpResponse::Conflict().json(ApiResponse::<()>::error("This GitHub account is already linked to another CodeHaat account."));
+            }
+            // If it's the same user, just update the token
+        }
+        Err(_) => {
+            // Not linked, so we link it
+            if let Err(e) = auth::link_github_to_user(pool.get_ref(), user_id, gh_user.id, &gh_user.login).await {
+                log::error!("Failed to link GitHub: {}", e);
+                return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to link GitHub account"));
+            }
+        }
+    }
+
+    // 5. Store GitHub access token
+    if let Err(e) = auth::store_github_token(pool.get_ref(), user_id, &access_token).await {
+        log::error!("Failed to store GitHub token: {}", e);
+        return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to store GitHub token"));
+    }
+
+    HttpResponse::Ok().json(ApiResponse::<()> {
+        success: true,
+        data: None,
+        message: Some("GitHub account linked successfully".to_string()),
+        error: None,
+    })
+}
+
+pub async fn github_unlink(
+    pool: web::Data<PgPool>,
+    req: HttpRequest,
+) -> HttpResponse {
+    // 1. Authenticate user
+    let auth_header = req.headers().get("Authorization");
+    let token = match auth_header {
+        Some(header) => header.to_str().unwrap_or("").strip_prefix("Bearer ").unwrap_or(header.to_str().unwrap_or("")),
+        None => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Missing Authorization header")),
+    };
+
+    let secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+    let claims = match auth::verify_token(token, &secret) {
+        Ok(claims) => claims,
+        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid token")),
+    };
+
+    let user_id = match uuid::Uuid::parse_str(&claims.sub) {
+        Ok(id) => id,
+        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid user ID in token")),
+    };
+
+    // Unlink in database
+    let _ = sqlx::query("UPDATE users SET github_id = NULL, github_username = NULL WHERE id = $1")
+        .bind(user_id)
+        .execute(pool.get_ref())
+        .await;
+
+    let _ = sqlx::query("UPDATE profiles SET github_username = NULL, github_access_token = NULL WHERE id = $1")
+        .bind(user_id)
+        .execute(pool.get_ref())
+        .await;
+
+    HttpResponse::Ok().json(ApiResponse::<()> {
+        success: true,
+        data: None,
+        message: Some("GitHub account unlinked successfully".to_string()),
+        error: None,
+    })
 }

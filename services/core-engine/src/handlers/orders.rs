@@ -2,15 +2,15 @@
 //!
 //! Flow:
 //! 1. `POST /api/orders`           — checks wallet balance first. If sufficient,
-//!                                    completes instantly. Otherwise creates a
-//!                                    Razorpay order for Checkout.js.
+//!    completes instantly. Otherwise creates a
+//!    Razorpay order for Checkout.js.
 //! 2. `POST /api/orders/verify`    — called by the frontend after Razorpay
-//!                                    Checkout closes; verifies the payment
-//!                                    signature and completes the order.
+//!    Checkout closes; verifies the payment
+//!    signature and completes the order.
 //! 3. `POST /api/webhooks/razorpay`— Razorpay server-to-server webhook; same
-//!                                    completion logic as (2) but triggered by
-//!                                    Razorpay. Idempotent via the pending
-//!                                    guard, so both paths are safe together.
+//!    completion logic as (2) but triggered by
+//!    Razorpay. Idempotent via the pending
+//!    guard, so both paths are safe together.
 //!
 //! Completion runs inside a single DB transaction so that the order, escrow
 //! row, seller wallet balance, wallet transaction, and notification are all
@@ -73,7 +73,7 @@ pub async fn create_order(
     }
 
     let price_paise = product.price_paise;
-    let platform_fee = price_paise * 25 / 1000; // 2.5%
+    let platform_fee = (price_paise as i64 * 25 / 1000) as i32; // 2.5%
     let seller_amount = price_paise - platform_fee;
 
     // Check buyer's wallet balance
@@ -169,39 +169,39 @@ async fn pay_from_wallet(
         }
     };
 
-    // Ensure buyer's wallet exists and lock it
-    let buyer_wallet = match sqlx::query_as::<_, crate::models::Wallet>(
-        "INSERT INTO wallets (user_id, balance_paise) VALUES ($1, 0) ON CONFLICT (user_id) DO UPDATE SET updated_at = NOW() RETURNING *"
+    // Ensure buyer's wallet exists
+    let _ = sqlx::query(
+        "INSERT INTO wallets (user_id, balance_paise) VALUES ($1, 0) ON CONFLICT (user_id) DO NOTHING"
     )
     .bind(buyer_uuid)
-    .fetch_one(&mut *tx)
+    .execute(&mut *tx)
+    .await;
+
+    // Atomically check balance and debit buyer wallet
+    let buyer_new_balance = match sqlx::query_scalar::<_, i32>(
+        r#"UPDATE wallets 
+           SET balance_paise = balance_paise - $1, 
+               total_spent_paise = total_spent_paise + $1, 
+               updated_at = NOW() 
+           WHERE user_id = $2 AND balance_paise >= $1 
+           RETURNING balance_paise"#
+    )
+    .bind(price_paise)
+    .bind(buyer_uuid)
+    .fetch_optional(&mut *tx)
     .await
     {
-        Ok(w) => w,
+        Ok(Some(bal)) => bal,
+        Ok(None) => {
+            let _ = tx.rollback().await;
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Insufficient wallet balance"));
+        }
         Err(e) => {
-            log::error!("Failed to fetch buyer wallet: {}", e);
+            log::error!("Failed to debit buyer wallet: {}", e);
             let _ = tx.rollback().await;
             return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Wallet error"));
         }
     };
-
-    // Double-check balance
-    if buyer_wallet.balance_paise < price_paise {
-        let _ = tx.rollback().await;
-        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Insufficient wallet balance"));
-    }
-
-    let buyer_new_balance = buyer_wallet.balance_paise - price_paise;
-
-    // Debit buyer wallet
-    let _ = sqlx::query(
-        "UPDATE wallets SET balance_paise = $1, total_spent_paise = total_spent_paise + $2, updated_at = NOW() WHERE user_id = $3"
-    )
-    .bind(buyer_new_balance)
-    .bind(price_paise)
-    .bind(buyer_uuid)
-    .execute(&mut *tx)
-    .await;
 
     // Record buyer transaction
     let _ = sqlx::query(
@@ -385,12 +385,6 @@ async fn complete_order_atomic(
     .bind(serde_json::json!({ "order_id": order_row.id }))
     .execute(&mut *tx)
     .await?;
-
-    // Increment product sales_count
-    sqlx::query("UPDATE products SET sales_count = COALESCE(sales_count, 0) + 1 WHERE id = $1")
-        .bind(order_row.product_id)
-        .execute(&mut *tx)
-        .await?;
 
     tx.commit().await?;
     Ok(true)
@@ -620,12 +614,16 @@ pub async fn razorpay_webhook(
         None => return HttpResponse::BadRequest().body("missing signature"),
     };
 
-    if let Err(payment::Error::NotConfigured) = payment::verify_webhook_signature(&body, signature) {
-        log::warn!("Webhook received but RAZORPAY_WEBHOOK_SECRET not configured");
-        return HttpResponse::ServiceUnavailable().body("webhook secret not configured");
-    } else if let Err(e) = payment::verify_webhook_signature(&body, signature) {
-        log::warn!("Webhook signature verification failed: {}", e);
-        return HttpResponse::BadRequest().body("invalid signature");
+    match payment::verify_webhook_signature(&body, signature) {
+        Ok(()) => {} // Signature valid, continue
+        Err(payment::Error::NotConfigured) => {
+            log::warn!("Webhook received but RAZORPAY_WEBHOOK_SECRET not configured");
+            return HttpResponse::ServiceUnavailable().body("webhook secret not configured");
+        }
+        Err(e) => {
+            log::warn!("Webhook signature verification failed: {}", e);
+            return HttpResponse::BadRequest().body("invalid signature");
+        }
     }
 
     let payload: WebhookPayload = match serde_json::from_slice(&body) {

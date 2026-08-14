@@ -65,7 +65,7 @@ async fn notify_seller_on_review(pool: &PgPool, product_id: uuid::Uuid, buyer_id
 
     if let Ok(Some((seller_id, title))) = product_info {
         let message = format!("{} left a {}-star review on \"{}\"", 
-            "A buyer".to_string(), rating, title);
+            "A buyer", rating, title);
         
         let _ = sqlx::query(
             r#"INSERT INTO notifications (user_id, type, title, message, data)
@@ -157,17 +157,6 @@ pub async fn create_review(
     .await
     {
         Ok(review) => {
-            // Update product rating and review_count
-            let _ = sqlx::query(
-                r#"UPDATE products SET
-                   rating = (SELECT COALESCE(AVG(rating)::numeric(3,2), 0) FROM reviews WHERE product_id = $1),
-                   review_count = (SELECT COUNT(*)::int FROM reviews WHERE product_id = $1)
-                   WHERE id = $1"#
-            )
-            .bind(body.product_id)
-            .execute(pool.get_ref())
-            .await;
-
             // Notify seller
             notify_seller_on_review(pool.get_ref(), body.product_id, user_uuid, body.rating).await;
 

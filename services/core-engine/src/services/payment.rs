@@ -122,8 +122,11 @@ pub fn verify_payment_signature(
     mac.update(payload.as_bytes());
 
     // `verify_slice` performs a constant-time comparison to resist timing
-    // attacks. An invalid signature means possible tampering — reject.
-    mac.verify_slice(razorpay_signature.as_bytes())
+    // attacks. Razorpay sends the signature as a hex-encoded string, so we
+    // must decode it to raw bytes before comparison.
+    let sig_bytes = hex::decode(razorpay_signature)
+        .map_err(|_| Error::InvalidSignature)?;
+    mac.verify_slice(&sig_bytes)
         .map_err(|_| Error::InvalidSignature)
 }
 
@@ -142,7 +145,9 @@ pub fn verify_webhook_signature(raw_body: &[u8], signature_header: &str) -> Resu
     let mut mac = Hmac::<Sha256>::new_from_slice(webhook_secret.as_bytes())
         .map_err(|_| Error::InvalidSignature)?;
     mac.update(raw_body);
-    mac.verify_slice(signature_header.as_bytes())
+    let sig_bytes = hex::decode(signature_header)
+        .map_err(|_| Error::InvalidSignature)?;
+    mac.verify_slice(&sig_bytes)
         .map_err(|_| Error::InvalidSignature)
 }
 

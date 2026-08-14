@@ -90,6 +90,13 @@ async fn main() -> std::io::Result<()> {
         .finish()
         .expect("Failed to build verify rate limiter");
 
+    let order_limiter = GovernorConfigBuilder::default()
+        .seconds_per_request(5) // Max 1 order every 5 seconds per IP
+        .burst_size(3)
+        .key_extractor(ForwardedIpKeyExtractor)
+        .finish()
+        .expect("Failed to build order rate limiter");
+
     HttpServer::new(move || {
         let mut cors = Cors::default()
             .allowed_methods(vec!["GET", "POST", "PUT", "DELETE", "OPTIONS"])
@@ -142,6 +149,17 @@ async fn main() -> std::io::Result<()> {
                     .to(handlers::auth::github_oauth)
                     .wrap(Governor::new(&auth_limiter)),
             )
+            .route(
+                "/api/auth/github/link",
+                web::post()
+                    .to(handlers::auth::github_link)
+                    .wrap(Governor::new(&auth_limiter)),
+            )
+            .route(
+                "/api/auth/github/unlink",
+                web::post()
+                    .to(handlers::auth::github_unlink)
+            )
             // Profile
             .route("/api/profile/{id}", web::get().to(handlers::profile::get_profile))
             .route("/api/profile", web::put().to(handlers::profile::update_profile))
@@ -150,7 +168,12 @@ async fn main() -> std::io::Result<()> {
             .route("/api/products/{id}", web::get().to(handlers::products::get_product))
             // Seller products
             .route("/api/seller/products", web::get().to(handlers::seller::list_seller_products))
-            .route("/api/seller/products", web::post().to(handlers::seller::create_product))
+            .route(
+                "/api/seller/products", 
+                web::post()
+                    .to(handlers::seller::create_product)
+                    .wrap(Governor::new(&upload_limiter))
+            )
             .route("/api/seller/products/{id}", web::put().to(handlers::seller::update_product))
             .route("/api/seller/products/{id}", web::delete().to(handlers::seller::delete_product))
             .route("/api/seller/stats", web::get().to(handlers::seller::get_stats))
@@ -166,7 +189,12 @@ async fn main() -> std::io::Result<()> {
             .route("/api/wallet/withdraw", web::post().to(handlers::wallet::withdraw))
             .route("/api/wallet/release-escrow", web::post().to(handlers::wallet::release_escrow))
             // Orders
-            .route("/api/orders", web::post().to(handlers::orders::create_order))
+            .route(
+                "/api/orders", 
+                web::post()
+                    .to(handlers::orders::create_order)
+                    .wrap(Governor::new(&order_limiter))
+            )
             .route(
                 "/api/orders/verify",
                 web::post()

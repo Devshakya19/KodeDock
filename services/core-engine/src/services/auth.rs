@@ -14,6 +14,7 @@ pub struct User {
     pub email: String,
     pub full_name: Option<String>,
     pub role: String,
+    pub github_username: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -22,6 +23,7 @@ pub struct Claims {
     pub email: String,
     pub full_name: Option<String>,
     pub role: String,
+    pub github_username: Option<String>,
     pub exp: usize,
     pub iat: usize,
 }
@@ -49,6 +51,7 @@ pub fn generate_token(user: &User, secret: &str) -> Result<String, String> {
         email: user.email.clone(),
         full_name: user.full_name.clone(),
         role: user.role.clone(),
+        github_username: user.github_username.clone(),
         exp: expires.timestamp() as usize,
         iat: now.timestamp() as usize,
     };
@@ -100,7 +103,7 @@ pub async fn create_user(pool: &PgPool, email: &str, password: &str, full_name: 
     let user = sqlx::query_as::<_, User>(
         r#"INSERT INTO users (id, email, password_hash, full_name, role)
            VALUES ($1, $2, $3, $4, $5)
-           RETURNING id, email, full_name, role"#
+           RETURNING id, email, full_name, role, github_username"#
     )
     .bind(id)
     .bind(email)
@@ -127,7 +130,7 @@ pub async fn get_user_by_email(pool: &PgPool, email: &str) -> Result<(Uuid, Stri
 
 pub async fn get_user_by_id(pool: &PgPool, user_id: Uuid) -> Result<User, String> {
     sqlx::query_as::<_, User>(
-        "SELECT id, email, full_name, role FROM users WHERE id = $1"
+        "SELECT id, email, full_name, role, github_username FROM users WHERE id = $1"
     )
     .bind(user_id)
     .fetch_optional(pool)
@@ -223,9 +226,9 @@ pub async fn fetch_github_user(access_token: &str) -> Result<GithubUser, String>
 /// Find an existing user linked to this GitHub ID.
 pub async fn get_user_by_github_id(pool: &PgPool, github_id: i64) -> Result<User, String> {
     sqlx::query_as::<_, User>(
-        "SELECT id, email, full_name, role FROM users WHERE github_id = $1"
+        "SELECT id, email, full_name, role, github_username FROM users WHERE github_id = $1"
     )
-    .bind(github_id)
+    .bind(github_id.to_string())
     .fetch_optional(pool)
     .await
     .map_err(|e| format!("Get user by github_id error: {}", e))?
@@ -246,13 +249,13 @@ pub async fn create_github_user(
     sqlx::query_as::<_, User>(
         r#"INSERT INTO users (id, email, full_name, role, github_id, github_username)
            VALUES ($1, $2, $3, $4, $5, $6)
-           RETURNING id, email, full_name, role"#
+           RETURNING id, email, full_name, role, github_username"#
     )
     .bind(id)
     .bind(email)
     .bind(full_name)
     .bind(role)
-    .bind(github_id)
+    .bind(github_id.to_string())
     .bind(github_username)
     .fetch_one(pool)
     .await
@@ -267,7 +270,7 @@ pub async fn link_github_to_user(
     github_username: &str,
 ) -> Result<(), String> {
     sqlx::query("UPDATE users SET github_id = $1, github_username = $2 WHERE id = $3")
-        .bind(github_id)
+        .bind(github_id.to_string())
         .bind(github_username)
         .bind(user_id)
         .execute(pool)
