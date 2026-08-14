@@ -13,6 +13,7 @@ export interface User {
   email: string;
   full_name: string | null;
   role: string;
+  github_username?: string | null;
   created_at?: string;
 }
 
