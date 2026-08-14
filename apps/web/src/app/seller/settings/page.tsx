@@ -1,5 +1,5 @@
-import { SettingsPage } from "@/features/seller";
+import { redirect } from "next/navigation";
 
-export default function Page() {
-  return <SettingsPage />;
+export default function SettingsIndex() {
+  redirect("/seller/settings/profile");
 }

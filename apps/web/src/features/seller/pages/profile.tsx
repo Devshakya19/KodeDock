@@ -112,14 +112,7 @@ export default function SellerProfilePage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-8">
-      <div className="mb-8">
-        <Link href="/seller" className="inline-flex items-center gap-2 text-[13px] font-semibold text-slate-500 hover:text-slate-900 mb-4 transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
-        </Link>
-        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Public Profile</h1>
-        <p className="text-slate-500 mt-1 text-[15px]">Manage how you appear to buyers on the marketplace</p>
-      </div>
+    <div className="w-full">
 
       <div className="bg-white rounded-[24px] p-6 sm:p-8 border border-slate-100 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.03)]">
         {success && (

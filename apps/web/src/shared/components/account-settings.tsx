@@ -10,12 +10,13 @@ import { auth } from "@/shared/lib/auth";
 import { apiPost, apiDelete } from "@/shared/lib/api";
 
 interface AccountSettingsProps {
-  backLink: string;
-  backText: string;
+  backLink?: string;
+  backText?: string;
   deleteWarningText: string;
+  hideHeader?: boolean;
 }
 
-export function AccountSettings({ backLink, backText, deleteWarningText }: AccountSettingsProps) {
+export function AccountSettings({ backLink, backText, deleteWarningText, hideHeader }: AccountSettingsProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -104,14 +105,18 @@ export function AccountSettings({ backLink, backText, deleteWarningText }: Accou
   }
 
   return (
-    <div className="max-w-3xl mx-auto py-8">
-      <div className="mb-8">
-        <Link href={backLink} className="inline-flex items-center gap-2 text-[13px] font-semibold text-slate-500 hover:text-slate-900 mb-4 transition-colors">
-          <ArrowLeft className="w-4 h-4" /> {backText}
-        </Link>
-        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Account Settings</h1>
-        <p className="text-slate-500 mt-1 text-[15px]">Manage your security preferences and account status</p>
-      </div>
+    <div className={hideHeader ? "w-full" : "max-w-3xl mx-auto py-8"}>
+      {!hideHeader && (
+        <div className="mb-8">
+          {backLink && backText && (
+            <Link href={backLink} className="inline-flex items-center gap-2 text-[13px] font-semibold text-slate-500 hover:text-slate-900 mb-4 transition-colors">
+              <ArrowLeft className="w-4 h-4" /> {backText}
+            </Link>
+          )}
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Account Settings</h1>
+          <p className="text-slate-500 mt-1 text-[15px]">Manage your security preferences and account status</p>
+        </div>
+      )}
 
       <div className="space-y-8">
         
