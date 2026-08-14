@@ -276,6 +276,14 @@ pub async fn link_github_to_user(
         .execute(pool)
         .await
         .map_err(|e| format!("Failed to link GitHub: {}", e))?;
+
+    sqlx::query("INSERT INTO profiles (id, github_username) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET github_username = $2")
+        .bind(user_id)
+        .bind(github_username)
+        .execute(pool)
+        .await
+        .map_err(|e| format!("Failed to update profile: {}", e))?;
+        
     Ok(())
 }
 

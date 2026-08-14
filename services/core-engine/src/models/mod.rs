@@ -18,6 +18,8 @@ pub struct Profile {
     pub website: Option<String>,
     pub location: Option<String>,
     pub is_verified: bool,
+    #[sqlx(default)]
+    pub is_github_connected: bool,
     pub created_at: Option<DateTime<Utc>>,
     pub updated_at: Option<DateTime<Utc>>,
 }

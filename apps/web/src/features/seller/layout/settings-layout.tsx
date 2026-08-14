@@ -8,7 +8,7 @@ export function SellerSettingsLayout({ children }: { children: React.ReactNode }
 
   const navItems = [
     {
-      name: "Public Profile",
+      name: "Profile",
       href: "/seller/settings/profile",
       icon: User,
       description: "Manage how you appear to buyers",

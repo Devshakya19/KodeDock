@@ -20,7 +20,7 @@ pub async fn get_profile(
         Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid profile ID")),
     };
 
-    match sqlx::query_as::<_, Profile>("SELECT * FROM profiles WHERE id = $1")
+    match sqlx::query_as::<_, Profile>("SELECT *, (github_access_token IS NOT NULL) AS is_github_connected FROM profiles WHERE id = $1")
         .bind(id)
         .fetch_optional(pool.get_ref())
         .await

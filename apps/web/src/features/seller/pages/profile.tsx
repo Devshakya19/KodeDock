@@ -25,6 +25,7 @@ export default function SellerProfilePage() {
   const [website, setWebsite] = useState("");
   const [location, setLocation] = useState("");
   const [githubUsername, setGithubUsername] = useState("");
+  const [isGithubConnected, setIsGithubConnected] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState("");
 
   async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -69,6 +70,7 @@ export default function SellerProfilePage() {
         setWebsite(result.data.website || "");
         setLocation(result.data.location || "");
         setGithubUsername(result.data.github_username || "");
+        setIsGithubConnected(result.data.is_github_connected || false);
         setAvatarUrl(result.data.avatar_url || "");
       }
       setLoading(false);
@@ -132,7 +134,7 @@ export default function SellerProfilePage() {
         {/* Avatar Section */}
         <div className="flex items-center gap-6 mb-10 pb-8 border-b border-slate-100">
           <div className="relative group">
-            <div className="w-24 h-24 rounded-3xl bg-gradient-to-tr from-slate-900 to-slate-700 flex items-center justify-center overflow-hidden shadow-md border-4 border-white ring-1 ring-slate-100">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-slate-900 to-slate-700 flex items-center justify-center overflow-hidden shadow-md border-4 border-white ring-1 ring-slate-100">
               {avatarUrl ? (
                 <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
               ) : (
@@ -152,7 +154,7 @@ export default function SellerProfilePage() {
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploadingAvatar}
-              className="absolute inset-0 rounded-3xl bg-black/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all cursor-pointer backdrop-blur-sm"
+              className="absolute inset-0 rounded-full bg-black/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all cursor-pointer backdrop-blur-sm"
             >
               {uploadingAvatar ? (
                 <Loader2 className="w-6 h-6 text-white animate-spin" />
@@ -165,16 +167,7 @@ export default function SellerProfilePage() {
             </button>
           </div>
           <div>
-            <h3 className="text-lg font-bold text-slate-900 mb-1">Profile Photo</h3>
-            <p className="text-sm text-slate-500 max-w-sm">
-              We recommend an image of at least 400x400px. Max size 2MB.
-            </p>
-            <button 
-              onClick={() => fileInputRef.current?.click()}
-              className="mt-3 text-[13px] font-semibold text-blue-600 hover:text-blue-700 transition-colors"
-            >
-              Upload new image
-            </button>
+            <h3 className="text-xl font-bold text-slate-900 mb-1">{fullName || "User Profile"}</h3>
           </div>
         </div>
 
@@ -196,10 +189,18 @@ export default function SellerProfilePage() {
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="githubUsername" className="flex items-center gap-2 text-[14px] font-semibold text-slate-900">
-                <GithubIcon className="w-4 h-4 text-slate-400" />
-                GitHub Username
-              </label>
+              <div className="flex items-center justify-between">
+                <label htmlFor="githubUsername" className="flex items-center gap-2 text-[14px] font-semibold text-slate-900">
+                  <GithubIcon className="w-4 h-4 text-slate-400" />
+                  GitHub Username
+                </label>
+                {isGithubConnected && (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                    <CheckCircle className="w-3 h-3" />
+                    Linked
+                  </span>
+                )}
+              </div>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-[15px] font-medium">@</span>
                 <Input
@@ -207,18 +208,24 @@ export default function SellerProfilePage() {
                   value={githubUsername}
                   onChange={(e) => setGithubUsername(e.target.value)}
                   placeholder="username"
-                  className="h-12 border-slate-200 bg-slate-50/50 focus-visible:bg-white rounded-xl text-[15px] pl-9"
+                  disabled={isGithubConnected}
+                  className={`h-12 border-slate-200 bg-slate-50/50 focus-visible:bg-white rounded-xl text-[15px] pl-9 ${isGithubConnected ? "opacity-70 cursor-not-allowed bg-slate-100" : ""}`}
                 />
               </div>
               {githubUsername && (
-                <a
-                  href={`https://github.com/${githubUsername}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-[12px] font-medium text-blue-600 hover:text-blue-700 transition-colors"
-                >
-                  Verify Profile <ExternalLink className="w-3 h-3" />
-                </a>
+                <div className="flex items-center justify-between mt-2">
+                  <a
+                    href={`https://github.com/${githubUsername}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-[12px] font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                  >
+                    Verify Profile <ExternalLink className="w-3 h-3" />
+                  </a>
+                  {isGithubConnected && (
+                    <span className="text-[11px] text-slate-500 font-medium">Auto-synced from connected account</span>
+                  )}
+                </div>
               )}
             </div>
           </div>
