@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { GithubIcon } from "@/shared/components/github-icon";
 import { Link as LinkIcon, Mail, Loader2 } from "lucide-react";
 import { auth, User } from "@/shared/lib/auth";
+import { apiPost } from "@/shared/lib/api";
 
 export default function SellerConnectionsPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -51,10 +52,9 @@ export default function SellerConnectionsPage() {
     setError("");
     setSuccess("");
     try {
-      const res = await fetch("/api/auth/github/unlink", { method: "POST" });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || "Failed to unlink GitHub");
+      const res = await apiPost<{}>("/auth/github/unlink", {});
+      if (!res.success) {
+        throw new Error(res.error || res.message || "Failed to unlink GitHub");
       }
       setSuccess("GitHub account unlinked successfully");
       // Update local state so UI updates
