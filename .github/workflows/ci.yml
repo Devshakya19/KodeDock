@@ -1,6 +1,8 @@
 name: CI
 
 on:
+  push:
+    branches: [main]
   pull_request:
     branches: [main]
 
@@ -189,24 +191,4 @@ jobs:
         run: cargo audit
         continue-on-error: true
 
-  docker-build:
-    name: docker-build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
 
-      - name: Build Frontend Docker image
-        run: docker build -t codehaat-frontend ./apps/web
-
-      - name: Build Core Engine Docker image
-        run: docker build -t codehaat-core-engine ./services/core-engine
-
-      - name: Build AI Service Docker image
-        run: docker build -t codehaat-ai-service ./services/ai-service
-
-      - name: Build Infra Worker Docker image
-        run: docker build -t codehaat-infra-worker ./services/infra-worker
-
-      - name: Build Realtime Service Docker image
-        run: docker build -t codehaat-realtime-service ./services/realtime-service
