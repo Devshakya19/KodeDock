@@ -180,7 +180,7 @@ docker compose exec core-engine curl -s redis:6379
 **Solution**:
 1. **403 Error** - Path not allowed in proxy:
    - Check that the API path you're calling is in the ALLOWED_PREFIXES list in 
-     `apps/web/src/app/api/proxy/[...path]/route.ts`
+     `web/src/app/api/proxy/[...path]/route.ts`
    - Common missed paths: new API endpoints you've added
 2. **502 Error** - Backend connection failed:
    - Verify the Core Engine service is running and healthy
@@ -201,7 +201,7 @@ docker compose exec core-engine curl -s redis:6379
 **Solution**:
 1. Clear Next.js cache and reinstall:
 ```bash
-cd apps/web
+cd web
 rm -rf .next node_modules/cache
 npm install
 npm run dev

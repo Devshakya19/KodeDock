@@ -1,6 +1,6 @@
 # Codebase Duplication Report
 
-This file documents all the duplicate code blocks, duplicate logic, and structurally identical files found across the `apps/web/src` codebase. It was generated using `jscpd` (JavaScript Copy/Paste Detector).
+This file documents all the duplicate code blocks, duplicate logic, and structurally identical files found across the `web/src` codebase. It was generated using `jscpd` (JavaScript Copy/Paste Detector).
 
 **Overall Duplication Rate:** 10.2%
 **Total Clones Found:** 73

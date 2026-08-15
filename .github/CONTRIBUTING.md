@@ -4,7 +4,7 @@ First off, thank you for considering contributing to CodeHaat! It's people like 
 
 ## 🏗️ Architecture Overview
 CodeHaat is a modern, polyglot microservices platform consisting of:
-- **Frontend**: Next.js (`/apps/web`)
+- **Frontend**: Next.js (`/web`)
 - **Core Engine**: Rust (`/services/core-engine`)
 - **AI Service**: Python (`/services/ai-service`)
 - **Infra Worker**: Go (`/services/infra-worker`)

@@ -95,7 +95,7 @@ For faster iteration during development, you can run services individually:
 
 #### Frontend (Next.js)
 ```bash
-cd apps/web
+cd web
 npm install
 npm run dev    # Runs on http://localhost:3001
 ```
@@ -113,7 +113,7 @@ Follow similar patterns for AI Service (Python), Infra Worker (Go), and Real-tim
 
 CodeHaat is a polyglot microservices architecture with five main services:
 
-### 1. Frontend (`apps/web/`)
+### 1. Frontend (`web/`)
 - **Technology**: Next.js 16, React 19, TypeScript
 - **Purpose**: User interface, server-side rendering for SEO
 - **Key Directories**:
@@ -154,7 +154,7 @@ CodeHaat is a polyglot microservices architecture with five main services:
 
 ### Making Changes
 
-1. **Frontend Changes**: Modify files in `apps/web/src/` and see changes immediately with `npm run dev`
+1. **Frontend Changes**: Modify files in `web/src/` and see changes immediately with `npm run dev`
 2. **Backend Changes**: 
    - Rust: Modify files in `services/core-engine/src/` and restart with `cargo run`
    - Python: Modify files in `services/ai-service/app/` and restart the service

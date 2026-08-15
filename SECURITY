@@ -72,8 +72,8 @@ We will publicly credit researchers who report valid, previously unknown vulnera
 - **Flags**: `Secure` (HTTPS-only) + `SameSite` (CSRF mitigation)
 - **Expiry**: Configurable (default 24 hours)
 - **Relevant files**:
-  - `apps/web/src/shared/lib/auth.ts` — client-side auth service
-  - `apps/web/src/app/api/proxy/[...path]/route.ts` — cookie extraction & forwarding
+  - `web/src/shared/lib/auth.ts` — client-side auth service
+  - `web/src/app/api/proxy/[...path]/route.ts` — cookie extraction & forwarding
   - `services/core-engine/src/main.rs` — token validation middleware
 
 ### Password Security
@@ -137,7 +137,7 @@ Uploads follow a **presigned URL** flow that keeps large payloads off applicatio
 
 - Rate limiting on presign requests prevents upload abuse
 - File type enforcement is applied at the presign validation stage
-- Relevant files: `apps/web/src/app/api/upload/file/route.ts`, `services/core-engine/src/handlers/upload.rs`
+- Relevant files: `web/src/app/api/upload/file/route.ts`, `services/core-engine/src/handlers/upload.rs`
 
 ### Encryption at Rest
 
@@ -167,7 +167,7 @@ Implemented via `actix-governor` middleware with a custom IP extractor:
 - Configured via the `CORS_ORIGINS` environment variable
 - Default (development): `http://localhost:3000,http://localhost:3001`
 - Dynamic origin validation — no wildcard origins permitted in production
-- Files: `services/core-engine/src/main.rs`, `apps/web/src/app/api/proxy/[...path]/route.ts`
+- Files: `services/core-engine/src/main.rs`, `web/src/app/api/proxy/[...path]/route.ts`
 
 ### Network Isolation (Docker)
 
@@ -198,7 +198,7 @@ External Traffic
 - API proxy routes enforce an allowlist via the `isAllowedPath()` function
 - Allowed prefixes: `products`, `seller/`, `orders`, `reviews`, `notifications`, `wallet`, `upload/`, `profile`, `auth/`, `search`
 - All outbound calls to external services (GitHub API, Razorpay) use hardcoded, predefined endpoints — no user-controlled URLs
-- File: `apps/web/src/app/api/proxy/[...path]/route.ts`
+- File: `web/src/app/api/proxy/[...path]/route.ts`
 
 ---
 

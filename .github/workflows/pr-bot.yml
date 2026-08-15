@@ -38,7 +38,7 @@ jobs:
             for (const file of files.data) {
               const path = file.filename;
 
-              if (path.startsWith('apps/web/')) labels.push('frontend');
+              if (path.startsWith('web/')) labels.push('frontend');
               if (path.startsWith('services/core-engine/')) labels.push('backend');
               if (path.startsWith('services/ai-service/')) labels.push('ai-service');
               if (path.startsWith('services/infra-worker/')) labels.push('infra-worker');

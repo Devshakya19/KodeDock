@@ -47,7 +47,7 @@ services:
   # Frontend - Next.js
   frontend:
     build:
-      context: ./apps/web
+      context: ./web
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_API_URL: http://localhost:4001

@@ -8,7 +8,7 @@ Fixes #
 
 ## 🏗️ Architecture / Service Modified
 <!-- Check all the services that are affected by this PR -->
-- [ ] 🌐 Frontend (Next.js - `apps/web`)
+- [ ] 🌐 Frontend (Next.js - `web`)
 - [ ] ⚙️ Core Engine (Rust - `services/core-engine`)
 - [ ] 🧠 AI Service (Python - `services/ai-service`)
 - [ ] ⚡ Infra Worker (Go - `services/infra-worker`)

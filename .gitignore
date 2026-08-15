@@ -32,8 +32,8 @@ yarn-error.log*
 # Service-level env files (may contain real secrets — never commit)
 services/*/.env
 services/*/.env.local
-apps/*/.env
-apps/*/.env.local
+web/.env
+web/.env.local
 # SeaweedFS S3 identity config contains credentials
 config/seaweedfs/s3.json
 
