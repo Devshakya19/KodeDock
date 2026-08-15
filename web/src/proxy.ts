@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { updateSession } from "@/shared/lib/auth-middleware";
+import { updateSession } from "@/lib/auth/middleware";
 
 export async function proxy(request: NextRequest) {
   // Skip ALL API routes — they handle their own auth
