@@ -1,6 +1,6 @@
 module github.com/codehaat/infra-worker
 
-go 1.23
+go 1.25.0
 
 require github.com/redis/go-redis/v9 v9.7.3
 
