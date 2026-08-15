@@ -86,8 +86,22 @@ export default function SellerProfilePage() {
       },
       (err) => {
         setFetchingLocation(false);
-        setError("Permission to access location was denied or failed.");
-      }
+        switch (err.code) {
+          case err.PERMISSION_DENIED:
+            setError("Permission to access location was denied. Please allow location access in your browser settings and try again.");
+            break;
+          case err.POSITION_UNAVAILABLE:
+            setError("Location information is unavailable. Please check your network or try again later.");
+            break;
+          case err.TIMEOUT:
+            setError("The request to get your location timed out.");
+            break;
+          default:
+            setError("An unknown error occurred while accessing location.");
+            break;
+        }
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
     );
   }
 
