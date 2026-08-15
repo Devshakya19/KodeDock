@@ -5,7 +5,14 @@ import { Landmark, Smartphone, Loader2, CheckCircle, AlertTriangle, CreditCard }
 import { Input } from "@/shared/ui/input";
 import { Button } from "@/shared/ui/button";
 import { apiGet, apiPost } from "@/shared/lib/api";
-import type { PayoutAccountData } from "@/features/wallet/components/add-payout-method";
+export interface PayoutAccountData {
+  account_type: "bank_account" | "upi";
+  account_holder_name?: string;
+  account_number?: string;
+  ifsc_code?: string;
+  bank_name?: string;
+  upi_id?: string;
+}
 
 export function PayoutSettings() {
   const [loading, setLoading] = useState(true);
