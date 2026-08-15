@@ -1,77 +1,74 @@
-name: Bug Report
-description: Report a bug or issue
-title: "[BUG] "
+name: 🐞 Bug Report
+description: Create a report to help us improve CodeHaat by fixing bugs
+title: "[BUG]: "
 labels: ["bug", "triage"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for reporting a bug! Please fill out the details below.
+        Thanks for taking the time to fill out this bug report! 
+        Before submitting, please search the issue tracker to ensure this bug hasn't already been reported.
+  
+  - type: input
+    id: version
+    attributes:
+      label: CodeHaat Version
+      description: What version of CodeHaat are you using? (e.g. v1.1.0, or specific commit hash)
+      placeholder: e.g. v1.1.0
+    validations:
+      required: true
+  
+  - type: dropdown
+    id: component
+    attributes:
+      label: Affected Component
+      description: Which service or component is causing the issue?
+      multiple: true
+      options:
+        - "Frontend (Next.js)"
+        - "Core Engine (Rust)"
+        - "AI Service (Python)"
+        - "Infra Worker (Go)"
+        - "Realtime Service (Node)"
+        - "CI/CD & Infrastructure"
+        - "Other / Unknown"
+    validations:
+      required: true
 
   - type: textarea
     id: description
     attributes:
       label: Bug Description
-      description: A clear description of what the bug is.
-      placeholder: Tell us what happened...
+      description: A clear and concise description of what the bug is.
+      placeholder: Tell us what went wrong...
     validations:
       required: true
 
   - type: textarea
-    id: steps
+    id: reproduction
     attributes:
       label: Steps to Reproduce
-      description: Steps to reproduce the behavior.
-      placeholder: |
+      description: Please explain the steps required to duplicate the issue.
+      value: |
         1. Go to '...'
-        2. Click on '...'
-        3. See error
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
     validations:
       required: true
-
+      
   - type: textarea
     id: expected
     attributes:
       label: Expected Behavior
-      description: What you expected to happen.
+      description: What did you expect to happen?
     validations:
       required: true
-
-  - type: dropdown
-    id: service
-    attributes:
-      label: Affected Service
-      description: Which service is affected?
-      options:
-        - Frontend (Next.js)
-        - Core Engine (Rust)
-        - AI Service (Python)
-        - Infra Worker (Go)
-        - Real-Time (Node.js)
-        - Database (PostgreSQL)
-        - Other
-    validations:
-      required: true
-
+      
   - type: textarea
-    id: environment
+    id: context
     attributes:
-      label: Environment
-      description: |
-        - OS: [e.g., Ubuntu 22.04]
-        - Browser: [e.g., Chrome 120]
-        - Node.js: [e.g., 20.10]
-      placeholder: |
-        OS: 
-        Browser: 
-        Node.js: 
-    validations:
-      required: false
-
-  - type: textarea
-    id: screenshots
-    attributes:
-      label: Screenshots
-      description: Add screenshots if applicable.
+      label: Additional Context (Logs, Screenshots)
+      description: Add any other context about the problem here, including logs, screenshots, or environment details (OS, Browser).
     validations:
       required: false
