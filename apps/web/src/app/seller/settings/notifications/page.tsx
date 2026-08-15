@@ -13,7 +13,14 @@ interface NotificationPrefs {
 }
 
 export default function NotificationsSettingsPage() {
-  const [prefs, setPrefs] = useState<NotificationPrefs | null>(null);
+  const [prefs, setPrefs] = useState<NotificationPrefs>({
+    email_sales: true,
+    email_reviews: true,
+    email_updates: true,
+    push_sales: true,
+    push_reviews: true,
+    push_updates: true,
+  });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
@@ -24,9 +31,12 @@ export default function NotificationsSettingsPage() {
         const res = await apiGet<NotificationPrefs>("/seller/notification-preferences");
         if (res.success && res.data) {
           setPrefs(res.data);
+        } else if (res.error) {
+          setMessage(res.error);
         }
       } catch (e) {
         console.error("Failed to load prefs", e);
+        setMessage("Network error while loading.");
       } finally {
         setLoading(false);
       }
@@ -65,8 +75,6 @@ export default function NotificationsSettingsPage() {
       </div>
     );
   }
-
-  if (!prefs) return null;
 
   return (
     <div className="w-full">

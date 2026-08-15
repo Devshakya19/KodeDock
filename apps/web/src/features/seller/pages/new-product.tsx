@@ -48,6 +48,7 @@ export default function NewProductPage() {
   const [tags, setTags] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isFree, setIsFree] = useState(false);
   const [stockLimit, setStockLimit] = useState("");
   const [status, setStatus] = useState("active");
@@ -74,25 +75,15 @@ export default function NewProductPage() {
     if (imagePreview) URL.revokeObjectURL(imagePreview);
     const previewUrl = URL.createObjectURL(file);
     setImagePreview(previewUrl);
-
-    setUploading(true);
+    setSelectedFile(file);
     setError("");
-    try {
-      const result = await uploadFile(file, "product");
-      setImageUrl(result.public_url);
-    } catch {
-      setError("Failed to upload image. Please try again.");
-      setImagePreview(null);
-      setImageUrl("");
-    } finally {
-      setUploading(false);
-    }
   }
 
   function handleRemoveImage() {
     if (imagePreview) URL.revokeObjectURL(imagePreview);
     setImagePreview(null);
     setImageUrl("");
+    setSelectedFile(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
@@ -124,13 +115,30 @@ export default function NewProductPage() {
     }
 
     try {
+      let finalImageUrl = imageUrl;
+      
+      // Upload image first if a new one was selected
+      if (selectedFile) {
+        setUploading(true);
+        try {
+          const uploadResult = await uploadFile(selectedFile, "product");
+          finalImageUrl = uploadResult.public_url;
+        } catch {
+          setError("Failed to upload image. Please try again.");
+          setLoading(false);
+          setUploading(false);
+          return;
+        }
+        setUploading(false);
+      }
+
       const result = await apiPost("/seller/products", {
         title,
         description,
         price_paise: pricePaise,
         category_id: category || undefined,
         github_repo_url: githubUrl || undefined,
-        image_url: imageUrl || undefined,
+        image_url: finalImageUrl || undefined,
         tags: tags ? tags.split(",").map((t) => t.trim()).filter(Boolean) : [],
         status,
         stock_limit: stockLimitValue,

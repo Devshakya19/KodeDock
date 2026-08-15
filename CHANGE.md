@@ -121,6 +121,15 @@ All notable changes to the CodeHaat backend project will be documented in this f
 - **Code Cleanliness**: Removed excessive production debug logging from category resolution in `seller.rs`. Codebase continues to pass `cargo clippy` perfectly with zero warnings.
 
 
+## [2026-08-15] - Deferred Uploads, Schema Synchronization & UI Fixes
+
+### ✨ Features
+- **Deferred Image Uploads (Plan A)**: Completely refactored the product creation flow (`new-product.tsx`) to prevent storage leaks. Product images are now temporarily held in React state and are only securely uploaded to SeaweedFS (via pre-signed URLs) at the exact moment the seller clicks "Publish". This ensures no orphaned images exist in the storage system if a seller abandons a draft.
+
+### 🐛 Bug Fixes
+- **Critical (Database Synchronization)**: Resolved a persistent `Failed to create product` internal server error caused by missing `updated_at` columns in the database. Performed a clean volume rebuild to properly synchronize the Docker Postgres instance with the definitive `01-schema.sql` (which correctly triggers `set_updated_at` on rows).
+- **High (Blank Screen in Settings)**: Fixed a bug in the Seller Notification Settings (`notifications/page.tsx`) where an uninitialized preferences row resulted in a completely blank page due to a strict null check. The UI now gracefully falls back to default values (Email/Push notifications ON) when no explicit configuration exists.
+- **Medium (Geolocation Error Handling)**: Added robust error handling in `profile.tsx` to display proper feedback messages to the seller if they deny the browser's location permission request (`GeolocationPositionError`).
 
 ---
 *End of Changelog.*
