@@ -71,6 +71,38 @@ pub async fn mark_read(
     }
 }
 
+pub async fn mark_all_read(
+    pool: web::Data<PgPool>,
+    req: HttpRequest,
+) -> HttpResponse {
+    let user_id = match extract_user_id(&req) {
+        Ok(id) => id,
+        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized")),
+    };
+
+    let user_uuid = match uuid::Uuid::parse_str(&user_id) {
+        Ok(uuid) => uuid,
+        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID")),
+    };
+
+    match sqlx::query("UPDATE notifications SET is_read = true WHERE user_id = $1 AND is_read = false")
+        .bind(user_uuid)
+        .execute(pool.get_ref())
+        .await
+    {
+        Ok(_) => HttpResponse::Ok().json(ApiResponse::<()> {
+            success: true,
+            data: None,
+            message: Some("All notifications marked as read".to_string()),
+            error: None,
+        }),
+        Err(e) => {
+            log::error!("Failed to mark all notifications as read: {}", e);
+            HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to mark notifications"))
+        }
+    }
+}
+
 pub async fn get_preferences(
     pool: web::Data<PgPool>,
     req: HttpRequest,

@@ -388,3 +388,17 @@ pub struct UpdateNotificationPreferencesRequest {
     pub push_reviews: bool,
     pub push_updates: bool,
 }
+
+#[derive(Debug, Serialize, sqlx::FromRow)]
+pub struct SellerReviewItem {
+    pub id: Uuid,
+    pub product_id: Uuid,
+    pub product_title: String,
+    pub user_id: Uuid,
+    pub user_name: Option<String>,
+    pub user_avatar: Option<String>,
+    pub rating: i32,
+    pub title: Option<String>,
+    pub comment: Option<String>,
+    pub created_at: Option<chrono::DateTime<chrono::Utc>>,
+}

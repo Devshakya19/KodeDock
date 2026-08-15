@@ -12,17 +12,20 @@ import {
   Bell,
   Menu,
   Wallet,
-  ChevronDown
+  ChevronDown,
+  Star
 } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { CodeHaatLogo } from "@/shared/components/codehaat-logo";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/shared/ui/sheet";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { apiGet } from "@/shared/lib/api";
 
 const SELLER_NAV_ITEMS = [
   { label: "Dashboard", href: "/seller", icon: LayoutDashboard },
   { label: "Products", href: "/seller/products", icon: Package },
   { label: "Orders", href: "/seller/orders", icon: ShoppingCart },
+  { label: "Reviews", href: "/seller/reviews", icon: Star },
   { label: "Wallet", href: "/seller/wallet", icon: Wallet },
 ];
 
@@ -47,6 +50,26 @@ export function SellerNavbar({
   const pathname = usePathname();
   const shortName = getShortName(fullName, email);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const fetchUnread = async () => {
+      try {
+        const res = await apiGet<any[]>("/notifications");
+        if (res.success && res.data) {
+          setUnreadCount(res.data.filter((n: any) => !n.is_read).length);
+        }
+      } catch (e) {
+        console.error("Failed to fetch notifications");
+      }
+    };
+    fetchUnread();
+    
+    // Auto-refresh every 30 seconds
+    const timer = setInterval(fetchUnread, 30000);
+    return () => clearInterval(timer);
+  }, []);
+
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/60 shadow-sm">
@@ -68,7 +91,11 @@ export function SellerNavbar({
             title="Notifications"
           >
             <Bell className="w-5 h-5" />
-            <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-blue-600 ring-2 ring-white"></span>
+            {unreadCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-blue-600 px-1 text-[10px] font-bold text-white ring-2 ring-white">
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
           </Link>
 
           {/* Profile Dropdown Menu */}

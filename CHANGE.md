@@ -131,5 +131,9 @@ All notable changes to the CodeHaat backend project will be documented in this f
 - **High (Blank Screen in Settings)**: Fixed a bug in the Seller Notification Settings (`notifications/page.tsx`) where an uninitialized preferences row resulted in a completely blank page due to a strict null check. The UI now gracefully falls back to default values (Email/Push notifications ON) when no explicit configuration exists.
 - **Medium (Geolocation Error Handling)**: Added robust error handling in `profile.tsx` to display proper feedback messages to the seller if they deny the browser's location permission request (`GeolocationPositionError`).
 
+- **Seller Reviews Dashboard**: Implemented a comprehensive `/seller/reviews` page featuring analytics, average rating aggregation, star distribution, and real-time search. Fully backed by a new `GET /api/seller/reviews` endpoint in the Rust core-engine.
+- **Interactive Notifications**: Upgraded the static notifications page to a Client Component, implementing optimistic UI updates. Added `PUT /api/notifications/read-all` to support "Mark all as read" and individual notification reading without page reloads.
+- **Dynamic Navbar Badge**: Added an unread notifications counter badge to the `SellerNavbar`, which auto-polls every 30 seconds for live updates.
+
 ---
 *End of Changelog.*

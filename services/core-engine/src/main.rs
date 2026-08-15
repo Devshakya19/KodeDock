@@ -177,6 +177,7 @@ async fn main() -> std::io::Result<()> {
             .route("/api/seller/products/{id}", web::put().to(handlers::seller::update_product))
             .route("/api/seller/products/{id}", web::delete().to(handlers::seller::delete_product))
             .route("/api/seller/stats", web::get().to(handlers::seller::get_stats))
+            .route("/api/seller/reviews", web::get().to(handlers::seller::get_seller_reviews))
             // Seller payout account
             .route("/api/seller/payout-account", web::get().to(handlers::payout::get_payout_account))
             .route("/api/seller/payout-account", web::post().to(handlers::payout::create_or_update_payout_account))
@@ -216,6 +217,7 @@ async fn main() -> std::io::Result<()> {
             // Notifications
             .route("/api/notifications", web::get().to(handlers::notifications::list_notifications))
             .route("/api/notifications/{id}/read", web::put().to(handlers::notifications::mark_read))
+            .route("/api/notifications/read-all", web::put().to(handlers::notifications::mark_all_read))
             // Upload (rate-limited)
             .route(
                 "/api/upload/presign",

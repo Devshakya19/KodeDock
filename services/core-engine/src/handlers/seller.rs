@@ -422,3 +422,40 @@ pub async fn get_stats(
 
     HttpResponse::Ok().json(ApiResponse::success(stats, "Stats fetched"))
 }
+
+pub async fn get_seller_reviews(
+    pool: web::Data<PgPool>,
+    req: HttpRequest,
+) -> HttpResponse {
+    let seller_id = match require_developer(&req) {
+        Ok(id) => id,
+        Err(resp) => return resp,
+    };
+
+    let seller_uuid = match uuid::Uuid::parse_str(&seller_id) {
+        Ok(uuid) => uuid,
+        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID")),
+    };
+
+    match sqlx::query_as::<_, crate::models::SellerReviewItem>(
+        r#"SELECT r.id, r.product_id, p.title as product_title, r.user_id,
+                  u.full_name as user_name, u.avatar_url as user_avatar,
+                  r.rating, r.title, r.comment, r.created_at
+           FROM reviews r
+           JOIN products p ON r.product_id = p.id
+           LEFT JOIN profiles u ON r.user_id = u.id
+           WHERE p.seller_id = $1
+           ORDER BY r.created_at DESC
+           LIMIT 100"#
+    )
+    .bind(seller_uuid)
+    .fetch_all(pool.get_ref())
+    .await
+    {
+        Ok(reviews) => HttpResponse::Ok().json(ApiResponse::success(reviews, "Reviews fetched")),
+        Err(e) => {
+            log::error!("Failed to fetch seller reviews: {}", e);
+            HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Database error"))
+        }
+    }
+}
