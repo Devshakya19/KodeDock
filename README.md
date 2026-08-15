@@ -26,11 +26,12 @@
 
 - [Overview](#overview)
 - [How It Works](#how-it-works)
+- [Access & Security](#access--security)
 - [Key Features](#key-features)
 - [Tech Stack](#tech-stack)
 - [Architecture](#architecture)
 - [Service Responsibilities](#service-responsibilities)
-- [Access & Security](#access--security)
+- [Security Mitigations](#security-mitigations)
 - [Documentation](#documentation)
 - [Contributors](#contributors)
 - [License](#license)
@@ -47,41 +48,83 @@ The platform is built on a highly optimized polyglot microservices architecture.
 
 ## How It Works
 
-1. **Sellers Upload:** Developers upload their code repositories or link their private GitHub repos to the platform.
-2. **Buyers Purchase:** Buyers browse the marketplace, review products, and purchase them securely via Razorpay (INR-native).
-3. **Escrow Protection:** Funds are held in a secure database escrow for 7 days. If a dispute is raised, admins intervene. Otherwise, the funds are automatically released to the seller's wallet.
-4. **Instant Delivery:** Upon successful payment, CodeHaat's background infrastructure automatically duplicates the purchased codebase into the buyer's GitHub account as a private repository.
+1. 📤 **Sellers Upload:** Developers upload their code repositories or link their private GitHub repos to the platform.
+2. 🛒 **Buyers Purchase:** Buyers browse the marketplace, review products, and purchase them securely via Razorpay (INR-native).
+3. 🔒 **Escrow Protection:** Funds are held in a secure database escrow for 7 days. If a dispute is raised, admins intervene. Otherwise, the funds are automatically released to the seller's wallet.
+4. 🚀 **Instant Delivery:** Upon successful payment, CodeHaat's background infrastructure automatically duplicates the purchased codebase into the buyer's GitHub account as a private repository.
+
+---
+
+## Access & Security
+
+CodeHaat is designed **security-first** across every layer of the stack. To prevent external tampering, the platform utilizes strict network segmentation and deep defense mechanisms.
+
+### Network Topology & Access
+
+```mermaid
+graph TD
+    classDef public fill:#e53e3e,stroke:#c53030,color:#fff,stroke-width:2px;
+    classDef proxy fill:#3182ce,stroke:#2b6cb0,color:#fff,stroke-width:2px;
+    classDef private fill:#38a169,stroke:#2f855a,color:#fff,stroke-width:2px;
+
+    Internet(("🌐 Public Internet")):::public
+    Proxy["🛡️ Next.js Reverse Proxy\n(Only Exposed Node)"]:::proxy
+    
+    subgraph isolated_network [🔒 Isolated Internal Docker Network]
+        RustCore["⚙️ Rust Core Engine"]:::private
+        PythonAI["🧠 Python AI Service"]:::private
+        GoWorker["🛠️ Go Infra Worker"]:::private
+        DB[("🐘 PostgreSQL")]:::private
+        Redis[("🔥 Redis")]:::private
+        Storage[("☁️ SeaweedFS")]:::private
+    end
+
+    Internet -- "HTTPS (Port 443)" --> Proxy
+    Proxy -- "Internal Routing" --> RustCore
+    RustCore --> DB
+    RustCore --> Redis
+    RustCore --> Storage
+```
+
+- **Public Entry Points:** Only the main web interface (Next.js proxy) and WebSocket endpoints are exposed securely.
+- **Internal Microservices:** All backend services operate exclusively on an **isolated, internal Docker bridge network**. They are completely invisible to the public internet and can only be accessed through authorized internal routing from the proxy.
+- **Database/Cache Isolation:** PostgreSQL, Redis, and SeaweedFS instances do not expose their connection protocols outside the internal container network.
 
 ---
 
 ## Key Features
 
-| Feature | Description |
-|---------|-------------|
-| 🔐 **Secure Authentication** | JWT stored in HttpOnly cookies, Argon2 password hashing, GitHub OAuth, RBAC (user / developer / admin) |
-| 💳 **Razorpay Payments** | INR-native payments, wallet top-ups, lowest platform commission (2.5%) |
-| 🏦 **Seller Payouts** | Bank account & UPI withdrawal with 7-day escrow protection |
-| 📦 **GitHub Delivery** | Code delivered as private repos — not `.zip` files |
-| 🛡️ **Escrow System** | DB-enforced 7-day hold with PostgreSQL row-level locks |
-| 🗄️ **Self-Hosted Storage** | SeaweedFS (S3-compatible) with presigned URL uploads |
-| ⚡ **Real-Time Notifications** | WebSocket push via Redis pub/sub |
-| 🤖 **AI Service** | FastAPI-powered search & personalized recommendations *(in development)* |
+CodeHaat packs powerful features to ensure a premium experience for both buyers and sellers:
+
+| Feature Category | Capabilities & Details |
+|-----------------|------------------------|
+| 🔐 **Identity & Auth** | • **HttpOnly JWTs:** Tokens never exposed to JS.<br>• **Argon2 Hashing:** GPU-resistant password security.<br>• **GitHub OAuth:** 1-click secure onboarding.<br>• **RBAC:** Multi-tier user/developer/admin roles. |
+| 💳 **Fintech & Escrow** | • **Razorpay Integration:** Native INR payments & top-ups.<br>• **Atomic Transactions:** DB-level row locks prevent double spending.<br>• **7-Day Escrow Hold:** Funds held securely to protect buyers.<br>• **Low Commission:** 2.5% platform fee. |
+| 📦 **Code Delivery** | • **GitHub Repo Duplication:** Buyers receive code as private repos, not zip files.<br>• **Deferred Uploads:** Images & assets upload directly to S3 storage via pre-signed URLs only upon publish. |
+| 💬 **Engagement** | • **Real-time Notifications:** WebSockets via Redis Pub/Sub.<br>• **Seller Reviews:** Analytics, average rating, star distributions, and buyer feedback.<br>• **Live Dashboards:** Auto-polling sales counters and wallet balances. |
+| 🤖 **AI Intelligence** | • **Smart Search:** FastAPI-powered semantic searching.<br>• **Personalization:** Algorithmic product recommendations *(In Development)*. |
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology | Version | Purpose |
-|-------|------------|---------|---------|
-| **Frontend** | Next.js, React, TypeScript | Next.js 15 / React 19 | User interface, SSR, SEO |
-| **Styling** | Tailwind CSS, shadcn/ui | Tailwind v4 | Design system |
-| **Core API** | Rust, Actix-Web, SQLx | Rust ≥ 1.70 | API gateway, transactions, auth |
-| **AI Service** | Python, FastAPI | Python 3.11+ | Recommendations, search |
-| **Worker** | Go | Go 1.21+ | Background jobs, GitHub API |
-| **Real-Time** | Node.js, ws | Node.js ≥ 20 | WebSocket notifications |
-| **Database** | PostgreSQL | 16 | Primary data store |
-| **Cache / Queue** | Redis | 7 | Job queues, cache, pub/sub |
-| **Object Storage** | SeaweedFS | 3.76 | S3-compatible media storage |
+We utilize a Polyglot Microservices architecture, selecting the best language for each specific job:
+
+### 🌐 Frontend & UI
+- <img src="https://img.shields.io/badge/Next.js-black?style=flat-square&logo=next.js&logoColor=white" /> **Next.js 15 (React 19)** – Server-Side Rendering (SSR), SEO, and secure API Proxying.
+- <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white" /> **Tailwind CSS v4** & **shadcn/ui** – Premium, glassmorphic design system.
+
+### ⚙️ Backend & Microservices
+- <img src="https://img.shields.io/badge/Rust-000000?style=flat-square&logo=rust&logoColor=white" /> **Rust (Actix-Web & SQLx)** – The Core Engine. Blazing fast, memory-safe handling of payments, auth, and DB transactions.
+- <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" /> **Python (FastAPI)** – AI Service for smart search and data modeling.
+- <img src="https://img.shields.io/badge/Go-00ADD8?style=flat-square&logo=go&logoColor=white" /> **Go** – Infra Worker. Concurrent execution of background tasks and GitHub API automations.
+- <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=node.js&logoColor=white" /> **Node.js (ws)** – High-concurrency WebSocket server for real-time notifications.
+
+### 🗄️ Infrastructure & Storage
+- <img src="https://img.shields.io/badge/PostgreSQL-316192?style=flat-square&logo=postgresql&logoColor=white" /> **PostgreSQL 16** – Primary relational data store with advanced triggers.
+- <img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white" /> **Redis 7** – High-speed caching and inter-service Pub/Sub message broker.
+- <img src="https://img.shields.io/badge/SeaweedFS-005571?style=flat-square&logo=seaweedfs&logoColor=white" /> **SeaweedFS** – S3-compatible, ultra-fast distributed object storage for images and codebase binaries.
+- <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" /> **Docker Compose** – Containerized environment orchestration.
 
 ---
 
@@ -136,33 +179,59 @@ To maintain a secure, decoupled ecosystem, each service acts independently withi
 
 | Service | Technology Focus | Core Responsibility |
 |---------|------------------|---------------------|
-| **Frontend** | TypeScript / Next.js | Serves as the public-facing application and Secure API Proxy. Manages HttpOnly cookies to defend against XSS. |
-| **Core Engine** | Rust / Actix-Web | The heart of the platform. Handles JWT verification, wallet logic, escrow logic, product management, and high-stakes database transactions safely. |
-| **AI Service** | Python / FastAPI | Powers intelligent marketplace features, including semantic search, product recommendations, and fraud detection signals. |
-| **Infra Worker** | Go | Handles long-running background tasks securely, including interacting with the GitHub API to automate repository duplication for buyers. |
-| **Real-Time** | Node.js / ws | Dedicated WebSocket handler. Listens to internal Redis Pub/Sub channels to push real-time notifications to users globally. |
+| 💻 **Frontend Proxy** | TypeScript / Next.js | Serves as the public-facing application and Secure API Proxy. Manages HttpOnly cookies to defend against XSS, shielding backend tokens from browser exposure. |
+| ⚙️ **Core Engine** | Rust / Actix-Web | The heart of the platform. Handles JWT verification, wallet balances, escrow locks, product CRUD, and high-stakes database transactions safely with zero data races. |
+| 🧠 **AI Service** | Python / FastAPI | Powers intelligent marketplace features, including semantic search, product recommendations, and automated fraud detection signals. |
+| 🛠️ **Infra Worker** | Go | Handles long-running background tasks securely, including interacting with the GitHub API to automate repository duplication and syncs for buyers. |
+| ⚡ **Real-Time WS** | Node.js / ws | Dedicated WebSocket handler. Listens to internal Redis Pub/Sub channels to push real-time notifications to users globally with minimal latency. |
 
 ---
 
-## Access & Security
+## Security Mitigations
 
-CodeHaat is designed **security-first** across every layer of the stack. 
+We employ rigorous security measures to protect users, creators, and financial transactions.
 
-### Network Topology & Access
-To prevent external tampering, the platform utilizes strict network segmentation:
-- **Public Entry Points:** Only the main web interface (Next.js proxy) and WebSocket endpoints are exposed securely via a Reverse Proxy.
-- **Internal Microservices:** All backend services (Rust Core, AI, Go Worker, etc.) operate exclusively on an **isolated, internal Docker bridge network**. They are entirely invisible to the public internet and can only be accessed through authorized internal routing.
-- **Database/Cache Isolation:** PostgreSQL, Redis, and SeaweedFS instances do not expose their connection protocols outside the internal container network. 
+```mermaid
+graph LR
+    classDef auth fill:#2b6cb0,stroke:#fff,color:#fff;
+    classDef data fill:#2f855a,stroke:#fff,color:#fff;
+    classDef network fill:#c53030,stroke:#fff,color:#fff;
+    classDef finance fill:#d69e2e,stroke:#fff,color:#fff;
 
-### Security Mitigations
-| Mechanism | Implementation |
-|-----------|----------------|
-| **Password Hashing** | Argon2 (memory-hard, GPU/ASIC-resistant) |
-| **Token Storage** | JWT in HttpOnly cookies — never readable by browser JS |
-| **SQL Injection** | Impossible — SQLx enforces compile-time parameterised queries |
-| **Rate Limiting** | Strict DoS mitigation on auth, uploads, and verification endpoints |
-| **Payment Integrity** | HMAC-SHA256 + constant-time comparison for Razorpay webhooks |
-| **Financial Escrow** | 7-day hold enforced at the database level with atomic `FOR UPDATE` row locks |
+    Shield((🛡️ Security<br>Shield))
+
+    Shield --> Auth[🔐 Authentication]:::auth
+    Auth -.-> JWT(HttpOnly JWTs)
+    Auth -.-> Argon2(Argon2 Hashing)
+    Auth -.-> OAuth(OAuth Validation)
+
+    Shield --> Data[💾 Data Protection]:::data
+    Data -.-> SQL(Compile-time SQL Parameterization)
+    Data -.-> Locks(Database Row-Level Locks)
+    Data -.-> S3(Pre-signed URL Uploads)
+
+    Shield --> Net[🕸️ Network & Traffic]:::network
+    Net -.-> Docker(Isolated Docker Bridges)
+    Net -.-> Proxy(Reverse Proxy Shielding)
+    Net -.-> Rate(Actix Governor Rate Limiting)
+
+    Shield --> Fin[💳 Fintech Security]:::finance
+    Fin -.-> Webhook(HMAC-SHA256 Webhook Verification)
+    Fin -.-> Escrow(7-Day Escrow Hold)
+    Fin -.-> Atomic(Atomic Balance Updates)
+```
+
+### 🛡️ Threat Mitigations Details
+
+| 🚨 Threat Scenario | 🛡️ Mitigation Implementation | 🔍 Deep Dive |
+|-------------------|---------------------------|-------------|
+| **XSS (Cross-Site Scripting)** | **HttpOnly JWTs** | Tokens are completely invisible to browser JavaScript, negating payload extraction. |
+| **Brute Force / Rainbow Tables** | **Argon2 Hashing** | Uses GPU/ASIC-resistant memory-hard hashing for maximum password security. |
+| **SQL Injection (SQLi)** | **SQLx Parameterization** | Enforces compile-time parameterized queries across all Rust handlers; raw strings are never executed. |
+| **DDoS / API Spam** | **Actix-Governor** | Enforces strict, IP-based rate limiting on sensitive endpoints (e.g., Auth, Uploads, Checkout). |
+| **Payment Spoofing** | **HMAC-SHA256 Verification** | Payment webhooks are validated using constant-time string comparison to prevent timing attacks. |
+| **Race Conditions / Double Spends** | **Atomic DB Transactions** | Wallet updates use atomic `FOR UPDATE` row locks in PostgreSQL to ensure sequential ledger updates. |
+| **Malicious File Uploads** | **Pre-signed URLs** | Uploads bypass backend APIs and go directly to SeaweedFS via temporary, size-restricted pre-signed URLs. |
 
 To report a security vulnerability, please email **security@codehaat.com**. See [SECURITY](SECURITY) for our responsible disclosure policy.
 
@@ -170,12 +239,14 @@ To report a security vulnerability, please email **security@codehaat.com**. See 
 
 ## Documentation
 
-| Document | Description |
-|----------|-------------|
-| [API_REFERENCE.md](API_REFERENCE.md) | Full REST API documentation |
-| [SECURITY](SECURITY) | Detailed security architecture & threat mitigations |
-| [CHANGE.md](CHANGE.md) | Project changelog |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Core team & contributors |
+CodeHaat maintains comprehensive documentation for developers, contributors, and auditors.
+
+| Area | Documentation Link | Description |
+|------|-------------------|-------------|
+| 📖 **API** | [API_REFERENCE.md](API_REFERENCE.md) | Complete REST API reference, endpoints, payloads, and response codes. |
+| 🛡️ **Security** | [SECURITY.md](SECURITY.md) | Detailed breakdown of our security architecture, threat models, and policies. |
+| 📝 **Changelog** | [CHANGE.md](CHANGE.md) | Ongoing log of platform updates, bug fixes, and feature additions. |
+| 🤝 **Contributing** | [CONTRIBUTING.md](CONTRIBUTING.md) | Guidelines for contributing code, architecture standards, and team info. |
 
 ---
 
@@ -193,7 +264,7 @@ This project is **proprietary software** owned by CodeHaat. All rights reserved.
 
 - Unauthorized copying, cloning, or distribution is **strictly prohibited**
 - See [LICENSE](LICENSE) for the complete license agreement
-- Licensing inquiries: **legal@codehaat.com**
+- Licensing inquiries: **legal@codehaat.me**
 
 ---
 
