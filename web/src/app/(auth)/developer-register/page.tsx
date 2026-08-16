@@ -21,6 +21,8 @@ export default function DeveloperRegisterPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [githubUsername, setGithubUsername] = useState("");
+  const [techStack, setTechStack] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -32,12 +34,23 @@ export default function DeveloperRegisterPage() {
     setError("");
 
     try {
-      await auth.signUp({
+      const user = await auth.signUp({
         email,
         password,
         fullName,
         role: "developer",
       });
+
+      if (githubUsername || techStack) {
+        const { apiPut } = await import("@/lib/api/client");
+        await apiPut("/profile", {
+          id: user.user.id, // AuthResponse returns { user: User }
+          full_name: fullName,
+          github_username: githubUsername || "",
+          bio: techStack ? `Tech Stack: ${techStack}` : "",
+        });
+      }
+
       setSuccess(true);
     } catch (err: any) {
       setError(err.message || "Registration failed");
@@ -129,6 +142,38 @@ export default function DeveloperRegisterPage() {
                 required
                 className="h-11 border-slate-300 bg-white"
               />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="githubUsername" className="block text-sm font-medium text-slate-700 mb-1.5">
+                  GitHub Username
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium">@</span>
+                  <Input
+                    id="githubUsername"
+                    type="text"
+                    placeholder="username"
+                    value={githubUsername}
+                    onChange={(e) => setGithubUsername(e.target.value)}
+                    className="h-11 border-slate-300 bg-white pl-8"
+                  />
+                </div>
+              </div>
+              <div>
+                <label htmlFor="techStack" className="block text-sm font-medium text-slate-700 mb-1.5">
+                  Primary Skill
+                </label>
+                <Input
+                  id="techStack"
+                  type="text"
+                  placeholder="e.g. React, Node.js, Rust"
+                  value={techStack}
+                  onChange={(e) => setTechStack(e.target.value)}
+                  className="h-11 border-slate-300 bg-white"
+                />
+              </div>
             </div>
 
             <div>
