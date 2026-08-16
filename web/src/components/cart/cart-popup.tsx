@@ -26,6 +26,8 @@ interface Props {
   onClose: () => void;
 }
 
+import { PopupWrapper } from "@/components/ui/popup-wrapper";
+
 export function CartPopup({ onClose }: Props) {
   const [items, setItems] = useState<CartItem[]>([]);
 
@@ -39,25 +41,13 @@ export function CartPopup({ onClose }: Props) {
 
   const total = items.reduce((sum, item) => sum + item.price_paise, 0);
 
-  useEffect(() => {
-    const h = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    document.addEventListener("keydown", h);
-    return () => document.removeEventListener("keydown", h);
-  }, [onClose]);
-
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-end bg-black/30" onClick={onClose}>
-      <div className="mt-16 mr-4 w-80 bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[80vh]" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
-          <div className="flex items-center gap-2">
-            <ShoppingCart className="w-4 h-4 text-slate-600" />
-            <span className="text-sm font-semibold text-slate-950">Cart</span>
-            {items.length > 0 && <span className="text-xs text-slate-400">({items.length})</span>}
-          </div>
-          <button onClick={onClose} className="w-6 h-6 rounded-full hover:bg-slate-100 flex items-center justify-center">
-            <X className="w-3.5 h-3.5 text-slate-400" />
-          </button>
-        </div>
+    <PopupWrapper 
+      title="Cart" 
+      icon={ShoppingCart} 
+      onClose={onClose}
+      headerRight={items.length > 0 && <span className="text-xs text-slate-400">({items.length})</span>}
+    >
 
         {items.length === 0 ? (
           <div className="py-10 text-center">
@@ -108,7 +98,6 @@ export function CartPopup({ onClose }: Props) {
             </div>
           </>
         )}
-      </div>
-    </div>
+    </PopupWrapper>
   );
 }

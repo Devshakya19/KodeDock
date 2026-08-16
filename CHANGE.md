@@ -136,7 +136,7 @@ All notable changes to the CodeHaat backend project will be documented in this f
 - **Dynamic Navbar Badge**: Added an unread notifications counter badge to the `SellerNavbar`, which auto-polls every 30 seconds for live updates.
 
 
-## [2026-08-16] - Buyer Dashboard UI/UX Redesign & Navbar Updates
+## [2026-08-17] - Buyer Dashboard UI/UX Redesign & Navbar Updates
 
 ### 🎨 UI/UX Redesigns & Enhancements
 - **Buyer Dashboard (`/dashboard`):**
@@ -151,6 +151,13 @@ All notable changes to the CodeHaat backend project will be documented in this f
   - **Buyer Profile Dropdown:** 
     - Removed the "My Profile" button.
     - Expanded functionality by adding quick access links for **Downloads & Licenses**, **Wishlist**, and **Billing & Invoices**.
+
+### 🧹 Technical Debt & Code Cleanup
+- **Dependency Optimization:** Uninstalled unused heavy 3D packages (`@react-three/drei`, `@react-three/fiber`, `three`) to drastically reduce `node_modules` size and prevent build bloat.
+- **Frontend Code Deduplication:**
+  - **Popups:** Extracted identical UI logic from `CartPopup`, `NotificationPopup`, and `WalletPopup` into a central `<PopupWrapper />` component.
+  - **Profile Settings:** Verified that the Buyer and Seller Profile Settings pages now use a central `ProfileSettings` component and a highly modular `useProfile` React hook to avoid redundant API calls and form logic.
+  - Updated `duplicate.md` to reflect resolved components.
 
 
 ---
