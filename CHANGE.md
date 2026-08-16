@@ -135,5 +135,23 @@ All notable changes to the CodeHaat backend project will be documented in this f
 - **Interactive Notifications**: Upgraded the static notifications page to a Client Component, implementing optimistic UI updates. Added `PUT /api/notifications/read-all` to support "Mark all as read" and individual notification reading without page reloads.
 - **Dynamic Navbar Badge**: Added an unread notifications counter badge to the `SellerNavbar`, which auto-polls every 30 seconds for live updates.
 
+
+## [2026-08-16] - Buyer Dashboard UI/UX Redesign & Navbar Updates
+
+### 🎨 UI/UX Redesigns & Enhancements
+- **Buyer Dashboard (`/dashboard`):**
+  - Completely overhauled the UI to feature a premium, spacious layout (`max-w-6xl`) with modern rounded cards (`rounded-[24px]`).
+  - Upgraded generic icons to semantic `lucide-react` icons (`ShoppingBag`, `CreditCard`, `Sparkles`, `Clock`).
+  - Redesigned the Wallet card with a dark luxury theme and subtle glowing blur effects.
+  - Enhanced the "Become a Seller" CTA with an indigo-to-blue gradient and dynamic background icons.
+  - Implemented interactive hover states (lifting and shadow changes) for a dynamic design experience.
+- **Global Navbar (`navbar.tsx`):**
+  - Removed redundant navigation pills ("Dashboard", "Purchases", "Browse") and the "Buyer" badge from the desktop view for a cleaner look.
+  - Simplified mobile menu by removing unused buyer dashboard links.
+  - **Buyer Profile Dropdown:** 
+    - Removed the "My Profile" button.
+    - Expanded functionality by adding quick access links for **Downloads & Licenses**, **Wishlist**, and **Billing & Invoices**.
+
+
 ---
 *End of Changelog.*

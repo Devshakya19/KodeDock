@@ -5,7 +5,8 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import {
   Search, Menu, ShoppingCart, Bell, Wallet, User, Package, ChevronDown,
-  Settings, LogOut, LayoutDashboard, LifeBuoy, Store, Star, Sparkles
+  Settings, LogOut, LayoutDashboard, LifeBuoy, Store, Star, Sparkles,
+  Heart, Download, FileText
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -146,6 +147,8 @@ export function Navbar({ variant, email, fullName, searchQuery = "" }: NavbarPro
             <>
               <Link href="/dashboard" onClick={() => setProfileDropdownOpen(false)} className="flex items-center gap-3 px-3 py-2.5 text-[14px] font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors"><LayoutDashboard className="w-[18px] h-[18px] text-slate-400" /> Buyer Dashboard</Link>
               <Link href="/dashboard/purchases" onClick={() => setProfileDropdownOpen(false)} className="flex items-center gap-3 px-3 py-2.5 text-[14px] font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors"><Package className="w-[18px] h-[18px] text-slate-400" /> My Purchases</Link>
+              <Link href="/dashboard/downloads" onClick={() => setProfileDropdownOpen(false)} className="flex items-center gap-3 px-3 py-2.5 text-[14px] font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors"><Download className="w-[18px] h-[18px] text-slate-400" /> Downloads & Licenses</Link>
+              <Link href="/dashboard/wishlist" onClick={() => setProfileDropdownOpen(false)} className="flex items-center gap-3 px-3 py-2.5 text-[14px] font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors"><Heart className="w-[18px] h-[18px] text-slate-400" /> Wishlist</Link>
               <Link href="/dashboard/wallet" onClick={() => setProfileDropdownOpen(false)} className="flex items-center gap-3 px-3 py-2.5 text-[14px] font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors"><Wallet className="w-[18px] h-[18px] text-slate-400" /> Wallet & Transactions</Link>
             </>
           )}
@@ -161,7 +164,7 @@ export function Navbar({ variant, email, fullName, searchQuery = "" }: NavbarPro
             </>
           ) : (
             <>
-              <Link href="/dashboard/profile" onClick={() => setProfileDropdownOpen(false)} className="flex items-center gap-3 px-3 py-2.5 text-[14px] font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors"><User className="w-[18px] h-[18px] text-slate-400" /> My Profile</Link>
+              <Link href="/dashboard/billing" onClick={() => setProfileDropdownOpen(false)} className="flex items-center gap-3 px-3 py-2.5 text-[14px] font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors"><FileText className="w-[18px] h-[18px] text-slate-400" /> Billing & Invoices</Link>
               <Link href="/dashboard/settings" onClick={() => setProfileDropdownOpen(false)} className="flex items-center gap-3 px-3 py-2.5 text-[14px] font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors"><Settings className="w-[18px] h-[18px] text-slate-400" /> Account Settings</Link>
               <Link href="/contact" onClick={() => setProfileDropdownOpen(false)} className="flex items-center gap-3 px-3 py-2.5 text-[14px] font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors"><LifeBuoy className="w-[18px] h-[18px] text-slate-400" /> Help Center</Link>
             </>
@@ -185,11 +188,6 @@ export function Navbar({ variant, email, fullName, searchQuery = "" }: NavbarPro
           
           <div className="flex items-center gap-2.5 shrink-0">
             <CodeHaatLogo href={variant === "seller" ? "/seller" : variant === "dashboard" ? "/dashboard" : "/browse"} />
-            {variant === "dashboard" && (
-              <span className="hidden lg:inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-50/80 border border-blue-100 text-[11px] font-bold text-blue-600 tracking-wide uppercase">
-                <Sparkles className="w-3 h-3 text-blue-500" /> Buyer
-              </span>
-            )}
           </div>
 
           {variant === "browse" && (
@@ -206,20 +204,7 @@ export function Navbar({ variant, email, fullName, searchQuery = "" }: NavbarPro
             </div>
           )}
 
-          {variant === "dashboard" && (
-            <div className="hidden md:flex items-center justify-center gap-1 bg-slate-200/40 p-1 rounded-full border border-slate-200/60 shadow-inner">
-              {BUYER_NAV_PILLS.map((item) => {
-                const isActive = item.href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(item.href);
-                return (
-                  <Link key={item.href} href={item.href} className={`flex items-center gap-2 px-4 py-2 text-[13px] font-bold rounded-full transition-all duration-200 ${isActive ? "bg-white text-slate-900 shadow-sm shadow-slate-900/5 ring-1 ring-slate-200/50" : "text-slate-500 hover:text-slate-900 hover:bg-white/50"}`}>
-                    <item.icon className={`w-4 h-4 ${isActive ? "text-blue-600" : "text-slate-400"}`} />
-                    <span className="hidden lg:inline">{item.label}</span>
-                    <span className="lg:hidden" title={item.label}>{item.label}</span>
-                  </Link>
-                );
-              })}
-            </div>
-          )}
+          {variant === "dashboard" && <div className="hidden md:flex flex-1" />}
           
           {variant === "seller" && <div className="hidden md:flex flex-1" />}
 
@@ -319,9 +304,6 @@ export function Navbar({ variant, email, fullName, searchQuery = "" }: NavbarPro
                         })
                       ) : (
                         <>
-                          <Link href="/dashboard" onClick={closeMobile} className="flex items-center gap-3 px-4 py-3.5 rounded-2xl text-[14px] font-bold text-slate-700 hover:bg-slate-50 transition-all"><User className="w-4.5 h-4.5 text-slate-400" /> Dashboard</Link>
-                          <Link href="/dashboard/purchases" onClick={closeMobile} className="flex items-center gap-3 px-4 py-3.5 rounded-2xl text-[14px] font-bold text-slate-700 hover:bg-slate-50 transition-all"><Package className="w-4.5 h-4.5 text-slate-400" /> My Purchases</Link>
-                          {variant === "dashboard" && <Link href="/browse" onClick={closeMobile} className="flex items-center gap-3 px-4 py-3.5 rounded-2xl text-[14px] font-bold text-slate-700 hover:bg-slate-50 transition-all"><Store className="w-4.5 h-4.5 text-slate-400" /> Browse Shop</Link>}
                           {variant === "browse" && (
                             <>
                               <button onClick={() => { setShowCart(true); closeMobile(); }} className="flex items-center gap-3 w-full px-4 py-3.5 rounded-2xl text-[14px] font-bold text-slate-700 hover:bg-slate-50 transition-all text-left">
