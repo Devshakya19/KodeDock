@@ -1,9 +1,9 @@
 import { Navbar } from "@/components/landing/navbar";
 import { Footer } from "@/components/landing/footer";
-import { DevHero } from "@/app/(shop)/developer/components/dev-hero";
-import { DevBenefits } from "@/app/(shop)/developer/components/dev-benefits";
-import { DevCommission } from "@/app/(shop)/developer/components/dev-commission";
-import { DevCTA } from "@/app/(shop)/developer/components/dev-cta";
+import { DevHero } from "@/app/(company)/developer/components/dev-hero";
+import { DevBenefits } from "@/app/(company)/developer/components/dev-benefits";
+import { DevCommission } from "@/app/(company)/developer/components/dev-commission";
+import { DevCTA } from "@/app/(company)/developer/components/dev-cta";
 
 export default function DeveloperPage() {
   return (
