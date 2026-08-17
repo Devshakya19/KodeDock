@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Search, Menu, ShoppingCart, Bell, Wallet, User, Package, ChevronDown,
@@ -45,14 +45,15 @@ function getCartCount(): number {
 
 interface NavbarProps {
   variant: "browse" | "dashboard" | "seller";
-  email: string;
+  email?: string;
   fullName?: string;
   searchQuery?: string;
 }
 
-export function Navbar({ variant, email, fullName, searchQuery = "" }: NavbarProps) {
+export function Navbar({ variant, email = "", fullName, searchQuery = "" }: NavbarProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const shortName = getShortName(fullName, email);
   
   // States
@@ -61,7 +62,7 @@ export function Navbar({ variant, email, fullName, searchQuery = "" }: NavbarPro
   const [mobileOpen, setMobileOpen] = useState(false);
   
   // Variant specific states
-  const [search, setSearch] = useState(searchQuery);
+  const [search, setSearch] = useState(searchParams?.get("search") || searchQuery);
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
   const [cartCount, setCartCount] = useState(0);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -184,52 +185,55 @@ export function Navbar({ variant, email, fullName, searchQuery = "" }: NavbarPro
   return (
     <>
       <header className={`sticky top-0 z-50 transition-all duration-200 ${scrolled ? "bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-200/50" : "bg-[#F8FAFC] border-b border-transparent"}`}>
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 md:h-20 flex items-center justify-between gap-4 md:gap-8">
+        <nav className="w-full px-4 sm:px-6 lg:px-10 xl:px-14 h-16 md:h-20 flex items-center justify-between">
           
-          <div className="flex items-center gap-2.5 shrink-0">
+          {/* LEFT: Logo */}
+          <div className="flex items-center flex-1 min-w-0">
             <CodeHaatLogo href={variant === "seller" ? "/seller" : variant === "dashboard" ? "/dashboard" : "/browse"} />
           </div>
 
-          {variant === "browse" && (
-            <div className="hidden md:flex flex-1 max-w-2xl mx-auto">
+          {/* MIDDLE: Search */}
+          {(variant === "browse" || variant === "dashboard") && (
+            <div className="hidden md:flex w-full max-w-[500px] lg:max-w-[600px] px-4">
               <form onSubmit={handleSearch} className="relative w-full group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <Search className="w-4 h-4 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
                 </div>
-                <Input placeholder="Search templates, UI kits, projects..." value={search} onChange={(e) => setSearch(e.target.value)} className="h-12 pl-11 pr-24 rounded-full border-slate-200/60 bg-white/60 focus:bg-white shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)] focus-visible:ring-4 focus-visible:ring-blue-600/10 focus-visible:border-blue-600 transition-all text-[15px] font-medium" />
+                <Input placeholder="Search templates, UI kits, projects..." value={search} onChange={(e) => setSearch(e.target.value)} className="h-11 md:h-12 pl-11 pr-24 rounded-full border-slate-200/60 bg-white/60 focus:bg-white shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)] focus-visible:ring-4 focus-visible:ring-blue-600/10 focus-visible:border-blue-600 transition-all text-[15px] font-medium" />
                 <div className="absolute inset-y-0 right-1.5 flex items-center">
-                  <Button type="submit" size="sm" className="h-9 px-5 rounded-full bg-slate-900 text-white text-[13px] font-bold hover:bg-blue-600 shadow-sm hover:shadow-blue-600/20 transition-all">Search</Button>
+                  <Button type="submit" size="sm" className="h-8 md:h-9 px-4 md:px-5 rounded-full bg-slate-900 text-white text-[13px] font-bold hover:bg-blue-600 shadow-sm hover:shadow-blue-600/20 transition-all">Search</Button>
                 </div>
               </form>
             </div>
           )}
-
-          {variant === "dashboard" && <div className="hidden md:flex flex-1" />}
           
-          {variant === "seller" && <div className="hidden md:flex flex-1" />}
+          {variant === "seller" && <div className="hidden md:flex w-full max-w-[500px] lg:max-w-[600px] px-4" />}
 
-          <div className="hidden md:flex items-center gap-3 shrink-0">
-            {variant === "browse" && (
-              <>
-                <button onClick={() => setShowWallet(true)} className="flex items-center gap-2 px-3 py-2 rounded-full bg-emerald-50/80 border border-emerald-100 hover:bg-emerald-100 transition-colors cursor-pointer group">
-                  <div className="w-6 h-6 rounded-full bg-emerald-200/50 flex items-center justify-center"><Wallet className="w-3.5 h-3.5 text-emerald-700" /></div>
-                  <div className="flex items-center pr-1">
-                    {walletBalance !== null ? <span className="text-[14px] font-bold text-emerald-900 tracking-tight">₹{(walletBalance / 100).toLocaleString()}</span> : <span className="text-[14px] font-bold text-emerald-900/50 tracking-tight">...</span>}
+          {/* RIGHT: Actions */}
+          <div className="hidden md:flex items-center justify-end gap-3 lg:gap-4 flex-1 min-w-0">
+            {(variant === "browse" || variant === "dashboard") && (
+              <div className="flex items-center gap-3 bg-white px-2 py-1.5 rounded-full border border-slate-200/60 shadow-sm">
+                <button onClick={() => setShowWallet(true)} className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50/80 border border-emerald-100 hover:bg-emerald-100 transition-colors cursor-pointer group">
+                  <div className="w-5 h-5 rounded-full bg-emerald-200/50 flex items-center justify-center"><Wallet className="w-3 h-3 text-emerald-700" /></div>
+                  <div className="flex items-center">
+                    {walletBalance !== null ? <span className="text-[13px] font-bold text-emerald-900 tracking-tight">₹{(walletBalance / 100).toLocaleString()}</span> : <span className="text-[13px] font-bold text-emerald-900/50 tracking-tight">...</span>}
                   </div>
                 </button>
-                <div className="w-px h-6 bg-slate-200/80 mx-1" />
-                <button onClick={() => setShowCart(true)} className="relative flex items-center justify-center w-10 h-10 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer">
-                  <ShoppingCart className="w-4.5 h-4.5" />
-                  {cartCount > 0 && <span className="absolute top-1.5 right-1 w-4 h-4 rounded-full bg-blue-600 text-white text-[10px] font-bold flex items-center justify-center shadow-sm ring-2 ring-white">{cartCount}</span>}
+                <div className="w-px h-5 bg-slate-200/80" />
+                <button onClick={() => setShowCart(true)} className="relative flex items-center justify-center w-8 h-8 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer">
+                  <ShoppingCart className="w-4 h-4" />
+                  {cartCount > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-blue-600 text-white text-[10px] font-bold flex items-center justify-center shadow-sm ring-2 ring-white">{cartCount}</span>}
                 </button>
-                <button onClick={() => setShowNotifications(true)} className="flex items-center justify-center w-10 h-10 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"><Bell className="w-4.5 h-4.5" /></button>
-              </>
+                <button onClick={() => setShowNotifications(true)} className="relative flex items-center justify-center w-8 h-8 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer">
+                  <Bell className="w-4 h-4" />
+                </button>
+              </div>
             )}
 
-            {(variant === "dashboard" || variant === "seller") && (
-              <Link href="/notifications" className="flex items-center justify-center w-10 h-10 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer relative mr-2">
+            {variant === "seller" && (
+              <Link href="/notifications" className="flex items-center justify-center w-10 h-10 rounded-full text-slate-500 hover:text-slate-900 hover:bg-white border border-transparent hover:border-slate-200/60 transition-colors cursor-pointer relative shadow-sm">
                 <Bell className="w-4.5 h-4.5" />
-                {variant === "seller" && unreadCount > 0 && <span className="absolute top-1.5 right-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-blue-600 px-1 text-[10px] font-bold text-white ring-2 ring-white">{unreadCount > 99 ? '99+' : unreadCount}</span>}
+                {unreadCount > 0 && <span className="absolute -top-1 -right-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-blue-600 px-1 text-[10px] font-bold text-white ring-2 ring-white">{unreadCount > 99 ? '99+' : unreadCount}</span>}
               </Link>
             )}
 
@@ -244,7 +248,7 @@ export function Navbar({ variant, email, fullName, searchQuery = "" }: NavbarPro
           </div>
 
           <div className="flex md:hidden items-center gap-2 shrink-0">
-            {variant === "browse" && (
+            {(variant === "browse" || variant === "dashboard") && (
               <button onClick={() => setShowCart(true)} className="relative flex items-center justify-center w-10 h-10 rounded-full bg-white text-slate-600 hover:bg-slate-50 border border-slate-200/60 shadow-sm">
                 <ShoppingCart className="w-4 h-4" />
                 {cartCount > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-blue-600 text-white text-[10px] font-bold flex items-center justify-center shadow-sm ring-2 ring-white">{cartCount}</span>}
@@ -269,7 +273,7 @@ export function Navbar({ variant, email, fullName, searchQuery = "" }: NavbarPro
                       </div>
                     </Link>
                     
-                    {variant === "browse" && (
+                    {(variant === "browse" || variant === "dashboard") && (
                       <button onClick={() => { setShowWallet(true); closeMobile(); }} className="mt-6 flex items-center justify-between w-full p-3.5 rounded-2xl bg-emerald-50 border border-emerald-100">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-emerald-200/50 flex items-center justify-center"><Wallet className="w-4 h-4 text-emerald-700" /></div>
@@ -304,7 +308,7 @@ export function Navbar({ variant, email, fullName, searchQuery = "" }: NavbarPro
                         })
                       ) : (
                         <>
-                          {variant === "browse" && (
+                          {(variant === "browse" || variant === "dashboard") && (
                             <>
                               <button onClick={() => { setShowCart(true); closeMobile(); }} className="flex items-center gap-3 w-full px-4 py-3.5 rounded-2xl text-[14px] font-bold text-slate-700 hover:bg-slate-50 transition-all text-left">
                                 <ShoppingCart className="w-4.5 h-4.5 text-slate-400" /> Cart {cartCount > 0 && <span className="ml-auto bg-blue-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">{cartCount}</span>}
@@ -323,7 +327,6 @@ export function Navbar({ variant, email, fullName, searchQuery = "" }: NavbarPro
                         <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-4 mb-3">Quick Links</p>
                         {variant === "seller" && <Link href="/browse" onClick={closeMobile} className="flex items-center gap-3.5 px-4 py-3 text-[15px] font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-2xl transition-colors"><Store className="w-5 h-5 text-slate-400" /> Browse Shop</Link>}
                         <Link href={variant === "seller" ? "/seller/settings" : "/dashboard/settings"} onClick={closeMobile} className={`flex items-center gap-3.5 px-4 py-3 text-[15px] font-medium rounded-2xl transition-colors ${pathname.startsWith(variant === "seller" ? "/seller/settings" : "/dashboard/settings") ? "bg-slate-100 text-slate-900 font-bold" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"}`}><Settings className="w-5 h-5 text-slate-400" /> Account Settings</Link>
-                        {variant === "dashboard" && <Link href="/notifications" onClick={closeMobile} className="flex items-center gap-3.5 px-4 py-3 text-[15px] font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-2xl transition-colors"><Bell className="w-5 h-5 text-slate-400" /> Notifications</Link>}
                       </div>
                     )}
                   </div>
