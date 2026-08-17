@@ -20,8 +20,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Fetch contributors using GitHub CLI (built-in on runners)
-          CONTRIBUTORS_HTML=$(gh api repos/${{ github.repository }}/contributors --jq 'map("<a href=\"" + .html_url + "\"><img src=\"" + .avatar_url + "&s=64\" width=\"64px;\" alt=\"" + .login + "\"/></a>") | join(" ")')
+          # Fetch contributors using GitHub CLI (built-in on runners) and filter out bots
+          CONTRIBUTORS_HTML=$(gh api repos/${{ github.repository }}/contributors --jq 'map(select(.type == "User")) | map("<a href=\"" + .html_url + "\"><img src=\"" + .avatar_url + "&s=64\" width=\"64px;\" alt=\"" + .login + "\"/></a>") | join(" ")')
           
           # HTML Block to inject (Left aligned)
           INJECTION="<p align=\"left\">\n  $CONTRIBUTORS_HTML\n</p>"
