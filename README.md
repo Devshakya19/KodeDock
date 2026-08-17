@@ -253,7 +253,7 @@ CodeHaat maintains comprehensive documentation for developers, contributors, and
 ## Contributors
 
 <a href="https://github.com/Devshakya19/CodeHaat/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Devshakya19/CodeHaat" alt="CodeHaat Contributors" />
+  <img src="https://contrib.rocks/image?repo=Devshakya19/CodeHaat&v=1" alt="CodeHaat Contributors" />
 </a>
 
 ---
