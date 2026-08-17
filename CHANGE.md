@@ -180,5 +180,17 @@ All notable changes to the CodeHaat backend project will be documented in this f
 - **Distributed Tracing:**
   - Injected a cryptographically generated `x-request-id` into all incoming requests and responses for advanced observability across the Next.js frontend and Rust backend.
 
+### 🤖 Agent Guidelines & Open Source Workflows
+- **CodeHaat Agent Guidelines:** Created `AGENT.md` strictly enforcing project architecture constraints, Next.js framework conventions, security priorities, and styling rules.
+- **Dynamic Contributors Automation:** Replaced static third-party `contrib.rocks` images with a custom GitHub Action (`.github/workflows/contributors.yml`) utilizing `gh api` to automatically generate and inject real, bot-filtered contributor avatars directly into `README.md` and `CONTRIBUTING.md` upon merge to `main`.
+
+### 🎨 Seller Dashboard UI Consistency
+- **Fluid Layout Migration:** Upgraded the Seller Dashboard layout (`(seller)/seller/layout.tsx`) to match the new fluid, edge-to-edge constraint used in the Buyer layout (`w-full px-4 sm:px-6 lg:px-10 xl:px-14 py-4 md:py-8`).
+- **Container Cleanup:** Extensively refactored all seller sub-pages by stripping out redundant hardcoded wrappers (`max-w-7xl`, `mx-auto`) and enforcing 100% fluid widths, allowing pages to perfectly inherit the parent layout's responsive padding.
+
+### 🐛 Bug Fixes
+- **Local Dev RSC Fetch Failure:** Removed the strict `upgrade-insecure-requests` directive from the development Content-Security-Policy in `middleware.ts`. This resolves local HTTP connection refusals and `TypeError: Failed to fetch` errors occurring during RSC payload fetches post-logout.
+- **Next.js Image Optimizations:** Added missing `qualities: [75, 90]` configuration in `next.config.ts` and injected a `sizes` prop into the Auth background image to resolve Next.js framework warnings.
+
 ---
 *End of Changelog.*

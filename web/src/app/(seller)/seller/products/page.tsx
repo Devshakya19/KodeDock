@@ -128,7 +128,7 @@ export default function ProductsPage() {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="w-full">
         <div className="flex items-center justify-center py-20">
           <RefreshCw className="w-6 h-6 text-slate-300 animate-spin" />
         </div>
@@ -137,7 +137,7 @@ export default function ProductsPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div className="w-full">
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-10">
         <div>

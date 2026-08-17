@@ -172,7 +172,7 @@ export default function SellerWalletPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6">
+    <div className="w-full">
 
 
       {/* Page Header */}

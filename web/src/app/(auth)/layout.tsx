@@ -13,7 +13,8 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           <Image 
             src="/images/auth-bg.jpg" 
             alt="Premium Abstract Background" 
-            fill 
+            fill
+            sizes="(min-width: 1024px) 45vw, 100vw"
             priority
             className="object-cover object-center opacity-40"
             quality={90}

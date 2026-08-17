@@ -75,14 +75,14 @@ export default function SellerReviewsPage() {
 
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto px-4 py-16 flex items-center justify-center">
+      <div className="w-full py-16 flex items-center justify-center">
         <RefreshCw className="w-6 h-6 text-slate-400 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 font-sans">
+    <div className="w-full font-sans">
       {/* Header & Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>

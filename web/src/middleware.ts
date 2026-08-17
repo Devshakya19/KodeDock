@@ -45,7 +45,6 @@ export async function middleware(request: NextRequest) {
     base-uri 'self';
     form-action 'self';
     frame-ancestors 'none';
-    upgrade-insecure-requests;
   `;
   // Replace newlines and extra spaces to form a valid header string
   response.headers.set("Content-Security-Policy", cspHeader.replace(/\s{2,}/g, " ").trim());
