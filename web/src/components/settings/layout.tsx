@@ -46,19 +46,21 @@ export function SettingsLayout({ children, basePath, backLink }: SettingsLayoutP
   ];
 
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <div className="w-full pb-12 pt-4">
       {/* Header */}
-      <div className="mb-8">
-        <Link href={backLink} className="inline-flex items-center gap-2 text-[13px] font-semibold text-slate-500 hover:text-slate-900 mb-4 transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Back
-        </Link>
-        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Account Settings</h1>
-        <p className="text-slate-500 mt-1 text-[15px]">Manage your profile, security, and preferences</p>
+      <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <Link href={backLink} className="inline-flex items-center gap-2 text-[13px] font-bold text-slate-500 hover:text-slate-900 mb-5 transition-all group">
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back to Dashboard
+          </Link>
+          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mb-2">Account Settings</h1>
+          <p className="text-slate-500 font-medium text-[15px]">Manage your profile, security, and preferences</p>
+        </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8">
+      <div className="flex flex-col lg:flex-row gap-10 xl:gap-16">
         {/* Sidebar Navigation */}
-        <nav className="flex-shrink-0 w-full lg:w-72 space-y-1">
+        <nav className="flex-shrink-0 w-full lg:w-72 space-y-2">
           {navItems.map((item) => {
             const isActive = pathname.startsWith(item.href);
             const Icon = item.icon;
@@ -67,22 +69,29 @@ export function SettingsLayout({ children, basePath, backLink }: SettingsLayoutP
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-start gap-4 p-4 rounded-2xl transition-all ${
+                className={`flex items-start gap-4 p-4 rounded-2xl transition-all group relative overflow-hidden ${
                   isActive 
-                    ? "bg-white shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100" 
-                    : "hover:bg-slate-50 border border-transparent"
+                    ? "bg-slate-900 text-white shadow-xl shadow-slate-900/10" 
+                    : "hover:bg-slate-50 text-slate-600 hover:text-slate-900 border border-transparent"
                 }`}
               >
-                <div className={`mt-0.5 w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                  isActive ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-500"
+                {isActive && (
+                  <div className="absolute top-0 right-0 p-4 opacity-10">
+                    <Icon className="w-24 h-24 -rotate-12 translate-x-8 -translate-y-8" />
+                  </div>
+                )}
+                
+                <div className={`relative z-10 mt-0.5 w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+                  isActive ? "bg-white/20 text-white backdrop-blur-md border border-white/20" : "bg-slate-100 text-slate-500 group-hover:bg-white group-hover:shadow-sm"
                 }`}>
                   <Icon className="w-5 h-5" />
                 </div>
-                <div>
-                  <h3 className={`text-[15px] font-bold ${isActive ? "text-slate-900" : "text-slate-700"}`}>
+                
+                <div className="relative z-10">
+                  <h3 className={`text-[15px] font-bold ${isActive ? "text-white" : "text-slate-900"}`}>
                     {item.name}
                   </h3>
-                  <p className="text-[13px] text-slate-500 font-medium mt-0.5 leading-snug">
+                  <p className={`text-[13px] font-medium mt-0.5 leading-snug ${isActive ? "text-slate-300" : "text-slate-500"}`}>
                     {item.description}
                   </p>
                 </div>
@@ -93,7 +102,9 @@ export function SettingsLayout({ children, basePath, backLink }: SettingsLayoutP
 
         {/* Content Area */}
         <div className="flex-1">
-          {children}
+          <div className="max-w-3xl">
+            {children}
+          </div>
         </div>
       </div>
     </div>

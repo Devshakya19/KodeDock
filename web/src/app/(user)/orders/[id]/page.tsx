@@ -56,14 +56,6 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
 
   return (
     <div className="flex-1">
-      <header className="border-b border-slate-200 bg-white">
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center">
-          <Link href={isBuyer ? "/dashboard/purchases" : "/seller/orders"} className="flex items-center gap-2 text-slate-600 hover:text-slate-950">
-            <ArrowLeft className="w-4 h-4" />
-            <span className="text-sm font-medium">Back to {isBuyer ? "Purchases" : "Orders"}</span>
-          </Link>
-        </nav>
-      </header>
 
       <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Card className="border-slate-200">

@@ -31,7 +31,7 @@ export default async function DashboardLayout({
         email={email}
         fullName={fullName}
       />
-      <main className="max-w-7xl mx-auto p-4 md:p-8">
+      <main className="w-full px-4 sm:px-6 lg:px-10 xl:px-14 py-4 md:py-8">
         {children}
       </main>
     </div>

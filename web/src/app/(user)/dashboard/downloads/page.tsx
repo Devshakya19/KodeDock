@@ -11,7 +11,7 @@ export default async function DownloadsPage() {
   const downloads: any[] = [];
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="w-full">
       {/* Header */}
       <div className="mb-10">
         <Link href="/dashboard" className="inline-flex items-center gap-2 text-[13px] font-semibold text-slate-500 hover:text-slate-900 mb-6 transition-colors group">
