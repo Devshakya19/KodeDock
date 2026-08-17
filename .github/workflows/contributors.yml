@@ -16,10 +16,46 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Update Contributors List
-        uses: akhilmhdh/contributors-readme-action@v2.3.10
+      - name: Generate and Inject Contributors HTML
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          commit_message: "chore(contributors): auto-update contributors list"
-          readme_path: "README.md,CONTRIBUTING.md"
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Fetch contributors using GitHub CLI (built-in on runners)
+          CONTRIBUTORS_HTML=$(gh api repos/${{ github.repository }}/contributors --jq 'map("<a href=\"" + .html_url + "\"><img src=\"" + .avatar_url + "&s=64\" width=\"64px;\" style=\"border-radius: 50%; margin: 5px;\" alt=\"" + .login + "\"/></a>") | join("\n  ")')
+          
+          # HTML Block to inject
+          INJECTION="<p align=\"center\">\n  $CONTRIBUTORS_HTML\n</p>"
+          
+          # Inject into README.md and CONTRIBUTING.md
+          for FILE in README.md CONTRIBUTING.md; do
+            if [ -f "$FILE" ]; then
+              awk -v repl="$INJECTION" '
+              /<!-- readme: contributors -start -->/ {
+                print $0
+                print repl
+                skip = 1
+                next
+              }
+              /<!-- readme: contributors -end -->/ {
+                skip = 0
+                print $0
+                next
+              }
+              !skip { print $0 }
+              ' "$FILE" > tmp.md && mv tmp.md "$FILE"
+            fi
+          done
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md CONTRIBUTING.md
+          
+          # Only commit if there are changes
+          if ! git diff --staged --quiet; then
+            git commit -m "chore(contributors): auto-update contributors list"
+            git push
+          else
+            echo "No changes to commit."
+          fi
