@@ -1,54 +1,31 @@
-"use client";
-
-import { useEffect, useState, use } from "react";
-import { Navbar } from "@/components/layout/navbar";
 import { ProductGrid } from "@/app/(shop)/browse/components/product-grid";
 import { BrowseFilters } from "@/app/(shop)/browse/components/browse-filters";
 import { Sparkles, ArrowRight, Zap, Code2, Cpu } from "lucide-react";
-import { auth, type User } from "@/lib/auth/client";
+import { cookies } from "next/headers";
+import { verifyToken } from "@/lib/auth/server";
+import { redirect } from "next/navigation";
 
 interface BrowsePageProps {
   searchParams: Promise<{ search?: string; category?: string }>;
 }
 
-export default function BrowsePage({ searchParams }: BrowsePageProps) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+export default async function BrowsePage({ searchParams }: BrowsePageProps) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("codehaat_token")?.value;
+  const claims = token ? await verifyToken(token) : null;
 
-  useEffect(() => {
-    async function loadUser() {
-      const userData = await auth.getUser();
-      if (!userData) {
-        window.location.href = "/login";
-        return;
-      }
-      setUser(userData);
-      setLoading(false);
-    }
-    loadUser();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
-        <div className="flex items-center gap-2 text-slate-500 font-medium">
-          <div className="w-5 h-5 border-2 border-slate-300 border-t-blue-600 rounded-full animate-spin" />
-          Loading marketplace...
-        </div>
-      </div>
-    );
+  if (!claims) {
+    redirect("/login");
   }
 
-  if (!user) return null;
-
-  const params = use(searchParams);
+  const params = await searchParams;
   const searchQuery = params?.search || "";
   const categoryFilter = params?.category || "";
-  const fullName = user.full_name || user.email.split("@")[0];
+  const fullName = claims.full_name || claims.email.split("@")[0];
 
   return (
     <>
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
+      <main className="w-full px-4 sm:px-6 lg:px-10 xl:px-14 py-8 md:py-10">
         
         {/* Clean Minimal Hero Section */}
         <div className="bg-white rounded-3xl p-8 md:p-14 mb-10 border border-slate-200/60 shadow-sm relative overflow-hidden">

@@ -160,5 +160,25 @@ All notable changes to the CodeHaat backend project will be documented in this f
   - Updated `duplicate.md` to reflect resolved components.
 
 
+### 🏗️ Global Shop Architecture & Layout
+- **Centralized Shop Layout (`(shop)/layout.tsx`):**
+  - Abstracted the Navbar and Premium Footer out of individual pages into a global, centralized Next.js App Router layout file.
+- **Server Component Migration (`browse/page.tsx`):**
+  - Fully refactored the Buyer Browse page from a Client Component into a Server Component.
+  - Eliminated the client-side full-screen loading spinner (which caused layout jumps) by securely verifying the JWT token on the server before rendering.
+- **Immersive Edge-to-Edge Design:**
+  - Upgraded the Navbar, Main Content containers, and Footer to share a consistent, full-width constraint (`w-full px-4 lg:px-10 xl:px-14`), providing a premium SaaS wide-screen aesthetic.
+  - Repositioned Navbar elements: Brand name locked to the far left, Search Bar perfectly dead-centered via flexible flexbox balancing (`flex-1 min-w-0`), and grouped action icons pushed to the extreme right edge.
+  - Simplified the `CodeHaatLogo` by removing the terminal icon for a cleaner, typography-focused brand mark.
+
+### 🛡️ Enterprise Middleware & Security
+- **Advanced Auth Redirection (`returnUrl`):**
+  - Upgraded `auth/middleware.ts` to dynamically capture the user's intended destination. Unauthenticated hits to protected routes now redirect to `/login?returnUrl=[path]` for seamless post-login redirection.
+- **Robust Security Headers (`middleware.ts`):**
+  - Enforced a strict **Content Security Policy (CSP)** restricting scripts/images to trusted domains (Stripe, GitHub Avatars, Unsplash) to prevent XSS attacks.
+  - Implemented **HSTS** (Strict-Transport-Security) for forced HTTPS, along with `X-Frame-Options` (Clickjacking prevention), and `Permissions-Policy` (Disabling unauthorized Camera/Mic access).
+- **Distributed Tracing:**
+  - Injected a cryptographically generated `x-request-id` into all incoming requests and responses for advanced observability across the Next.js frontend and Rust backend.
+
 ---
 *End of Changelog.*
