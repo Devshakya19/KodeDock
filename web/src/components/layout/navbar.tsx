@@ -6,7 +6,7 @@ import Link from "next/link";
 import {
   Search, Menu, ShoppingCart, Bell, Wallet, User, Package, ChevronDown,
   Settings, LogOut, LayoutDashboard, LifeBuoy, Store, Star, Sparkles,
-  Heart, Download, FileText
+  Heart, Download, FileText, TrendingUp
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +28,7 @@ const SELLER_NAV_ITEMS = [
   { label: "Dashboard", href: "/seller", icon: LayoutDashboard },
   { label: "Products", href: "/seller/products", icon: Package },
   { label: "Orders", href: "/seller/orders", icon: ShoppingCart },
+  { label: "Earnings", href: "/seller/earnings", icon: TrendingUp },
   { label: "Reviews", href: "/seller/reviews", icon: Star },
   { label: "Wallet", href: "/seller/wallet", icon: Wallet },
 ];
@@ -207,7 +208,28 @@ export function Navbar({ variant, email = "", fullName, searchQuery = "" }: Navb
             </div>
           )}
           
-          {variant === "seller" && <div className="hidden md:flex w-full max-w-[500px] lg:max-w-[600px] px-4" />}
+          {variant === "seller" && (
+            <div className="hidden lg:flex items-center gap-1 bg-white px-2 py-1.5 rounded-full border border-slate-200/80 shadow-xs">
+              {SELLER_NAV_ITEMS.map((item) => {
+                const isActive = item.href === "/seller" ? pathname === "/seller" : pathname.startsWith(item.href);
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
+                      isActive
+                        ? "bg-slate-950 text-white shadow-2xs"
+                        : "text-slate-600 hover:text-slate-950 hover:bg-slate-50"
+                    }`}
+                  >
+                    <Icon className={`w-3.5 h-3.5 ${isActive ? "text-blue-400" : "text-slate-400"}`} />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
 
           {/* RIGHT: Actions */}
           <div className="hidden md:flex items-center justify-end gap-3 lg:gap-4 flex-1 min-w-0">
