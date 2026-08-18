@@ -184,13 +184,32 @@ All notable changes to the CodeHaat backend project will be documented in this f
 - **CodeHaat Agent Guidelines:** Created `AGENT.md` strictly enforcing project architecture constraints, Next.js framework conventions, security priorities, and styling rules.
 - **Dynamic Contributors Automation:** Replaced static third-party `contrib.rocks` images with a custom GitHub Action (`.github/workflows/contributors.yml`) utilizing `gh api` to automatically generate and inject real, bot-filtered contributor avatars directly into `README.md` and `CONTRIBUTING.md` upon merge to `main`.
 
-### 🎨 Seller Dashboard UI Consistency
-- **Fluid Layout Migration:** Upgraded the Seller Dashboard layout (`(seller)/seller/layout.tsx`) to match the new fluid, edge-to-edge constraint used in the Buyer layout (`w-full px-4 sm:px-6 lg:px-10 xl:px-14 py-4 md:py-8`).
-- **Container Cleanup:** Extensively refactored all seller sub-pages by stripping out redundant hardcoded wrappers (`max-w-7xl`, `mx-auto`) and enforcing 100% fluid widths, allowing pages to perfectly inherit the parent layout's responsive padding.
-
-### 🐛 Bug Fixes
-- **Local Dev RSC Fetch Failure:** Removed the strict `upgrade-insecure-requests` directive from the development Content-Security-Policy in `middleware.ts`. This resolves local HTTP connection refusals and `TypeError: Failed to fetch` errors occurring during RSC payload fetches post-logout.
-- **Next.js Image Optimizations:** Added missing `qualities: [75, 90]` configuration in `next.config.ts` and injected a `sizes` prop into the Auth background image to resolve Next.js framework warnings.
+### 💎 Complete Seller Dashboard Redesign (Awwwards & Anti-Slop Tier)
+- **Design System & Architecture:**
+  - Enforced the **Double-Bezel (Doppelrand)** nested container architecture across all creator views (outer shell ring-1 + inner core gradient card) to eliminate flat, generic cards.
+  - Implemented **Button-in-Button** trailing icon patterns and tactile active feedback (`active:scale-[0.98]`).
+  - Added dedicated floating seller navigation pills in the central header on desktop (`Overview`, `Products`, `Orders`, `Reviews`, `Wallet`).
+- **Creator Overview Hub (`/seller`):**
+  - Upgraded to an Asymmetrical Bento Grid with real-time sales stream, live auto-sync indicator, top performing asset velocity, and escrow balance card.
+  - Overhauled `SalesChart` with dual-mode metric toggle (**Revenue ₹ vs Units Sold**), timeframe selectors (`Today`, `7D`, `30D`, `6M`, `1Y`, `Custom`), smooth cubic-bezier area spline, vertical hover guide, and glassmorphic tooltip.
+- **Product Inventory Studio (`/seller/products`):**
+  - Added full filter toolbar: Category filter dropdown, status filter tabs (`All`, `Active`, `Limited`, `Paused`, `Draft`), sorting options (Top Sales, Most Views, Price), and live keyword search.
+  - Upgraded product cards with hover image zoom, stock limit counters, one-click public URL copy with feedback, and direct links to marketplace listings.
+- **Customer Orders & Fulfillment (`/seller/orders`):**
+  - Redesigned orders ledger with fulfillment health statistics, one-click copyable Order IDs, formatted timestamps, and real-time pending escrow status badges.
+- **Reputation & Feedback Studio (`/seller/reviews`):**
+  - Built an interactive 5-star sentiment breakdown allowing sellers to filter reviews by star rating with a single click.
+  - Added verified purchase badges, reviewer initial badges, and product tag attribution.
+- **Creator Wallet & Payout Engine (`/seller/wallet`):**
+  - Upgraded the 3D CodeHaat Creator Card with realistic metallic chip, holographic radial mesh, and smooth 3D perspective flip.
+  - Integrated instant preset withdrawal chips (`₹500`, `₹1,000`, `₹2,500`, `₹5,000`, `MAX`) and verified bank/UPI destination cards.
+- **Revenue Analytics (`/seller/earnings`):**
+  - Added transparent commission breakdown explaining the 2.5% platform fee and 97.5% creator net take-home pay, alongside total historical disbursements.
+- **Product Creation & Editor (`/seller/products/new` & `/edit`):**
+  - Stepped multi-section form with drag-and-drop cover dropzone, live seller take-home calculator, GitHub private repository auto-invite configuration, and a sticky real-time marketplace buyer card replica preview.
+  - Added high-impact destructive delete flow for existing listings.
+- **Double-Bezel Loading State (`/seller/loading`):**
+  - Replaced basic pulse boxes with an exact layout-matching double-bezel skeleton deck.
 
 ---
 *End of Changelog.*

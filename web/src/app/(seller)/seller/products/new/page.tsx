@@ -1,4 +1,5 @@
 "use client";
+
 import { GithubIcon } from "@/components/icons/github-icon";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -14,14 +15,17 @@ import {
   Eye,
   Tag,
   Package,
-  Globe,
-  Code,
+  Sparkles,
   IndianRupee,
+  ShieldCheck,
+  CheckCircle2,
+  AlertCircle,
+  Plus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { apiPost } from "@/lib/api/client";
 import { uploadFile } from "@/lib/api/upload";
-import { theme } from "@/lib/theme";
+import { SellerHeader } from "../../components/seller-header";
 
 const CATEGORIES = [
   "Web Templates",
@@ -65,11 +69,11 @@ export default function NewProductPage() {
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      setError("Please select an image file");
+      setError("Please select a valid image file (JPG, PNG, WebP)");
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      setError("Image must be less than 5MB");
+      setError("Cover image size must be less than 5MB");
       return;
     }
 
@@ -97,7 +101,7 @@ export default function NewProductPage() {
     if (!isFree) {
       const priceValue = parseFloat(price);
       if (isNaN(priceValue) || priceValue < 49) {
-        setError("Price must be at least ₹49");
+        setError("Minimum listing price for paid assets is ₹49");
         setLoading(false);
         return;
       }
@@ -108,7 +112,7 @@ export default function NewProductPage() {
     if (status === "limited" && stockLimit) {
       const stockLimitNum = parseInt(stockLimit);
       if (isNaN(stockLimitNum) || stockLimitNum <= 0) {
-        setError("Stock limit must be a positive number");
+        setError("Stock limit must be a positive integer");
         setLoading(false);
         return;
       }
@@ -117,15 +121,15 @@ export default function NewProductPage() {
 
     try {
       let finalImageUrl = imageUrl;
-      
-      // Upload image first if a new one was selected
+
+      // Upload image first if file selected
       if (selectedFile) {
         setUploading(true);
         try {
           const uploadResult = await uploadFile(selectedFile, "product");
           finalImageUrl = uploadResult.public_url;
         } catch {
-          setError("Failed to upload image. Please try again.");
+          setError("Failed to upload image asset to storage. Please try again.");
           setLoading(false);
           setUploading(false);
           return;
@@ -147,107 +151,111 @@ export default function NewProductPage() {
 
       if (result.success) {
         setSuccess(true);
-        setTimeout(() => router.push("/seller/products"), 2000);
+        setTimeout(() => router.push("/seller/products"), 1500);
       } else {
-        setError(result.error || "Failed to create product");
+        setError(result.error || "Failed to create product listing");
       }
     } catch {
-      setError("Network error. Please try again.");
+      setError("Network error. Please verify your connection.");
     } finally {
       setLoading(false);
     }
   }
 
+  const parsedPrice = parseFloat(price);
+  const sellerEarnings = !isNaN(parsedPrice) && parsedPrice >= 49 ? (parsedPrice * 0.975).toFixed(2) : "0.00";
+
   if (success) {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center">
-        <div className="w-full max-w-md mx-auto text-center animate-in fade-in zoom-in duration-500">
-          <div className="w-20 h-20 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-6 shadow-sm border border-emerald-100/50">
-            <CheckCircle className="w-10 h-10 text-emerald-500" />
+      <div className="min-h-[70vh] flex items-center justify-center">
+        <div className="w-full max-w-md mx-auto text-center p-8 rounded-[32px] bg-white ring-1 ring-slate-200/80 shadow-xl">
+          <div className="w-20 h-20 rounded-3xl bg-emerald-50 border border-emerald-100 flex items-center justify-center mx-auto mb-6 shadow-xs">
+            <CheckCircle2 className="w-10 h-10 text-emerald-500" />
           </div>
-          <h2 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">Product Listed!</h2>
-          <p className="text-slate-500 text-[15px]">Your product is now live on the marketplace. Redirecting you to the dashboard...</p>
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-950 mb-2 tracking-tight">
+            Product Published!
+          </h2>
+          <p className="text-slate-500 text-sm leading-relaxed mb-6 font-normal">
+            Your code asset is now live on the marketplace. Redirecting to your inventory...
+          </p>
+          <div className="w-8 h-8 mx-auto border-3 border-emerald-500 border-t-transparent rounded-full animate-spin" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full">
-      {/* Header */}
-      <div className="mb-10">
-        <Link
-          href="/seller/products"
-          className="inline-flex items-center gap-2 text-[13px] font-medium text-slate-500 hover:text-slate-900 transition-colors mb-5 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-full"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          Back to products
-        </Link>
-        <h1 className={theme.typography.h1}>
-          List a New Product
-        </h1>
-        <p className="text-slate-500 mt-2 text-[15px]">
-          Share your code, templates, and tools with the world.
-        </p>
-      </div>
+    <div className="w-full font-sans">
+      {/* 1. Header */}
+      <SellerHeader
+        badge="Asset Studio"
+        title="Publish New Code Asset"
+        description="List your templates, boilerplate code, or full-stack projects for buyers across the marketplace."
+        backHref="/seller/products"
+        backLabel="Back to Products"
+      />
 
-      <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-start">
-        {/* Left Column: Form */}
-        <div className="lg:col-span-7 space-y-10">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        {/* Left Column (7 Cols): Multi-Step Form */}
+        <div className="lg:col-span-7 space-y-6">
           {error && (
-            <div className="p-4 rounded-2xl bg-red-50 border border-red-100 text-sm text-red-600 flex items-center gap-3 animate-in fade-in">
-              <X className="w-5 h-5 flex-shrink-0" />
-              <p>{error}</p>
+            <div className="p-4 rounded-2xl bg-rose-50 border border-rose-100 text-xs font-bold text-rose-600 flex items-center gap-3">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{error}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-10">
-            {/* 1. Basic Info Section */}
-            <section className="space-y-6">
-              <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-                <div className="w-6 h-6 rounded-md bg-slate-900 text-white flex items-center justify-center text-xs font-bold">1</div>
-                <h2 className="text-lg font-bold text-slate-900">Basic Details</h2>
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Step 1: Basic Information */}
+            <div className="rounded-[28px] bg-white p-2 ring-1 ring-slate-200/80 shadow-xs">
+              <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/40 p-6 space-y-5">
+                <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
+                  <div className="w-6 h-6 rounded-lg bg-slate-950 text-white flex items-center justify-center text-xs font-black">
+                    1
+                  </div>
+                  <h3 className="text-base font-black text-slate-900 tracking-tight">
+                    Basic Information
+                  </h3>
+                </div>
 
-              <div className="space-y-5">
                 {/* Title */}
-                <div className="group">
-                  <label htmlFor="title" className="block text-[13px] font-semibold text-slate-700 mb-2 transition-colors group-focus-within:text-slate-900">
-                    Product Title <span className="text-red-500">*</span>
+                <div>
+                  <label htmlFor="title" className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Product Title <span className="text-rose-500">*</span>
                   </label>
                   <input
                     id="title"
-                    placeholder="e.g. Next.js SaaS Starter Kit"
+                    placeholder="e.g. Next.js SaaS Starter Kit & AI Boilerplate"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     required
                     maxLength={200}
-                    className="w-full h-12 bg-slate-50/50 border border-slate-200 rounded-xl px-4 text-[15px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all"
+                    className="w-full h-11 bg-white border border-slate-200/80 rounded-xl px-3.5 text-sm font-medium text-slate-900 outline-none focus:border-slate-950 shadow-2xs transition-colors"
                   />
                 </div>
 
                 {/* Description */}
-                <div className="group">
-                  <label htmlFor="description" className="block text-[13px] font-semibold text-slate-700 mb-2 transition-colors group-focus-within:text-slate-900">
-                    Short Description <span className="text-red-500">*</span>
+                <div>
+                  <label htmlFor="description" className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Short Description <span className="text-rose-500">*</span>
                   </label>
                   <textarea
                     id="description"
                     rows={4}
-                    placeholder="Briefly describe what this product does..."
+                    placeholder="Describe the tech stack, key features, database setup, and architecture..."
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     required
                     maxLength={5000}
-                    className="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-4 text-[15px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all resize-y"
+                    className="w-full bg-white border border-slate-200/80 rounded-xl p-3.5 text-sm font-medium text-slate-900 outline-none focus:border-slate-950 shadow-2xs transition-colors resize-y"
                   />
                 </div>
 
                 {/* Category & Tags Grid */}
-                <div className="grid sm:grid-cols-2 gap-5">
-                  <div className="group">
-                    <label htmlFor="category" className="block text-[13px] font-semibold text-slate-700 mb-2 transition-colors group-focus-within:text-slate-900">
-                      Category <span className="text-red-500">*</span>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="category" className="block text-xs font-bold text-slate-700 mb-1.5">
+                      Category <span className="text-rose-500">*</span>
                     </label>
                     <div className="relative">
                       <select
@@ -255,310 +263,331 @@ export default function NewProductPage() {
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
                         required
-                        className="w-full h-12 appearance-none bg-slate-50/50 border border-slate-200 rounded-xl pl-11 pr-10 text-[14px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all cursor-pointer"
+                        className="w-full h-11 appearance-none bg-white border border-slate-200/80 rounded-xl pl-10 pr-8 text-xs font-bold text-slate-800 outline-none focus:border-slate-950 shadow-2xs cursor-pointer"
                       >
-                        <option value="" disabled>Select category</option>
+                        <option value="" disabled>
+                          Select category
+                        </option>
                         {CATEGORIES.map((cat) => (
-                          <option key={cat} value={cat}>{cat}</option>
+                          <option key={cat} value={cat}>
+                            {cat}
+                          </option>
                         ))}
                       </select>
-                      <Package className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                        <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                      </div>
+                      <Package className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                     </div>
                   </div>
 
-                  <div className="group">
-                    <label htmlFor="tags" className="block text-[13px] font-semibold text-slate-700 mb-2 transition-colors group-focus-within:text-slate-900">
-                      Tags
+                  <div>
+                    <label htmlFor="tags" className="block text-xs font-bold text-slate-700 mb-1.5">
+                      Tags (Comma separated)
                     </label>
                     <div className="relative">
                       <input
                         id="tags"
-                        placeholder="React, SaaS, UI..."
+                        placeholder="React, Tailwind, Auth..."
                         value={tags}
                         onChange={(e) => setTags(e.target.value)}
-                        maxLength={500}
-                        className="w-full h-12 bg-slate-50/50 border border-slate-200 rounded-xl pl-11 pr-4 text-[14px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all"
+                        className="w-full h-11 bg-white border border-slate-200/80 rounded-xl pl-10 pr-3.5 text-xs font-medium text-slate-900 outline-none focus:border-slate-950 shadow-2xs"
                       />
-                      <Tag className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                      <Tag className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                     </div>
                   </div>
                 </div>
               </div>
-            </section>
+            </div>
 
-            {/* 2. Media Section */}
-            <section className="space-y-6">
-              <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-                <div className="w-6 h-6 rounded-md bg-slate-900 text-white flex items-center justify-center text-xs font-bold">2</div>
-                <h2 className="text-lg font-bold text-slate-900">Media & Assets</h2>
-              </div>
-
-              <div>
-                <label className="block text-[13px] font-semibold text-slate-700 mb-3">
-                  Cover Image <span className="text-red-500">*</span>
-                </label>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageSelect}
-                  className="hidden"
-                />
-
-                {imagePreview ? (
-                  <div className="relative group/img rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 shadow-sm flex items-center justify-center">
-                    <img
-                      src={imagePreview}
-                      alt="Product preview"
-                      className="w-full h-auto max-h-[400px] object-contain transition-transform duration-700 group-hover/img:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-slate-900/0 group-hover/img:bg-slate-900/10 transition-colors duration-300" />
-                    <button
-                      type="button"
-                      onClick={handleRemoveImage}
-                      className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/90 backdrop-blur-md text-slate-700 flex items-center justify-center hover:bg-white hover:text-red-600 shadow-sm border border-slate-200/50 transition-all transform hover:scale-105"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
+            {/* Step 2: Media & Code Repository */}
+            <div className="rounded-[28px] bg-white p-2 ring-1 ring-slate-200/80 shadow-xs">
+              <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/40 p-6 space-y-5">
+                <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
+                  <div className="w-6 h-6 rounded-lg bg-slate-950 text-white flex items-center justify-center text-xs font-black">
+                    2
                   </div>
-                ) : (
-                  <div
-                    onClick={() => fileInputRef.current?.click()}
-                    className="group flex flex-col items-center justify-center w-full aspect-[16/9] border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/50 hover:bg-slate-50 hover:border-slate-400 transition-all cursor-pointer relative overflow-hidden"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-slate-100/50 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <div className="relative z-10 flex flex-col items-center gap-3">
-                      <div className="w-14 h-14 rounded-full bg-white shadow-sm border border-slate-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                        <ImageIcon className="w-6 h-6 text-slate-400 group-hover:text-slate-600 transition-colors" />
-                      </div>
-                      <div className="text-center">
-                        <span className="text-[14px] font-medium text-slate-700">Click to upload cover image</span>
-                        <p className="text-[12px] text-slate-400 mt-1">16:9 ratio recommended. Max 5MB (JPG/PNG)</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* GitHub URL */}
-              <div className="group">
-                <label htmlFor="githubUrl" className="block text-[13px] font-semibold text-slate-700 mb-2 transition-colors group-focus-within:text-slate-900">
-                  GitHub Repository (Optional)
-                </label>
-                <div className="relative">
-                  <GithubIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-                  <input
-                    id="githubUrl"
-                    placeholder="https://github.com/username/repo"
-                    value={githubUrl}
-                    onChange={(e) => setGithubUrl(e.target.value)}
-                    className="w-full h-12 bg-slate-50/50 border border-slate-200 rounded-xl pl-11 pr-4 text-[14px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all"
-                  />
+                  <h3 className="text-base font-black text-slate-900 tracking-tight">
+                    Cover Asset & GitHub Sync
+                  </h3>
                 </div>
-                <p className="text-[12px] text-slate-500 mt-2">
-                  Link your private repository to automatically invite buyers upon purchase.
-                </p>
-              </div>
-            </section>
 
-            {/* 3. Pricing & Delivery */}
-            <section className="space-y-6">
-              <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-                <div className="w-6 h-6 rounded-md bg-slate-900 text-white flex items-center justify-center text-xs font-bold">3</div>
-                <h2 className="text-lg font-bold text-slate-900">Pricing & Delivery</h2>
-              </div>
-
-              <div className="grid sm:grid-cols-2 gap-5">
-                {/* Pricing Type Toggle */}
+                {/* Image Dropzone */}
                 <div>
-                  <label className="block text-[13px] font-semibold text-slate-700 mb-2">
-                    Pricing Model
+                  <label className="block text-xs font-bold text-slate-700 mb-2">
+                    Cover Image <span className="text-rose-500">*</span>
                   </label>
-                  <div className="grid grid-cols-2 p-1 rounded-xl bg-slate-100/80 border border-slate-200/60 relative">
-                    <div
-                      className={`absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] bg-white rounded-lg shadow-sm border border-slate-200 transition-transform duration-300 ease-in-out ${
-                        isFree ? "translate-x-full" : "translate-x-0"
-                      }`}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => { setIsFree(false); setPrice(""); }}
-                      className={`relative z-10 h-10 text-[13px] font-semibold rounded-lg transition-colors ${
-                        !isFree ? "text-slate-900" : "text-slate-500 hover:text-slate-700"
-                      }`}
-                    >
-                      Paid
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setIsFree(true)}
-                      className={`relative z-10 h-10 text-[13px] font-semibold rounded-lg transition-colors ${
-                        isFree ? "text-emerald-600" : "text-slate-500 hover:text-slate-700"
-                      }`}
-                    >
-                      Free
-                    </button>
-                  </div>
-                </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageSelect}
+                    className="hidden"
+                  />
 
-                {/* Price Input */}
-                <div className={`group transition-opacity duration-300 ${isFree ? "opacity-40 pointer-events-none" : "opacity-100"}`}>
-                  <label htmlFor="price" className="block text-[13px] font-semibold text-slate-700 mb-2 group-focus-within:text-slate-900">
-                    Price (INR) <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <IndianRupee className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-                    <input
-                      id="price"
-                      type="number"
-                      placeholder={isFree ? "0" : "499"}
-                      value={price}
-                      onChange={(e) => setPrice(e.target.value)}
-                      min={isFree ? "0" : "49"}
-                      className="w-full h-12 bg-slate-50/50 border border-slate-200 rounded-xl pl-11 pr-4 text-[14px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all"
-                      disabled={isFree}
-                    />
-                  </div>
-                  {!isFree && (
-                    <p className="text-[11px] font-medium text-slate-500 mt-2">
-                      Min. ₹49. Platform fee is 2.5%. You earn: <span className="text-emerald-600 font-bold">₹{price && parseFloat(price) >= 49 ? (parseFloat(price) * 0.975).toFixed(2) : "0"}</span>
-                    </p>
+                  {imagePreview ? (
+                    <div className="relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 flex items-center justify-center group/preview">
+                      <img
+                        src={imagePreview}
+                        alt="Product preview"
+                        className="w-full h-auto max-h-[300px] object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleRemoveImage}
+                        className="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-950/80 text-white flex items-center justify-center hover:bg-rose-600 transition-colors shadow-md cursor-pointer"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div
+                      onClick={() => fileInputRef.current?.click()}
+                      className="group flex flex-col items-center justify-center w-full aspect-[16/8] border-2 border-dashed border-slate-200/80 rounded-2xl bg-white hover:border-slate-400 transition-all cursor-pointer p-6 text-center shadow-2xs"
+                    >
+                      <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+                        <ImageIcon className="w-6 h-6" />
+                      </div>
+                      <span className="text-xs font-bold text-slate-800">
+                        Click to upload product thumbnail
+                      </span>
+                      <p className="text-[11px] text-slate-400 mt-1">
+                        16:9 or 16:10 ratio recommended (JPG, PNG, WebP up to 5MB)
+                      </p>
+                    </div>
                   )}
                 </div>
-              </div>
 
-              {/* Status and Stock Limit */}
-              <div className="grid sm:grid-cols-2 gap-5">
-                <div className="group">
-                  <label htmlFor="status" className="block text-[13px] font-semibold text-slate-700 mb-2 transition-colors group-focus-within:text-slate-900">
-                    Product Status
+                {/* GitHub Repo */}
+                <div>
+                  <label htmlFor="githubUrl" className="block text-xs font-bold text-slate-700 mb-1.5">
+                    GitHub Private Repository (Optional)
                   </label>
                   <div className="relative">
+                    <GithubIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                    <input
+                      id="githubUrl"
+                      placeholder="https://github.com/your-username/your-repo"
+                      value={githubUrl}
+                      onChange={(e) => setGithubUrl(e.target.value)}
+                      className="w-full h-11 bg-white border border-slate-200/80 rounded-xl pl-10 pr-3.5 text-xs font-medium text-slate-900 outline-none focus:border-slate-950 shadow-2xs"
+                    />
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-1.5 leading-relaxed">
+                    When linked, CodeHaat automatically invites buyers to access your private repository upon verified checkout.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 3: Pricing & Availability */}
+            <div className="rounded-[28px] bg-white p-2 ring-1 ring-slate-200/80 shadow-xs">
+              <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/40 p-6 space-y-5">
+                <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
+                  <div className="w-6 h-6 rounded-lg bg-slate-950 text-white flex items-center justify-center text-xs font-black">
+                    3
+                  </div>
+                  <h3 className="text-base font-black text-slate-900 tracking-tight">
+                    Pricing & Inventory Availability
+                  </h3>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-5 items-start">
+                  {/* Model Toggle */}
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-2">
+                      Pricing Model
+                    </label>
+                    <div className="grid grid-cols-2 p-1 rounded-xl bg-slate-100 border border-slate-200/80 relative">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsFree(false);
+                          setPrice("");
+                        }}
+                        className={`h-9 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                          !isFree
+                            ? "bg-white text-slate-950 shadow-2xs font-extrabold"
+                            : "text-slate-500 hover:text-slate-900"
+                        }`}
+                      >
+                        Paid
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsFree(true);
+                          setPrice("0");
+                        }}
+                        className={`h-9 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                          isFree
+                            ? "bg-white text-emerald-600 shadow-2xs font-extrabold"
+                            : "text-slate-500 hover:text-slate-900"
+                        }`}
+                      >
+                        Free Asset
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Price input */}
+                  <div>
+                    <label htmlFor="price" className="block text-xs font-bold text-slate-700 mb-2">
+                      Price (INR) <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <IndianRupee className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                      <input
+                        id="price"
+                        type="number"
+                        placeholder={isFree ? "0" : "499"}
+                        value={price}
+                        onChange={(e) => setPrice(e.target.value)}
+                        min={isFree ? "0" : "49"}
+                        disabled={isFree}
+                        className="w-full h-11 bg-white border border-slate-200/80 rounded-xl pl-9 pr-3.5 text-sm font-bold text-slate-900 outline-none focus:border-slate-950 shadow-2xs disabled:opacity-40"
+                      />
+                    </div>
+                    {!isFree && (
+                      <p className="text-[11px] text-slate-500 font-medium mt-1.5">
+                        Net take-home (97.5%):{" "}
+                        <span className="font-bold text-emerald-600">₹{sellerEarnings}</span>
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Status selector */}
+                <div className="grid sm:grid-cols-2 gap-4 pt-2">
+                  <div>
+                    <label htmlFor="status" className="block text-xs font-bold text-slate-700 mb-1.5">
+                      Catalog Status
+                    </label>
                     <select
                       id="status"
                       value={status}
                       onChange={(e) => setStatus(e.target.value)}
-                      className="w-full h-12 appearance-none bg-slate-50/50 border border-slate-200 rounded-xl pl-4 pr-10 text-[14px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all cursor-pointer"
+                      className="w-full h-11 bg-white border border-slate-200/80 rounded-xl px-3.5 text-xs font-bold text-slate-800 outline-none focus:border-slate-950 shadow-2xs cursor-pointer"
                     >
-                      <option value="active">Active (Available for all)</option>
-                      <option value="limited">Limited Edition</option>
+                      <option value="active">Active (Available to all)</option>
+                      <option value="limited">Limited Edition (Capped Units)</option>
                       <option value="paused">Paused</option>
+                      <option value="draft">Draft</option>
                     </select>
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                      <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                  </div>
+
+                  {status === "limited" && (
+                    <div>
+                      <label htmlFor="stockLimit" className="block text-xs font-bold text-slate-700 mb-1.5">
+                        Stock Limit (Available Copies) <span className="text-rose-500">*</span>
+                      </label>
+                      <input
+                        id="stockLimit"
+                        type="number"
+                        placeholder="e.g. 25"
+                        value={stockLimit}
+                        onChange={(e) => setStockLimit(e.target.value)}
+                        min="1"
+                        className="w-full h-11 bg-white border border-slate-200/80 rounded-xl px-3.5 text-xs font-bold text-slate-900 outline-none focus:border-slate-950 shadow-2xs"
+                      />
                     </div>
-                  </div>
+                  )}
                 </div>
-
-                {status === "limited" && (
-                  <div className="group animate-in fade-in slide-in-from-top-1">
-                    <label htmlFor="stockLimit" className="block text-[13px] font-semibold text-slate-700 mb-2 group-focus-within:text-slate-900">
-                      Stock Limit <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      id="stockLimit"
-                      type="number"
-                      placeholder="e.g. 50"
-                      value={stockLimit}
-                      onChange={(e) => setStockLimit(e.target.value)}
-                      min="1"
-                      className="w-full h-12 bg-slate-50/50 border border-slate-200 rounded-xl px-4 text-[14px] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all"
-                    />
-                  </div>
-                )}
               </div>
-            </section>
+            </div>
 
-            {/* Action Area */}
-            <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <p className="text-[12px] text-slate-500 text-center sm:text-left">
-                By clicking "Publish Product", you agree to our <Link href="#" className="underline hover:text-slate-800">Seller Terms</Link>.
-              </p>
-              <Button
+            {/* Action Deck */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
+              <Link href="/seller/products" className="w-full sm:w-auto">
+                <button
+                  type="button"
+                  className="w-full sm:w-auto h-12 px-6 rounded-xl bg-white border border-slate-200/80 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+              </Link>
+
+              <button
                 type="submit"
                 disabled={loading || uploading}
-                className="w-full sm:w-auto h-12 px-8 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800 shadow-lg shadow-slate-900/20 transition-all hover:-translate-y-0.5 active:translate-y-0"
+                className="w-full sm:w-auto h-12 px-8 rounded-xl bg-slate-950 text-white font-bold text-xs hover:bg-slate-800 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-950/20 active:scale-[0.98] cursor-pointer"
               >
                 {loading || uploading ? (
-                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                ) : null}
-                {uploading ? "Uploading image..." : "Publish Product"}
-              </Button>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <>
+                    <Plus className="w-4 h-4" />
+                    <span>{uploading ? "Uploading Cover..." : "Publish Product Listing"}</span>
+                  </>
+                )}
+              </button>
             </div>
           </form>
         </div>
 
-        {/* Right Column: Live Preview Card */}
-        <div className="lg:col-span-5 hidden lg:block relative">
-          <div className="sticky top-24">
-            <div className="flex items-center gap-2 mb-4 px-1">
-              <Eye className="w-4 h-4 text-slate-400" />
-              <span className="text-[13px] font-bold text-slate-400 uppercase tracking-wider">Card Preview</span>
-            </div>
-            
-            {/* The Marketplace Card Replica */}
-            <div className="group relative bg-white rounded-[24px] border border-slate-200/60 shadow-xl shadow-slate-200/40 overflow-hidden transform transition-all duration-500 hover:shadow-2xl hover:-translate-y-1">
-              <div className="aspect-[4/3] w-full overflow-hidden bg-slate-50 flex items-center justify-center relative">
+        {/* Right Column (5 Cols): Sticky Marketplace Card Replica Preview */}
+        <div className="lg:col-span-5 hidden lg:block sticky top-24">
+          <div className="flex items-center gap-2 mb-3">
+            <Eye className="w-4 h-4 text-slate-400" />
+            <span className="text-[11px] font-black text-slate-400 uppercase tracking-wider">
+              Live Buyer Preview
+            </span>
+          </div>
+
+          <div className="rounded-[28px] bg-white p-2 ring-1 ring-slate-200/80 shadow-lg">
+            <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/50 overflow-hidden flex flex-col">
+              <div className="aspect-[16/10] w-full bg-slate-100 flex items-center justify-center relative overflow-hidden">
                 {imagePreview ? (
                   <img
                     src={imagePreview}
                     alt="Preview"
-                    className="w-full h-full object-contain p-2 transition-transform duration-700 group-hover:scale-105"
+                    className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <ImageIcon className="w-10 h-10 text-slate-200" />
-                  </div>
+                  <ImageIcon className="w-12 h-12 text-slate-300" />
                 )}
-                {/* Category Badge */}
+
                 {category && (
-                  <div className="absolute top-4 left-4 z-10">
-                    <span className="bg-white/95 backdrop-blur-md text-slate-700 text-[11px] font-bold px-3 py-1.5 rounded-full shadow-sm border border-slate-200/50">
+                  <div className="absolute top-3 left-3 z-10">
+                    <span className="bg-slate-950/80 text-white text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur-md">
                       {category}
                     </span>
                   </div>
                 )}
               </div>
-              
+
               <div className="p-5">
                 <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-1.5">
-                    <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                    <span className="text-[13px] font-bold text-slate-700">0.0</span>
-                    <span className="text-[12px] text-slate-400">(0)</span>
+                  <div className="flex items-center gap-1 text-amber-400">
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <Star key={s} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                    ))}
+                    <span className="text-xs font-bold text-slate-700 ml-1">5.0</span>
                   </div>
                   {status === "limited" && stockLimit && (
                     <span className="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full">
-                      Only {stockLimit} left
+                      {stockLimit} copies left
                     </span>
                   )}
                 </div>
 
-                <h3 className="font-extrabold text-slate-900 text-[18px] leading-tight mb-1.5 line-clamp-2">
-                  {title || "Your Product Title"}
+                <h3 className="font-black text-slate-900 text-base leading-snug mb-2 line-clamp-2">
+                  {title || "Your Code Product Title"}
                 </h3>
-                <p className="text-[13px] text-slate-500 line-clamp-2 mb-4 min-h-[40px]">
-                  {description || "A short, catchy description of what makes your product great..."}
+                <p className="text-xs text-slate-500 line-clamp-2 mb-4 leading-relaxed font-normal">
+                  {description || "A concise summary of your boilerplate code, components, and design assets..."}
                 </p>
 
-                <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-                  <div className="flex items-baseline gap-1.5">
-                    <span className={`text-[20px] font-extrabold ${isFree ? "text-emerald-600" : "text-slate-900"}`}>
-                      {isFree ? "Free" : (price && !isNaN(parseFloat(price)) && parseFloat(price) >= 49 ? `₹${parseFloat(price).toLocaleString()}` : "₹0")}
-                    </span>
+                <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+                  <div className="font-black text-slate-950 text-lg tabular-nums">
+                    {isFree ? (
+                      <span className="text-emerald-600">Free</span>
+                    ) : parsedPrice && !isNaN(parsedPrice) && parsedPrice >= 49 ? (
+                      `₹${parsedPrice.toLocaleString()}`
+                    ) : (
+                      "₹0"
+                    )}
                   </div>
-                  <span className="text-[12px] font-medium text-slate-400">by You</span>
+                  <span className="text-xs font-bold text-blue-600">View Details ↗</span>
                 </div>
               </div>
-            </div>
-
-            <div className="mt-6 text-center">
-               <p className="text-[13px] text-slate-400 flex items-center justify-center gap-1.5">
-                 <Star className="w-3.5 h-3.5" /> High-quality images attract 3x more buyers
-               </p>
             </div>
           </div>
         </div>
