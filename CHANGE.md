@@ -3,6 +3,20 @@
 All notable changes to the CodeHaat backend project will be documented in this file.
 
 
+## [v1.4.0] - 2026-08-18
+
+### 🎨 UI/UX Redesigns & Enhancements
+- **Seller Dashboard UI Overhaul:**
+  - Fully redesigned `/seller/page.tsx` adopting the "Asymmetrical Bento" grid layout and "Double-Bezel" component architecture.
+  - Implemented the "Ethereal Glass" dark aesthetic for the Wallet Hub card with a deep OLED black background (`#050505`), custom noise filters, and glowing emerald highlights.
+  - Integrated `recharts` for the Sales Chart with custom glassmorphic tooltips and fluid transitions.
+- **Cinematic Framer Motion Animations:**
+  - Added staggering, spring-based cascade reveals for the main Dashboard Stats Deck.
+  - **Seller Navbar:** Integrated `framer-motion` layout animations for the active menu pill, ensuring it glides smoothly between tabs with organic spring physics.
+  - **Seller Welcome Header:** Built an ultra-premium staggered typo-animation engine. The welcome text splits into word groups and fades in with dynamic blur reduction on load, intelligently handling responsive word wrapping.
+  - **Animated Financials:** Created a new `AnimatedNumber` component using `useSpring` that smoothly rolls up the Wallet Balance, Escrow, and Total Earned metrics from zero to their actual values on page load.
+
+
 ## [v1.2.0] - 2026-08-11
 
 ### 🎨 UI/UX Redesigns & Enhancements

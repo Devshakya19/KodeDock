@@ -13,8 +13,9 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "Missing url parameter" }, { status: 400 });
     }
 
-    // SSRF protection — only allow SeaweedFS URLs
-    if (!uploadUrl.includes("seaweedfs") || !uploadUrl.includes(":8333")) {
+    // SSRF protection — only allow SeaweedFS URLs or localhost
+    const isLocalhost = uploadUrl.includes("localhost") || uploadUrl.includes("127.0.0.1");
+    if ((!uploadUrl.includes("seaweedfs") && !isLocalhost) || !uploadUrl.includes(":8333")) {
       return NextResponse.json({ error: "Invalid upload URL" }, { status: 403 });
     }
 

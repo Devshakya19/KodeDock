@@ -22,6 +22,7 @@ import { getUserRole, ROLES } from "@/lib/auth/roles";
 import { SalesChart } from "./components/sales-chart";
 import { SellerHeader } from "./components/seller-header";
 import { SellerStatsDeck } from "./components/seller-stats-deck";
+import { AnimatedNumber } from "@/components/ui/animated-number";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -98,31 +99,31 @@ export default async function SellerDashboardPage() {
   const sellerFirstName = user.full_name?.split(" ")[0] || "Creator";
 
   return (
-    <div className="w-full font-sans min-h-screen">
+    <div className="w-full font-sans min-h-[100dvh] pb-24">
       {/* 1. Header with Actions */}
       <SellerHeader
         badge="Creator Studio"
-        title={`Welcome back, ${sellerFirstName}!`}
-        description="Monitor your code assets, track customer orders, and manage financial payouts."
+        title={`Welcome back, ${sellerFirstName}.`}
+        description="Monitor your code assets, track customer orders, and manage financial payouts in real-time."
         actions={
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <Link href="/browse">
               <button
                 type="button"
-                className="h-11 px-4 rounded-xl bg-white border border-slate-200/80 text-slate-700 text-xs font-bold hover:bg-slate-50 transition-all flex items-center gap-2 shadow-2xs hover:border-slate-300 cursor-pointer"
+                className="group h-12 px-6 rounded-full bg-white border border-slate-200 text-slate-700 text-xs font-black uppercase tracking-wider hover:bg-slate-50 transition-all flex items-center gap-2 shadow-sm hover:border-slate-300 cursor-pointer active:scale-[0.98]"
               >
-                <Store className="w-3.5 h-3.5 text-slate-500" />
+                <Store className="w-4 h-4 text-slate-400 group-hover:text-slate-900 transition-colors" />
                 Storefront
               </button>
             </Link>
             <Link href="/seller/products/new">
               <button
                 type="button"
-                className="group h-11 pl-5 pr-2 rounded-xl bg-slate-950 text-white text-xs font-bold hover:bg-slate-800 transition-all flex items-center gap-3 shadow-md shadow-slate-950/20 active:scale-[0.98] cursor-pointer"
+                className="group h-12 pl-6 pr-1.5 rounded-full bg-slate-950 text-white text-xs font-black uppercase tracking-wider hover:bg-slate-900 transition-all flex items-center gap-4 shadow-lg shadow-slate-950/20 active:scale-[0.98] cursor-pointer"
               >
                 <span>New Product</span>
-                <div className="w-7 h-7 rounded-lg bg-white/15 flex items-center justify-center group-hover:translate-x-0.5 transition-transform">
-                  <Plus className="w-4 h-4" />
+                <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center transition-transform duration-300 group-hover:bg-white group-hover:text-slate-950">
+                  <Plus className="w-4 h-4 transition-transform duration-300 group-hover:rotate-90" />
                 </div>
               </button>
             </Link>
@@ -140,27 +141,28 @@ export default async function SellerDashboardPage() {
       />
 
       {/* 3. Asymmetrical Bento Workspace */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column (Span 2): Performance Velocity Chart & Recent Sales Activity */}
-        <div className="lg:col-span-2 space-y-6">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+        
+        {/* Left Column (Span 8): Performance Velocity Chart & Recent Sales Activity */}
+        <div className="xl:col-span-8 space-y-8">
           {/* Main Analytics Spline */}
           <SalesChart orders={orders} />
 
-          {/* Recent Live Sales Stream */}
-          <div className="rounded-[28px] bg-white p-2 ring-1 ring-slate-200/80 shadow-xs">
-            <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/40 p-6 sm:p-7">
-              <div className="flex items-center justify-between mb-6">
+          {/* Recent Live Sales Stream (Double-Bezel) */}
+          <div className="rounded-[2rem] bg-white p-2 ring-1 ring-slate-200/60 shadow-sm">
+            <div className="rounded-[calc(2rem-0.5rem)] bg-gradient-to-b from-white to-slate-50/40 p-8">
+              <div className="flex items-end justify-between mb-8">
                 <div>
-                  <h3 className="text-lg font-black text-slate-900 tracking-tight">
-                    Recent Sales Activity
+                  <h3 className="text-2xl font-black text-slate-950 tracking-tight">
+                    Recent Activity
                   </h3>
-                  <p className="text-xs text-slate-500 font-medium mt-0.5">
-                    Real-time live feed of customer purchases & deliveries
+                  <p className="text-sm text-slate-500 font-medium mt-1">
+                    Real-time live feed of customer purchases
                   </p>
                 </div>
                 <Link href="/seller/orders">
-                  <span className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1">
-                    All Orders <ArrowRight className="w-3 h-3" />
+                  <span className="group text-[11px] font-black uppercase tracking-widest text-slate-900 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-full transition-colors flex items-center gap-2">
+                    All Orders <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                   </span>
                 </Link>
               </div>
@@ -173,18 +175,18 @@ export default async function SellerDashboardPage() {
                   return (
                     <div
                       key={order.id}
-                      className="group p-4 rounded-2xl bg-white border border-slate-200/60 hover:border-slate-300 hover:shadow-2xs transition-all flex items-center justify-between gap-4"
+                      className="group p-2 rounded-2xl bg-white border border-slate-100 hover:border-slate-300 hover:shadow-md transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] flex items-center justify-between gap-4 pr-6 cursor-default"
                     >
-                      <div className="flex items-center gap-3.5 min-w-0">
-                        <div className="w-11 h-11 rounded-xl bg-blue-50/80 border border-blue-100/80 flex items-center justify-center flex-shrink-0 text-blue-600">
+                      <div className="flex items-center gap-4 min-w-0">
+                        <div className="w-14 h-14 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center flex-shrink-0 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:border-blue-100 transition-colors">
                           <Package className="w-5 h-5" />
                         </div>
                         <div className="min-w-0">
-                          <h4 className="text-sm font-bold text-slate-900 truncate group-hover:text-blue-600 transition-colors">
+                          <h4 className="text-base font-bold text-slate-900 truncate group-hover:text-blue-600 transition-colors">
                             {product?.title || "Digital Product Asset"}
                           </h4>
-                          <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-500 font-medium">
-                            <span className="font-mono text-[11px] text-slate-400 font-semibold">
+                          <div className="flex items-center gap-2 mt-1 text-xs text-slate-500 font-semibold">
+                            <span className="font-mono text-[11px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
                               #{order.id.slice(0, 8)}
                             </span>
                             <span className="w-1 h-1 rounded-full bg-slate-300" />
@@ -195,14 +197,14 @@ export default async function SellerDashboardPage() {
 
                       <div className="text-right flex-shrink-0">
                         <div
-                          className={`text-sm font-black tracking-tight tabular-nums ${
+                          className={`text-lg font-black tracking-tight tabular-nums ${
                             isFree ? "text-emerald-600" : "text-slate-950"
                           }`}
                         >
                           {isFree ? "Free" : `+₹${(order.seller_amount_paise / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                         </div>
-                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full mt-0.5 border border-emerald-200/50">
-                          <CheckCircle2 className="w-2.5 h-2.5" /> Fulfilled
+                        <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-emerald-700 bg-emerald-50 px-2 py-1 rounded-md mt-1 border border-emerald-200/50">
+                          <CheckCircle2 className="w-3 h-3" /> Fulfilled
                         </span>
                       </div>
                     </div>
@@ -210,11 +212,11 @@ export default async function SellerDashboardPage() {
                 })}
 
                 {recentActivities.length === 0 && (
-                  <div className="py-12 text-center bg-slate-50/60 rounded-2xl border border-dashed border-slate-200">
-                    <Package className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                    <p className="text-sm font-bold text-slate-700">No recent customer sales</p>
-                    <p className="text-xs text-slate-400 mt-0.5">
-                      Your customer purchases and downloads will stream here live.
+                  <div className="py-16 text-center bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
+                    <Package className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+                    <p className="text-base font-bold text-slate-900">No recent sales yet</p>
+                    <p className="text-sm font-medium text-slate-500 mt-1 max-w-sm mx-auto">
+                      Your customer purchases and real-time fulfillments will appear here once you make a sale.
                     </p>
                   </div>
                 )}
@@ -223,49 +225,44 @@ export default async function SellerDashboardPage() {
           </div>
         </div>
 
-        {/* Right Column: Wallet Hub, Top Products, Creator Tip */}
-        <div className="space-y-6">
-          {/* 1. Wallet Quick-Deck */}
-          <div className="rounded-[28px] bg-white p-2 ring-1 ring-slate-200/80 shadow-xs">
-            <div className="rounded-[22px] bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 sm:p-7 text-white relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none">
-                <Wallet className="w-36 h-36 -rotate-12 translate-x-8 -translate-y-8" />
-              </div>
-
-              <div className="relative z-10 flex flex-col justify-between h-full">
+        {/* Right Column (Span 4): Wallet Hub, Top Products */}
+        <div className="xl:col-span-4 space-y-8">
+          {/* 1. Wallet Hub (Ethereal Glass Design) */}
+          <div className="rounded-[2rem] bg-[#050505] p-2 ring-1 ring-slate-900 shadow-2xl relative overflow-hidden group">
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}></div>
+            <div className="absolute -top-32 -right-32 w-64 h-64 bg-emerald-500/20 blur-[80px] rounded-full pointer-events-none group-hover:bg-emerald-500/30 transition-colors duration-700" />
+            
+            <div className="rounded-[calc(2rem-0.5rem)] bg-gradient-to-br from-white/5 to-white/[0.02] p-8 text-white relative z-10 border border-white/10 backdrop-blur-2xl">
+              <div className="flex flex-col justify-between h-full">
                 <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-[10px] font-black tracking-[0.18em] uppercase text-slate-400">
-                      Creator Balance
+                  <div className="flex items-center justify-between mb-8">
+                    <span className="text-[10px] font-black tracking-[0.2em] uppercase text-white/50">
+                      Total Balance
                     </span>
-                    <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-2.5 py-0.5 rounded-full">
-                      <ShieldCheck className="w-3 h-3" /> Escrow Protected
+                    <span className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-3 py-1 rounded-full">
+                      <ShieldCheck className="w-3 h-3" /> Secured
                     </span>
                   </div>
 
-                  <div className="text-3xl sm:text-4xl font-black tracking-tight mb-5 tabular-nums">
-                    ₹
-                    {((wallet?.balance_paise ?? 0) / 100).toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
+                  <div className="text-5xl sm:text-6xl font-black tracking-tighter mb-8 tabular-nums">
+                    <AnimatedNumber value={(wallet?.balance_paise ?? 0) / 100} prefix="₹" decimals={2} duration={2} />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3 p-3.5 rounded-xl bg-white/5 border border-white/10 mb-6 text-xs backdrop-blur-xs">
-                    <div>
-                      <p className="text-slate-400 text-[11px] font-medium flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-amber-400" /> In Escrow
+                  <div className="grid grid-cols-2 gap-4 mb-8">
+                    <div className="p-4 rounded-2xl bg-white/5 border border-white/5 backdrop-blur-sm">
+                      <p className="text-white/40 text-[10px] uppercase tracking-wider font-bold flex items-center gap-1.5">
+                        <Clock className="w-3 h-3 text-amber-400" /> Escrow
                       </p>
-                      <p className="font-bold text-white mt-0.5 tabular-nums">
-                        ₹{((wallet?.pending_paise ?? 0) / 100).toLocaleString()}
+                      <p className="font-bold text-white text-lg mt-1.5 tabular-nums tracking-tight">
+                        <AnimatedNumber value={(wallet?.pending_paise ?? 0) / 100} prefix="₹" duration={2} />
                       </p>
                     </div>
-                    <div>
-                      <p className="text-slate-400 text-[11px] font-medium flex items-center gap-1">
-                        <TrendingUp className="w-3 h-3 text-emerald-400" /> Total Earned
+                    <div className="p-4 rounded-2xl bg-white/5 border border-white/5 backdrop-blur-sm">
+                      <p className="text-white/40 text-[10px] uppercase tracking-wider font-bold flex items-center gap-1.5">
+                        <TrendingUp className="w-3 h-3 text-emerald-400" /> Earned
                       </p>
-                      <p className="font-bold text-white mt-0.5 tabular-nums">
-                        ₹{((wallet?.total_earned_paise ?? 0) / 100).toLocaleString()}
+                      <p className="font-bold text-white text-lg mt-1.5 tabular-nums tracking-tight">
+                        <AnimatedNumber value={(wallet?.total_earned_paise ?? 0) / 100} prefix="₹" duration={2} />
                       </p>
                     </div>
                   </div>
@@ -274,9 +271,9 @@ export default async function SellerDashboardPage() {
                 <Link href="/seller/wallet">
                   <button
                     type="button"
-                    className="w-full py-3 rounded-xl bg-white text-slate-950 text-xs font-black hover:bg-slate-100 transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer active:scale-[0.98]"
+                    className="w-full h-12 rounded-xl bg-white text-slate-950 text-xs font-black uppercase tracking-wider hover:bg-slate-200 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
                   >
-                    <span>Manage Wallet & Payouts</span>
+                    <span>Payouts</span>
                     <ArrowUpRight className="w-4 h-4" />
                   </button>
                 </Link>
@@ -284,26 +281,28 @@ export default async function SellerDashboardPage() {
             </div>
           </div>
 
-          {/* 2. Top Performing Assets */}
-          <div className="rounded-[28px] bg-white p-2 ring-1 ring-slate-200/80 shadow-xs">
-            <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/40 p-6">
-              <div className="flex items-center justify-between mb-5">
+          {/* 2. Top Performing Assets (Double-Bezel) */}
+          <div className="rounded-[2rem] bg-white p-2 ring-1 ring-slate-200/60 shadow-sm">
+            <div className="rounded-[calc(2rem-0.5rem)] bg-slate-50/50 p-8">
+              <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-2">
-                  <BarChart2 className="w-4 h-4 text-blue-600" />
-                  <h3 className="text-base font-black text-slate-900 tracking-tight">
+                  <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                    <BarChart2 className="w-4 h-4" />
+                  </div>
+                  <h3 className="text-lg font-black text-slate-950 tracking-tight">
                     Top Assets
                   </h3>
                 </div>
                 <Link href="/seller/products">
-                  <span className="text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-900 transition-colors">
                     View All
                   </span>
                 </Link>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {topProducts.length === 0 ? (
-                  <div className="p-6 bg-slate-50/60 rounded-2xl text-center text-xs font-medium text-slate-500 border border-dashed border-slate-200">
+                  <div className="p-8 bg-white rounded-2xl text-center text-sm font-semibold text-slate-500 border border-dashed border-slate-200 shadow-sm">
                     No products listed yet.
                   </div>
                 ) : (
@@ -312,24 +311,24 @@ export default async function SellerDashboardPage() {
 
                     return (
                       <Link href={`/seller/products/${product.id}/edit`} key={product.id}>
-                        <div className="group p-3 rounded-2xl bg-white border border-slate-200/60 hover:border-slate-300 hover:shadow-2xs transition-all flex flex-col gap-2 cursor-pointer mb-2">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200/80 flex items-center justify-center flex-shrink-0 overflow-hidden relative font-black text-slate-400">
+                        <div className="group relative">
+                          <div className="flex items-center gap-4 p-3 rounded-2xl hover:bg-white hover:shadow-md border border-transparent hover:border-slate-200 transition-all duration-300 cursor-pointer">
+                            <div className="w-12 h-12 rounded-xl bg-slate-200 border border-slate-200/80 flex items-center justify-center flex-shrink-0 overflow-hidden relative font-black text-slate-400">
                               {product.image_url ? (
                                 <img
                                   src={product.image_url}
                                   alt=""
-                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
                                 />
                               ) : (
-                                <span className="text-xs">#{rank + 1}</span>
+                                <span className="text-sm">#{rank + 1}</span>
                               )}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h4 className="text-xs font-bold text-slate-900 truncate group-hover:text-blue-600 transition-colors">
+                              <h4 className="text-sm font-bold text-slate-900 truncate group-hover:text-blue-600 transition-colors">
                                 {product.title}
                               </h4>
-                              <div className="flex items-center gap-2 mt-0.5 text-[11px] text-slate-500 font-semibold">
+                              <div className="flex items-center gap-2 mt-1 text-[11px] text-slate-500 font-semibold uppercase tracking-wider">
                                 <span className="text-slate-900 tabular-nums">
                                   {product.sales_count} sales
                                 </span>
@@ -337,8 +336,8 @@ export default async function SellerDashboardPage() {
                                 <span className="tabular-nums">{product.view_count} views</span>
                               </div>
                             </div>
-                            <div className="text-right flex-shrink-0">
-                              <span className="text-xs font-black text-slate-900 tabular-nums">
+                            <div className="text-right flex-shrink-0 pl-4 border-l border-slate-200/80">
+                              <span className="text-sm font-black text-slate-900 tabular-nums">
                                 {product.price_paise === 0
                                   ? "Free"
                                   : `₹${(product.price_paise / 100).toLocaleString()}`}
@@ -346,10 +345,10 @@ export default async function SellerDashboardPage() {
                             </div>
                           </div>
 
-                          {/* Velocity Progress Bar */}
-                          <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                          {/* Minimal Progress Line underneath the item when hovered */}
+                          <div className="absolute bottom-0 left-3 right-3 h-[2px] bg-slate-100 rounded-full overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                             <div
-                              className="h-full rounded-full bg-blue-600 transition-all duration-500"
+                              className="h-full rounded-full bg-blue-500 transition-all duration-1000 ease-out"
                               style={{ width: `${salesShare}%` }}
                             />
                           </div>
@@ -358,25 +357,6 @@ export default async function SellerDashboardPage() {
                     );
                   })
                 )}
-              </div>
-            </div>
-          </div>
-
-          {/* 3. Creator Playbook Card */}
-          <div className="rounded-[28px] bg-white p-2 ring-1 ring-slate-200/80 shadow-xs">
-            <div className="rounded-[22px] bg-gradient-to-br from-blue-50/60 to-indigo-50/50 p-5 border border-blue-100/60">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center flex-shrink-0 shadow-xs shadow-blue-500/20">
-                  <Sparkles className="w-4 h-4" />
-                </div>
-                <div>
-                  <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-wider">
-                    Creator Tip
-                  </h4>
-                  <p className="text-xs text-slate-600 font-medium mt-1 leading-relaxed">
-                    Link a GitHub repository to enable automatic repository cloning for buyers upon checkout.
-                  </p>
-                </div>
               </div>
             </div>
           </div>

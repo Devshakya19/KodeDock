@@ -1,5 +1,7 @@
 "use client";
 
+import { motion, AnimatePresence } from "framer-motion";
+
 import { useState, useEffect } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -209,7 +211,7 @@ export function Navbar({ variant, email = "", fullName, searchQuery = "" }: Navb
           )}
           
           {variant === "seller" && (
-            <div className="hidden lg:flex items-center gap-1 bg-white px-2 py-1.5 rounded-full border border-slate-200/80 shadow-xs">
+            <div className="hidden lg:flex items-center gap-1 bg-white/90 backdrop-blur-md px-1.5 py-1.5 rounded-full border border-slate-200 shadow-sm relative">
               {SELLER_NAV_ITEMS.map((item) => {
                 const isActive = item.href === "/seller" ? pathname === "/seller" : pathname.startsWith(item.href);
                 const Icon = item.icon;
@@ -217,13 +219,20 @@ export function Navbar({ variant, email = "", fullName, searchQuery = "" }: Navb
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
+                    className={`relative flex items-center gap-2 px-4 py-2.5 rounded-full text-[13px] font-bold transition-all z-10 group ${
                       isActive
-                        ? "bg-slate-950 text-white shadow-2xs"
-                        : "text-slate-600 hover:text-slate-950 hover:bg-slate-50"
+                        ? "text-white"
+                        : "text-slate-500 hover:text-slate-900 hover:bg-slate-50/80"
                     }`}
                   >
-                    <Icon className={`w-3.5 h-3.5 ${isActive ? "text-blue-400" : "text-slate-400"}`} />
+                    {isActive && (
+                      <motion.div
+                        layoutId="seller-nav-pill"
+                        className="absolute inset-0 bg-slate-950 rounded-full shadow-md -z-10"
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                      />
+                    )}
+                    <Icon className={`w-3.5 h-3.5 transition-all duration-300 ${isActive ? "text-white" : "text-slate-400 group-hover:scale-110"}`} />
                     <span>{item.label}</span>
                   </Link>
                 );
