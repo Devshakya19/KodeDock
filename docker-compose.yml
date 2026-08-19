@@ -60,6 +60,7 @@ services:
       - CORE_ENGINE_URL=http://core-engine:4001
       - JWT_SECRET=${JWT_SECRET:-codehaat-super-secret-jwt-key-change-in-production-2024}
       - SEAWEEDFS_URL=http://seaweedfs:8333
+      - SEAWEEDFS_FILER_URL=http://seaweedfs:8888
     depends_on:
       - core-engine
     networks:

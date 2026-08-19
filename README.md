@@ -2,8 +2,8 @@
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: light)" srcset="assets/banner.jpg">
-    <img src="assets/banner.jpg" alt="CodeHaat — India's #1 Digital Code Marketplace" width="100%">
+    <source media="(prefers-color-scheme: light)" srcset="assets/banner.png">
+    <img src="assets/banner.png" alt="CodeHaat — India's #1 Digital Code Marketplace" width="100%">
   </picture>
 </p>
 
