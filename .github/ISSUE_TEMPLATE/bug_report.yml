@@ -1,5 +1,5 @@
 name: 🐞 Bug Report
-description: Create a report to help us improve CodeHaat by fixing bugs
+description: Create a report to help us improve KodeDock by fixing bugs
 title: "[BUG]: "
 labels: ["bug", "triage"]
 body:
@@ -12,8 +12,8 @@ body:
   - type: input
     id: version
     attributes:
-      label: CodeHaat Version
-      description: What version of CodeHaat are you using? (e.g. v1.1.0, or specific commit hash)
+      label: KodeDock Version
+      description: What version of KodeDock are you using? (e.g. v1.1.0, or specific commit hash)
       placeholder: e.g. v1.1.0
     validations:
       required: true

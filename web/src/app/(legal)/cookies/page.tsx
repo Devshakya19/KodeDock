@@ -4,7 +4,7 @@ export default function CookiesPage() {
   return (
     <StaticPageLayout
       title="Cookie Policy"
-      description="How we use cookies on CodeHaat."
+      description="How we use cookies on KodeDock."
     >
       <div className="space-y-8 text-sm text-slate-600 leading-relaxed">
         <p><em>Last updated: July 2026</em></p>

@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CodeHaatLogo } from "@/components/brand/codehaat-logo";
+import { KodeDockLogo } from "@/components/brand/kodedock-logo";
 import { serverApiGet } from "@/lib/auth/client";
 import { theme } from "@/lib/theme";
 
@@ -43,7 +43,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             <ArrowLeft className="w-4 h-4" />
             <span className="text-sm font-medium">Back</span>
           </Link>
-          <CodeHaatLogo href="/browse" />
+          <KodeDockLogo href="/browse" />
           <form className="hidden md:flex flex-1 max-w-xl" action="/search" method="get">
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />

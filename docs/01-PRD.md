@@ -1,6 +1,6 @@
-# CodeHaat — Project Requirement Document
+# KodeDock — Project Requirement Document
 
-> **"Haat" means marketplace in Hindi. CodeHaat is where code meets commerce.**
+> **"Haat" means marketplace in Hindi. KodeDock is where code meets commerce.**
 
 ---
 
@@ -19,7 +19,7 @@
 
 ## 1. Executive Summary
 
-CodeHaat is India's first developer-focused digital goods marketplace that delivers code directly to buyers' GitHub accounts as private repositories — no .zip files, no extraction, just clone and build.
+KodeDock is India's first developer-focused digital goods marketplace that delivers code directly to buyers' GitHub accounts as private repositories — no .zip files, no extraction, just clone and build.
 
 **The Problem:** Indian developers create thousands of valuable projects, templates, and tools every year but have no affordable platform to sell them. Global alternatives like CodeCanyon charge 20-55% commission and distribute static .zip files.
 
@@ -42,7 +42,7 @@ CodeHaat is India's first developer-focused digital goods marketplace that deliv
 
 ## 3. Solution Overview
 
-### What CodeHaat Does
+### What KodeDock Does
 
 1. **Sellers** connect their GitHub account, link repos, set prices
 2. **Buyers** browse, preview, and purchase code
@@ -52,7 +52,7 @@ CodeHaat is India's first developer-focused digital goods marketplace that deliv
 
 ### How It's Different
 
-| Feature | CodeHaat | CodeCanyon | Gumroad |
+| Feature | KodeDock | CodeCanyon | Gumroad |
 |---------|----------|------------|---------|
 | Commission | 2.5% | 20-55% | 10% |
 | Delivery | GitHub Repo | .zip File | File Download |

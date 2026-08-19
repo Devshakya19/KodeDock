@@ -30,11 +30,11 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CodeHaat",
+  title: "KodeDock",
   description:
     "Buy and sell production-grade digital assets with seamless GitHub integration. No .zip files — code delivered directly to your GitHub. Starting from ₹49. Only 2.5% commission.",
   keywords: [
-    "CodeHaat",
+    "KodeDock",
     "digital marketplace",
     "code marketplace",
     "developer tools",
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     "UI kits",
     "web templates",
   ],
-  authors: [{ name: "CodeHaat" }],
+  authors: [{ name: "KodeDock" }],
   icons: {
     icon: [
       {
@@ -57,16 +57,16 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: "CodeHaat",
+    title: "KodeDock",
     description:
       "Buy and sell production-grade digital assets. GitHub repo delivery. Only 2.5% commission.",
-    url: "https://codehaat.com",
-    siteName: "CodeHaat",
+    url: "https://kodedock.com",
+    siteName: "KodeDock",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "CodeHaat — India's #1 Digital Code Marketplace",
+    title: "KodeDock — India's #1 Digital Code Marketplace",
     description:
       "No .zip files. GitHub repos delivered instantly. Only 2.5% commission.",
   },

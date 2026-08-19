@@ -7,7 +7,7 @@ function setAuthCookie(response: NextResponse, request: Request, token: string) 
   const proto = request.headers.get("x-forwarded-proto") || new URL(request.url).protocol.replace(":", "");
   const isSecure = proto === "https";
 
-  response.cookies.set("codehaat_token", token, {
+  response.cookies.set("kodedock_token", token, {
     httpOnly: true,
     secure: isSecure,
     sameSite: "lax",

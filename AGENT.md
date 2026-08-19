@@ -1,10 +1,10 @@
-# CodeHaat Agent Guidelines
+# KodeDock Agent Guidelines
 
-Welcome to the CodeHaat project. This document serves as the primary rulebook for AI agents assisting with this project. 
+Welcome to the KodeDock project. This document serves as the primary rulebook for AI agents assisting with this project. 
 When working on this codebase, always adhere strictly to the following guidelines.
 
 ## 1. Core Architecture & Philosophy
-- **Polyglot Microservices:** CodeHaat is a distributed system with strict network segmentation. Never try to combine services into a monolith.
+- **Polyglot Microservices:** KodeDock is a distributed system with strict network segmentation. Never try to combine services into a monolith.
 - **Security-First:** The platform handles financial transactions. Prioritize security (HttpOnly JWTs, Argon2 hashing, SQL parameterization, escaping inputs).
 - **Isolated Networks:** Backend services operate on an isolated Docker bridge network. Only the Next.js proxy and WebSocket endpoints are exposed to the public internet.
 

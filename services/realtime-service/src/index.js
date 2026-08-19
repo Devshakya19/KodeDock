@@ -38,7 +38,7 @@ const server = http.createServer((req, res) => {
     res.end(
       JSON.stringify({
         status: "ok",
-        service: "codehaat-realtime",
+        service: "kodedock-realtime",
         version: "0.1.0",
         connections: clients.size,
       })

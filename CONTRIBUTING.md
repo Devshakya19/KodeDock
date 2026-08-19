@@ -1,6 +1,6 @@
-# Contributors — CodeHaat
+# Contributors — KodeDock
 
-> CodeHaat is built by a small, focused team with a big mission: to make India's developer ecosystem
+> KodeDock is built by a small, focused team with a big mission: to make India's developer ecosystem
 > more accessible by building the country's premier digital code marketplace.
 
 ---
@@ -17,13 +17,13 @@
 
 ## Contributing
 
-CodeHaat is **proprietary software**. External contributions are accepted only through an explicit written agreement with the CodeHaat team.
+KodeDock is **proprietary software**. External contributions are accepted only through an explicit written agreement with the KodeDock team.
 
 If you are interested in contributing, please reach out:
 
-- 📧 **Team**: hello@codehaat.com
-- 🔐 **Security**: security@codehaat.com
-- ⚖️ **Legal / Licensing**: legal@codehaat.com
+- 📧 **Team**: hello@kodedock.com
+- 🔐 **Security**: security@kodedock.com
+- ⚖️ **Legal / Licensing**: legal@kodedock.com
 
 ---
 

@@ -9,7 +9,7 @@ const OPENINGS = [
     department: "Engineering",
     location: "Remote / India",
     type: "Full-time",
-    description: "Build and scale CodeHaat's marketplace platform using Next.js, Rust, and Go.",
+    description: "Build and scale KodeDock's marketplace platform using Next.js, Rust, and Go.",
   },
   {
     title: "UI/UX Designer",
@@ -42,7 +42,7 @@ export default function CareersPage() {
     >
       <div className="space-y-8">
         <section>
-          <h2 className="text-2xl font-semibold text-slate-950 mb-4">Why Work at CodeHaat?</h2>
+          <h2 className="text-2xl font-semibold text-slate-950 mb-4">Why Work at KodeDock?</h2>
           <p className="text-slate-600 leading-relaxed">
             We&apos;re building something meaningful — a platform that empowers Indian developers
             to monetize their skills. Join a small, passionate team where your work directly

@@ -1,6 +1,6 @@
-# CodeHaat Troubleshooting Guide
+# KodeDock Troubleshooting Guide
 
-This guide covers common issues encountered during development and deployment of CodeHaat, along with their solutions.
+This guide covers common issues encountered during development and deployment of KodeDock, along with their solutions.
 
 ## Table of Contents
 1. [Docker & Container Issues](#docker--container-issues)
@@ -92,12 +92,12 @@ docker compose logs -f postgres
 3. Ensure depends_on is set correctly in docker-compose.yml
 4. Manually test connection:
 ```bash
-docker compose exec postgres pg_isready -U codehaat -d codehaat
+docker compose exec postgres pg_isready -U kodedock -d kodedock
 ```
 
 ### Authentication Failed
 **Symptoms**:
-- "password authentication failed for user "codehaat""
+- "password authentication failed for user "kodedock""
 - Database connection rejected despite service running
 
 **Solution**:
@@ -129,7 +129,7 @@ docker compose exec postgres ls -la /docker-entrypoint-initdb.d/
 ```
 3. Manually apply schema if needed:
 ```bash
-docker compose exec -T postgres psql -U codehaat -d codehaat < sql/01-schema.sql
+docker compose exec -T postgres psql -U kodedock -d kodedock < sql/01-schema.sql
 ```
 
 ## Service Connection Issues
@@ -307,7 +307,7 @@ RUST_LOG=info cargo run
 - Redirect loops to login page
 
 **Solution**:
-1. Check that the `codehaat_token` cookie is being set (Application > Cookies in devtools)
+1. Check that the `kodedock_token` cookie is being set (Application > Cookies in devtools)
 2. Verify JWT_SECRET is consistent across services
 3. Check token expiration (tokens typically expire in 24h)
 4. Verify the cookie path and domain settings
@@ -334,7 +334,7 @@ RUST_LOG=info cargo run
 **Solution**:
 1. Verify the user's role in the database:
 ```bash
-docker compose exec -T postgres psql -U codehaat -d codehaat -c "SELECT role FROM profiles WHERE id = 'user-uuid-here';"
+docker compose exec -T postgres psql -U kodedock -d kodedock -c "SELECT role FROM profiles WHERE id = 'user-uuid-here';"
 ```
 2. Check that role-based middleware is correctly implemented
 3. Verify that the JWT token contains the correct role information
@@ -368,7 +368,7 @@ docker compose logs -f core-engine | grep razorpay
 **Solution**:
 1. Check wallet transactions for accuracy:
 ```bash
-docker compose exec -T postgres psql -U codehaat -d codehaat -c "SELECT * FROM wallet_transactions ORDER BY created_at DESC LIMIT 10;"
+docker compose exec -T postgres psql -U kodedock -d kodedock -c "SELECT * FROM wallet_transactions ORDER BY created_at DESC LIMIT 10;"
 ```
 2. Verify that transaction types are correctly interpreted (positive vs negative amounts)
 3. Check for race conditions in concurrent transactions
@@ -461,7 +461,7 @@ docker compose exec -T postgres psql -U codehaat -d codehaat -c "SELECT * FROM w
 2. Convert to local time only for display purposes
 3. Verify database timezone settings:
 ```bash
-docker compose exec -T postgres psql -U codehaat -d codehaat -c "SHOW timezone;"
+docker compose exec -T postgres psql -U kodedock -d kodedock -c "SHOW timezone;"
 ```
 4. Check that application code handles timezones correctly (especially in escrow calculations)
 5. Use libraries like chrono (Rust) or datetime (Python) with proper timezone support

@@ -12,7 +12,7 @@ pub async fn health_check(pool: actix_web::web::Data<PgPool>) -> HttpResponse {
 
     HttpResponse::Ok().json(json!({
         "status": status,
-        "service": "codehaat-core",
+        "service": "kodedock-core",
         "version": "0.1.0",
         "db": if db_ok { "connected" } else { "unavailable" }
     }))

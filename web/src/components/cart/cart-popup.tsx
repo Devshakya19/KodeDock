@@ -14,11 +14,11 @@ interface CartItem {
 
 function getCart(): CartItem[] {
   if (typeof window === "undefined") return [];
-  try { return JSON.parse(localStorage.getItem("codehaat_cart") || "[]"); } catch { return []; }
+  try { return JSON.parse(localStorage.getItem("kodedock_cart") || "[]"); } catch { return []; }
 }
 
 function saveCart(cart: CartItem[]) {
-  localStorage.setItem("codehaat_cart", JSON.stringify(cart));
+  localStorage.setItem("kodedock_cart", JSON.stringify(cart));
   window.dispatchEvent(new Event("cart-updated"));
 }
 

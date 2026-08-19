@@ -38,7 +38,7 @@ async function proxyRequest(request: NextRequest, method: string) {
 
   // Read token from HttpOnly cookie
   const cookieHeader = request.headers.get("cookie") || "";
-  const tokenMatch = cookieHeader.match(/codehaat_token=([^;]+)/);
+  const tokenMatch = cookieHeader.match(/kodedock_token=([^;]+)/);
   const token = tokenMatch?.[1];
 
   // Get client IP — trust only X-Forwarded-For from trusted reverse proxy

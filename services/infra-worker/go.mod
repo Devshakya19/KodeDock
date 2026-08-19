@@ -1,4 +1,4 @@
-module github.com/codehaat/infra-worker
+module github.com/kodedock/infra-worker
 
 go 1.23.0
 

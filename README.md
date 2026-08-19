@@ -1,22 +1,22 @@
-# CodeHaat — India's Digital Code Marketplace
+# KodeDock — India's Digital Code Marketplace
 
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: light)" srcset="assets/banner.png">
-    <img src="assets/banner.png" alt="CodeHaat — India's #1 Digital Code Marketplace" width="100%">
+    <img src="assets/banner.png" alt="KodeDock — India's #1 Digital Code Marketplace" width="100%">
   </picture>
 </p>
 
 <p align="center">
-  <a href="https://github.com/Devshakya19/CodeHaat/actions"><img src="https://img.shields.io/github/actions/workflow/status/Devshakya19/CodeHaat/ci.yml?branch=main&style=flat-square&label=CI" alt="CI Status"></a>
-  <a href="https://github.com/Devshakya19/CodeHaat/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Proprietary-red?style=flat-square" alt="License: Proprietary"></a>
+  <a href="https://github.com/Devshakya19/KodeDock/actions"><img src="https://img.shields.io/github/actions/workflow/status/Devshakya19/KodeDock/ci.yml?branch=main&style=flat-square&label=CI" alt="CI Status"></a>
+  <a href="https://github.com/Devshakya19/KodeDock/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Proprietary-red?style=flat-square" alt="License: Proprietary"></a>
   <a href="https://nodejs.org/en"><img src="https://img.shields.io/badge/node-%3E%3D%2020.x-brightgreen?style=flat-square" alt="Node.js ≥ 20"></a>
   <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/rust-%3E%3D%201.70-orange?style=flat-square" alt="Rust ≥ 1.70"></a>
   <a href="https://docs.docker.com/"><img src="https://img.shields.io/badge/docker-%3E%3D%2024.0-blue?style=flat-square" alt="Docker ≥ 24.0"></a>
   <img src="https://img.shields.io/badge/version-1.3.0-informational?style=flat-square" alt="Version 1.3.0">
 </p>
 
-> **⚠️ PROPRIETARY SOFTWARE** — This repository contains proprietary and confidential code owned by CodeHaat.
+> **⚠️ PROPRIETARY SOFTWARE** — This repository contains proprietary and confidential code owned by KodeDock.
 > Unauthorized copying, cloning, distribution, or use of this code is strictly prohibited and may result in legal action.
 > See [LICENSE](LICENSE) for full terms.
 
@@ -40,7 +40,7 @@
 
 ## Overview
 
-**CodeHaat** is India's premier digital code marketplace connecting developers who build production-grade code assets with businesses and developers who need them. Unlike traditional platforms that distribute static `.zip` archives, CodeHaat delivers purchased code directly to buyers' private GitHub repositories — providing a seamless, version-controlled experience from day one.
+**KodeDock** is India's premier digital code marketplace connecting developers who build production-grade code assets with businesses and developers who need them. Unlike traditional platforms that distribute static `.zip` archives, KodeDock delivers purchased code directly to buyers' private GitHub repositories — providing a seamless, version-controlled experience from day one.
 
 The platform is built on a highly optimized polyglot microservices architecture. It leverages the raw performance of Rust for its financial core, Next.js for a premium frontend experience, Go for background automation, Python for AI-driven recommendations, and Node.js for real-time WebSocket capabilities.
 
@@ -51,13 +51,13 @@ The platform is built on a highly optimized polyglot microservices architecture.
 1. 📤 **Sellers Upload:** Developers upload their code repositories or link their private GitHub repos to the platform.
 2. 🛒 **Buyers Purchase:** Buyers browse the marketplace, review products, and purchase them securely via Razorpay (INR-native).
 3. 🔒 **Escrow Protection:** Funds are held in a secure database escrow for 7 days. If a dispute is raised, admins intervene. Otherwise, the funds are automatically released to the seller's wallet.
-4. 🚀 **Instant Delivery:** Upon successful payment, CodeHaat's background infrastructure automatically duplicates the purchased codebase into the buyer's GitHub account as a private repository.
+4. 🚀 **Instant Delivery:** Upon successful payment, KodeDock's background infrastructure automatically duplicates the purchased codebase into the buyer's GitHub account as a private repository.
 
 ---
 
 ## Access & Security
 
-CodeHaat is designed **security-first** across every layer of the stack. To prevent external tampering, the platform utilizes strict network segmentation and deep defense mechanisms.
+KodeDock is designed **security-first** across every layer of the stack. To prevent external tampering, the platform utilizes strict network segmentation and deep defense mechanisms.
 
 ### Network Topology & Access
 
@@ -94,7 +94,7 @@ graph TD
 
 ## Key Features
 
-CodeHaat packs powerful features to ensure a premium experience for both buyers and sellers:
+KodeDock packs powerful features to ensure a premium experience for both buyers and sellers:
 
 | Feature Category | Capabilities & Details |
 |-----------------|------------------------|
@@ -233,13 +233,13 @@ graph LR
 | **Race Conditions / Double Spends** | **Atomic DB Transactions** | Wallet updates use atomic `FOR UPDATE` row locks in PostgreSQL to ensure sequential ledger updates. |
 | **Malicious File Uploads** | **Pre-signed URLs** | Uploads bypass backend APIs and go directly to SeaweedFS via temporary, size-restricted pre-signed URLs. |
 
-To report a security vulnerability, please email **security@codehaat.com**. See [SECURITY](SECURITY) for our responsible disclosure policy.
+To report a security vulnerability, please email **security@kodedock.com**. See [SECURITY](SECURITY) for our responsible disclosure policy.
 
 ---
 
 ## Documentation
 
-CodeHaat maintains comprehensive documentation for developers, contributors, and auditors.
+KodeDock maintains comprehensive documentation for developers, contributors, and auditors.
 
 | Area | Documentation Link | Description |
 |------|-------------------|-------------|
@@ -262,11 +262,11 @@ CodeHaat maintains comprehensive documentation for developers, contributors, and
 
 ## License
 
-This project is **proprietary software** owned by CodeHaat. All rights reserved.
+This project is **proprietary software** owned by KodeDock. All rights reserved.
 
 - Unauthorized copying, cloning, or distribution is **strictly prohibited**
 - See [LICENSE](LICENSE) for the complete license agreement
-- Licensing inquiries: **legal@codehaat.me**
+- Licensing inquiries: **legal@kodedock.me**
 
 ---
 

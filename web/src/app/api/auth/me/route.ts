@@ -5,7 +5,7 @@ const RUST_BACKEND = process.env.CORE_ENGINE_URL || "http://localhost:4001";
 export async function GET(request: Request) {
   try {
     const cookieHeader = request.headers.get("cookie") || "";
-    const tokenMatch = cookieHeader.match(/codehaat_token=([^;]+)/);
+    const tokenMatch = cookieHeader.match(/kodedock_token=([^;]+)/);
     const token = tokenMatch?.[1];
 
     if (!token) {

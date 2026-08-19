@@ -103,7 +103,7 @@ export default function DeveloperRegisterPage() {
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-slate-950">Create seller account</h1>
             <p className="text-sm text-slate-600 mt-2">
-              Start selling your code on CodeHaat
+              Start selling your code on KodeDock
             </p>
           </div>
 

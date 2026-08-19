@@ -1,14 +1,14 @@
 PROPRIETARY SOFTWARE LICENSE AGREEMENT
 
-Copyright (c) 2024–2026 CodeHaat. All rights reserved.
+Copyright (c) 2024–2026 KodeDock. All rights reserved.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 IMPORTANT — PLEASE READ CAREFULLY
 
 This Proprietary Software License Agreement ("Agreement") is a legally binding
-contract between you ("User") and CodeHaat ("Company") governing your access
-to and use of the CodeHaat software platform and all associated documentation,
+contract between you ("User") and KodeDock ("Company") governing your access
+to and use of the KodeDock software platform and all associated documentation,
 source code, algorithms, data structures, APIs, designs, user interfaces, and
 derivative works (collectively, the "Software").
 
@@ -21,13 +21,13 @@ ACCESS OR USE THE SOFTWARE.
 
 1. DEFINITIONS
 
-   1.1  "Software" means the CodeHaat platform in its entirety, including but
+   1.1  "Software" means the KodeDock platform in its entirety, including but
         not limited to all source code, object code, compiled binaries,
         algorithms, data structures, database schemas, APIs, user interfaces,
         design assets, configuration files, scripts, and associated
         documentation, whether in human-readable or machine-readable form.
 
-   1.2  "CodeHaat" or "Company" means the legal entity and individual(s) that
+   1.2  "KodeDock" or "Company" means the legal entity and individual(s) that
         own all intellectual property rights to the Software.
 
    1.3  "User" means any individual, company, organisation, or other legal
@@ -35,24 +35,24 @@ ACCESS OR USE THE SOFTWARE.
         Software in any form.
 
    1.4  "Authorised Personnel" means employees, contractors, or consultants
-        of CodeHaat who have been granted explicit written permission to
+        of KodeDock who have been granted explicit written permission to
         access and work with the Software.
 
    1.5  "Confidential Information" means the Software and any non-public
-        information disclosed by CodeHaat in connection with this Agreement,
+        information disclosed by KodeDock in connection with this Agreement,
         including technical, financial, business, and product information.
 
 2. GRANT OF LIMITED RIGHTS
 
-   Subject to your full compliance with this Agreement, CodeHaat grants you
+   Subject to your full compliance with this Agreement, KodeDock grants you
    a limited, non-exclusive, non-transferable, non-sublicensable, and
    revocable licence to view the Software solely for the following permitted
    purposes:
 
    (a) Internal review and evaluation by Authorised Personnel;
    (b) Security research conducted under a written authorisation from
-       CodeHaat; or
-   (c) Such other purposes as CodeHaat may expressly authorise in writing.
+       KodeDock; or
+   (c) Such other purposes as KodeDock may expressly authorise in writing.
 
    ALL OTHER USES ARE EXPRESSLY PROHIBITED. This Agreement does NOT grant
    any right to:
@@ -79,32 +79,32 @@ ACCESS OR USE THE SOFTWARE.
    3.1  Ownership. The Software and all copies thereof, together with all
         patents (pending or granted), copyrights, trade secrets, trademarks,
         and other intellectual property rights embodied therein, are and shall
-        remain the sole and exclusive property of CodeHaat. This Agreement
+        remain the sole and exclusive property of KodeDock. This Agreement
         does not convey, transfer, or assign any ownership interest in or to
         the Software.
 
    3.2  No Implied Licences. No licence is granted by implication, estoppel,
         or otherwise. Any rights not expressly granted in this Agreement are
-        reserved by CodeHaat.
+        reserved by KodeDock.
 
    3.3  Feedback. Any suggestions, ideas, or feedback you provide regarding
         the Software are voluntarily given and become the exclusive property
-        of CodeHaat, which may use such feedback without any obligation to you.
+        of KodeDock, which may use such feedback without any obligation to you.
 
 4. CONFIDENTIALITY
 
-   4.1  The Software constitutes valuable Confidential Information of CodeHaat.
+   4.1  The Software constitutes valuable Confidential Information of KodeDock.
         You agree to:
 
         (a) Hold the Software in strict confidence using at least the same
             degree of care you use to protect your own confidential information
             (and in no event less than reasonable care);
         (b) Not disclose, share, publish, or make the Software available to
-            any third party without the prior written consent of CodeHaat;
+            any third party without the prior written consent of KodeDock;
         (c) Limit access to the Software to Authorised Personnel who have a
             legitimate need to know and are bound by confidentiality obligations
             no less restrictive than those in this Agreement;
-        (d) Immediately notify CodeHaat in writing upon discovering any
+        (d) Immediately notify KodeDock in writing upon discovering any
             unauthorised use, disclosure, or breach of this Agreement.
 
    4.2  These confidentiality obligations survive the termination or expiry
@@ -124,7 +124,7 @@ ACCESS OR USE THE SOFTWARE.
    (d) Interfere with, disrupt, or degrade the performance or security of
        the Software or any infrastructure connected to it;
    (e) Conduct penetration testing, fuzzing, or security assessments of any
-       CodeHaat production systems without prior written authorisation.
+       KodeDock production systems without prior written authorisation.
 
 6. TERMINATION
 
@@ -132,7 +132,7 @@ ACCESS OR USE THE SOFTWARE.
         terminate automatically and immediately, without notice, if you fail to
         comply with any term or condition of this Agreement.
 
-   6.2  Termination by CodeHaat. CodeHaat may terminate this Agreement at any
+   6.2  Termination by KodeDock. KodeDock may terminate this Agreement at any
         time, for any reason, upon written notice to you.
 
    6.3  Effect of Termination. Upon termination, you must immediately:
@@ -140,7 +140,7 @@ ACCESS OR USE THE SOFTWARE.
         (a) Cease all access to and use of the Software;
         (b) Destroy all copies of the Software in your possession or control,
             whether in whole or in part, in any format or medium;
-        (c) Certify in writing to CodeHaat that you have done so, if requested.
+        (c) Certify in writing to KodeDock that you have done so, if requested.
 
    6.4  Survival. Sections 3 (Intellectual Property), 4 (Confidentiality),
         5 (Restrictions), 7 (Disclaimer of Warranties), 8 (Limitation of
@@ -151,30 +151,30 @@ ACCESS OR USE THE SOFTWARE.
 
    THE SOFTWARE IS PROVIDED "AS IS" AND "AS AVAILABLE," WITHOUT WARRANTY OF
    ANY KIND, EXPRESS OR IMPLIED. TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE
-   LAW, CODEHAAT EXPRESSLY DISCLAIMS ALL WARRANTIES, INCLUDING BUT NOT LIMITED
+   LAW, KODEDOCK EXPRESSLY DISCLAIMS ALL WARRANTIES, INCLUDING BUT NOT LIMITED
    TO THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-   PURPOSE, TITLE, AND NON-INFRINGEMENT. CODEHAAT DOES NOT WARRANT THAT THE
+   PURPOSE, TITLE, AND NON-INFRINGEMENT. KODEDOCK DOES NOT WARRANT THAT THE
    SOFTWARE WILL MEET YOUR REQUIREMENTS, OPERATE WITHOUT INTERRUPTION, OR BE
    FREE OF ERRORS, DEFECTS, VIRUSES, OR OTHER HARMFUL COMPONENTS.
 
 8. LIMITATION OF LIABILITY
 
-   8.1  IN NO EVENT SHALL CODEHAAT, ITS DIRECTORS, OFFICERS, EMPLOYEES,
+   8.1  IN NO EVENT SHALL KODEDOCK, ITS DIRECTORS, OFFICERS, EMPLOYEES,
         AGENTS, LICENSORS, OR SERVICE PROVIDERS BE LIABLE FOR ANY INDIRECT,
         INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES
         OF ANY KIND, INCLUDING BUT NOT LIMITED TO LOSS OF REVENUE, LOSS OF
         PROFITS, LOSS OF BUSINESS, LOSS OF DATA, OR LOSS OF GOODWILL, ARISING
         OUT OF OR RELATED TO THIS AGREEMENT OR YOUR USE OF OR INABILITY TO
-        USE THE SOFTWARE, EVEN IF CODEHAAT HAS BEEN ADVISED OF THE POSSIBILITY
+        USE THE SOFTWARE, EVEN IF KODEDOCK HAS BEEN ADVISED OF THE POSSIBILITY
         OF SUCH DAMAGES.
 
-   8.2  TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, CODEHAAT'S TOTAL
+   8.2  TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, KODEDOCK'S TOTAL
         CUMULATIVE LIABILITY ARISING OUT OF OR RELATED TO THIS AGREEMENT SHALL
         NOT EXCEED ONE HUNDRED INDIAN RUPEES (INR 100).
 
 9. INDEMNIFICATION
 
-   You agree to indemnify, defend, and hold harmless CodeHaat and its officers,
+   You agree to indemnify, defend, and hold harmless KodeDock and its officers,
    directors, employees, agents, and successors from and against any claims,
    liabilities, damages, losses, costs, and expenses (including reasonable
    legal fees) arising from or related to: (a) your breach of this Agreement;
@@ -199,12 +199,12 @@ ACCESS OR USE THE SOFTWARE.
 
     For licensing inquiries, commercial arrangements, or general legal matters:
 
-        Email:   legal@codehaat.com
+        Email:   legal@kodedock.com
         Subject: [LICENSE INQUIRY] <brief description>
 
     For security vulnerability reports:
 
-        Email:   security@codehaat.com
+        Email:   security@kodedock.com
 
 12. GENERAL PROVISIONS
 
@@ -213,7 +213,7 @@ ACCESS OR USE THE SOFTWARE.
           all prior and contemporaneous understandings, agreements,
           representations, and warranties, whether written or oral.
 
-    12.2  Amendments. CodeHaat may update this Agreement at any time. Continued
+    12.2  Amendments. KodeDock may update this Agreement at any time. Continued
           access to the Software after such update constitutes acceptance of the
           revised Agreement.
 
@@ -222,16 +222,16 @@ ACCESS OR USE THE SOFTWARE.
           necessary to make it enforceable, and the remaining provisions shall
           remain in full force and effect.
 
-    12.4  No Waiver. CodeHaat's failure to enforce any right or provision of
+    12.4  No Waiver. KodeDock's failure to enforce any right or provision of
           this Agreement shall not constitute a waiver of such right or provision.
 
     12.5  Assignment. You may not assign or transfer any rights or obligations
-          under this Agreement without CodeHaat's prior written consent. Any
+          under this Agreement without KodeDock's prior written consent. Any
           purported assignment in violation of this section is void.
 
     12.6  Notices. All legal notices under this Agreement shall be in writing
-          and delivered to legal@codehaat.com or the address provided by
-          CodeHaat at the time of engagement.
+          and delivered to legal@kodedock.com or the address provided by
+          KodeDock at the time of engagement.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -241,4 +241,4 @@ UNDER THE COPYRIGHT ACT, 1957 (INDIA) AND OTHER APPLICABLE LAWS.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Copyright (c) 2024–2026 CodeHaat. All rights reserved.
+Copyright (c) 2024–2026 KodeDock. All rights reserved.

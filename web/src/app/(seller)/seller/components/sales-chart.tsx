@@ -106,19 +106,19 @@ export function SalesChart({ orders }: SalesChartProps) {
 
   // Load saved filter state on mount
   useEffect(() => {
-    const savedFilter = localStorage.getItem("codehaat_seller_chart_filter");
+    const savedFilter = localStorage.getItem("kodedock_seller_chart_filter");
     if (savedFilter) setFilter(savedFilter);
-    const savedStart = localStorage.getItem("codehaat_seller_chart_start");
+    const savedStart = localStorage.getItem("kodedock_seller_chart_start");
     if (savedStart) setCustomStart(savedStart);
-    const savedEnd = localStorage.getItem("codehaat_seller_chart_end");
+    const savedEnd = localStorage.getItem("kodedock_seller_chart_end");
     if (savedEnd) setCustomEnd(savedEnd);
   }, []);
 
   // Save filter state on change
   useEffect(() => {
-    localStorage.setItem("codehaat_seller_chart_filter", filter);
-    localStorage.setItem("codehaat_seller_chart_start", customStart);
-    localStorage.setItem("codehaat_seller_chart_end", customEnd);
+    localStorage.setItem("kodedock_seller_chart_filter", filter);
+    localStorage.setItem("kodedock_seller_chart_start", customStart);
+    localStorage.setItem("kodedock_seller_chart_end", customEnd);
   }, [filter, customStart, customEnd]);
 
   // Auto-refresh the entire dashboard page every 15 seconds to stream live sales

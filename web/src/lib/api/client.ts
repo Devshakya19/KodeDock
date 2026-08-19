@@ -1,7 +1,7 @@
 /**
  * API client — all requests go through the Next.js /api/proxy route.
  *
- * The proxy reads the HttpOnly `codehaat_token` cookie server-side and
+ * The proxy reads the HttpOnly `kodedock_token` cookie server-side and
  * forwards it as a Bearer Authorization header to the Rust backend.
  * This means the raw JWT token is never exposed to browser JS.
  *

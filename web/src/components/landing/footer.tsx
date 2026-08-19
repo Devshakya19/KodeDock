@@ -53,8 +53,8 @@ export function Footer() {
             </p>
             <div className="flex items-center gap-3 mt-6">
               {[
-                { label: "GitHub", icon: GithubIcon, href: "https://github.com/codehaat" },
-                { label: "Twitter", icon: Globe, href: "https://twitter.com/codehaat" },
+                { label: "GitHub", icon: GithubIcon, href: "https://github.com/kodedock" },
+                { label: "Twitter", icon: Globe, href: "https://twitter.com/kodedock" },
               ].map((social) => (
                 <a
                   key={social.label}
@@ -90,7 +90,7 @@ export function Footer() {
         </div>
 
         <div className="mt-12 pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-slate-500">&copy; {new Date().getFullYear()} CodeHaat. All rights reserved.</p>
+          <p className="text-xs text-slate-500">&copy; {new Date().getFullYear()} KodeDock. All rights reserved.</p>
           <div className="flex items-center gap-2 text-xs text-slate-500">
             <span>Made with</span>
             <span className="text-slate-950">&#9829;</span>

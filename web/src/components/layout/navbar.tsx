@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { CodeHaatLogo } from "@/components/brand/codehaat-logo";
+import { KodeDockLogo } from "@/components/brand/kodedock-logo";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { apiGet } from "@/lib/api/client";
 import { WalletPopup } from "@/components/wallet/wallet-popup";
@@ -43,7 +43,7 @@ function getShortName(fullName?: string, email?: string): string {
 
 function getCartCount(): number {
   if (typeof window === "undefined") return 0;
-  try { return JSON.parse(localStorage.getItem("codehaat_cart") || "[]").length; } catch { return 0; }
+  try { return JSON.parse(localStorage.getItem("kodedock_cart") || "[]").length; } catch { return 0; }
 }
 
 interface NavbarProps {
@@ -192,7 +192,7 @@ export function Navbar({ variant, email = "", fullName, searchQuery = "" }: Navb
           
           {/* LEFT: Logo */}
           <div className="flex items-center flex-1 min-w-0">
-            <CodeHaatLogo href={variant === "seller" ? "/seller" : variant === "dashboard" ? "/dashboard" : "/browse"} />
+            <KodeDockLogo href={variant === "seller" ? "/seller" : variant === "dashboard" ? "/dashboard" : "/browse"} />
           </div>
 
           {/* MIDDLE: Search */}

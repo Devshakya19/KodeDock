@@ -73,7 +73,7 @@ export default function WalletPage() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <h1 className="text-4xl font-black text-slate-900 tracking-tight">My Wallet</h1>
-            <p className="text-slate-500 mt-2 text-base">Manage your CodeHaat Black Card and billing history.</p>
+            <p className="text-slate-500 mt-2 text-base">Manage your KodeDock Black Card and billing history.</p>
           </div>
           <Button disabled={isRefreshing} onClick={() => fetchData(true)} variant="outline" className="h-10 px-4 rounded-xl font-bold border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors">
             <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? "animate-spin text-blue-600" : ""}`} /> Sync Data
@@ -110,9 +110,9 @@ export default function WalletPage() {
                 {/* Glossy overlay */}
                 <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent opacity-40 pointer-events-none" />
                 
-                {/* CODEHAAT BLACK Watermark */}
+                {/* KODEDOCK BLACK Watermark */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-[20deg] pointer-events-none opacity-[0.03] w-full flex justify-center mix-blend-overlay">
-                  <span className="text-[80px] sm:text-[110px] font-black tracking-tighter whitespace-nowrap">CODEHAAT BLACK</span>
+                  <span className="text-[80px] sm:text-[110px] font-black tracking-tighter whitespace-nowrap">KODEDOCK BLACK</span>
                 </div>
                 
                 <div className="relative z-10 flex flex-col h-full justify-between">
@@ -122,7 +122,7 @@ export default function WalletPage() {
                       <div className="w-10 h-10 rounded-lg bg-gradient-to-tr from-slate-200 to-white flex items-center justify-center shadow-lg border border-white/20">
                         <span className="text-slate-900 font-black text-2xl leading-none -mt-0.5">c</span>
                       </div>
-                      <span className="font-black tracking-tighter text-xl text-white/90">CODEHAAT</span>
+                      <span className="font-black tracking-tighter text-xl text-white/90">KODEDOCK</span>
                     </div>
                     <div className="flex flex-col items-end">
                       <Wifi className="w-7 h-7 text-slate-300 opacity-80 rotate-90" />
@@ -187,7 +187,7 @@ export default function WalletPage() {
                   </div>
 
                   <div className="mt-4 sm:mt-6 text-[10px] sm:text-xs text-slate-400 leading-tight opacity-70 max-w-[80%]">
-                    <p>This card is issued by CodeHaat for digital marketplace transactions and is non-transferable. Use of this card is governed by the terms and conditions.</p>
+                    <p>This card is issued by KodeDock for digital marketplace transactions and is non-transferable. Use of this card is governed by the terms and conditions.</p>
                     <p className="mt-2 text-[9px] uppercase tracking-widest font-bold">Authorized signature required.</p>
                   </div>
                   
@@ -197,9 +197,9 @@ export default function WalletPage() {
                       <div className="w-6 h-6 border border-slate-600 rounded-md flex items-center justify-center">
                          <Search className="w-3 h-3" />
                       </div>
-                      support@codehaat.com
+                      support@kodedock.com
                     </div>
-                    <div className="text-xs font-black text-slate-600 tracking-[0.2em]">CODEHAAT BLACK</div>
+                    <div className="text-xs font-black text-slate-600 tracking-[0.2em]">KODEDOCK BLACK</div>
                   </div>
                 </div>
               </div>

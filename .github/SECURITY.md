@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-We currently support the latest version of CodeHaat for security updates.
+We currently support the latest version of KodeDock for security updates.
 
 | Version | Supported          |
 | ------- | ------------------ |
@@ -12,9 +12,9 @@ We currently support the latest version of CodeHaat for security updates.
 
 ## Reporting a Vulnerability
 
-Security is a top priority for CodeHaat. We take all security vulnerabilities seriously.
+Security is a top priority for KodeDock. We take all security vulnerabilities seriously.
 
-If you discover a security vulnerability within CodeHaat, please **DO NOT** create a public issue. Instead, send an email to our security team or use GitHub's private vulnerability reporting feature.
+If you discover a security vulnerability within KodeDock, please **DO NOT** create a public issue. Instead, send an email to our security team or use GitHub's private vulnerability reporting feature.
 
 ### Information to Include
 When reporting an issue, please provide the following:
@@ -26,4 +26,4 @@ When reporting an issue, please provide the following:
 ### Our Response
 We will acknowledge receipt of your vulnerability report within 48 hours and strive to send you regular updates about our progress. If the vulnerability is accepted, we will coordinate a timeline with you for releasing the fix.
 
-Thank you for helping keep CodeHaat secure! 🛡️
+Thank you for helping keep KodeDock secure! 🛡️

@@ -1,4 +1,4 @@
-# CodeHaat — UI/UX Design System
+# KodeDock — UI/UX Design System
 
 > Clean, professional, developer-focused. Light theme with slate colors.
 
@@ -22,7 +22,7 @@
 
 - **Developer-first:** Clean, functional, no unnecessary decorations
 - **Light theme:** White backgrounds, slate text, subtle borders
-- **Dark Theme Note:** The main application is Light theme, but the CodeHaat Wallet interface uses a specialized **CodeHaat Black** dark theme for a premium financial feel.
+- **Dark Theme Note:** The main application is Light theme, but the KodeDock Wallet interface uses a specialized **KodeDock Black** dark theme for a premium financial feel.
 - **Minimal animations:** Smooth but not distracting
 - **Mobile-first:** Responsive design, works on all devices
 - **Accessible:** Proper contrast, focus states, keyboard navigation
@@ -152,7 +152,7 @@ We use **Lucide React** for all system icons to maintain a consistent, sharp, an
 
 | Component | File | Usage |
 |-----------|------|-------|
-| CodeHaatLogo | `shared/components/codehaat-logo.tsx` | Navigation, footer |
+| KodeDockLogo | `shared/components/kodedock-logo.tsx` | Navigation, footer |
 | FadeIn | `shared/components/fade-in.tsx` | Scroll animations |
 | GithubIcon | `shared/components/github-icon.tsx` | GitHub branding (custom SVG) |
 | EmptyState | `shared/components/empty-state.tsx` | Fallback for empty lists |

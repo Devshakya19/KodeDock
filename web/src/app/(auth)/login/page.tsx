@@ -64,7 +64,7 @@ export default function LoginPage() {
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-slate-950">Welcome back</h1>
             <p className="text-sm text-slate-600 mt-2">
-              Sign in to your CodeHaat account
+              Sign in to your KodeDock account
             </p>
           </div>
 

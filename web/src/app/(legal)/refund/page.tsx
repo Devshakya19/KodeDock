@@ -12,7 +12,7 @@ export default function RefundPage() {
         <section>
           <h2 className="text-xl font-semibold text-slate-950 mb-3">1. General Policy</h2>
           <p>
-            All sales on CodeHaat are final. However, we understand that sometimes things
+            All sales on KodeDock are final. However, we understand that sometimes things
             don&apos;t work as expected. We offer a 48-hour dispute window for all purchases.
           </p>
         </section>

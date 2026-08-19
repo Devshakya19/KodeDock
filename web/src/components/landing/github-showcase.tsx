@@ -83,7 +83,7 @@ export function GithubShowcase() {
             <Card className="border border-slate-200 bg-slate-50">
               <CardContent className="p-6">
                 <div className="text-sm font-bold text-slate-950 uppercase tracking-wider mb-4">
-                  CodeHaat
+                  KodeDock
                 </div>
                 <ul className="space-y-2.5 text-slate-700">
                   {[

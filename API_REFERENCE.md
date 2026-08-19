@@ -1,6 +1,6 @@
-# CodeHaat API Reference
+# KodeDock API Reference
 
-This document provides a quick reference to the main API endpoints in CodeHaat. For detailed information, please refer to [docs/07-BACKEND.md](../docs/07-BACKEND.md).
+This document provides a quick reference to the main API endpoints in KodeDock. For detailed information, please refer to [docs/07-BACKEND.md](../docs/07-BACKEND.md).
 
 ## Base URL
 All API endpoints are prefixed with `/api` and are served by the Core Engine (Rust) service on port 4001.

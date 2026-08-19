@@ -3,7 +3,7 @@ import { Package, ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CodeHaatLogo } from "@/components/brand/codehaat-logo";
+import { KodeDockLogo } from "@/components/brand/kodedock-logo";
 import { serverApiGet } from "@/lib/auth/client";
 import { theme } from "@/lib/theme";
 
@@ -41,7 +41,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
               <ArrowLeft className="w-4 h-4" />
               <span className="text-sm font-medium">Back</span>
             </Link>
-            <CodeHaatLogo href="/browse" />
+            <KodeDockLogo href="/browse" />
           </div>
         </nav>
       </header>

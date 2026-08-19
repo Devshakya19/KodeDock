@@ -37,9 +37,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
 RUN useradd -r -s /bin/false appuser
 
 # Copy only the compiled binary from the builder stage
-COPY --from=builder /app/target/release/codehaat-core /usr/local/bin/
+COPY --from=builder /app/target/release/kodedock-core /usr/local/bin/
 
 USER appuser
 EXPOSE 4001
 
-CMD ["codehaat-core"]
+CMD ["kodedock-core"]

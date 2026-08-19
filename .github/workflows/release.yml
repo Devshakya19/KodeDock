@@ -26,9 +26,9 @@ jobs:
             const tag = context.ref.replace('refs/tags/', '');
             
             const releaseBody = `
-            # 🚀 CodeHaat ${tag} is officially live!
+            # 🚀 KodeDock ${tag} is officially live!
 
-            Welcome to the latest major release of **CodeHaat**, packed with massive UI upgrades, real-time sync, and critical core engine improvements.
+            Welcome to the latest major release of **KodeDock**, packed with massive UI upgrades, real-time sync, and critical core engine improvements.
 
             ## ✨ Key Features & Upgrades
             * 🌟 **Seller Reviews Dashboard**: Brand new analytics page with star distributions and average rating metrics.
@@ -41,7 +41,7 @@ jobs:
             * **Atomic Row Locks**: Eliminated double-spending race conditions in wallet and order endpoints.
             * **Database Synchronization**: Successfully rebuilt the volume to guarantee row-level triggers (like \`updated_at\` and \`sales_count\`) fire correctly.
 
-            *Thank you for supporting CodeHaat! Built with passion for the Indian developer community 🇮🇳*
+            *Thank you for supporting KodeDock! Built with passion for the Indian developer community 🇮🇳*
             `;
 
             await github.rest.repos.createRelease({

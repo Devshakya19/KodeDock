@@ -56,11 +56,11 @@ function Stars({ rating, size = "w-4 h-4", interactive = false, onRate }: { rati
 
 function getCart(): { id: string; title: string; price_paise: number; image_url: string | null }[] {
   if (typeof window === "undefined") return [];
-  try { return JSON.parse(localStorage.getItem("codehaat_cart") || "[]"); } catch { return []; }
+  try { return JSON.parse(localStorage.getItem("kodedock_cart") || "[]"); } catch { return []; }
 }
 
 function saveCart(cart: { id: string; title: string; price_paise: number; image_url: string | null }[]) {
-  localStorage.setItem("codehaat_cart", JSON.stringify(cart));
+  localStorage.setItem("kodedock_cart", JSON.stringify(cart));
   window.dispatchEvent(new Event("cart-updated"));
 }
 

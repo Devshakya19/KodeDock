@@ -217,7 +217,7 @@ export default function SellerWalletPage() {
                       C
                     </div>
                     <span className="font-black text-sm tracking-widest text-white">
-                      CODEHAAT <span className="text-blue-400">CREATOR</span>
+                      KODEDOCK <span className="text-blue-400">CREATOR</span>
                     </span>
                   </div>
                   <Wifi className="w-5 h-5 text-slate-400 rotate-90" />
@@ -264,11 +264,11 @@ export default function SellerWalletPage() {
                     </span>
                   </div>
                   <p className="text-[10px] text-slate-400 mt-3 leading-relaxed opacity-70">
-                    Official CodeHaat verified creator balance token. Payout disbursements comply with Indian banking norms.
+                    Official KodeDock verified creator balance token. Payout disbursements comply with Indian banking norms.
                   </p>
                 </div>
                 <div className="p-6 pt-0 text-[9px] font-mono text-slate-500 uppercase tracking-widest">
-                  CodeHaat Payout Engine v2.0
+                  KodeDock Payout Engine v2.0
                 </div>
               </div>
             </div>

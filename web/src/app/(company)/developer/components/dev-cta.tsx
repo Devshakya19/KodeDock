@@ -15,7 +15,7 @@ export function DevCTA() {
             Ready to start earning?
           </h2>
           <p className="mt-4 text-slate-400 max-w-lg mx-auto">
-            Join developers who are already earning passive income on CodeHaat. It takes 5 minutes to list your first product.
+            Join developers who are already earning passive income on KodeDock. It takes 5 minutes to list your first product.
           </p>
           <Link href="/developer-register">
             <Button size="lg" className="mt-8 bg-white text-slate-950 hover:bg-slate-100 shadow-lg px-8 h-12 text-base font-semibold rounded-full">

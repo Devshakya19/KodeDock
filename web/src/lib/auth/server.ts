@@ -64,14 +64,14 @@ export async function verifyToken(
 }
 
 /**
- * Extract the codehaat_token from a request (cookie first, then Authorization
+ * Extract the kodedock_token from a request (cookie first, then Authorization
  * header fallback) and verify it.
  */
 export async function verifyRequest(
   request: NextRequest
 ): Promise<TokenClaims | null> {
   const token =
-    request.cookies.get("codehaat_token")?.value ||
+    request.cookies.get("kodedock_token")?.value ||
     (request.headers
       .get("Authorization")
       ?.replace(/^Bearer\s+/i, "")) ||

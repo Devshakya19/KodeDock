@@ -36,7 +36,7 @@ export function SellerSection() {
             </h2>
             <p className="mt-4 text-slate-600 leading-relaxed">
               Every developer has projects gathering dust on GitHub. Monetize them with zero effort.
-              Link your repo, set your price, and let CodeHaat handle everything else — from payments
+              Link your repo, set your price, and let KodeDock handle everything else — from payments
               to delivery to support.
             </p>
             <div className="mt-8 space-y-3">

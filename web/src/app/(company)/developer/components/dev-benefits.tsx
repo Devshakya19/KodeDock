@@ -52,7 +52,7 @@ export function DevBenefits() {
         <FadeIn>
           <div className="text-center mb-16">
             <Badge variant="secondary" className="mb-4 px-4 py-1.5 text-xs font-semibold tracking-wide uppercase bg-slate-100 border border-slate-300 text-slate-900">
-              Why CodeHaat
+              Why KodeDock
             </Badge>
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-950">
               Everything you need to sell code

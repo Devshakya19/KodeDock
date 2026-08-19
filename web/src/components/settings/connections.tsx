@@ -156,7 +156,7 @@ export function ConnectionsSettings() {
               <div>
                 <h3 className="text-[15px] font-bold text-slate-900">Google</h3>
                 <p className="text-[13px] text-slate-500 mt-0.5 max-w-[280px]">
-                  Use Google to securely log into your CodeHaat account.
+                  Use Google to securely log into your KodeDock account.
                 </p>
               </div>
             </div>

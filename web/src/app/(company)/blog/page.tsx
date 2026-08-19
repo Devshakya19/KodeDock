@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 
 const BLOG_POSTS = [
   {
-    title: "Introducing CodeHaat: The Future of Code Commerce",
+    title: "Introducing KodeDock: The Future of Code Commerce",
     excerpt: "Why we built a marketplace that delivers code directly to your GitHub account.",
     date: "July 2026",
     category: "Announcement",
@@ -33,14 +33,14 @@ const BLOG_POSTS = [
   },
   {
     title: "Building a Marketplace: Lessons Learned",
-    excerpt: "Technical insights from building CodeHaat's polyglot microservices architecture.",
+    excerpt: "Technical insights from building KodeDock's polyglot microservices architecture.",
     date: "July 2026",
     category: "Engineering",
     readTime: "12 min read",
   },
   {
     title: "Student Projects That Sell: A Guide",
-    excerpt: "How B.Tech students can package and sell their projects on CodeHaat.",
+    excerpt: "How B.Tech students can package and sell their projects on KodeDock.",
     date: "July 2026",
     category: "Guide",
     readTime: "7 min read",
@@ -51,7 +51,7 @@ export default function BlogPage() {
   return (
     <StaticPageLayout
       title="Blog"
-      description="Insights, guides, and updates from the CodeHaat team."
+      description="Insights, guides, and updates from the KodeDock team."
     >
       <div className="space-y-6">
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">

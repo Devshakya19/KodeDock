@@ -1,6 +1,6 @@
-# CodeHaat — Help & Support
+# KodeDock — Help & Support
 
-> Everything you need to get help on CodeHaat.
+> Everything you need to get help on KodeDock.
 
 ---
 
@@ -19,7 +19,7 @@
 | **How do I top up my wallet?** | Dashboard → Wallet → "Add Money" → Pay via Razorpay |
 | **Can I get a refund?** | Yes, within 7 days if the product is non-functional or misdescribed. See [Refund Policy](03-REFUND-POLICY.md) |
 | **How do I leave a review?** | Go to your purchase → "Write Review" (only for verified purchases) |
-| **My payment failed but money was deducted** | Don't worry — Razorpay auto-refunds within 5–7 business days. If not, email support@codehaat.com |
+| **My payment failed but money was deducted** | Don't worry — Razorpay auto-refunds within 5–7 business days. If not, email support@kodedock.com |
 
 ### I'm a Seller
 
@@ -175,16 +175,16 @@ Level 2: Seller support (for product issues)
    └── Contact the seller directly
    └── Give them 48 hours to respond
 
-Level 3: CodeHaat support
-   └── Email: support@codehaat.com
+Level 3: KodeDock support
+   └── Email: support@kodedock.com
    └── Response within 24-48 hours
 
 Level 4: Dispute resolution
    └── Raise formal dispute via Orders page
-   └── CodeHaat team mediates within 72 hours
+   └── KodeDock team mediates within 72 hours
 
 Level 5: Grievance Officer
-   └── Email: grievance@codehaat.com
+   └── Email: grievance@kodedock.com
    └── For unresolved or serious issues
 ```
 
@@ -193,8 +193,8 @@ Level 5: Grievance Officer
 ## 6. FAQ
 
 ### General
-**Q: Is CodeHaat available outside India?**  
-A: Currently, CodeHaat serves the Indian market with INR payments via Razorpay. International expansion is planned.
+**Q: Is KodeDock available outside India?**  
+A: Currently, KodeDock serves the Indian market with INR payments via Razorpay. International expansion is planned.
 
 **Q: Do I need a GitHub account?**  
 A: Yes — code is delivered as a private GitHub repository. Create a free account at github.com if you don't have one.
@@ -210,7 +210,7 @@ A: No, wallet balance has no expiry.
 A: No, wallet balance is non-transferable.
 
 **Q: Is wallet balance real money?**  
-A: Wallet balance is a prepaid credit for Platform use. It's not legal tender outside CodeHaat.
+A: Wallet balance is a prepaid credit for Platform use. It's not legal tender outside KodeDock.
 
 ### Security
 **Q: Is my bank account safe?**  
@@ -228,12 +228,12 @@ A: We use HttpOnly cookies that JavaScript cannot access, making XSS token theft
 
 | Need | Channel | Response Time |
 |------|---------|---------------|
-| **General help** | support@codehaat.com | 24–48 hours |
-| **Refunds** | refunds@codehaat.com | 48 hours |
-| **Disputes** | disputes@codehaat.com | 72 hours |
-| **Security bugs** | security@codehaat.com | 24 hours |
-| **Privacy/grievance** | grievance@codehaat.com | 48 hours |
-| **Business/partnership** | hello@codehaat.com | 3–5 business days |
+| **General help** | support@kodedock.com | 24–48 hours |
+| **Refunds** | refunds@kodedock.com | 48 hours |
+| **Disputes** | disputes@kodedock.com | 72 hours |
+| **Security bugs** | security@kodedock.com | 24 hours |
+| **Privacy/grievance** | grievance@kodedock.com | 48 hours |
+| **Business/partnership** | hello@kodedock.com | 3–5 business days |
 
 See [Contact](05-CONTACT.md) for full contact details.
 
@@ -243,9 +243,9 @@ See [Contact](05-CONTACT.md) for full contact details.
 
 We love hearing from our community:
 
-- **Feature requests:** Email features@codehaat.com with your idea
-- **Bug reports:** Email bugs@codehaat.com with screenshots and steps to reproduce
-- **General feedback:** Email feedback@codehaat.com
+- **Feature requests:** Email features@kodedock.com with your idea
+- **Bug reports:** Email bugs@kodedock.com with screenshots and steps to reproduce
+- **General feedback:** Email feedback@kodedock.com
 
 We review all feedback weekly and prioritize based on community impact.
 
@@ -253,4 +253,4 @@ We review all feedback weekly and prioritize based on community impact.
 
 *Document Version: 1.0 | Last Updated: August 2026*
 
-© 2025-2026 CodeHaat. All rights reserved.
+© 2025-2026 KodeDock. All rights reserved.

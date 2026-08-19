@@ -4,14 +4,14 @@ services:
     image: postgres:16-alpine
     environment:
       TZ: Asia/Kolkata
-      POSTGRES_DB: codehaat
-      POSTGRES_USER: codehaat
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-codehaat_secret}
+      POSTGRES_DB: kodedock
+      POSTGRES_USER: kodedock
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-kodedock_secret}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./sql/01-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U codehaat -d codehaat"]
+      test: ["CMD-SHELL", "pg_isready -U kodedock -d kodedock"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -27,11 +27,11 @@ services:
   # Redis - Cache & Job Queue
   redis:
     image: redis:7-alpine
-    command: redis-server --requirepass ${REDIS_PASSWORD:-codehaat_redis_secret}
+    command: redis-server --requirepass ${REDIS_PASSWORD:-kodedock_redis_secret}
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-codehaat_redis_secret}", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-kodedock_redis_secret}", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -58,7 +58,7 @@ services:
       - TZ=Asia/Kolkata
       - NEXT_PUBLIC_API_URL=http://localhost:4001
       - CORE_ENGINE_URL=http://core-engine:4001
-      - JWT_SECRET=${JWT_SECRET:-codehaat-super-secret-jwt-key-change-in-production-2024}
+      - JWT_SECRET=${JWT_SECRET:-kodedock-super-secret-jwt-key-change-in-production-2024}
       - SEAWEEDFS_URL=http://seaweedfs:8333
       - SEAWEEDFS_FILER_URL=http://seaweedfs:8888
     depends_on:
@@ -83,14 +83,14 @@ services:
     environment:
       - TZ=Asia/Kolkata
       - PORT=4001
-      - DATABASE_URL=postgres://codehaat:${POSTGRES_PASSWORD:-codehaat_secret}@postgres:5432/codehaat
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-codehaat_redis_secret}@redis:6379
-      - JWT_SECRET=${JWT_SECRET:-codehaat-super-secret-jwt-key-change-in-production-2024}
+      - DATABASE_URL=postgres://kodedock:${POSTGRES_PASSWORD:-kodedock_secret}@postgres:5432/kodedock
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-kodedock_redis_secret}@redis:6379
+      - JWT_SECRET=${JWT_SECRET:-kodedock-super-secret-jwt-key-change-in-production-2024}
       - CORS_ORIGINS=http://localhost:3000,http://localhost:3001
       - S3_ENDPOINT=http://seaweedfs:8333
-      - S3_ACCESS_KEY=codehaat_seaweed
-      - S3_SECRET_KEY=codehaat_seaweed_secret
-      - S3_BUCKET=codehaat-media
+      - S3_ACCESS_KEY=kodedock_seaweed
+      - S3_SECRET_KEY=kodedock_seaweed_secret
+      - S3_BUCKET=kodedock-media
       - S3_REGION=us-east-1
       - S3_PUBLIC_URL=/api/images
       - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID:-}
@@ -126,7 +126,7 @@ services:
     environment:
       - TZ=Asia/Kolkata
       - PORT=4002
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-codehaat_redis_secret}@redis:6379
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-kodedock_redis_secret}@redis:6379
       - ALLOWED_ORIGINS=http://localhost:3000
     depends_on:
       redis:
@@ -152,7 +152,7 @@ services:
       dockerfile: Dockerfile
     environment:
       - TZ=Asia/Kolkata
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-codehaat_redis_secret}@redis:6379
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-kodedock_redis_secret}@redis:6379
     depends_on:
       redis:
         condition: service_healthy
@@ -173,8 +173,8 @@ services:
     environment:
       - TZ=Asia/Kolkata
       - PORT=4004
-      - REDIS_URL=redis://:${REDIS_PASSWORD:-codehaat_redis_secret}@redis:6379
-      - JWT_SECRET=${JWT_SECRET:-codehaat-super-secret-jwt-key-change-in-production-2024}
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-kodedock_redis_secret}@redis:6379
+      - JWT_SECRET=${JWT_SECRET:-kodedock-super-secret-jwt-key-change-in-production-2024}
       - ALLOWED_ORIGINS=http://localhost:3000
     depends_on:
       redis:

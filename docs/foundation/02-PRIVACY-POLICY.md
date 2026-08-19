@@ -1,4 +1,4 @@
-# CodeHaat — Privacy Policy
+# KodeDock — Privacy Policy
 
 > How we collect, use, store, and protect your data.
 
@@ -11,7 +11,7 @@
 
 ## 1. Overview
 
-CodeHaat ("we," "us," "our") respects your privacy. This Privacy Policy explains what data we collect, why we collect it, how we use it, and the controls you have over your information.
+KodeDock ("we," "us," "our") respects your privacy. This Privacy Policy explains what data we collect, why we collect it, how we use it, and the controls you have over your information.
 
 We comply with applicable Indian data protection regulations, including the **Digital Personal Data Protection Act, 2023**.
 
@@ -99,7 +99,7 @@ We comply with applicable Indian data protection regulations, including the **Di
 
 | Cookie | Type | Duration | Purpose |
 |--------|------|----------|---------|
-| `codehaat_token` | HttpOnly | 24 hours | Authentication (JWT) |
+| `kodedock_token` | HttpOnly | 24 hours | Authentication (JWT) |
 
 We use only **essential cookies** for authentication. We do **not** use third-party tracking cookies, analytics cookies, or advertising cookies.
 
@@ -111,7 +111,7 @@ Under the Digital Personal Data Protection Act, 2023, you have the right to:
 
 | Right | How to Exercise |
 |-------|-----------------|
-| **Access** — Get a copy of your data | Email privacy@codehaat.com |
+| **Access** — Get a copy of your data | Email privacy@kodedock.com |
 | **Correction** — Fix inaccurate data | Use Profile Settings or email us |
 | **Erasure** — Delete your data | Use Settings → Delete Account |
 | **Withdrawal** — Revoke consent | Delete your account |
@@ -146,7 +146,7 @@ We **never** share:
 
 ## 8. Children's Privacy
 
-CodeHaat is not intended for users under 18. We do not knowingly collect data from minors. If we become aware of such data, we will delete it immediately. Contact privacy@codehaat.com to report underage accounts.
+KodeDock is not intended for users under 18. We do not knowingly collect data from minors. If we become aware of such data, we will delete it immediately. Contact privacy@kodedock.com to report underage accounts.
 
 ---
 
@@ -166,8 +166,8 @@ As required by Indian law, our Grievance Officer is available to address privacy
 
 | | Details |
 |---|---------|
-| **Name** | CodeHaat Privacy Grievance Officer |
-| **Email** | privacy@codehaat.com |
+| **Name** | KodeDock Privacy Grievance Officer |
+| **Email** | privacy@kodedock.com |
 | **Response Time** | Within 48 hours of receipt |
 | **Resolution Time** | Within 30 days (or as per applicable law) |
 
@@ -185,7 +185,7 @@ As required by Indian law, our Grievance Officer is available to address privacy
 ## 12. Contact
 
 For privacy questions or data requests:
-- **Email:** privacy@codehaat.com
+- **Email:** privacy@kodedock.com
 - **Grievance:** See Section 10 above
 - **General:** See [Contact](05-CONTACT.md)
 
@@ -193,4 +193,4 @@ For privacy questions or data requests:
 
 *Document Version: 1.0 | Last Updated: August 2026*
 
-© 2025-2026 CodeHaat. All rights reserved.
+© 2025-2026 KodeDock. All rights reserved.

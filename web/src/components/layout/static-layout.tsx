@@ -44,7 +44,7 @@ export function StaticPageLayout({ children, title, description }: StaticPageLay
       <footer className="border-t border-slate-200 bg-slate-50 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-xs text-slate-500">
-            &copy; {new Date().getFullYear()} CodeHaat. All rights reserved.
+            &copy; {new Date().getFullYear()} KodeDock. All rights reserved.
           </p>
         </div>
       </footer>

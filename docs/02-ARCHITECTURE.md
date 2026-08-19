@@ -1,4 +1,4 @@
-# CodeHaat — System Architecture
+# KodeDock — System Architecture
 
 > Polyglot Microservices — Each service has a specific role and doesn't interfere with others.
 

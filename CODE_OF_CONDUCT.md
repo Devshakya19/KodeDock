@@ -1,4 +1,4 @@
-# CodeHaat Code of Conduct
+# KodeDock Code of Conduct
 
 ## Our Pledge
 
@@ -26,17 +26,17 @@ Examples of unacceptable behavior include:
 
 ## Enforcement Responsibilities
 
-CodeHaat leadership is responsible for clarifying and enforcing our standards of acceptable behavior and will take appropriate and fair corrective action in response to any behavior that they deem inappropriate, threatening, offensive, or harmful.
+KodeDock leadership is responsible for clarifying and enforcing our standards of acceptable behavior and will take appropriate and fair corrective action in response to any behavior that they deem inappropriate, threatening, offensive, or harmful.
 
 Team leaders have the right and responsibility to remove, edit, or reject comments, commits, code, wiki edits, issues, and other contributions that are not aligned to this Code of Conduct, and will communicate reasons for moderation decisions when appropriate.
 
 ## Scope
 
-This Code of Conduct applies within all project spaces, including the proprietary codebase, internal communication channels, GitHub repositories, and issue trackers. It also applies when an individual is officially representing CodeHaat in public spaces. Examples of representing our project include using an official email address, posting via an official social media account, or acting as an appointed representative at an online or offline event.
+This Code of Conduct applies within all project spaces, including the proprietary codebase, internal communication channels, GitHub repositories, and issue trackers. It also applies when an individual is officially representing KodeDock in public spaces. Examples of representing our project include using an official email address, posting via an official social media account, or acting as an appointed representative at an online or offline event.
 
 ## Enforcement
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the CodeHaat leadership team at **hello@codehaat.com**. All complaints will be reviewed and investigated promptly and fairly.
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the KodeDock leadership team at **hello@kodedock.com**. All complaints will be reviewed and investigated promptly and fairly.
 
 All team members are obligated to respect the privacy and security of the reporter of any incident.
 

@@ -6,7 +6,7 @@ import { Code2 } from "lucide-react";
 
 export default async function ShopLayout({ children }: { children: ReactNode }) {
   const cookieStore = await cookies();
-  const token = cookieStore.get("codehaat_token")?.value;
+  const token = cookieStore.get("kodedock_token")?.value;
   const claims = token ? await verifyToken(token) : null;
 
   const email = claims?.email || "";
@@ -25,7 +25,7 @@ export default async function ShopLayout({ children }: { children: ReactNode }) 
             <div className="md:col-span-1">
               <div className="flex items-center gap-2 mb-4">
                 <Code2 className="w-6 h-6 text-blue-600" />
-                <span className="text-[18px] font-black tracking-tight text-slate-900">CodeHaat</span>
+                <span className="text-[18px] font-black tracking-tight text-slate-900">KodeDock</span>
               </div>
               <p className="text-[13px] font-medium text-slate-500 leading-relaxed mb-6 max-w-xs">
                 India's premium marketplace for developers. Buy and sell production-grade code assets with instant GitHub delivery.
@@ -61,7 +61,7 @@ export default async function ShopLayout({ children }: { children: ReactNode }) 
           
           <div className="flex flex-col sm:flex-row items-center justify-between pt-8 border-t border-slate-100 gap-4">
             <p className="text-[13px] font-medium text-slate-400">
-              &copy; {new Date().getFullYear()} CodeHaat. All rights reserved.
+              &copy; {new Date().getFullYear()} KodeDock. All rights reserved.
             </p>
             <div className="flex items-center gap-6">
               <a href="https://twitter.com" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-slate-900 transition-colors">

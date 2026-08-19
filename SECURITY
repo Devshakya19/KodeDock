@@ -1,6 +1,6 @@
-# CodeHaat — Security Policy
+# KodeDock — Security Policy
 
-This document defines CodeHaat's security architecture, threat mitigations, responsible disclosure process, and operational security guidelines. All implementations described are grounded in the actual codebase.
+This document defines KodeDock's security architecture, threat mitigations, responsible disclosure process, and operational security guidelines. All implementations described are grounded in the actual codebase.
 
 ---
 
@@ -25,11 +25,11 @@ This document defines CodeHaat's security architecture, threat mitigations, resp
 
 **Do not open public GitHub issues for security vulnerabilities.**
 
-If you discover a security vulnerability in CodeHaat, please disclose it responsibly:
+If you discover a security vulnerability in KodeDock, please disclose it responsibly:
 
 | Channel | Details |
 |---------|---------|
-| 📧 **Email** | security@codehaat.com |
+| 📧 **Email** | security@kodedock.com |
 | 🔐 **Encryption** | PGP key available on request |
 | ⏱️ **Response SLA** | Initial acknowledgement within **48 hours** |
 | 🏁 **Resolution Target** | Critical issues patched within **7 days** |
@@ -108,7 +108,7 @@ We will publicly credit researchers who report valid, previously unknown vulnera
 
 ### SQL Injection Prevention
 
-CodeHaat's Rust backend uses **SQLx** with compile-time query validation. Every database query is a parameterised statement checked at compile time — string-concatenated SQL is structurally impossible in this codebase.
+KodeDock's Rust backend uses **SQLx** with compile-time query validation. Every database query is a parameterised statement checked at compile time — string-concatenated SQL is structurally impossible in this codebase.
 
 - **Scope**: All handlers in `services/core-engine/src/handlers/` and `services/core-engine/src/services/`
 - **Guarantee**: If a query compiles, it cannot be SQL-injected
@@ -240,7 +240,7 @@ All API request bodies are validated through Rust's type system and explicit han
 
 ### Razorpay Integration
 
-CodeHaat's payment layer is designed to eliminate card data from our infrastructure entirely.
+KodeDock's payment layer is designed to eliminate card data from our infrastructure entirely.
 
 | Mechanism | Implementation |
 |-----------|---------------|
@@ -255,7 +255,7 @@ CodeHaat's payment layer is designed to eliminate card data from our infrastruct
 
 ### PCI DSS Scope
 
-- Card data **never** touches CodeHaat servers
+- Card data **never** touches KodeDock servers
 - Processing, storage, and transmission of cardholder data is fully delegated to Razorpay
 - SAQ A-EP scope applies (outsourced payment page with server-to-server webhook)
 
@@ -397,7 +397,7 @@ Every service exposes a `/health` endpoint monitored by Docker Compose:
 
 | Service | Health Check Command |
 |---------|---------------------|
-| PostgreSQL | `pg_isready -U codehaat -d codehaat` |
+| PostgreSQL | `pg_isready -U kodedock -d kodedock` |
 | Redis | `redis-cli ping` |
 | Core Engine | `GET http://localhost:4001/health` |
 | AI Service | `GET http://localhost:4002/health` |
@@ -461,7 +461,7 @@ Security-relevant events are logged by every service:
 
 ## Conclusion
 
-CodeHaat implements a defence-in-depth security architecture covering authentication, authorisation, data protection, network security, payment integrity, and application hardening. Core guarantees include:
+KodeDock implements a defence-in-depth security architecture covering authentication, authorisation, data protection, network security, payment integrity, and application hardening. Core guarantees include:
 
 - **No SQL injection** — structurally impossible via SQLx compile-time query checking
 - **No XSS token theft** — JWT lives exclusively in HttpOnly cookies
@@ -472,4 +472,4 @@ Security is treated as an ongoing engineering discipline, not a one-time configu
 
 ---
 
-*Security policy accurate as of **v1.3.0** (2026-08-12). For implementation details, refer directly to the source code. To report a vulnerability, contact **security@codehaat.com**.*
+*Security policy accurate as of **v1.3.0** (2026-08-12). For implementation details, refer directly to the source code. To report a vulnerability, contact **security@kodedock.com**.*

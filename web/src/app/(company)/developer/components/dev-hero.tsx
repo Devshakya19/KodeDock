@@ -29,7 +29,7 @@ export function DevHero() {
         <FadeIn delay={0.2}>
           <p className="mt-6 text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
             Turn your side projects into passive income. Link your GitHub repo, set a price, and let
-            CodeHaat handle payments, delivery, and support. Only 2.5% commission.
+            KodeDock handle payments, delivery, and support. Only 2.5% commission.
           </p>
         </FadeIn>
         <FadeIn delay={0.3}>

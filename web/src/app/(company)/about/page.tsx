@@ -3,20 +3,20 @@ import { StaticPageLayout } from "@/components/layout/static-layout";
 export default function AboutPage() {
   return (
     <StaticPageLayout
-      title="About CodeHaat"
+      title="About KodeDock"
       description="India's #1 Digital Code Marketplace — Where Code Meets Commerce"
     >
       <div className="space-y-8">
         <section>
           <h2 className="text-2xl font-semibold text-slate-950 mb-4">Our Story</h2>
           <p className="text-slate-600 leading-relaxed">
-            CodeHaat was born from a simple observation: Indian developers create thousands of
+            KodeDock was born from a simple observation: Indian developers create thousands of
             valuable projects every year but have no affordable platform to sell them. Global
             alternatives charge 20-55% commission and distribute static .zip files — that&apos;s not
             the experience our community deserves.
           </p>
           <p className="text-slate-600 leading-relaxed mt-4">
-            We built CodeHaat to change that. A marketplace where developers can monetize their
+            We built KodeDock to change that. A marketplace where developers can monetize their
             code with just 2.5% commission, where buyers get production-ready code delivered
             directly to their GitHub accounts, and where the Indian developer community can thrive.
           </p>
@@ -56,7 +56,7 @@ export default function AboutPage() {
             The Indian developer ecosystem has over <strong>8 million developers</strong> and
             <strong>500,000+ CS students</strong> graduating annually. These creators build
             thousands of projects, templates, and tools every year but have no affordable,
-            localized platform to monetize them. CodeHaat fills this gap with a 2.5% commission
+            localized platform to monetize them. KodeDock fills this gap with a 2.5% commission
             rate (lowest in the market), automatic GitHub repo delivery, and a focus on
             affordability for both buyers and sellers.
           </p>

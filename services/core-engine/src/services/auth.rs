@@ -214,7 +214,7 @@ pub async fn fetch_github_user(access_token: &str) -> Result<GithubUser, String>
     client
         .get("https://api.github.com/user")
         .header("Authorization", format!("Bearer {}", access_token))
-        .header("User-Agent", "CodeHaat")
+        .header("User-Agent", "KodeDock")
         .send()
         .await
         .map_err(|e| format!("GitHub user request failed: {}", e))?

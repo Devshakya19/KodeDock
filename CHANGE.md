@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the CodeHaat backend project will be documented in this file.
+All notable changes to the KodeDock backend project will be documented in this file.
 
 
 ## [v1.4.0] - 2026-08-18
@@ -62,11 +62,11 @@ All notable changes to the CodeHaat backend project will be documented in this f
 
 ### 💳 Wallet & Payment UI Overhaul
 - **Buyer Wallet (`/dashboard/wallet`):**
-  - Completely redesigned using a premium "CodeHaat Black" theme.
+  - Completely redesigned using a premium "KodeDock Black" theme.
   - Implemented an interactive 3D Flip Credit Card showcasing the buyer's name, "BUYER ACCT" format, and an "ACTIVE" status.
   - Added "Silent Refresh" for fetching balance in the background without full-page reloads.
 - **Seller Wallet (`/seller/wallet`):**
-  - Unified with the premium aesthetic, featuring a 3D "CODEHAAT PRO" Creator Card.
+  - Unified with the premium aesthetic, featuring a 3D "KODEDOCK PRO" Creator Card.
   - Split earnings view into "Escrow" (Pending) and "All Time" (Total Earned) metrics.
   - Revamped withdrawal interface with a MAX button and streamlined transaction history tabs (Sales vs. Payouts).
 - **Checkout Page (`/checkout`):**
@@ -93,7 +93,7 @@ All notable changes to the CodeHaat backend project will be documented in this f
   - Redesigned "My Purchases" (`/dashboard/purchases`) with sleek purchase history cards.
   - Transformed Buyer Profile (`/dashboard/profile`) and Settings (`/dashboard/settings`) into premium slate-themed pages.
 - **Seller Dashboard (`/seller`):**
-  - Updated `dashboard.tsx` with a refined UI, matching the new "CodeHaat Premium" minimal aesthetic.
+  - Updated `dashboard.tsx` with a refined UI, matching the new "KodeDock Premium" minimal aesthetic.
   - Enhanced Seller Settings (`/seller/settings.tsx`).
 - **Shared Components:**
   - Added `account-settings.tsx` for reusable, standardized security and danger-zone configurations across buyer and seller profiles.
@@ -183,7 +183,7 @@ All notable changes to the CodeHaat backend project will be documented in this f
 - **Immersive Edge-to-Edge Design:**
   - Upgraded the Navbar, Main Content containers, and Footer to share a consistent, full-width constraint (`w-full px-4 lg:px-10 xl:px-14`), providing a premium SaaS wide-screen aesthetic.
   - Repositioned Navbar elements: Brand name locked to the far left, Search Bar perfectly dead-centered via flexible flexbox balancing (`flex-1 min-w-0`), and grouped action icons pushed to the extreme right edge.
-  - Simplified the `CodeHaatLogo` by removing the terminal icon for a cleaner, typography-focused brand mark.
+  - Simplified the `KodeDockLogo` by removing the terminal icon for a cleaner, typography-focused brand mark.
 
 ### 🛡️ Enterprise Middleware & Security
 - **Advanced Auth Redirection (`returnUrl`):**
@@ -195,7 +195,7 @@ All notable changes to the CodeHaat backend project will be documented in this f
   - Injected a cryptographically generated `x-request-id` into all incoming requests and responses for advanced observability across the Next.js frontend and Rust backend.
 
 ### 🤖 Agent Guidelines & Open Source Workflows
-- **CodeHaat Agent Guidelines:** Created `AGENT.md` strictly enforcing project architecture constraints, Next.js framework conventions, security priorities, and styling rules.
+- **KodeDock Agent Guidelines:** Created `AGENT.md` strictly enforcing project architecture constraints, Next.js framework conventions, security priorities, and styling rules.
 - **Dynamic Contributors Automation:** Replaced static third-party `contrib.rocks` images with a custom GitHub Action (`.github/workflows/contributors.yml`) utilizing `gh api` to automatically generate and inject real, bot-filtered contributor avatars directly into `README.md` and `CONTRIBUTING.md` upon merge to `main`.
 
 ### 💎 Complete Seller Dashboard Redesign (Awwwards & Anti-Slop Tier)
@@ -215,7 +215,7 @@ All notable changes to the CodeHaat backend project will be documented in this f
   - Built an interactive 5-star sentiment breakdown allowing sellers to filter reviews by star rating with a single click.
   - Added verified purchase badges, reviewer initial badges, and product tag attribution.
 - **Creator Wallet & Payout Engine (`/seller/wallet`):**
-  - Upgraded the 3D CodeHaat Creator Card with realistic metallic chip, holographic radial mesh, and smooth 3D perspective flip.
+  - Upgraded the 3D KodeDock Creator Card with realistic metallic chip, holographic radial mesh, and smooth 3D perspective flip.
   - Integrated instant preset withdrawal chips (`₹500`, `₹1,000`, `₹2,500`, `₹5,000`, `MAX`) and verified bank/UPI destination cards.
 - **Revenue Analytics (`/seller/earnings`):**
   - Added transparent commission breakdown explaining the 2.5% platform fee and 97.5% creator net take-home pay, alongside total historical disbursements.

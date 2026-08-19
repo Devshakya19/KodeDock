@@ -32,7 +32,7 @@ export async function getServerUser(): Promise<User | null> {
     const { verifyToken } = await import("@/lib/auth/server");
 
     const cookieStore = await cookies();
-    const token = cookieStore.get("codehaat_token")?.value;
+    const token = cookieStore.get("kodedock_token")?.value;
     if (!token) return null;
 
     const claims = await verifyToken(token);
@@ -59,7 +59,7 @@ export async function getServerToken(): Promise<string | null> {
     const { cookies } = await import("next/headers");
     const { verifyToken } = await import("@/lib/auth/server");
     const cookieStore = await cookies();
-    const token = cookieStore.get("codehaat_token")?.value;
+    const token = cookieStore.get("kodedock_token")?.value;
     if (!token) return null;
     const claims = await verifyToken(token);
     return claims ? token : null;

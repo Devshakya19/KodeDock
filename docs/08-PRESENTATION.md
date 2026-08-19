@@ -1,4 +1,4 @@
-# CodeHaat — Investor & Partner Presentation
+# KodeDock — Investor & Partner Presentation
 
 > India's #1 Digital Code Marketplace — Where Code Meets Commerce
 
@@ -30,7 +30,7 @@
 - **Current Pain**: 80% of Indian developers use global platforms with 20-55% commissions
 
 ### Our Solution
-CodeHaat is India's first developer-focused digital marketplace that delivers code directly to buyers' GitHub accounts as private repositories — eliminating ZIP files and enabling true version-controlled code distribution.
+KodeDock is India's first developer-focused digital marketplace that delivers code directly to buyers' GitHub accounts as private repositories — eliminating ZIP files and enabling true version-controlled code distribution.
 
 ### Key Metrics (Projected 24 Months)
 - **GMV**: ₹50 Crores annually
@@ -285,7 +285,7 @@ CodeHaat is India's first developer-focused digital marketplace that delivers co
 ### Direct Competitors
 | Platform | Commission | Delivery Method | Payment | Focus | Weakness |
 |----------|------------|-----------------|---------|-------|----------|
-| **CodeHaat** | **2.5%** | **GitHub Repos** | **UPI/Wallet/Razorpay** | **India Developer Code** | **New entrant** |
+| **KodeDock** | **2.5%** | **GitHub Repos** | **UPI/Wallet/Razorpay** | **India Developer Code** | **New entrant** |
 | CodeCanyon | 30-55% | ZIP Files | Intl Cards | Global Assets | High fees, outdated delivery |
 | Gumroad | 8.5% + $0.30 | ZIP/Links | Intl Cards | General Digital | No dev-specific features |
 | Sellfy | 5% | ZIP/Links | Intl Cards | Creators | Weak discovery, no escrow |
@@ -398,7 +398,7 @@ CodeHaat is India's first developer-focused digital marketplace that delivers co
 #### Deeksha Jain — Marketing
 - **Role**: Marketing lead responsible for brand growth and developer community
 - **Expertise**: Brand strategy, social media, developer community building, market research
-- **Focus**: Growing CodeHaat's presence in the Indian developer ecosystem
+- **Focus**: Growing KodeDock's presence in the Indian developer ecosystem
 - **GitHub**: [github.com/Deekshajain28](https://github.com/Deekshajain28)
 
 ### Advisory Board
@@ -527,7 +527,7 @@ CodeHaat is India's first developer-focused digital marketplace that delivers co
 | **T2** | ₹1.00 Cr | Public launch, 10K users, ₹10L GMV/mo | Month 6 |
 | **T3** | ₹0.75 Cr | ₹50L GMV/mo, 50K users, breakeven path | Month 12 |
 
-### Why Invest in CodeHaat?
+### Why Invest in KodeDock?
 #### Market Timing
 - **India's Digital Decade**: 500M+ new internet users by 2025
 - **Developer Economy Maturity**: Shift from services to product mindset
@@ -563,44 +563,44 @@ CodeHaat is India's first developer-focused digital marketplace that delivers co
 6. **Post-Closing**: Board observer seat, monthly updates
 
 ### Contact for Investment Inquiries
-**Dev Shakya — Founder, CodeHaat**  
-Email: investors@codehaat.com  
+**Dev Shakya — Founder, KodeDock**  
+Email: investors@kodedock.com  
 GitHub: [github.com/Devshakya19](https://github.com/Devshakya19)  
-Calendly: calendly.com/codehaat/invest
+Calendly: calendly.com/kodedock/invest
 
 ---
 
 ## 13. Contact Information
 
 ### General Inquiries
-- **Email**: info@codehaat.com
-- **Website**: https://codehaat.com
+- **Email**: info@kodedock.com
+- **Website**: https://kodedock.com
 - **Phone**: +91-120-XXXXXXX (Main Line)
 
 ### Investment & Partnerships
-- **Email**: investors@codehaat.com
+- **Email**: investors@kodedock.com
 - **Phone**: +91-120-XXXXXXX (Option 2)
-- **LinkedIn**: https://linkedin.com/company/codehaat
+- **LinkedIn**: https://linkedin.com/company/kodedock
 
 ### Press & Media
-- **Email**: press@codehaat.com
+- **Email**: press@kodedock.com
 - **Phone**: +91-120-XXXXXXX (Option 3)
-- **Press Kit**: https://codehaat.com/press
+- **Press Kit**: https://kodedock.com/press
 
 ### Customer Support
-- **Email**: support@codehaat.com
+- **Email**: support@kodedock.com
 - **Phone**: +91-120-XXXXXXX (Option 1)
 - **Live Chat**: Available via dashboard (9 AM - 8 PM IST)
-- **Twitter**: @CodeHaatSupport
+- **Twitter**: @KodeDockSupport
 
 ### Security & Abuse
-- **Email**: security@codehaat.com (PGP key available)
-- **Bug Bounty**: https://hackerrank.com/codehaat
+- **Email**: security@kodedock.com (PGP key available)
+- **Bug Bounty**: https://hackerrank.com/kodedock
 - **Response Time**: < 2 hours for critical issues
 
 ### Career Opportunities
-- **Email**: careers@codehaat.com
-- **Website**: https://codehaat.com/careers
+- **Email**: careers@kodedock.com
+- **Website**: https://kodedock.com/careers
 - **Current Openings**: 
   - Senior Backend Engineer (Rust/Go)
   - Frontend Engineer (React/TypeScript)
@@ -609,20 +609,20 @@ Calendly: calendly.com/codehaat/invest
   - Community Manager
 
 ### Legal & Compliance
-- **Email**: legal@codehaat.com
-- **Address**: CodeHaat Legal Dept, Noida Address (see footer)
+- **Email**: legal@kodedock.com
+- **Address**: KodeDock Legal Dept, Noida Address (see footer)
 - **GDPR Representative**: EU Representative available upon request
 
 ### Social Media & Community
-- **Twitter/X**: @CodeHaatOfficial
-- **LinkedIn**: https://linkedin.com/company/codehaat
-- **Facebook**: https://facebook.com/CodeHaatOfficial
-- **Instagram**: @codehaat_official
-- **YouTube**: CodeHaat Official Channel
-- **Discord**: discord.gg/codehaat
-- **Reddit**: r/CodeHaat
-- **Blog**: blog.codehaat.com
-- **Status**: status.codehaat.com
+- **Twitter/X**: @KodeDockOfficial
+- **LinkedIn**: https://linkedin.com/company/kodedock
+- **Facebook**: https://facebook.com/KodeDockOfficial
+- **Instagram**: @kodedock_official
+- **YouTube**: KodeDock Official Channel
+- **Discord**: discord.gg/kodedock
+- **Reddit**: r/KodeDock
+- **Blog**: blog.kodedock.com
+- **Status**: status.kodedock.com
 
 ---
 
@@ -651,7 +651,7 @@ Calendly: calendly.com/codehaat/invest
 *Prepared for: Potential Investors & Strategic Partners*  
 *Date: August 2026*  
 *Version: v1.3.0*  
-*Confidentiality: This document contains confidential and proprietary information of CodeHaat. Distribution restricted to authorized recipients only.*
+*Confidentiality: This document contains confidential and proprietary information of KodeDock. Distribution restricted to authorized recipients only.*
 
-*© 2025-2026 CodeHaat. All rights reserved.*  
+*© 2025-2026 KodeDock. All rights reserved.*  
 *India's #1 Digital Code Marketplace — Where Code Meets Commerce*

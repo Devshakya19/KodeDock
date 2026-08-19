@@ -1,4 +1,4 @@
-# CodeHaat — Technical Requirements Document
+# KodeDock — Technical Requirements Document
 
 > Exact technical specifications for every service, endpoint, and schema.
 
@@ -191,7 +191,7 @@ sequenceDiagram
 
 ## 6. Database Schema
 
-CodeHaat uses 13 core tables to manage the marketplace logic. Below is a summary of all tables and the schema for the most critical ones.
+KodeDock uses 13 core tables to manage the marketplace logic. Below is a summary of all tables and the schema for the most critical ones.
 
 ### Tables Overview
 1. `profiles`
@@ -352,7 +352,7 @@ Below is the complete set of required and optional environment variables.
 
 ```env
 # =============================================================================
-# CodeHaat - Environment Variables
+# KodeDock - Environment Variables
 # =============================================================================
 # Razorpay Payment Gateway (REQUIRED)
 RAZORPAY_KEY_ID=
@@ -360,13 +360,13 @@ RAZORPAY_KEY_SECRET=
 RAZORPAY_WEBHOOK_SECRET=
 
 # Database
-POSTGRES_PASSWORD=codehaat_secret
+POSTGRES_PASSWORD=kodedock_secret
 
 # Redis
-REDIS_PASSWORD=codehaat_redis_secret
+REDIS_PASSWORD=kodedock_redis_secret
 
 # JWT Secret
-JWT_SECRET=codehaat-super-secret-jwt-key-change-in-production-2024
+JWT_SECRET=kodedock-super-secret-jwt-key-change-in-production-2024
 ```
 
 ### Frontend (`.env.local`)
@@ -380,9 +380,9 @@ NEXT_PUBLIC_WS_URL=ws://localhost:4004
 
 ```env
 PORT=4001
-DATABASE_URL=postgres://codehaat:codehaat_secret@localhost:5432/codehaat
+DATABASE_URL=postgres://kodedock:kodedock_secret@localhost:5432/kodedock
 REDIS_URL=redis://localhost:6379
-JWT_SECRET=codehaat-super-secret-jwt-key-change-in-production-2024
+JWT_SECRET=kodedock-super-secret-jwt-key-change-in-production-2024
 ```
 
 ### AI Service (Python)

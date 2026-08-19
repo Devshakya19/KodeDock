@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "=== CodeHaat Docker Test Script ==="
+echo "=== KodeDock Docker Test Script ==="
 echo ""
 
 # Check if Docker is running

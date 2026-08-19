@@ -6,12 +6,12 @@ import { Badge } from "@/components/ui/badge";
 
 
 const COMPARISON = [
-  { feature: "Commission Rate", codehaat: "2.5%", codecanyon: "50%", gumroad: "10%" },
-  { feature: "GitHub Repo Delivery", codehaat: true, codecanyon: false, gumroad: false },
-  { feature: "Payout Cycle", codehaat: "7 days", codecanyon: "30-60 days", gumroad: "Instant" },
-  { feature: "Built-in Audience (India)", codehaat: true, codecanyon: false, gumroad: false },
-  { feature: "Free Listings", codehaat: true, codecanyon: false, gumroad: true },
-  { feature: "Analytics Dashboard", codehaat: true, codecanyon: true, gumroad: true },
+  { feature: "Commission Rate", kodedock: "2.5%", codecanyon: "50%", gumroad: "10%" },
+  { feature: "GitHub Repo Delivery", kodedock: true, codecanyon: false, gumroad: false },
+  { feature: "Payout Cycle", kodedock: "7 days", codecanyon: "30-60 days", gumroad: "Instant" },
+  { feature: "Built-in Audience (India)", kodedock: true, codecanyon: false, gumroad: false },
+  { feature: "Free Listings", kodedock: true, codecanyon: false, gumroad: true },
+  { feature: "Analytics Dashboard", kodedock: true, codecanyon: true, gumroad: true },
 ];
 
 export function DevCommission() {
@@ -35,7 +35,7 @@ export function DevCommission() {
                 <tr className="border-b border-slate-200 bg-slate-50">
                   <th className="text-left p-4 font-medium text-slate-600">Feature</th>
                   <th className="text-center p-4 font-bold text-white bg-slate-950">
-                    CodeHaat
+                    KodeDock
                   </th>
                   <th className="text-center p-4 font-medium text-slate-600">CodeCanyon</th>
                   <th className="text-center p-4 font-medium text-slate-600">Gumroad</th>
@@ -46,9 +46,9 @@ export function DevCommission() {
                   <tr key={row.feature} className={i < COMPARISON.length - 1 ? "border-b border-slate-100" : ""}>
                     <td className="p-4 text-slate-700 font-medium">{row.feature}</td>
                     <td className="p-4 text-center font-semibold text-slate-950">
-                      {typeof row.codehaat === "boolean" ? (
-                        row.codehaat ? <Check className="w-5 h-5 text-emerald-600 mx-auto" /> : <X className="w-5 h-5 text-red-400 mx-auto" />
-                      ) : row.codehaat}
+                      {typeof row.kodedock === "boolean" ? (
+                        row.kodedock ? <Check className="w-5 h-5 text-emerald-600 mx-auto" /> : <X className="w-5 h-5 text-red-400 mx-auto" />
+                      ) : row.kodedock}
                     </td>
                     <td className="p-4 text-center text-slate-500">
                       {typeof row.codecanyon === "boolean" ? (

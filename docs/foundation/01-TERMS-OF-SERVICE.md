@@ -1,4 +1,4 @@
-# CodeHaat — Terms of Service
+# KodeDock — Terms of Service
 
 > The terms that govern your use of India's #1 Digital Code Marketplace.
 
@@ -11,9 +11,9 @@
 
 ## 1. Acceptance of Terms
 
-Welcome to CodeHaat ("we," "us," "our," or "the Platform"). By creating an account, browsing the marketplace, purchasing products, or listing products for sale, you agree to be bound by these Terms of Service ("Terms"). If you do not agree with any part of these Terms, you must not use the Platform.
+Welcome to KodeDock ("we," "us," "our," or "the Platform"). By creating an account, browsing the marketplace, purchasing products, or listing products for sale, you agree to be bound by these Terms of Service ("Terms"). If you do not agree with any part of these Terms, you must not use the Platform.
 
-CodeHaat is operated as a proprietary service. These Terms constitute a legally binding agreement between you and CodeHaat, governed by the laws of India.
+KodeDock is operated as a proprietary service. These Terms constitute a legally binding agreement between you and KodeDock, governed by the laws of India.
 
 ---
 
@@ -21,7 +21,7 @@ CodeHaat is operated as a proprietary service. These Terms constitute a legally 
 
 | Term | Definition |
 |------|-----------|
-| **Platform** | The CodeHaat website, API, and all associated services |
+| **Platform** | The KodeDock website, API, and all associated services |
 | **User** | Any person who creates an account or browses the Platform |
 | **Buyer** | A User who purchases digital code assets |
 | **Seller** | A User (with developer role) who lists and sells code assets |
@@ -42,7 +42,7 @@ CodeHaat is operated as a proprietary service. These Terms constitute a legally 
 - You are responsible for safeguarding your password
 - You must not share your account credentials with anyone
 - You are liable for all activity under your account
-- Notify us immediately of any unauthorized access at security@codehaat.com
+- Notify us immediately of any unauthorized access at security@kodedock.com
 
 ### 3.3 Roles
 - **User (Buyer):** Can browse, purchase, review products, and top up wallet
@@ -115,7 +115,7 @@ Sellers are responsible for ensuring their products:
 
 ## 7. Escrow System
 
-To protect both buyers and sellers, CodeHaat employs a 7-day escrow:
+To protect both buyers and sellers, KodeDock employs a 7-day escrow:
 
 1. **On purchase:** Seller's earnings are placed in `pending` status
 2. **Day 1–7:** Funds are held in escrow (disputes can be raised during this period)
@@ -127,12 +127,12 @@ To protect both buyers and sellers, CodeHaat employs a 7-day escrow:
 ## 8. Intellectual Property
 
 ### 8.1 Platform IP
-The CodeHaat Platform, including its code, design, logo, and brand assets, is **proprietary software** owned by CodeHaat. Unauthorized copying, cloning, or distribution is strictly prohibited.
+The KodeDock Platform, including its code, design, logo, and brand assets, is **proprietary software** owned by KodeDock. Unauthorized copying, cloning, or distribution is strictly prohibited.
 
 ### 8.2 Product IP
 - Sellers retain ownership of their code
 - Buyers receive a perpetual usage license upon purchase
-- Sellers grant CodeHaat a license to host and deliver their code to buyers
+- Sellers grant KodeDock a license to host and deliver their code to buyers
 
 ---
 
@@ -143,7 +143,7 @@ You must not:
 - Use bots, scrapers, or automated tools to access the Platform
 - Create fake accounts or engage in fraudulent transactions
 - Manipulate reviews, ratings, or sales counts
-- Exploit bugs or vulnerabilities — report them to security@codehaat.com
+- Exploit bugs or vulnerabilities — report them to security@kodedock.com
 - Harass, threaten, or defame other users
 - Attempt to circumvent the Platform's payment system
 
@@ -169,7 +169,7 @@ You must not:
 
 ## 12. Limitation of Liability
 
-To the maximum extent permitted by law, CodeHaat shall not be liable for:
+To the maximum extent permitted by law, KodeDock shall not be liable for:
 - Indirect, incidental, or consequential damages
 - Loss of profits, data, or business opportunities
 - Any damages exceeding the amount paid by the user to the Platform in the preceding 12 months
@@ -196,11 +196,11 @@ To the maximum extent permitted by law, CodeHaat shall not be liable for:
 ## 15. Contact
 
 For questions about these Terms:
-- **Email:** legal@codehaat.com
+- **Email:** legal@kodedock.com
 - **Support:** See [Help & Support](04-HELP-AND-SUPPORT.md)
 
 ---
 
 *Document Version: 1.0 | Last Updated: August 2026*
 
-© 2025-2026 CodeHaat. All rights reserved.
+© 2025-2026 KodeDock. All rights reserved.

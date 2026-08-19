@@ -1,5 +1,5 @@
 /**
- * CodeHaat Design System Theme File
+ * KodeDock Design System Theme File
  * 
  * Sourced directly from docs/04-DESIGN.md
  * 

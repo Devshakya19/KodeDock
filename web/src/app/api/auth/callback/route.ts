@@ -7,7 +7,7 @@ function setAuthCookie(response: NextResponse, request: NextRequest, token: stri
   const proto = request.headers.get("x-forwarded-proto") || new URL(request.url).protocol.replace(":", "");
   const isSecure = proto === "https";
 
-  response.cookies.set("codehaat_token", token, {
+  response.cookies.set("kodedock_token", token, {
     httpOnly: true,
     secure: isSecure,
     sameSite: "lax",
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
 
   try {
     if (action === "link") {
-      const token = request.cookies.get("codehaat_token")?.value;
+      const token = request.cookies.get("kodedock_token")?.value;
       if (!token) {
         return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent("You must be logged in to link an account")}`);
       }

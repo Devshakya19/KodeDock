@@ -111,7 +111,7 @@ export function NotificationsSettings() {
               />
               <ToggleRow 
                 label="Platform Updates" 
-                description="Important updates about CodeHaat platform features"
+                description="Important updates about KodeDock platform features"
                 checked={prefs.email_updates}
                 onChange={() => handleToggle('email_updates')}
               />

@@ -219,7 +219,7 @@ export default function SellerEarningsPage() {
               You keep 97.5% of every sale.
             </h3>
             <p className="text-slate-300 text-xs sm:text-sm font-medium leading-relaxed">
-              CodeHaat charges a minimal 2.5% platform fee to cover automated payment gateway processing, instant repository invitations, and fraud protection. No hidden subscription fees.
+              KodeDock charges a minimal 2.5% platform fee to cover automated payment gateway processing, instant repository invitations, and fraud protection. No hidden subscription fees.
             </p>
           </div>
 

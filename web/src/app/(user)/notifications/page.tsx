@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { CodeHaatLogo } from "@/components/brand/codehaat-logo";
+import { KodeDockLogo } from "@/components/brand/kodedock-logo";
 import { verifyToken } from "@/lib/auth/server";
 import { NotificationsList, Notification } from "@/components/notifications/notifications-list";
 import { theme } from "@/lib/theme";
@@ -24,7 +24,7 @@ async function fetchNotifications(token: string) {
 
 export default async function NotificationsPage() {
   const cookieStore = await cookies();
-  const token = cookieStore.get("codehaat_token")?.value;
+  const token = cookieStore.get("kodedock_token")?.value;
 
   if (!token) {
     redirect("/login");

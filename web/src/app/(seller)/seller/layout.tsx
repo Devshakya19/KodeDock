@@ -10,7 +10,7 @@ export default async function SellerLayout({
   children: React.ReactNode;
 }) {
   const cookieStore = await cookies();
-  const token = cookieStore.get("codehaat_token")?.value;
+  const token = cookieStore.get("kodedock_token")?.value;
 
   if (!token) {
     redirect("/login");

@@ -6,7 +6,7 @@ export async function POST(request: Request) {
 
   const response = NextResponse.redirect(new URL("/", request.url));
 
-  response.cookies.set("codehaat_token", "", {
+  response.cookies.set("kodedock_token", "", {
     httpOnly: true,
     secure: isSecure,
     sameSite: "lax",

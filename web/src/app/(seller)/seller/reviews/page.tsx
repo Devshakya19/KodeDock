@@ -192,7 +192,7 @@ export default function SellerReviewsPage() {
                 High ratings drive 3.2x higher conversion.
               </h3>
               <p className="text-slate-300 text-xs sm:text-sm max-w-xl font-normal leading-relaxed">
-                Every review on CodeHaat is linked directly to a verified customer purchase. Maintaining detailed documentation and responsive updates helps keep your average above 4.8 stars.
+                Every review on KodeDock is linked directly to a verified customer purchase. Maintaining detailed documentation and responsive updates helps keep your average above 4.8 stars.
               </p>
             </div>
 

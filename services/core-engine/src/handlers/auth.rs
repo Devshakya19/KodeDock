@@ -552,7 +552,7 @@ pub async fn github_oauth(
 
     // Derive email and name from GitHub profile
     let email = gh_user.email.clone().unwrap_or_else(|| {
-        format!("{}@github.codehaat.app", gh_user.login)
+        format!("{}@github.kodedock.app", gh_user.login)
     });
     let full_name = gh_user.name.clone().unwrap_or_else(|| gh_user.login.clone());
 
@@ -686,7 +686,7 @@ pub async fn github_link(
     match auth::get_user_by_github_id(pool.get_ref(), gh_user.id).await {
         Ok(existing) => {
             if existing.id != user_id {
-                return HttpResponse::Conflict().json(ApiResponse::<()>::error("This GitHub account is already linked to another CodeHaat account."));
+                return HttpResponse::Conflict().json(ApiResponse::<()>::error("This GitHub account is already linked to another KodeDock account."));
             }
             // If it's the same user, just update the token
         }

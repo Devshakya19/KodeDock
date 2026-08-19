@@ -1,6 +1,6 @@
-# CodeHaat Developer Onboarding Guide
+# KodeDock Developer Onboarding Guide
 
-This guide will help you set up the CodeHaat development environment and understand the codebase structure.
+This guide will help you set up the KodeDock development environment and understand the codebase structure.
 
 ## Table of Contents
 1. [Prerequisites](#prerequisites)
@@ -26,8 +26,8 @@ Before you begin, ensure you have the following installed:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/Devshakya19/CodeHaat.git
-cd CodeHaat
+git clone https://github.com/Devshakya19/KodeDock.git
+cd KodeDock
 ```
 
 ### 2. Run the Setup Script
@@ -111,7 +111,7 @@ Follow similar patterns for AI Service (Python), Infra Worker (Go), and Real-tim
 
 ## Codebase Overview
 
-CodeHaat is a polyglot microservices architecture with five main services:
+KodeDock is a polyglot microservices architecture with five main services:
 
 ### 1. Frontend (`web/`)
 - **Technology**: Next.js 16, React 19, TypeScript
@@ -220,4 +220,4 @@ If you encounter issues:
 4. Ensure ports are not conflicting with other applications
 5. Consult the architecture documentation in `docs/02-ARCHITECTURE.md`
 
-Welcome to the CodeHaat development team!
+Welcome to the KodeDock development team!

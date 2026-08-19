@@ -1,4 +1,4 @@
-# CodeHaat — Backend Work & Schema
+# KodeDock — Backend Work & Schema
 
 > Detailed backend implementation plan — what each service does, complete database schema, and API specifications.
 
@@ -257,7 +257,7 @@ sequenceDiagram
 | Docker image | `chrislusf/seaweedfs:3.76` |
 | S3 API | Port 8333 |
 | Filer API | Port 8888 |
-| Bucket | `codehaat-media` |
+| Bucket | `kodedock-media` |
 | Allowed paths | `products/`, `avatars/` |
 | Allowed types | JPEG, PNG, GIF, WebP |
 

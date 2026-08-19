@@ -7,7 +7,7 @@ export default function ContactPage() {
   return (
     <StaticPageLayout
       title="Contact Us"
-      description="Get in touch with the CodeHaat team."
+      description="Get in touch with the KodeDock team."
     >
       <div className="space-y-8">
         <section>
@@ -21,8 +21,8 @@ export default function ContactPage() {
         <section>
           <div className="grid sm:grid-cols-3 gap-6">
             {[
-              { icon: Mail, title: "Email", value: "hello@codehaat.com", desc: "For general inquiries" },
-              { icon: Mail, title: "Support", value: "support@codehaat.com", desc: "For technical support" },
+              { icon: Mail, title: "Email", value: "hello@kodedock.com", desc: "For general inquiries" },
+              { icon: Mail, title: "Support", value: "support@kodedock.com", desc: "For technical support" },
               { icon: MapPin, title: "Location", value: "India", desc: "Remote-first company" },
             ].map((contact) => (
               <Card key={contact.title} className="border-slate-200">

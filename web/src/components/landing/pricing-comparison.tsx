@@ -7,16 +7,16 @@ import { Badge } from "@/components/ui/badge";
 
 
 const COMPARISON = [
-  { feature: "Commission Rate", codehaat: "2.5%", codecanyon: "20-55%", gumroad: "10%" },
-  { feature: "Delivery Method", codehaat: "GitHub Repo", codecanyon: ".zip File", gumroad: "File Download" },
-  { feature: "Live Preview", codehaat: true, codecanyon: false, gumroad: false },
-  { feature: "Escrow System", codehaat: true, codecanyon: false, gumroad: false },
-  { feature: "Wallet System", codehaat: true, codecanyon: false, gumroad: false },
-  { feature: "Indian Focus", codehaat: true, codecanyon: false, gumroad: false },
-  { feature: "INR Payments", codehaat: "Native", codecanyon: "Converted", gumroad: "Converted" },
-  { feature: "Payout Speed", codehaat: "7 days", codecanyon: "30-60 days", gumroad: "7 days" },
-  { feature: "Student Assets", codehaat: true, codecanyon: false, gumroad: "Limited" },
-  { feature: "Buyer Protection", codehaat: "48h Escrow", codecanyon: "Basic", gumroad: "Limited" },
+  { feature: "Commission Rate", kodedock: "2.5%", codecanyon: "20-55%", gumroad: "10%" },
+  { feature: "Delivery Method", kodedock: "GitHub Repo", codecanyon: ".zip File", gumroad: "File Download" },
+  { feature: "Live Preview", kodedock: true, codecanyon: false, gumroad: false },
+  { feature: "Escrow System", kodedock: true, codecanyon: false, gumroad: false },
+  { feature: "Wallet System", kodedock: true, codecanyon: false, gumroad: false },
+  { feature: "Indian Focus", kodedock: true, codecanyon: false, gumroad: false },
+  { feature: "INR Payments", kodedock: "Native", codecanyon: "Converted", gumroad: "Converted" },
+  { feature: "Payout Speed", kodedock: "7 days", codecanyon: "30-60 days", gumroad: "7 days" },
+  { feature: "Student Assets", kodedock: true, codecanyon: false, gumroad: "Limited" },
+  { feature: "Buyer Protection", kodedock: "48h Escrow", codecanyon: "Basic", gumroad: "Limited" },
 ];
 
 function CellValue({ value }: { value: string | boolean }) {
@@ -64,7 +64,7 @@ export function PricingComparison() {
                         <Badge className="bg-slate-950 text-white border-0 px-3 py-1 text-xs font-bold shadow-sm shadow-slate-200/50">
                           RECOMMENDED
                         </Badge>
-                        <span className="text-base font-bold">CodeHaat</span>
+                        <span className="text-base font-bold">KodeDock</span>
                       </div>
                     </th>
                     <th className="px-6 py-4 text-center text-sm font-semibold text-slate-600">CodeCanyon</th>
@@ -76,7 +76,7 @@ export function PricingComparison() {
                     <tr key={row.feature} className={`border-b border-slate-200 last:border-0 ${i % 2 === 0 ? "bg-slate-50" : ""}`}>
                       <td className="px-6 py-3.5 text-sm font-medium text-slate-950">{row.feature}</td>
                       <td className="px-6 py-3.5 text-center font-semibold text-slate-950">
-                        <CellValue value={row.codehaat} />
+                        <CellValue value={row.kodedock} />
                       </td>
                       <td className="px-6 py-3.5 text-center text-slate-600">
                         <CellValue value={row.codecanyon} />

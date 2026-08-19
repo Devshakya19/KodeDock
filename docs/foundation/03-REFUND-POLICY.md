@@ -1,4 +1,4 @@
-# CodeHaat — Refund & Cancellation Policy
+# KodeDock — Refund & Cancellation Policy
 
 > Clear, fair refund rules for digital code purchases.
 
@@ -11,7 +11,7 @@
 
 ## 1. Overview
 
-CodeHaat sells **digital code assets** that are delivered instantly to your GitHub account. Due to the nature of digital goods, our refund policy is designed to be fair to both buyers and sellers while preventing abuse.
+KodeDock sells **digital code assets** that are delivered instantly to your GitHub account. Due to the nature of digital goods, our refund policy is designed to be fair to both buyers and sellers while preventing abuse.
 
 ---
 
@@ -64,13 +64,13 @@ Refunds will **not** be granted for:
    └── Go to: Orders → Select Order → Raise Dispute
    └── Provide: Detailed description, evidence (screenshots/logs)
 
-3. CodeHaat mediation
+3. KodeDock mediation
    └── Our team reviews within 72 hours
    └── Decision: Full refund / Partial refund / No refund
 
 4. Refund processing
    └── Refund to original payment method (Razorpay)
-   └── Or credit to CodeHaat wallet (instant)
+   └── Or credit to KodeDock wallet (instant)
 ```
 
 ### Refund Request Must Include:
@@ -92,7 +92,7 @@ Refunds will **not** be granted for:
 | **Account closure** | Remaining balance refunded to original payment method within 7 business days |
 
 To request a wallet top-up refund:
-- Email: refunds@codehaat.com
+- Email: refunds@kodedock.com
 - Include: Transaction ID, reason, and your wallet balance screenshot
 
 ---
@@ -116,7 +116,7 @@ To request a wallet top-up refund:
 
 ## 6. Escrow & Dispute Resolution
 
-CodeHaat's 7-day escrow system ensures fair resolution:
+KodeDock's 7-day escrow system ensures fair resolution:
 
 ```
 Day 0:    Purchase made → Seller earnings held in escrow
@@ -125,7 +125,7 @@ Day 7:    Escrow releases → Funds become available to seller
 
 If dispute is raised:
 ├── Funds remain held until resolution
-├── CodeHaat team reviews evidence from both parties
+├── KodeDock team reviews evidence from both parties
 ├── Resolution within 72 hours
 └── Outcome:
     ├── Buyer wins → Full refund to buyer, seller gets nothing
@@ -140,7 +140,7 @@ If dispute is raised:
 | Original Payment | Refund Method | Processing Time |
 |------------------|---------------|-----------------|
 | Razorpay (card/UPI/netbanking) | Back to original method | 5–7 business days |
-| Wallet balance | Credit to CodeHaat wallet | Instant |
+| Wallet balance | Credit to KodeDock wallet | Instant |
 | Bank withdrawal | Not applicable | — |
 
 ---
@@ -160,13 +160,13 @@ We track refund patterns and investigate suspicious activity. Honest users have 
 
 ## 9. Subscription / Recurring Payments
 
-CodeHaat currently does **not** offer subscriptions or recurring payments. All transactions are one-time purchases. If subscriptions are introduced in the future, this section will be updated with cancellation terms.
+KodeDock currently does **not** offer subscriptions or recurring payments. All transactions are one-time purchases. If subscriptions are introduced in the future, this section will be updated with cancellation terms.
 
 ---
 
 ## 10. Force Majeure
 
-CodeHaat is not liable for refund delays caused by:
+KodeDock is not liable for refund delays caused by:
 - Payment gateway (Razorpay) outages
 - Bank processing delays
 - Natural disasters or government actions
@@ -180,10 +180,10 @@ In such cases, refunds will be processed as soon as normal operations resume.
 
 | Purpose | Email |
 |---------|-------|
-| Refund requests | refunds@codehaat.com |
-| Dispute escalation | disputes@codehaat.com |
-| General questions | support@codehaat.com |
-| Fraud reporting | security@codehaat.com |
+| Refund requests | refunds@kodedock.com |
+| Dispute escalation | disputes@kodedock.com |
+| General questions | support@kodedock.com |
+| Fraud reporting | security@kodedock.com |
 
 **Response Times:**
 - Refund requests: Within 48 hours
@@ -194,4 +194,4 @@ In such cases, refunds will be processed as soon as normal operations resume.
 
 *Document Version: 1.0 | Last Updated: August 2026*
 
-© 2025-2026 CodeHaat. All rights reserved.
+© 2025-2026 KodeDock. All rights reserved.

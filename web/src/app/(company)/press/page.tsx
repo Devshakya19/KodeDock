@@ -9,10 +9,10 @@ export default function PressPage() {
     >
       <div className="space-y-8">
         <section>
-          <h2 className="text-2xl font-semibold text-slate-950 mb-4">About CodeHaat</h2>
+          <h2 className="text-2xl font-semibold text-slate-950 mb-4">About KodeDock</h2>
           <p className="text-slate-600 leading-relaxed">
-            CodeHaat is India&apos;s #1 digital code marketplace where developers buy and sell
-            production-grade code assets. Unlike traditional platforms, CodeHaat delivers code
+            KodeDock is India&apos;s #1 digital code marketplace where developers buy and sell
+            production-grade code assets. Unlike traditional platforms, KodeDock delivers code
             directly to buyers&apos; GitHub accounts as private repositories.
           </p>
         </section>
@@ -39,14 +39,14 @@ export default function PressPage() {
         <section>
           <h2 className="text-2xl font-semibold text-slate-950 mb-4">Brand Assets</h2>
           <p className="text-slate-600 leading-relaxed mb-4">
-            Download official CodeHaat brand assets for use in articles, presentations, and media coverage.
+            Download official KodeDock brand assets for use in articles, presentations, and media coverage.
           </p>
           <Card className="border-slate-200">
             <CardContent className="p-6">
               <div className="space-y-3">
                 {[
-                  { name: "CodeHaat Logo (SVG)", size: "2 KB" },
-                  { name: "CodeHaat Logo (PNG)", size: "50 KB" },
+                  { name: "KodeDock Logo (SVG)", size: "2 KB" },
+                  { name: "KodeDock Logo (PNG)", size: "50 KB" },
                   { name: "Social Media Banner", size: "200 KB" },
                   { name: "Brand Guidelines PDF", size: "1.2 MB" },
                 ].map((asset) => (
@@ -64,8 +64,8 @@ export default function PressPage() {
           <h2 className="text-2xl font-semibold text-slate-950 mb-4">Press Contact</h2>
           <p className="text-slate-600 leading-relaxed">
             For press inquiries, interviews, or media requests, please contact us at{" "}
-            <a href="mailto:press@codehaat.com" className="text-blue-600 hover:underline">
-              press@codehaat.com
+            <a href="mailto:press@kodedock.com" className="text-blue-600 hover:underline">
+              press@kodedock.com
             </a>
           </p>
         </section>

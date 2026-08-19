@@ -71,7 +71,7 @@ export function AddMoneyModal({ onClose, onSuccess }: AddMoneyModalProps) {
         key: result.data.key_id,
         amount: result.data.amount_paise,
         currency: result.data.currency,
-        name: "CodeHaat",
+        name: "KodeDock",
         description: "Add money to wallet",
         order_id: result.data.razorpay_order_id,
         handler: async (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => {

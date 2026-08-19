@@ -138,7 +138,7 @@ function CheckoutContent() {
         key: orderData.key_id,
         amount: orderData.amount_paise,
         currency: orderData.currency,
-        name: "CodeHaat",
+        name: "KodeDock",
         description: orderData.product_title,
         order_id: orderData.razorpay_order_id,
         handler: async (response) => {
@@ -385,7 +385,7 @@ function CheckoutContent() {
                           Payments processed securely
                         </p>
                         <p className="text-[11px] text-slate-500 font-medium leading-relaxed">
-                          By proceeding, you agree to CodeHaat&apos;s <Link href="/terms" className="text-slate-700 hover:text-slate-950 underline underline-offset-2 decoration-slate-300">Terms of Service</Link> and <Link href="/privacy" className="text-slate-700 hover:text-slate-950 underline underline-offset-2 decoration-slate-300">Privacy Policy</Link>.
+                          By proceeding, you agree to KodeDock&apos;s <Link href="/terms" className="text-slate-700 hover:text-slate-950 underline underline-offset-2 decoration-slate-300">Terms of Service</Link> and <Link href="/privacy" className="text-slate-700 hover:text-slate-950 underline underline-offset-2 decoration-slate-300">Privacy Policy</Link>.
                         </p>
                       </div>
                     </div>

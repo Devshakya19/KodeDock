@@ -1,9 +1,9 @@
-# Contributing to CodeHaat 🚀
+# Contributing to KodeDock 🚀
 
-First off, thank you for considering contributing to CodeHaat! It's people like you that make CodeHaat such a great platform.
+First off, thank you for considering contributing to KodeDock! It's people like you that make KodeDock such a great platform.
 
 ## 🏗️ Architecture Overview
-CodeHaat is a modern, polyglot microservices platform consisting of:
+KodeDock is a modern, polyglot microservices platform consisting of:
 - **Frontend**: Next.js (`/web`)
 - **Core Engine**: Rust (`/services/core-engine`)
 - **AI Service**: Python (`/services/ai-service`)
@@ -14,8 +14,8 @@ CodeHaat is a modern, polyglot microservices platform consisting of:
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/Devshakya19/CodeHaat.git
-   cd CodeHaat
+   git clone https://github.com/Devshakya19/KodeDock.git
+   cd KodeDock
    ```
 
 2. **Start Infrastructure**:
@@ -40,4 +40,4 @@ Use the Bug Report issue template. Please include logs, steps to reproduce, and 
 ## ✨ Suggesting Enhancements
 Use the Feature Request issue template. Provide as much context as possible.
 
-Thank you for contributing to CodeHaat! 🎉
+Thank you for contributing to KodeDock! 🎉

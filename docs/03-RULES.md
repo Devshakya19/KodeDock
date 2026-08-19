@@ -1,4 +1,4 @@
-# CodeHaat — Rules & Conventions
+# KodeDock — Rules & Conventions
 
 > Consistency is key. Every developer should follow these rules to keep the codebase professional.
 

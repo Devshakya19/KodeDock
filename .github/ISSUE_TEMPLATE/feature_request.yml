@@ -1,5 +1,5 @@
 name: ✨ Feature Request
-description: Suggest an idea for CodeHaat
+description: Suggest an idea for KodeDock
 title: "[FEATURE]: "
 labels: ["enhancement", "triage"]
 body:
@@ -23,7 +23,7 @@ body:
     attributes:
       label: Describe the solution you'd like
       description: A clear and concise description of what you want to happen.
-      placeholder: I would like CodeHaat to...
+      placeholder: I would like KodeDock to...
     validations:
       required: true
 
@@ -44,7 +44,7 @@ body:
       options:
         - "Low (Nice to have)"
         - "Medium (Useful but I can work around it)"
-        - "High (Blocks me from using CodeHaat effectively)"
+        - "High (Blocks me from using KodeDock effectively)"
     validations:
       required: true
 

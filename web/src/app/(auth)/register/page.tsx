@@ -90,7 +90,7 @@ export default function RegisterPage() {
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-slate-950">Create your account</h1>
             <p className="text-sm text-slate-600 mt-2">
-              Join 2,000+ developers on CodeHaat
+              Join 2,000+ developers on KodeDock
             </p>
           </div>
 

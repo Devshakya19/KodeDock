@@ -4,7 +4,7 @@ export default function LicensePage() {
   return (
     <StaticPageLayout
       title="License Agreement"
-      description="Terms governing the use of purchased code on CodeHaat."
+      description="Terms governing the use of purchased code on KodeDock."
     >
       <div className="space-y-8 text-sm text-slate-600 leading-relaxed">
         <p><em>Last updated: July 2026</em></p>
@@ -13,7 +13,7 @@ export default function LicensePage() {
           <h2 className="text-xl font-semibold text-slate-950 mb-3">1. License Grant</h2>
           <p>
             Upon purchase, you receive a non-exclusive, perpetual license to use the code
-            as specified by the seller. This license is tied to your CodeHaat account.
+            as specified by the seller. This license is tied to your KodeDock account.
           </p>
         </section>
 

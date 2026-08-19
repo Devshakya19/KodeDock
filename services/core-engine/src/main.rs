@@ -56,7 +56,7 @@ async fn main() -> std::io::Result<()> {
         .await
         .expect("Failed to create PostgreSQL pool");
 
-    log::info!("Starting CodeHaat Core Engine on port {}", port);
+    log::info!("Starting KodeDock Core Engine on port {}", port);
     log::info!("Connected to PostgreSQL");
 
     let storage = storage::StorageClient::new().await;

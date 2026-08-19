@@ -42,7 +42,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
   const { id } = await params;
 
   const cookieStore = await cookies();
-  const token = cookieStore.get("codehaat_token")?.value;
+  const token = cookieStore.get("kodedock_token")?.value;
   if (!token) redirect("/login");
 
   const claims = await verifyToken(token);

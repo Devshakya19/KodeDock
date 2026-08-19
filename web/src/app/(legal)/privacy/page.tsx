@@ -65,8 +65,8 @@ export default function PrivacyPage() {
           <h2 className="text-xl font-semibold text-slate-950 mb-3">6. Contact</h2>
           <p>
             For privacy-related inquiries, contact us at{" "}
-            <a href="mailto:privacy@codehaat.com" className="text-blue-600 hover:underline">
-              privacy@codehaat.com
+            <a href="mailto:privacy@kodedock.com" className="text-blue-600 hover:underline">
+              privacy@kodedock.com
             </a>
           </p>
         </section>

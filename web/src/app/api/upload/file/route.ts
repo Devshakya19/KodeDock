@@ -20,16 +20,16 @@ export async function PUT(request: NextRequest) {
     }
 
     // Extract the key from the presigned URL (everything after the bucket name)
-    // e.g. http://seaweedfs:8333/codehaat-media/products/uuid.png → products/uuid.png
+    // e.g. http://seaweedfs:8333/kodedock-media/products/uuid.png → products/uuid.png
     const urlObj = new URL(uploadUrl);
-    const fullPath = urlObj.pathname; // /codehaat-media/products/uuid.png
-    const key = fullPath.replace("/codehaat-media/", ""); // products/uuid.png
+    const fullPath = urlObj.pathname; // /kodedock-media/products/uuid.png
+    const key = fullPath.replace("/kodedock-media/", ""); // products/uuid.png
 
     // Upload via filer API (no S3 auth needed)
     const fileBody = await request.arrayBuffer();
     const contentType = request.headers.get("content-type") || "application/octet-stream";
 
-    const filerUrl = `${SEAWEEDFS_FILER}/buckets/codehaat-media/${key}`;
+    const filerUrl = `${SEAWEEDFS_FILER}/buckets/kodedock-media/${key}`;
     const filerRes = await fetch(filerUrl, {
       method: "PUT",
       headers: { "Content-Type": contentType },

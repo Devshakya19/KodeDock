@@ -371,7 +371,7 @@ export default function NewProductPage() {
                     />
                   </div>
                   <p className="text-[11px] text-slate-400 mt-1.5 leading-relaxed">
-                    When linked, CodeHaat automatically invites buyers to access your private repository upon verified checkout.
+                    When linked, KodeDock automatically invites buyers to access your private repository upon verified checkout.
                   </p>
                 </div>
               </div>

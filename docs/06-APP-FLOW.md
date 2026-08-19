@@ -1,4 +1,4 @@
-# CodeHaat — Application Flow Diagrams
+# KodeDock — Application Flow Diagrams
 
 > Step-by-step user flows for every feature in the application.
 
@@ -337,7 +337,7 @@ sequenceDiagram
 
 | Route | Content | Purpose |
 |-------|---------|---------|
-| `/about` | Company story, mission, values | About CodeHaat |
+| `/about` | Company story, mission, values | About KodeDock |
 | `/blog` | Blog posts with categories | Content marketing |
 | `/careers` | Job openings, company perks | Recruitment |
 | `/contact` | Contact info + form | Customer support |
