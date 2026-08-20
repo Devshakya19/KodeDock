@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { X, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { apiPost } from "@/lib/api/client";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+import { apiPost } from "@/shared/lib/api/client";
 
 interface AddMoneyModalProps {
   onClose: () => void;
@@ -107,20 +107,20 @@ export function AddMoneyModal({ onClose, onSuccess }: AddMoneyModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
-      <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-background rounded-xl p-6 w-full max-w-md shadow-xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-slate-950">Add Money to Wallet</h2>
-          <button onClick={onClose} className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center">
-            <X className="w-4 h-4 text-slate-500" />
+          <h2 className="text-lg font-semibold text-foreground">Add Money to Wallet</h2>
+          <button onClick={onClose} className="w-8 h-8 rounded-full hover:bg-secondary/80 flex items-center justify-center">
+            <X className="w-4 h-4 text-muted-foreground" />
           </button>
         </div>
 
         {error && (
-          <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">{error}</div>
+          <div className="mb-4 p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-sm text-destructive">{error}</div>
         )}
 
         <div className="mb-4">
-          <label className="block text-sm font-medium text-slate-700 mb-2">Amount (INR)</label>
+          <label className="block text-sm font-medium text-foreground mb-2">Amount (INR)</label>
           <Input
             type="number"
             value={amount}
@@ -138,8 +138,8 @@ export function AddMoneyModal({ onClose, onSuccess }: AddMoneyModalProps) {
               onClick={() => setAmount(a.toString())}
               className={`py-2 rounded-lg border text-sm font-medium transition-colors ${
                 amount === a.toString()
-                  ? "bg-slate-950 text-white border-slate-950"
-                  : "bg-white text-slate-700 border-slate-200 hover:border-slate-400"
+                  ? "bg-primary text-primary-foreground border-slate-950"
+                  : "bg-background text-foreground border-border hover:border-slate-400"
               }`}
             >
               ₹{a.toLocaleString()}
@@ -147,7 +147,7 @@ export function AddMoneyModal({ onClose, onSuccess }: AddMoneyModalProps) {
           ))}
         </div>
 
-        <Button onClick={handleAddMoney} disabled={loading || !amount} className="w-full bg-slate-950 text-white hover:bg-slate-800">
+        <Button onClick={handleAddMoney} disabled={loading || !amount} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
           {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
           Add Money
         </Button>

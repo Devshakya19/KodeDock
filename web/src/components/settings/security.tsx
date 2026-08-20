@@ -4,11 +4,11 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Loader2, CheckCircle, Shield, Trash2, ArrowLeft, KeyRound, AlertTriangle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { auth } from "@/lib/auth/client";
-import { apiPost, apiDelete } from "@/lib/api/client";
-import { theme } from "@/lib/theme";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+import { auth } from "@/shared/lib/auth/client";
+import { apiPost, apiDelete } from "@/shared/lib/api/client";
+import { theme } from "@/shared/lib/theme";
 
 interface SecuritySettingsProps {
   backLink?: string;
@@ -118,7 +118,7 @@ export function SecuritySettings({ backLink, backText, deleteWarningText, hideHe
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20 min-h-[60vh]">
-        <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+        <Loader2 className="w-8 h-8 text-accent animate-spin" />
       </div>
     );
   }
@@ -128,12 +128,12 @@ export function SecuritySettings({ backLink, backText, deleteWarningText, hideHe
       {!hideHeader && (
         <div className="mb-8">
           {backLink && backText && (
-            <Link href={backLink} className="inline-flex items-center gap-2 text-[13px] font-semibold text-slate-500 hover:text-slate-900 mb-4 transition-colors">
+            <Link href={backLink} className="inline-flex items-center gap-2 text-[13px] font-semibold text-muted-foreground hover:text-foreground mb-4 transition-colors">
               <ArrowLeft className="w-4 h-4" /> {backText}
             </Link>
           )}
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Account Settings</h1>
-          <p className="text-slate-500 mt-1 text-[15px]">Manage your security preferences and account status</p>
+          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">Account Settings</h1>
+          <p className="text-muted-foreground mt-1 text-[15px]">Manage your security preferences and account status</p>
         </div>
       )}
 
@@ -141,26 +141,26 @@ export function SecuritySettings({ backLink, backText, deleteWarningText, hideHe
         
         {/* Security Section */}
         <div className={theme.components.card}>
-          <div className="flex items-center gap-3 mb-8 border-b border-slate-100 pb-4">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-              <Shield className="w-5 h-5 text-blue-600" />
+          <div className="flex items-center gap-3 mb-8 border-b border-border pb-4">
+            <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
+              <Shield className="w-5 h-5 text-accent" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-900">Security & Password</h2>
-              <p className="text-[13px] text-slate-500 font-medium mt-0.5">Keep your account secure by updating your password regularly</p>
+              <h2 className="text-lg font-bold text-foreground">Security & Password</h2>
+              <p className="text-[13px] text-muted-foreground font-medium mt-0.5">Keep your account secure by updating your password regularly</p>
             </div>
           </div>
 
           {success && (
-            <div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-100/50 text-sm font-medium text-emerald-800 flex items-center gap-3">
+            <div className="mb-6 p-4 rounded-2xl bg-success/10 border border-emerald-100/50 text-sm font-medium text-success-foreground flex items-center gap-3">
               <CheckCircle className="w-5 h-5 text-emerald-500" />
               {success}
             </div>
           )}
 
           {error && (
-            <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-100/50 text-sm font-medium text-red-800 flex items-center gap-3">
-              <AlertTriangle className="w-5 h-5 text-red-500" />
+            <div className="mb-6 p-4 rounded-2xl bg-destructive/10 border border-red-100/50 text-sm font-medium text-red-800 flex items-center gap-3">
+              <AlertTriangle className="w-5 h-5 text-destructive" />
               {error}
             </div>
           )}
@@ -168,7 +168,7 @@ export function SecuritySettings({ backLink, backText, deleteWarningText, hideHe
           <form onSubmit={handlePasswordChange} className="space-y-6 max-w-xl">
             <div className="space-y-2">
               <label htmlFor="currentPassword" className={theme.typography.label}>
-                <KeyRound className="w-4 h-4 text-slate-400" />
+                <KeyRound className="w-4 h-4 text-muted-foreground" />
                 Current Password
               </label>
               <Input
@@ -184,7 +184,7 @@ export function SecuritySettings({ backLink, backText, deleteWarningText, hideHe
 
             <div className="grid sm:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label htmlFor="newPassword" className="block text-[14px] font-semibold text-slate-900">
+                <label htmlFor="newPassword" className="block text-[14px] font-semibold text-foreground">
                   New Password
                 </label>
                 <Input
@@ -199,7 +199,7 @@ export function SecuritySettings({ backLink, backText, deleteWarningText, hideHe
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="confirmPassword" className="block text-[14px] font-semibold text-slate-900">
+                <label htmlFor="confirmPassword" className="block text-[14px] font-semibold text-foreground">
                   Confirm Password
                 </label>
                 <Input
@@ -218,7 +218,7 @@ export function SecuritySettings({ backLink, backText, deleteWarningText, hideHe
               <Button
                 type="submit"
                 disabled={saving}
-                className="h-12 px-8 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-[14px] font-semibold shadow-md transition-all"
+                className="h-12 px-8 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-[14px] font-semibold shadow-md transition-all"
               >
                 {saving ? (
                   <>
@@ -237,11 +237,11 @@ export function SecuritySettings({ backLink, backText, deleteWarningText, hideHe
         <div className="bg-red-50/30 rounded-[24px] p-6 sm:p-8 border border-red-100">
           <div className="flex items-start justify-between gap-6 flex-col sm:flex-row">
             <div>
-              <h2 className="text-lg font-bold text-red-700 flex items-center gap-2 mb-2">
+              <h2 className="text-lg font-bold text-destructive flex items-center gap-2 mb-2">
                 <AlertTriangle className="w-5 h-5" />
                 Danger Zone
               </h2>
-              <p className="text-[14px] text-slate-600 font-medium max-w-md">
+              <p className="text-[14px] text-muted-foreground font-medium max-w-md">
                 {deleteWarningText}
               </p>
             </div>
@@ -249,7 +249,7 @@ export function SecuritySettings({ backLink, backText, deleteWarningText, hideHe
             <Button
               variant="outline"
               onClick={handleDeleteAccount}
-              className="h-12 px-6 rounded-xl border-red-200 bg-white text-red-600 font-bold hover:bg-red-50 hover:text-red-700 hover:border-red-300 transition-all shadow-sm shrink-0"
+              className="h-12 px-6 rounded-xl border-destructive/30 bg-background text-destructive font-bold hover:bg-red-50 hover:text-red-700 hover:border-red-300 transition-all shadow-sm shrink-0"
             >
               <Trash2 className="w-4 h-4 mr-2" />
               Delete Account

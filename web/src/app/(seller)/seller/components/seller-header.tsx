@@ -38,7 +38,7 @@ export function SellerHeader({
         >
           <Link
             href={backHref}
-            className="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-slate-900 transition-all mb-6 px-4 py-2 rounded-full bg-white border border-slate-200 shadow-sm hover:border-slate-300 group"
+            className="inline-flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-foreground transition-all mb-6 px-4 py-2 rounded-full bg-background border border-border shadow-sm hover:border-border group"
           >
             <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform ease-[cubic-bezier(0.22,1,0.36,1)] duration-300" />
             <span>{backLabel}</span>
@@ -54,12 +54,12 @@ export function SellerHeader({
           className="max-w-2xl"
         >
           {badge && (
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-950 text-white text-[10px] font-black uppercase tracking-[0.2em] mb-4 shadow-md">
-              <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-[0.2em] mb-4 shadow-md">
+              <Sparkles className="w-3.5 h-3.5 text-accent" />
               <span>{badge}</span>
             </div>
           )}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-slate-950 tracking-tighter leading-[1.1] flex flex-wrap" aria-label={title}>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-foreground tracking-tighter leading-[1.1] flex flex-wrap" aria-label={title}>
             {title.split(" ").map((word, wordIndex, wordsArray) => {
               const previousCharsCount = wordsArray.slice(0, wordIndex).join("").length;
               return (
@@ -83,7 +83,7 @@ export function SellerHeader({
             })}
           </h1>
           {description && (
-            <p className="text-slate-500 mt-4 text-base sm:text-lg font-medium leading-relaxed">
+            <p className="text-muted-foreground mt-4 text-base sm:text-lg font-medium leading-relaxed">
               {description}
             </p>
           )}
@@ -96,10 +96,10 @@ export function SellerHeader({
           className="flex items-center flex-wrap gap-4"
         >
           {(onRefresh || lastUpdated) && (
-            <div className="flex items-center gap-3 bg-white p-1.5 rounded-[1.25rem] border border-slate-200/80 shadow-sm">
+            <div className="flex items-center gap-3 bg-background p-1.5 rounded-[1.25rem] border border-border/80 shadow-sm">
               <div className="px-3 flex items-center gap-3">
                 {lastUpdated && (
-                  <span className="text-[10px] font-bold text-slate-400 tabular-nums uppercase tracking-[0.15em]">
+                  <span className="text-[10px] font-bold text-muted-foreground tabular-nums uppercase tracking-[0.15em]">
                     {lastUpdated.toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
@@ -111,22 +111,22 @@ export function SellerHeader({
                     type="button"
                     onClick={onRefresh}
                     disabled={refreshing}
-                    className="flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-slate-950 transition-colors disabled:opacity-50 cursor-pointer"
+                    className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 cursor-pointer"
                     title="Sync with live database"
                   >
                     <RefreshCw
                       className={`w-3.5 h-3.5 ${
-                        refreshing ? "animate-spin text-blue-600" : ""
+                        refreshing ? "animate-spin text-accent" : ""
                       }`}
                     />
                     <span>Sync</span>
                   </button>
                 )}
               </div>
-              <div className="flex items-center gap-2 text-[10px] font-black text-emerald-700 uppercase tracking-widest bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-100">
+              <div className="flex items-center gap-2 text-[10px] font-black text-success uppercase tracking-widest bg-success/10 px-3 py-1.5 rounded-xl border border-success/20">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success/80 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-success" />
                 </span>
                 Live
               </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { GithubIcon } from "@/components/icons/github-icon";
+import { GithubIcon } from "@/shared/components/icons/github";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -22,9 +22,9 @@ import {
   AlertCircle,
   Plus,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { apiPost } from "@/lib/api/client";
-import { uploadFile } from "@/lib/api/upload";
+import { Button } from "@/shared/ui/button";
+import { apiPost } from "@/shared/lib/api/client";
+import { uploadFile } from "@/shared/lib/api/upload";
 import { SellerHeader } from "../../components/seller-header";
 
 const CATEGORIES = [
@@ -168,14 +168,14 @@ export default function NewProductPage() {
   if (success) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center">
-        <div className="w-full max-w-md mx-auto text-center p-8 rounded-[32px] bg-white ring-1 ring-slate-200/80 shadow-xl">
-          <div className="w-20 h-20 rounded-3xl bg-emerald-50 border border-emerald-100 flex items-center justify-center mx-auto mb-6 shadow-xs">
+        <div className="w-full max-w-md mx-auto text-center p-8 rounded-[32px] bg-background ring-1 ring-slate-200/80 shadow-xl">
+          <div className="w-20 h-20 rounded-3xl bg-success/10 border border-success/20 flex items-center justify-center mx-auto mb-6 shadow-xs">
             <CheckCircle2 className="w-10 h-10 text-emerald-500" />
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-950 mb-2 tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-black text-foreground mb-2 tracking-tight">
             Product Published!
           </h2>
-          <p className="text-slate-500 text-sm leading-relaxed mb-6 font-normal">
+          <p className="text-muted-foreground text-sm leading-relaxed mb-6 font-normal">
             Your code asset is now live on the marketplace. Redirecting to your inventory...
           </p>
           <div className="w-8 h-8 mx-auto border-3 border-emerald-500 border-t-transparent rounded-full animate-spin" />
@@ -207,20 +207,20 @@ export default function NewProductPage() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Step 1: Basic Information */}
-            <div className="rounded-[28px] bg-white p-2 ring-1 ring-slate-200/80 shadow-xs">
+            <div className="rounded-[28px] bg-background p-2 ring-1 ring-slate-200/80 shadow-xs">
               <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/40 p-6 space-y-5">
-                <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
-                  <div className="w-6 h-6 rounded-lg bg-slate-950 text-white flex items-center justify-center text-xs font-black">
+                <div className="flex items-center gap-2.5 pb-3 border-b border-border">
+                  <div className="w-6 h-6 rounded-lg bg-primary text-primary-foreground flex items-center justify-center text-xs font-black">
                     1
                   </div>
-                  <h3 className="text-base font-black text-slate-900 tracking-tight">
+                  <h3 className="text-base font-black text-foreground tracking-tight">
                     Basic Information
                   </h3>
                 </div>
 
                 {/* Title */}
                 <div>
-                  <label htmlFor="title" className="block text-xs font-bold text-slate-700 mb-1.5">
+                  <label htmlFor="title" className="block text-xs font-bold text-foreground mb-1.5">
                     Product Title <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -230,13 +230,13 @@ export default function NewProductPage() {
                     onChange={(e) => setTitle(e.target.value)}
                     required
                     maxLength={200}
-                    className="w-full h-11 bg-white border border-slate-200/80 rounded-xl px-3.5 text-sm font-medium text-slate-900 outline-none focus:border-slate-950 shadow-2xs transition-colors"
+                    className="w-full h-11 bg-background border border-border/80 rounded-xl px-3.5 text-sm font-medium text-foreground outline-none focus:border-slate-950 shadow-2xs transition-colors"
                   />
                 </div>
 
                 {/* Description */}
                 <div>
-                  <label htmlFor="description" className="block text-xs font-bold text-slate-700 mb-1.5">
+                  <label htmlFor="description" className="block text-xs font-bold text-foreground mb-1.5">
                     Short Description <span className="text-rose-500">*</span>
                   </label>
                   <textarea
@@ -247,14 +247,14 @@ export default function NewProductPage() {
                     onChange={(e) => setDescription(e.target.value)}
                     required
                     maxLength={5000}
-                    className="w-full bg-white border border-slate-200/80 rounded-xl p-3.5 text-sm font-medium text-slate-900 outline-none focus:border-slate-950 shadow-2xs transition-colors resize-y"
+                    className="w-full bg-background border border-border/80 rounded-xl p-3.5 text-sm font-medium text-foreground outline-none focus:border-slate-950 shadow-2xs transition-colors resize-y"
                   />
                 </div>
 
                 {/* Category & Tags Grid */}
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="category" className="block text-xs font-bold text-slate-700 mb-1.5">
+                    <label htmlFor="category" className="block text-xs font-bold text-foreground mb-1.5">
                       Category <span className="text-rose-500">*</span>
                     </label>
                     <div className="relative">
@@ -263,7 +263,7 @@ export default function NewProductPage() {
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
                         required
-                        className="w-full h-11 appearance-none bg-white border border-slate-200/80 rounded-xl pl-10 pr-8 text-xs font-bold text-slate-800 outline-none focus:border-slate-950 shadow-2xs cursor-pointer"
+                        className="w-full h-11 appearance-none bg-background border border-border/80 rounded-xl pl-10 pr-8 text-xs font-bold text-foreground outline-none focus:border-slate-950 shadow-2xs cursor-pointer"
                       >
                         <option value="" disabled>
                           Select category
@@ -274,12 +274,12 @@ export default function NewProductPage() {
                           </option>
                         ))}
                       </select>
-                      <Package className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                      <Package className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                     </div>
                   </div>
 
                   <div>
-                    <label htmlFor="tags" className="block text-xs font-bold text-slate-700 mb-1.5">
+                    <label htmlFor="tags" className="block text-xs font-bold text-foreground mb-1.5">
                       Tags (Comma separated)
                     </label>
                     <div className="relative">
@@ -288,9 +288,9 @@ export default function NewProductPage() {
                         placeholder="React, Tailwind, Auth..."
                         value={tags}
                         onChange={(e) => setTags(e.target.value)}
-                        className="w-full h-11 bg-white border border-slate-200/80 rounded-xl pl-10 pr-3.5 text-xs font-medium text-slate-900 outline-none focus:border-slate-950 shadow-2xs"
+                        className="w-full h-11 bg-background border border-border/80 rounded-xl pl-10 pr-3.5 text-xs font-medium text-foreground outline-none focus:border-slate-950 shadow-2xs"
                       />
-                      <Tag className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                      <Tag className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                     </div>
                   </div>
                 </div>
@@ -298,20 +298,20 @@ export default function NewProductPage() {
             </div>
 
             {/* Step 2: Media & Code Repository */}
-            <div className="rounded-[28px] bg-white p-2 ring-1 ring-slate-200/80 shadow-xs">
+            <div className="rounded-[28px] bg-background p-2 ring-1 ring-slate-200/80 shadow-xs">
               <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/40 p-6 space-y-5">
-                <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
-                  <div className="w-6 h-6 rounded-lg bg-slate-950 text-white flex items-center justify-center text-xs font-black">
+                <div className="flex items-center gap-2.5 pb-3 border-b border-border">
+                  <div className="w-6 h-6 rounded-lg bg-primary text-primary-foreground flex items-center justify-center text-xs font-black">
                     2
                   </div>
-                  <h3 className="text-base font-black text-slate-900 tracking-tight">
+                  <h3 className="text-base font-black text-foreground tracking-tight">
                     Cover Asset & GitHub Sync
                   </h3>
                 </div>
 
                 {/* Image Dropzone */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-2">
+                  <label className="block text-xs font-bold text-foreground mb-2">
                     Cover Image <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -323,7 +323,7 @@ export default function NewProductPage() {
                   />
 
                   {imagePreview ? (
-                    <div className="relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 flex items-center justify-center group/preview">
+                    <div className="relative rounded-2xl overflow-hidden border border-border bg-secondary flex items-center justify-center group/preview">
                       <img
                         src={imagePreview}
                         alt="Product preview"
@@ -332,7 +332,7 @@ export default function NewProductPage() {
                       <button
                         type="button"
                         onClick={handleRemoveImage}
-                        className="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-950/80 text-white flex items-center justify-center hover:bg-rose-600 transition-colors shadow-md cursor-pointer"
+                        className="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-950/80 text-primary-foreground flex items-center justify-center hover:bg-rose-600 transition-colors shadow-md cursor-pointer"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -340,15 +340,15 @@ export default function NewProductPage() {
                   ) : (
                     <div
                       onClick={() => fileInputRef.current?.click()}
-                      className="group flex flex-col items-center justify-center w-full aspect-[16/8] border-2 border-dashed border-slate-200/80 rounded-2xl bg-white hover:border-slate-400 transition-all cursor-pointer p-6 text-center shadow-2xs"
+                      className="group flex flex-col items-center justify-center w-full aspect-[16/8] border-2 border-dashed border-border/80 rounded-2xl bg-background hover:border-slate-400 transition-all cursor-pointer p-6 text-center shadow-2xs"
                     >
-                      <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+                      <div className="w-12 h-12 rounded-2xl bg-accent/10 text-accent flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
                         <ImageIcon className="w-6 h-6" />
                       </div>
-                      <span className="text-xs font-bold text-slate-800">
+                      <span className="text-xs font-bold text-foreground">
                         Click to upload product thumbnail
                       </span>
-                      <p className="text-[11px] text-slate-400 mt-1">
+                      <p className="text-[11px] text-muted-foreground mt-1">
                         16:9 or 16:10 ratio recommended (JPG, PNG, WebP up to 5MB)
                       </p>
                     </div>
@@ -357,20 +357,20 @@ export default function NewProductPage() {
 
                 {/* GitHub Repo */}
                 <div>
-                  <label htmlFor="githubUrl" className="block text-xs font-bold text-slate-700 mb-1.5">
+                  <label htmlFor="githubUrl" className="block text-xs font-bold text-foreground mb-1.5">
                     GitHub Private Repository (Optional)
                   </label>
                   <div className="relative">
-                    <GithubIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                    <GithubIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                     <input
                       id="githubUrl"
                       placeholder="https://github.com/your-username/your-repo"
                       value={githubUrl}
                       onChange={(e) => setGithubUrl(e.target.value)}
-                      className="w-full h-11 bg-white border border-slate-200/80 rounded-xl pl-10 pr-3.5 text-xs font-medium text-slate-900 outline-none focus:border-slate-950 shadow-2xs"
+                      className="w-full h-11 bg-background border border-border/80 rounded-xl pl-10 pr-3.5 text-xs font-medium text-foreground outline-none focus:border-slate-950 shadow-2xs"
                     />
                   </div>
-                  <p className="text-[11px] text-slate-400 mt-1.5 leading-relaxed">
+                  <p className="text-[11px] text-muted-foreground mt-1.5 leading-relaxed">
                     When linked, KodeDock automatically invites buyers to access your private repository upon verified checkout.
                   </p>
                 </div>
@@ -378,13 +378,13 @@ export default function NewProductPage() {
             </div>
 
             {/* Step 3: Pricing & Availability */}
-            <div className="rounded-[28px] bg-white p-2 ring-1 ring-slate-200/80 shadow-xs">
+            <div className="rounded-[28px] bg-background p-2 ring-1 ring-slate-200/80 shadow-xs">
               <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/40 p-6 space-y-5">
-                <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
-                  <div className="w-6 h-6 rounded-lg bg-slate-950 text-white flex items-center justify-center text-xs font-black">
+                <div className="flex items-center gap-2.5 pb-3 border-b border-border">
+                  <div className="w-6 h-6 rounded-lg bg-primary text-primary-foreground flex items-center justify-center text-xs font-black">
                     3
                   </div>
-                  <h3 className="text-base font-black text-slate-900 tracking-tight">
+                  <h3 className="text-base font-black text-foreground tracking-tight">
                     Pricing & Inventory Availability
                   </h3>
                 </div>
@@ -392,10 +392,10 @@ export default function NewProductPage() {
                 <div className="grid sm:grid-cols-2 gap-5 items-start">
                   {/* Model Toggle */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-2">
+                    <label className="block text-xs font-bold text-foreground mb-2">
                       Pricing Model
                     </label>
-                    <div className="grid grid-cols-2 p-1 rounded-xl bg-slate-100 border border-slate-200/80 relative">
+                    <div className="grid grid-cols-2 p-1 rounded-xl bg-secondary border border-border/80 relative">
                       <button
                         type="button"
                         onClick={() => {
@@ -404,8 +404,8 @@ export default function NewProductPage() {
                         }}
                         className={`h-9 text-xs font-bold rounded-lg transition-all cursor-pointer ${
                           !isFree
-                            ? "bg-white text-slate-950 shadow-2xs font-extrabold"
-                            : "text-slate-500 hover:text-slate-900"
+                            ? "bg-background text-foreground shadow-2xs font-extrabold"
+                            : "text-muted-foreground hover:text-foreground"
                         }`}
                       >
                         Paid
@@ -418,8 +418,8 @@ export default function NewProductPage() {
                         }}
                         className={`h-9 text-xs font-bold rounded-lg transition-all cursor-pointer ${
                           isFree
-                            ? "bg-white text-emerald-600 shadow-2xs font-extrabold"
-                            : "text-slate-500 hover:text-slate-900"
+                            ? "bg-background text-success shadow-2xs font-extrabold"
+                            : "text-muted-foreground hover:text-foreground"
                         }`}
                       >
                         Free Asset
@@ -429,11 +429,11 @@ export default function NewProductPage() {
 
                   {/* Price input */}
                   <div>
-                    <label htmlFor="price" className="block text-xs font-bold text-slate-700 mb-2">
+                    <label htmlFor="price" className="block text-xs font-bold text-foreground mb-2">
                       Price (INR) <span className="text-rose-500">*</span>
                     </label>
                     <div className="relative">
-                      <IndianRupee className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                      <IndianRupee className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                       <input
                         id="price"
                         type="number"
@@ -442,13 +442,13 @@ export default function NewProductPage() {
                         onChange={(e) => setPrice(e.target.value)}
                         min={isFree ? "0" : "49"}
                         disabled={isFree}
-                        className="w-full h-11 bg-white border border-slate-200/80 rounded-xl pl-9 pr-3.5 text-sm font-bold text-slate-900 outline-none focus:border-slate-950 shadow-2xs disabled:opacity-40"
+                        className="w-full h-11 bg-background border border-border/80 rounded-xl pl-9 pr-3.5 text-sm font-bold text-foreground outline-none focus:border-slate-950 shadow-2xs disabled:opacity-40"
                       />
                     </div>
                     {!isFree && (
-                      <p className="text-[11px] text-slate-500 font-medium mt-1.5">
+                      <p className="text-[11px] text-muted-foreground font-medium mt-1.5">
                         Net take-home (97.5%):{" "}
-                        <span className="font-bold text-emerald-600">₹{sellerEarnings}</span>
+                        <span className="font-bold text-success">₹{sellerEarnings}</span>
                       </p>
                     )}
                   </div>
@@ -457,14 +457,14 @@ export default function NewProductPage() {
                 {/* Status selector */}
                 <div className="grid sm:grid-cols-2 gap-4 pt-2">
                   <div>
-                    <label htmlFor="status" className="block text-xs font-bold text-slate-700 mb-1.5">
+                    <label htmlFor="status" className="block text-xs font-bold text-foreground mb-1.5">
                       Catalog Status
                     </label>
                     <select
                       id="status"
                       value={status}
                       onChange={(e) => setStatus(e.target.value)}
-                      className="w-full h-11 bg-white border border-slate-200/80 rounded-xl px-3.5 text-xs font-bold text-slate-800 outline-none focus:border-slate-950 shadow-2xs cursor-pointer"
+                      className="w-full h-11 bg-background border border-border/80 rounded-xl px-3.5 text-xs font-bold text-foreground outline-none focus:border-slate-950 shadow-2xs cursor-pointer"
                     >
                       <option value="active">Active (Available to all)</option>
                       <option value="limited">Limited Edition (Capped Units)</option>
@@ -475,7 +475,7 @@ export default function NewProductPage() {
 
                   {status === "limited" && (
                     <div>
-                      <label htmlFor="stockLimit" className="block text-xs font-bold text-slate-700 mb-1.5">
+                      <label htmlFor="stockLimit" className="block text-xs font-bold text-foreground mb-1.5">
                         Stock Limit (Available Copies) <span className="text-rose-500">*</span>
                       </label>
                       <input
@@ -485,7 +485,7 @@ export default function NewProductPage() {
                         value={stockLimit}
                         onChange={(e) => setStockLimit(e.target.value)}
                         min="1"
-                        className="w-full h-11 bg-white border border-slate-200/80 rounded-xl px-3.5 text-xs font-bold text-slate-900 outline-none focus:border-slate-950 shadow-2xs"
+                        className="w-full h-11 bg-background border border-border/80 rounded-xl px-3.5 text-xs font-bold text-foreground outline-none focus:border-slate-950 shadow-2xs"
                       />
                     </div>
                   )}
@@ -498,7 +498,7 @@ export default function NewProductPage() {
               <Link href="/seller/products" className="w-full sm:w-auto">
                 <button
                   type="button"
-                  className="w-full sm:w-auto h-12 px-6 rounded-xl bg-white border border-slate-200/80 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+                  className="w-full sm:w-auto h-12 px-6 rounded-xl bg-background border border-border/80 text-xs font-bold text-foreground hover:bg-secondary transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -507,7 +507,7 @@ export default function NewProductPage() {
               <button
                 type="submit"
                 disabled={loading || uploading}
-                className="w-full sm:w-auto h-12 px-8 rounded-xl bg-slate-950 text-white font-bold text-xs hover:bg-slate-800 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-950/20 active:scale-[0.98] cursor-pointer"
+                className="w-full sm:w-auto h-12 px-8 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:bg-primary/90 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-950/20 active:scale-[0.98] cursor-pointer"
               >
                 {loading || uploading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -525,15 +525,15 @@ export default function NewProductPage() {
         {/* Right Column (5 Cols): Sticky Marketplace Card Replica Preview */}
         <div className="lg:col-span-5 hidden lg:block sticky top-24">
           <div className="flex items-center gap-2 mb-3">
-            <Eye className="w-4 h-4 text-slate-400" />
-            <span className="text-[11px] font-black text-slate-400 uppercase tracking-wider">
+            <Eye className="w-4 h-4 text-muted-foreground" />
+            <span className="text-[11px] font-black text-muted-foreground uppercase tracking-wider">
               Live Buyer Preview
             </span>
           </div>
 
-          <div className="rounded-[28px] bg-white p-2 ring-1 ring-slate-200/80 shadow-lg">
+          <div className="rounded-[28px] bg-background p-2 ring-1 ring-slate-200/80 shadow-lg">
             <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/50 overflow-hidden flex flex-col">
-              <div className="aspect-[16/10] w-full bg-slate-100 flex items-center justify-center relative overflow-hidden">
+              <div className="aspect-[16/10] w-full bg-secondary flex items-center justify-center relative overflow-hidden">
                 {imagePreview ? (
                   <img
                     src={imagePreview}
@@ -541,12 +541,12 @@ export default function NewProductPage() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <ImageIcon className="w-12 h-12 text-slate-300" />
+                  <ImageIcon className="w-12 h-12 text-muted-foreground/80" />
                 )}
 
                 {category && (
                   <div className="absolute top-3 left-3 z-10">
-                    <span className="bg-slate-950/80 text-white text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur-md">
+                    <span className="bg-slate-950/80 text-primary-foreground text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur-md">
                       {category}
                     </span>
                   </div>
@@ -559,7 +559,7 @@ export default function NewProductPage() {
                     {[1, 2, 3, 4, 5].map((s) => (
                       <Star key={s} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                     ))}
-                    <span className="text-xs font-bold text-slate-700 ml-1">5.0</span>
+                    <span className="text-xs font-bold text-foreground ml-1">5.0</span>
                   </div>
                   {status === "limited" && stockLimit && (
                     <span className="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full">
@@ -568,24 +568,24 @@ export default function NewProductPage() {
                   )}
                 </div>
 
-                <h3 className="font-black text-slate-900 text-base leading-snug mb-2 line-clamp-2">
+                <h3 className="font-black text-foreground text-base leading-snug mb-2 line-clamp-2">
                   {title || "Your Code Product Title"}
                 </h3>
-                <p className="text-xs text-slate-500 line-clamp-2 mb-4 leading-relaxed font-normal">
+                <p className="text-xs text-muted-foreground line-clamp-2 mb-4 leading-relaxed font-normal">
                   {description || "A concise summary of your boilerplate code, components, and design assets..."}
                 </p>
 
-                <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                  <div className="font-black text-slate-950 text-lg tabular-nums">
+                <div className="flex items-center justify-between pt-3 border-t border-border">
+                  <div className="font-black text-foreground text-lg tabular-nums">
                     {isFree ? (
-                      <span className="text-emerald-600">Free</span>
+                      <span className="text-success">Free</span>
                     ) : parsedPrice && !isNaN(parsedPrice) && parsedPrice >= 49 ? (
                       `₹${parsedPrice.toLocaleString()}`
                     ) : (
                       "₹0"
                     )}
                   </div>
-                  <span className="text-xs font-bold text-blue-600">View Details ↗</span>
+                  <span className="text-xs font-bold text-accent">View Details ↗</span>
                 </div>
               </div>
             </div>

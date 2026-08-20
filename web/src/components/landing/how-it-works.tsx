@@ -1,72 +1,38 @@
 "use client";
-import { GithubIcon } from "@/components/icons/github-icon";
-import { FadeIn } from "@/components/layout/fade-in";
 
-import { Search, Wallet } from "lucide-react";
-
-
-const STEPS = [
-  {
-    step: "01",
-    icon: Search,
-    title: "Browse product listings",
-    description: "Explore thousands of code assets and preview them before you buy.",
-  },
-  {
-    step: "02",
-    icon: Wallet,
-    title: "Secure payment",
-    description: "Pay in INR with escrow protection and no surprise fees.",
-  },
-  {
-    step: "03",
-    icon: GithubIcon,
-    title: "Receive GitHub repo",
-    description: "Get a private repository with full commit history delivered to your account.",
-  },
-];
+import { motion } from "framer-motion";
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="px-4 sm:px-6 lg:px-8 py-20 md:py-28 bg-slate-50">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <FadeIn>
-            <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-slate-100 border border-slate-300 text-xs font-semibold tracking-wide uppercase text-slate-900 mb-4">
-              How It Works
-            </div>
-          </FadeIn>
-          <FadeIn delay={0.1}>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-950">
-              Three steps to live code delivery
-            </h2>
-          </FadeIn>
-          <FadeIn delay={0.2}>
-            <p className="mt-4 text-lg text-slate-600 leading-relaxed">
-              Discover, purchase, and start building from a real GitHub repository in minutes.
-            </p>
-          </FadeIn>
-        </div>
+    <section id="how-it-works" className="container mx-auto py-24 lg:py-32">
+      <div className="text-center max-w-2xl mx-auto mb-16">
+        <h2 className="font-marketing text-3xl md:text-4xl font-bold tracking-tight mb-4">How it works</h2>
+        <p className="text-muted-foreground text-lg">A seamless workflow from discovery to deployment.</p>
+      </div>
 
-        <div className="grid md:grid-cols-3 gap-8 lg:gap-12 relative">
-          <div className="hidden md:block absolute top-24 left-[20%] right-[20%] h-px bg-slate-200" />
-          {STEPS.map((s, i) => (
-            <FadeIn key={s.step} delay={i * 0.15} className="relative">
-              <div className="text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-950 text-white shadow-sm mb-6 mx-auto">
-                  <s.icon className="w-7 h-7" />
-                </div>
-                <div className="text-xs font-bold tracking-widest text-slate-600 uppercase mb-2">
-                  Step {s.step}
-                </div>
-                <h3 className="text-xl font-bold mb-3 text-slate-950">{s.title}</h3>
-                <p className="text-sm text-slate-600 leading-relaxed max-w-xs mx-auto">
-                  {s.description}
-                </p>
-              </div>
-            </FadeIn>
-          ))}
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+        <div className="hidden md:block absolute top-12 left-1/6 right-1/6 h-px bg-border -z-10" />
+        
+        {[
+          { step: "01", title: "Browse & Purchase", desc: "Find the perfect code asset. Pay securely via Razorpay with UPI, Cards, or Netbanking." },
+          { step: "02", title: "Instant Transfer", desc: "Our worker instantly bare-clones the seller's repo and pushes it to a new private repo in your GitHub." },
+          { step: "03", title: "Clone & Build", desc: "No zips. You get full version history. Clone your new repo locally and start building immediately." }
+        ].map((item, i) => (
+          <motion.div 
+            key={i}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.2 }}
+            viewport={{ once: true }}
+            className="flex flex-col items-center text-center bg-background p-6"
+          >
+            <div className="h-24 w-24 rounded-full bg-secondary border-4 border-background flex items-center justify-center text-2xl font-marketing font-bold text-muted-foreground mb-6 shadow-sm">
+              {item.step}
+            </div>
+            <h3 className="text-xl font-bold mb-3">{item.title}</h3>
+            <p className="text-muted-foreground leading-relaxed">{item.desc}</p>
+          </motion.div>
+        ))}
       </div>
     </section>
   );

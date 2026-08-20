@@ -1,9 +1,9 @@
 "use client";
-import { GithubIcon } from "@/components/icons/github-icon";
-import { FadeIn } from "@/components/layout/fade-in";
+import { GithubIcon } from "@/shared/components/icons/github";
+import { FadeIn } from "@/shared/components/layout/fade-in";
 
 import { Eye, Shield, Wallet, GitBranch, Lock } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/shared/ui/card";
 
 
 const FEATURES = [
@@ -45,17 +45,17 @@ export function Features() {
       <div className="max-w-7xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <FadeIn>
-            <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-slate-100 border border-slate-300 text-xs font-semibold tracking-wide uppercase text-slate-900 mb-4">
+            <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-secondary border border-border text-xs font-semibold tracking-wide uppercase text-foreground mb-4">
               Features
             </div>
           </FadeIn>
           <FadeIn delay={0.1}>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-950">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground">
               Everything you need, nothing more
             </h2>
           </FadeIn>
           <FadeIn delay={0.2}>
-            <p className="mt-4 text-lg text-slate-600 leading-relaxed">
+            <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
               Build, buy, and sell with a simple marketplace that focuses on code delivery, security,
               and clarity.
             </p>
@@ -65,13 +65,13 @@ export function Features() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {FEATURES.map((feature, i) => (
             <FadeIn key={feature.title} delay={i * 0.08}>
-              <Card className="group h-full border border-slate-200 bg-white hover:shadow-lg transition-all duration-300">
+              <Card className="group h-full border border-border bg-background hover:shadow-lg transition-all duration-300">
                 <CardContent className="p-6">
-                  <div className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-slate-950/10 mb-4 text-slate-950">
+                  <div className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-slate-950/10 mb-4 text-foreground">
                     <feature.icon className="w-5 h-5" />
                   </div>
-                  <h3 className="text-lg font-semibold mb-2 text-slate-950">{feature.title}</h3>
-                  <p className="text-sm text-slate-600 leading-relaxed">{feature.description}</p>
+                  <h3 className="text-lg font-semibold mb-2 text-foreground">{feature.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
                 </CardContent>
               </Card>
             </FadeIn>

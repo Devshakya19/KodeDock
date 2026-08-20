@@ -24,10 +24,10 @@ import {
   AlertCircle,
   Sparkles,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { apiGet, apiPost } from "@/lib/api/client";
-import { auth } from "@/lib/auth/client";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+import { apiGet, apiPost } from "@/shared/lib/api/client";
+import { auth } from "@/shared/lib/auth/client";
 import { SellerHeader } from "../components/seller-header";
 
 export interface PayoutAccountData {
@@ -166,8 +166,8 @@ export default function SellerWalletPage() {
   if (loading) {
     return (
       <div className="w-full py-24 flex flex-col items-center justify-center gap-3">
-        <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
-        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+        <RefreshCw className="w-8 h-8 text-accent animate-spin" />
+        <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
           Loading Wallet & Ledger...
         </p>
       </div>
@@ -204,7 +204,7 @@ export default function SellerWalletPage() {
             >
               {/* Front Side */}
               <div
-                className="absolute inset-0 w-full h-full bg-gradient-to-br from-slate-950 via-slate-900 to-black rounded-[28px] p-6 sm:p-7 text-white overflow-hidden border border-slate-800 shadow-inner flex flex-col justify-between"
+                className="absolute inset-0 w-full h-full bg-gradient-to-br from-slate-950 via-slate-900 to-black rounded-[28px] p-6 sm:p-7 text-primary-foreground overflow-hidden border border-slate-800 shadow-inner flex flex-col justify-between"
                 style={{ backfaceVisibility: "hidden" }}
               >
                 {/* Background Pattern */}
@@ -213,20 +213,20 @@ export default function SellerWalletPage() {
                 {/* Top Row */}
                 <div className="relative z-10 flex justify-between items-start">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center font-black text-white text-base">
+                    <div className="w-8 h-8 rounded-lg bg-white/10 backdrop-blur-md border border-border/20 flex items-center justify-center font-black text-primary-foreground text-base">
                       C
                     </div>
-                    <span className="font-black text-sm tracking-widest text-white">
-                      KODEDOCK <span className="text-blue-400">CREATOR</span>
+                    <span className="font-black text-sm tracking-widest text-primary-foreground">
+                      KODEDOCK <span className="text-accent">CREATOR</span>
                     </span>
                   </div>
-                  <Wifi className="w-5 h-5 text-slate-400 rotate-90" />
+                  <Wifi className="w-5 h-5 text-muted-foreground rotate-90" />
                 </div>
 
                 {/* Chip & Number */}
                 <div className="relative z-10 my-auto">
                   <div className="w-11 h-8 bg-gradient-to-br from-amber-200 to-amber-400 rounded-md mb-4 opacity-90 shadow-2xs border border-amber-300/40" />
-                  <div className="font-mono text-base sm:text-lg tracking-[0.2em] text-slate-200 font-bold">
+                  <div className="font-mono text-base sm:text-lg tracking-[0.2em] text-muted-foreground/60 font-bold">
                     •••• •••• •••• 9900
                   </div>
                 </div>
@@ -234,7 +234,7 @@ export default function SellerWalletPage() {
                 {/* Bottom Row */}
                 <div className="relative z-10 flex justify-between items-end">
                   <div>
-                    <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                    <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">
                       Creator Account
                     </div>
                     <div className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-slate-100 truncate max-w-[160px]">
@@ -243,7 +243,7 @@ export default function SellerWalletPage() {
                   </div>
 
                   <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="w-2 h-2 rounded-full bg-success/80 animate-pulse" />
                     <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">
                       Active
                     </span>
@@ -253,46 +253,46 @@ export default function SellerWalletPage() {
 
               {/* Back Side */}
               <div
-                className="absolute inset-0 w-full h-full bg-gradient-to-br from-slate-950 via-slate-900 to-black rounded-[28px] text-white overflow-hidden border border-slate-800 flex flex-col justify-between"
+                className="absolute inset-0 w-full h-full bg-gradient-to-br from-slate-950 via-slate-900 to-black rounded-[28px] text-primary-foreground overflow-hidden border border-slate-800 flex flex-col justify-between"
                 style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
               >
-                <div className="w-full h-10 bg-slate-900 mt-6 border-y border-slate-800" />
+                <div className="w-full h-10 bg-primary mt-6 border-y border-slate-800" />
                 <div className="p-6">
                   <div className="w-full h-8 bg-slate-200 rounded-md flex items-center justify-end px-3">
-                    <span className="text-slate-900 font-serif italic text-xs font-bold">
+                    <span className="text-foreground font-serif italic text-xs font-bold">
                       {userName}
                     </span>
                   </div>
-                  <p className="text-[10px] text-slate-400 mt-3 leading-relaxed opacity-70">
+                  <p className="text-[10px] text-muted-foreground mt-3 leading-relaxed opacity-70">
                     Official KodeDock verified creator balance token. Payout disbursements comply with Indian banking norms.
                   </p>
                 </div>
-                <div className="p-6 pt-0 text-[9px] font-mono text-slate-500 uppercase tracking-widest">
+                <div className="p-6 pt-0 text-[9px] font-mono text-muted-foreground uppercase tracking-widest">
                   KodeDock Payout Engine v2.0
                 </div>
               </div>
             </div>
           </div>
-          <p className="text-center text-[11px] text-slate-400 font-semibold mt-3 flex items-center justify-center gap-1">
+          <p className="text-center text-[11px] text-muted-foreground font-semibold mt-3 flex items-center justify-center gap-1">
             <RefreshCw className="w-3 h-3" /> Click card to flip and verify digital signature
           </p>
         </div>
 
         {/* Right (Col 7): Balance & Payout Action Hub */}
-        <div className="lg:col-span-7 rounded-[28px] bg-white p-2 ring-1 ring-slate-200/80 shadow-xs flex flex-col">
+        <div className="lg:col-span-7 rounded-[28px] bg-background p-2 ring-1 ring-slate-200/80 shadow-xs flex flex-col">
           <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/40 p-6 sm:p-8 flex-1 flex flex-col justify-between">
             {/* Top Balance Stat */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                   Available for Payout
                 </span>
-                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-100">
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-success bg-success/10 px-2.5 py-0.5 rounded-full border border-success/20">
                   <CheckCircle2 className="w-3 h-3" /> Instant Settlement
                 </span>
               </div>
 
-              <div className="text-4xl sm:text-5xl font-black text-slate-950 tracking-tight tabular-nums mb-6">
+              <div className="text-4xl sm:text-5xl font-black text-foreground tracking-tight tabular-nums mb-6">
                 ₹
                 {((wallet?.balance_paise ?? 0) / 100).toLocaleString(undefined, {
                   minimumFractionDigits: 2,
@@ -302,26 +302,26 @@ export default function SellerWalletPage() {
 
               {/* Escrow & All Time Deck */}
               <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-2xs">
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1 mb-1">
+                <div className="p-4 rounded-2xl bg-background border border-border/80 shadow-2xs">
+                  <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1 mb-1">
                     <Clock className="w-3 h-3 text-amber-500" /> In Escrow
                   </span>
-                  <div className="text-xl font-black text-slate-900 tabular-nums">
+                  <div className="text-xl font-black text-foreground tabular-nums">
                     ₹{((wallet?.pending_paise ?? 0) / 100).toLocaleString()}
                   </div>
-                  <p className="text-[10px] text-slate-400 font-medium mt-0.5">
+                  <p className="text-[10px] text-muted-foreground font-medium mt-0.5">
                     Released 7 days post-sale
                   </p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-2xs">
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1 mb-1">
+                <div className="p-4 rounded-2xl bg-background border border-border/80 shadow-2xs">
+                  <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1 mb-1">
                     <TrendingUp className="w-3 h-3 text-emerald-500" /> All-Time Earned
                   </span>
-                  <div className="text-xl font-black text-slate-900 tabular-nums">
+                  <div className="text-xl font-black text-foreground tabular-nums">
                     ₹{((wallet?.total_earned_paise ?? 0) / 100).toLocaleString()}
                   </div>
-                  <p className="text-[10px] text-slate-400 font-medium mt-0.5">
+                  <p className="text-[10px] text-muted-foreground font-medium mt-0.5">
                     Net lifetime sales
                   </p>
                 </div>
@@ -329,7 +329,7 @@ export default function SellerWalletPage() {
             </div>
 
             {/* Withdrawal Form */}
-            <div className="pt-6 border-t border-slate-100 space-y-4">
+            <div className="pt-6 border-t border-border space-y-4">
               {error && (
                 <div className="text-xs font-bold text-rose-600 bg-rose-50 p-3 rounded-xl border border-rose-100 flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0" />
@@ -337,7 +337,7 @@ export default function SellerWalletPage() {
                 </div>
               )}
               {success && (
-                <div className="text-xs font-bold text-emerald-700 bg-emerald-50 p-3 rounded-xl border border-emerald-100 flex items-center gap-2">
+                <div className="text-xs font-bold text-success bg-success/10 p-3 rounded-xl border border-success/20 flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 shrink-0" />
                   <span>{success}</span>
                 </div>
@@ -347,7 +347,7 @@ export default function SellerWalletPage() {
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <div className="relative flex-1">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-black text-lg">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-black text-lg">
                       ₹
                     </span>
                     <input
@@ -357,13 +357,13 @@ export default function SellerWalletPage() {
                       placeholder="Enter amount (min. ₹500)"
                       min="500"
                       disabled={!payoutAccount || withdrawing}
-                      className="w-full h-12 pl-9 pr-16 bg-white border border-slate-200/80 rounded-xl text-sm font-bold text-slate-900 outline-none focus:border-slate-950 shadow-2xs"
+                      className="w-full h-12 pl-9 pr-16 bg-background border border-border/80 rounded-xl text-sm font-bold text-foreground outline-none focus:border-slate-950 shadow-2xs"
                     />
                     <button
                       type="button"
                       onClick={setMaxAmount}
                       disabled={!payoutAccount || withdrawing}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-[10px] font-black text-slate-700 uppercase tracking-wider transition-colors cursor-pointer"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-lg bg-secondary hover:bg-slate-200 text-[10px] font-black text-foreground uppercase tracking-wider transition-colors cursor-pointer"
                     >
                       MAX
                     </button>
@@ -373,7 +373,7 @@ export default function SellerWalletPage() {
                     type="button"
                     onClick={handleWithdraw}
                     disabled={withdrawing || !withdrawAmount || !payoutAccount}
-                    className="h-12 px-6 rounded-xl bg-slate-950 text-white font-bold text-xs hover:bg-slate-800 disabled:opacity-50 transition-all flex items-center gap-2 shadow-md shadow-slate-950/20 active:scale-[0.98] cursor-pointer"
+                    className="h-12 px-6 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:bg-primary/90 disabled:opacity-50 transition-all flex items-center gap-2 shadow-md shadow-slate-950/20 active:scale-[0.98] cursor-pointer"
                   >
                     {withdrawing ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -388,13 +388,13 @@ export default function SellerWalletPage() {
 
                 {/* Preset Chips */}
                 <div className="flex items-center gap-2 pt-1">
-                  <span className="text-[11px] font-semibold text-slate-400">Quick:</span>
+                  <span className="text-[11px] font-semibold text-muted-foreground">Quick:</span>
                   {[500, 1000, 2500, 5000].map((amt) => (
                     <button
                       key={amt}
                       type="button"
                       onClick={() => setPresetAmount(amt)}
-                      className="px-2.5 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-[11px] font-bold text-slate-700 transition-colors cursor-pointer"
+                      className="px-2.5 py-0.5 rounded-md bg-secondary hover:bg-slate-200 text-[11px] font-bold text-foreground transition-colors cursor-pointer"
                     >
                       ₹{amt.toLocaleString()}
                     </button>
@@ -404,10 +404,10 @@ export default function SellerWalletPage() {
 
               {/* Destination info */}
               <div className="flex items-center justify-between text-xs pt-2">
-                <span className="text-slate-500 font-medium">Payout Destination:</span>
+                <span className="text-muted-foreground font-medium">Payout Destination:</span>
                 <Link
                   href="/seller/settings/payouts"
-                  className="font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                  className="font-bold text-accent hover:text-blue-700 flex items-center gap-1"
                 >
                   {payoutAccount ? (
                     payoutAccount.account_type === "upi" ? (
@@ -427,19 +427,19 @@ export default function SellerWalletPage() {
       </div>
 
       {/* 3. Transaction History Ledger */}
-      <div className="rounded-[28px] bg-white p-2 ring-1 ring-slate-200/80 shadow-xs">
+      <div className="rounded-[28px] bg-background p-2 ring-1 ring-slate-200/80 shadow-xs">
         <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/40 p-5 sm:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
-              <h3 className="text-lg font-black text-slate-900 tracking-tight">
+              <h3 className="text-lg font-black text-foreground tracking-tight">
                 Financial Transactions Ledger
               </h3>
-              <p className="text-xs text-slate-500 font-medium mt-0.5">
+              <p className="text-xs text-muted-foreground font-medium mt-0.5">
                 Audit record of sales earnings, platform commissions, and bank disbursements
               </p>
             </div>
 
-            <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl">
+            <div className="flex items-center gap-1.5 p-1 bg-secondary rounded-xl">
               {[
                 { id: "all", label: "All" },
                 { id: "sales", label: "Sales Credits" },
@@ -451,8 +451,8 @@ export default function SellerWalletPage() {
                   onClick={() => setTxFilter(tab.id)}
                   className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     txFilter === tab.id
-                      ? "bg-white text-slate-950 shadow-2xs font-extrabold"
-                      : "text-slate-600 hover:text-slate-950"
+                      ? "bg-background text-foreground shadow-2xs font-extrabold"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {tab.label}
@@ -462,10 +462,10 @@ export default function SellerWalletPage() {
           </div>
 
           {filteredTransactions.length === 0 ? (
-            <div className="py-16 text-center bg-slate-50/60 rounded-2xl border border-dashed border-slate-200">
-              <Activity className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-              <p className="text-sm font-bold text-slate-800">No transactions recorded</p>
-              <p className="text-xs text-slate-400 mt-0.5">
+            <div className="py-16 text-center bg-slate-50/60 rounded-2xl border border-dashed border-border">
+              <Activity className="w-8 h-8 text-muted-foreground/80 mx-auto mb-2" />
+              <p className="text-sm font-bold text-foreground">No transactions recorded</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
                 Your earning and withdrawal transactions will appear here.
               </p>
             </div>
@@ -482,7 +482,7 @@ export default function SellerWalletPage() {
                       <div
                         className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${
                           isCredit
-                            ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+                            ? "bg-success/10 text-success border-success/20"
                             : "bg-rose-50 text-rose-600 border-rose-100"
                         }`}
                       >
@@ -493,10 +493,10 @@ export default function SellerWalletPage() {
                         )}
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-slate-900">
+                        <p className="text-sm font-bold text-foreground">
                           {tx.description || (isCredit ? "Product Sale Credit" : "Withdrawal Payout")}
                         </p>
-                        <p className="text-xs text-slate-400 font-medium mt-0.5">
+                        <p className="text-xs text-muted-foreground font-medium mt-0.5">
                           {new Date(tx.created_at).toLocaleDateString("en-IN", {
                             day: "numeric",
                             month: "short",
@@ -511,7 +511,7 @@ export default function SellerWalletPage() {
                     <div className="text-right">
                       <div
                         className={`text-sm font-black tabular-nums ${
-                          isCredit ? "text-emerald-600" : "text-slate-950"
+                          isCredit ? "text-success" : "text-foreground"
                         }`}
                       >
                         {isCredit ? "+" : "-"}₹
@@ -520,7 +520,7 @@ export default function SellerWalletPage() {
                           maximumFractionDigits: 2,
                         })}
                       </div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                         Bal: ₹{(tx.balance_after_paise / 100).toLocaleString()}
                       </span>
                     </div>

@@ -1,14 +1,14 @@
 "use client";
-import { GithubIcon } from "@/components/icons/github-icon";
+import { GithubIcon } from "@/shared/components/icons/github";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, Loader2, Check } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
-import { auth } from "@/lib/auth/client";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+import { Card, CardContent } from "@/shared/ui/card";
+import { auth } from "@/shared/lib/auth/client";
 
 const PASSWORD_REQUIREMENTS = [
   { label: "At least 8 characters", test: (p: string) => p.length >= 8 },
@@ -61,19 +61,19 @@ export default function RegisterPage() {
   if (success) {
     return (
       <div className="w-full max-w-md">
-        <Card className="border-slate-200 shadow-lg shadow-slate-200/20">
+        <Card className="border-border shadow-lg shadow-sm">
           <CardContent className="p-8 text-center">
-            <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
-              <Check className="w-7 h-7 text-emerald-600" />
+            <div className="w-14 h-14 rounded-full bg-success/20 flex items-center justify-center mx-auto mb-4">
+              <Check className="w-7 h-7 text-success" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-950">Account created!</h1>
-            <p className="text-sm text-slate-600 mt-3 leading-relaxed">
+            <h1 className="text-2xl font-bold text-foreground">Account created!</h1>
+            <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
               You can now sign in with your credentials.
             </p>
             <Button
               variant="outline"
               onClick={() => router.push("/login")}
-              className="mt-6 border-slate-300 text-slate-700"
+              className="mt-6 border-border text-foreground"
             >
               Go to sign in
             </Button>
@@ -85,24 +85,24 @@ export default function RegisterPage() {
 
   return (
     <div className="w-full max-w-md">
-      <Card className="border-slate-200 shadow-lg shadow-slate-200/20">
+      <Card className="border-border shadow-lg shadow-sm">
         <CardContent className="p-8">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-slate-950">Create your account</h1>
-            <p className="text-sm text-slate-600 mt-2">
+            <h1 className="text-2xl font-bold text-foreground">Create your account</h1>
+            <p className="text-sm text-muted-foreground mt-2">
               Join 2,000+ developers on KodeDock
             </p>
           </div>
 
           {error && (
-            <div className="mb-6 p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+            <div className="mb-6 p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-sm text-destructive">
               {error}
             </div>
           )}
 
           <form onSubmit={handleRegister} className="space-y-4">
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-slate-700 mb-1.5">
+              <label htmlFor="fullName" className="block text-sm font-medium text-foreground mb-1.5">
                 Full name
               </label>
               <Input
@@ -112,12 +112,12 @@ export default function RegisterPage() {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 required
-                className="h-11 border-slate-300 bg-white"
+                className="h-11 border-border bg-background"
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1.5">
+              <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1.5">
                 Email address
               </label>
               <Input
@@ -127,12 +127,12 @@ export default function RegisterPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="h-11 border-slate-300 bg-white"
+                className="h-11 border-border bg-background"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1.5">
+              <label htmlFor="password" className="block text-sm font-medium text-foreground mb-1.5">
                 Password
               </label>
               <div className="relative">
@@ -143,12 +143,12 @@ export default function RegisterPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="h-11 border-slate-300 bg-white pr-10"
+                  className="h-11 border-border bg-background pr-10"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -159,13 +159,13 @@ export default function RegisterPage() {
                     <div
                       className={`w-3.5 h-3.5 rounded-full flex items-center justify-center ${
                         req.test(password)
-                          ? "bg-emerald-100 text-emerald-600"
-                          : "bg-slate-100 text-slate-400"
+                          ? "bg-success/20 text-success"
+                          : "bg-secondary text-muted-foreground"
                       }`}
                     >
                       {req.test(password) && <Check className="w-2.5 h-2.5" />}
                     </div>
-                    <span className={req.test(password) ? "text-slate-700" : "text-slate-400"}>
+                    <span className={req.test(password) ? "text-foreground" : "text-muted-foreground"}>
                       {req.label}
                     </span>
                   </div>
@@ -176,7 +176,7 @@ export default function RegisterPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full h-11 bg-slate-950 text-white hover:bg-slate-800"
+              className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90"
             >
               {loading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -188,10 +188,10 @@ export default function RegisterPage() {
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200" />
+              <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-white px-2 text-slate-500">or continue with</span>
+              <span className="bg-background px-2 text-muted-foreground">or continue with</span>
             </div>
           </div>
 
@@ -199,24 +199,24 @@ export default function RegisterPage() {
             variant="outline"
             onClick={handleGithubLogin}
             disabled={loading}
-            className="w-full h-11 border-slate-300 text-slate-700 hover:bg-slate-50"
+            className="w-full h-11 border-border text-foreground hover:bg-secondary"
           >
             <GithubIcon className="w-4 h-4 mr-2" />
             GitHub
           </Button>
 
-          <p className="mt-6 text-center text-sm text-slate-600">
+          <p className="mt-6 text-center text-sm text-muted-foreground">
             Already have an account?{" "}
             <Link
               href="/login"
-              className="font-semibold text-slate-950 hover:underline"
+              className="font-semibold text-foreground hover:underline"
             >
               Sign in
             </Link>
           </p>
-          <p className="mt-2 text-center text-xs text-slate-500">
+          <p className="mt-2 text-center text-xs text-muted-foreground">
             Want to sell code?{" "}
-            <Link href="/developer-register" className="font-medium text-slate-700 hover:underline">
+            <Link href="/developer-register" className="font-medium text-foreground hover:underline">
               Create seller account
             </Link>
           </p>

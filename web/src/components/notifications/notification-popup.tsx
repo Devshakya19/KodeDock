@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { X, Bell, Package, ShoppingCart, Loader2 } from "lucide-react";
-import { apiGet } from "@/lib/api/client";
+import { apiGet } from "@/shared/lib/api/client";
 
 interface Notification {
   id: string;
@@ -25,7 +25,7 @@ function getIcon(type: string) {
   }
 }
 
-import { PopupWrapper } from "@/components/ui/popup-wrapper";
+import { PopupWrapper } from "@/shared/ui/popup-wrapper";
 
 export function NotificationPopup({ onClose }: Props) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -47,12 +47,12 @@ export function NotificationPopup({ onClose }: Props) {
 
         {loading ? (
           <div className="flex items-center justify-center py-8">
-            <Loader2 className="w-5 h-5 text-slate-400 animate-spin" />
+            <Loader2 className="w-5 h-5 text-muted-foreground animate-spin" />
           </div>
         ) : notifications.length === 0 ? (
           <div className="py-10 text-center">
-            <Bell className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-            <p className="text-sm text-slate-500">No notifications</p>
+            <Bell className="w-8 h-8 text-muted-foreground/80 mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground">No notifications</p>
           </div>
         ) : (
           <div className="max-h-80 overflow-y-auto">
@@ -61,17 +61,17 @@ export function NotificationPopup({ onClose }: Props) {
               return (
                 <div key={n.id} className={`px-4 py-3 border-b border-slate-50 last:border-0 ${!n.is_read ? "bg-blue-50/40" : ""}`}>
                   <div className="flex items-start gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Icon className="w-3.5 h-3.5 text-slate-500" />
+                    <div className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Icon className="w-3.5 h-3.5 text-muted-foreground" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-slate-950">{n.title}</p>
-                      {n.message && <p className="text-xs text-slate-500 mt-0.5 truncate">{n.message}</p>}
-                      <p className="text-[11px] text-slate-400 mt-1">
+                      <p className="text-sm font-medium text-foreground">{n.title}</p>
+                      {n.message && <p className="text-xs text-muted-foreground mt-0.5 truncate">{n.message}</p>}
+                      <p className="text-[11px] text-muted-foreground mt-1">
                         {new Date(n.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
                       </p>
                     </div>
-                    {!n.is_read && <div className="w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0 mt-2" />}
+                    {!n.is_read && <div className="w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0 mt-2" />}
                   </div>
                 </div>
               );

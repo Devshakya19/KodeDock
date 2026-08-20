@@ -1,4 +1,4 @@
-import { StaticPageLayout } from "@/components/layout/static-layout";
+import { StaticPageLayout } from "@/shared/components/layout/static-layout";
 
 export default function RefundPage() {
   return (
@@ -6,11 +6,11 @@ export default function RefundPage() {
       title="Refund Policy"
       description="Our policies regarding refunds and returns."
     >
-      <div className="space-y-8 text-sm text-slate-600 leading-relaxed">
+      <div className="space-y-8 text-sm text-muted-foreground leading-relaxed">
         <p><em>Last updated: July 2026</em></p>
 
         <section>
-          <h2 className="text-xl font-semibold text-slate-950 mb-3">1. General Policy</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-3">1. General Policy</h2>
           <p>
             All sales on KodeDock are final. However, we understand that sometimes things
             don&apos;t work as expected. We offer a 48-hour dispute window for all purchases.
@@ -18,7 +18,7 @@ export default function RefundPage() {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-slate-950 mb-3">2. Eligible for Refund</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-3">2. Eligible for Refund</h2>
           <ul className="list-disc pl-6 space-y-1">
             <li>Product does not match the description</li>
             <li>Code is broken or non-functional</li>
@@ -28,7 +28,7 @@ export default function RefundPage() {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-slate-950 mb-3">3. Not Eligible for Refund</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-3">3. Not Eligible for Refund</h2>
           <ul className="list-disc pl-6 space-y-1">
             <li>Change of mind after 48 hours</li>
             <li>Product works as described but doesn&apos;t meet expectations</li>
@@ -38,7 +38,7 @@ export default function RefundPage() {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-slate-950 mb-3">4. How to Request a Refund</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-3">4. How to Request a Refund</h2>
           <ol className="list-decimal pl-6 space-y-1">
             <li>Go to your Order History</li>
             <li>Select the order you want to dispute</li>
@@ -49,7 +49,7 @@ export default function RefundPage() {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-slate-950 mb-3">5. Refund Processing</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-3">5. Refund Processing</h2>
           <p>
             Approved refunds are processed within 5-7 business days. The refund amount
             is credited back to the original payment method.

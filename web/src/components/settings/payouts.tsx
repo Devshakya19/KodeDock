@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { Landmark, Smartphone, Loader2, CheckCircle, AlertTriangle, CreditCard } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { apiGet, apiPost } from "@/lib/api/client";
-import { theme } from "@/lib/theme";
+import { Input } from "@/shared/ui/input";
+import { Button } from "@/shared/ui/button";
+import { apiGet, apiPost } from "@/shared/lib/api/client";
+import { theme } from "@/shared/lib/theme";
 export interface PayoutAccountData {
   account_type: "bank_account" | "upi";
   account_holder_name?: string;
@@ -106,34 +106,34 @@ export function PayoutSettings() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-[24px] p-6 sm:p-8 border border-slate-100 flex justify-center items-center h-40">
-        <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+      <div className="bg-background rounded-[24px] p-6 sm:p-8 border border-border flex justify-center items-center h-40">
+        <Loader2 className="w-8 h-8 text-accent animate-spin" />
       </div>
     );
   }
 
   return (
     <div className={theme.components.card}>
-      <div className="flex items-center gap-3 mb-8 border-b border-slate-100 pb-4">
-        <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-          <CreditCard className="w-5 h-5 text-blue-600" />
+      <div className="flex items-center gap-3 mb-8 border-b border-border pb-4">
+        <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
+          <CreditCard className="w-5 h-5 text-accent" />
         </div>
         <div>
-          <h2 className="text-lg font-bold text-slate-900">Payout Details</h2>
-          <p className="text-[13px] text-slate-500 font-medium mt-0.5">Configure where you want to receive your earnings</p>
+          <h2 className="text-lg font-bold text-foreground">Payout Details</h2>
+          <p className="text-[13px] text-muted-foreground font-medium mt-0.5">Configure where you want to receive your earnings</p>
         </div>
       </div>
 
       {success && (
-        <div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-100/50 text-sm font-medium text-emerald-800 flex items-center gap-3">
+        <div className="mb-6 p-4 rounded-2xl bg-success/10 border border-emerald-100/50 text-sm font-medium text-success-foreground flex items-center gap-3">
           <CheckCircle className="w-5 h-5 text-emerald-500" />
           {success}
         </div>
       )}
 
       {error && (
-        <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-100/50 text-sm font-medium text-red-800 flex items-center gap-3">
-          <AlertTriangle className="w-5 h-5 text-red-500" />
+        <div className="mb-6 p-4 rounded-2xl bg-destructive/10 border border-red-100/50 text-sm font-medium text-red-800 flex items-center gap-3">
+          <AlertTriangle className="w-5 h-5 text-destructive" />
           {error}
         </div>
       )}
@@ -146,11 +146,11 @@ export function PayoutSettings() {
             className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
               accountType === "bank_account"
                 ? "border-blue-600 bg-blue-50/50 shadow-sm"
-                : "border-slate-100 hover:border-slate-200 bg-white"
+                : "border-border hover:border-slate-200 bg-background"
             }`}
           >
-            <Landmark className={`w-6 h-6 ${accountType === "bank_account" ? "text-blue-600" : "text-slate-400"}`} />
-            <span className={`text-[13px] font-semibold ${accountType === "bank_account" ? "text-blue-700" : "text-slate-500"}`}>
+            <Landmark className={`w-6 h-6 ${accountType === "bank_account" ? "text-accent" : "text-muted-foreground"}`} />
+            <span className={`text-[13px] font-semibold ${accountType === "bank_account" ? "text-accent" : "text-muted-foreground"}`}>
               Bank Account
             </span>
           </button>
@@ -160,11 +160,11 @@ export function PayoutSettings() {
             className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
               accountType === "upi"
                 ? "border-blue-600 bg-blue-50/50 shadow-sm"
-                : "border-slate-100 hover:border-slate-200 bg-white"
+                : "border-border hover:border-slate-200 bg-background"
             }`}
           >
-            <Smartphone className={`w-6 h-6 ${accountType === "upi" ? "text-blue-600" : "text-slate-400"}`} />
-            <span className={`text-[13px] font-semibold ${accountType === "upi" ? "text-blue-700" : "text-slate-500"}`}>
+            <Smartphone className={`w-6 h-6 ${accountType === "upi" ? "text-accent" : "text-muted-foreground"}`} />
+            <span className={`text-[13px] font-semibold ${accountType === "upi" ? "text-accent" : "text-muted-foreground"}`}>
               UPI ID
             </span>
           </button>
@@ -173,7 +173,7 @@ export function PayoutSettings() {
         {accountType === "bank_account" && (
           <div className="space-y-5">
             <div>
-              <label className="block text-[14px] font-semibold text-slate-900 mb-2">Account Holder Name</label>
+              <label className="block text-[14px] font-semibold text-foreground mb-2">Account Holder Name</label>
               <Input
                 type="text"
                 value={holderName}
@@ -184,7 +184,7 @@ export function PayoutSettings() {
               />
             </div>
             <div>
-              <label className="block text-[14px] font-semibold text-slate-900 mb-2">Account Number</label>
+              <label className="block text-[14px] font-semibold text-foreground mb-2">Account Number</label>
               <Input
                 type="text"
                 inputMode="numeric"
@@ -194,22 +194,22 @@ export function PayoutSettings() {
                 className={theme.inputs.base}
                 maxLength={18}
               />
-              <p className="text-[12px] font-medium text-slate-500 mt-2">For security reasons, please re-enter your full account number to update.</p>
+              <p className="text-[12px] font-medium text-muted-foreground mt-2">For security reasons, please re-enter your full account number to update.</p>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-[14px] font-semibold text-slate-900 mb-2">IFSC Code</label>
+                <label className="block text-[14px] font-semibold text-foreground mb-2">IFSC Code</label>
                 <Input
                   type="text"
                   value={ifscCode}
                   onChange={(e) => setIfscCode(e.target.value.toUpperCase())}
                   placeholder="SBIN0001234"
-                  className="h-12 border-slate-200 bg-slate-50/50 focus-visible:bg-white rounded-xl text-[15px] uppercase"
+                  className="h-12 border-border bg-slate-50/50 focus-visible:bg-white rounded-xl text-[15px] uppercase"
                   maxLength={11}
                 />
               </div>
               <div>
-                <label className="block text-[14px] font-semibold text-slate-900 mb-2">Bank Name</label>
+                <label className="block text-[14px] font-semibold text-foreground mb-2">Bank Name</label>
                 <Input
                   type="text"
                   value={bankName}
@@ -226,7 +226,7 @@ export function PayoutSettings() {
         {accountType === "upi" && (
           <div className="space-y-5">
             <div>
-              <label className="block text-[14px] font-semibold text-slate-900 mb-2">UPI ID</label>
+              <label className="block text-[14px] font-semibold text-foreground mb-2">UPI ID</label>
               <Input
                 type="text"
                 value={upiId}
@@ -235,7 +235,7 @@ export function PayoutSettings() {
                 className={theme.inputs.base}
                 maxLength={100}
               />
-              <p className="text-[12px] font-medium text-slate-500 mt-2">Make sure this UPI ID is linked to your bank account to receive payouts successfully.</p>
+              <p className="text-[12px] font-medium text-muted-foreground mt-2">Make sure this UPI ID is linked to your bank account to receive payouts successfully.</p>
             </div>
           </div>
         )}
@@ -244,7 +244,7 @@ export function PayoutSettings() {
           <Button
             type="submit"
             disabled={saving}
-            className="h-12 px-8 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-[14px] font-semibold shadow-md transition-all"
+            className="h-12 px-8 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-[14px] font-semibold shadow-md transition-all"
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
             Save Payout Details

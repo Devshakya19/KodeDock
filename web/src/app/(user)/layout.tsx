@@ -1,8 +1,8 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { Navbar } from "@/components/layout/navbar";
-import { verifyToken } from "@/lib/auth/server";
-import { theme } from "@/lib/theme";
+import { Navbar } from "@/shared/components/layout/navbar";
+import { verifyToken } from "@/shared/lib/auth/server";
+import { theme } from "@/shared/lib/theme";
 
 export default async function DashboardLayout({
   children,

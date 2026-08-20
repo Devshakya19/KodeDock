@@ -2,10 +2,10 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { KodeDockLogo } from "@/components/brand/kodedock-logo";
-import { verifyToken } from "@/lib/auth/server";
+import { KodeDockLogo } from "@/shared/components/brand/kodedock-logo";
+import { verifyToken } from "@/shared/lib/auth/server";
 import { NotificationsList, Notification } from "@/components/notifications/notifications-list";
-import { theme } from "@/lib/theme";
+import { theme } from "@/shared/lib/theme";
 
 const RUST_BACKEND = process.env.CORE_ENGINE_URL || "http://localhost:4001";
 
@@ -42,7 +42,7 @@ export default async function NotificationsPage() {
     <div className="flex-1">
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
-        <div className="bg-white rounded-[24px] p-2 sm:p-4 border border-slate-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] min-h-[60vh]">
+        <div className="bg-background rounded-[24px] p-2 sm:p-4 border border-border shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] min-h-[60vh]">
           <NotificationsList initialNotifications={notifications} />
         </div>
       </main>

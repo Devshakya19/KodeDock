@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { GithubIcon } from "@/components/icons/github-icon";
+import { GithubIcon } from "@/shared/components/icons/github";
 import { Link as LinkIcon, Mail, Loader2 } from "lucide-react";
-import { auth, User } from "@/lib/auth/client";
-import { apiPost } from "@/lib/api/client";
-import { theme } from "@/lib/theme";
+import { auth, User } from "@/shared/lib/auth/client";
+import { apiPost } from "@/shared/lib/api/client";
+import { theme } from "@/shared/lib/theme";
 
 export function ConnectionsSettings() {
   const [user, setUser] = useState<User | null>(null);
@@ -72,7 +72,7 @@ export function ConnectionsSettings() {
   if (loading) {
     return (
       <div className="w-full flex items-center justify-center p-12">
-        <Loader2 className="w-8 h-8 animate-spin text-slate-300" />
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground/80" />
       </div>
     );
   }
@@ -82,24 +82,24 @@ export function ConnectionsSettings() {
   return (
     <div className="w-full">
       <div className={theme.components.card}>
-        <div className="flex items-center gap-3 mb-8 border-b border-slate-100 pb-4">
-          <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center">
-            <LinkIcon className="w-5 h-5 text-white" />
+        <div className="flex items-center gap-3 mb-8 border-b border-border pb-4">
+          <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
+            <LinkIcon className="w-5 h-5 text-primary-foreground" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-slate-900">Connected Accounts</h2>
-            <p className="text-[13px] text-slate-500 font-medium mt-0.5">Link third-party accounts for login and integrations</p>
+            <h2 className="text-lg font-bold text-foreground">Connected Accounts</h2>
+            <p className="text-[13px] text-muted-foreground font-medium mt-0.5">Link third-party accounts for login and integrations</p>
           </div>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-100/50 text-[13px] font-medium text-red-800">
+          <div className="mb-6 p-4 rounded-2xl bg-destructive/10 border border-red-100/50 text-[13px] font-medium text-red-800">
             {error}
           </div>
         )}
 
         {success && (
-          <div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-100/50 text-[13px] font-medium text-emerald-800">
+          <div className="mb-6 p-4 rounded-2xl bg-success/10 border border-emerald-100/50 text-[13px] font-medium text-success-foreground">
             {success}
           </div>
         )}
@@ -107,22 +107,22 @@ export function ConnectionsSettings() {
         <div className="space-y-6">
           {/* GitHub Connection */}
           <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl border transition-colors ${
-            isGithubLinked ? "border-emerald-200/60 bg-emerald-50/30" : "border-slate-200/60 bg-white"
+            isGithubLinked ? "border-emerald-200/60 bg-emerald-50/30" : "border-border/60 bg-background"
           }`}>
             <div className="flex items-center gap-4">
               <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 border ${
-                isGithubLinked ? "bg-white border-emerald-100" : "bg-slate-50 border-slate-100"
+                isGithubLinked ? "bg-background border-success/20" : "bg-secondary/50 border-border"
               }`}>
-                <GithubIcon className="w-6 h-6 text-slate-900" />
+                <GithubIcon className="w-6 h-6 text-foreground" />
               </div>
               <div>
-                <h3 className="text-[15px] font-bold text-slate-900">GitHub</h3>
+                <h3 className="text-[15px] font-bold text-foreground">GitHub</h3>
                 {isGithubLinked ? (
-                  <p className="text-[13px] text-emerald-600 font-medium mt-0.5">
-                    Linked to <span className="font-bold text-emerald-700">@{user?.github_username}</span>
+                  <p className="text-[13px] text-success font-medium mt-0.5">
+                    Linked to <span className="font-bold text-success">@{user?.github_username}</span>
                   </p>
                 ) : (
-                  <p className="text-[13px] text-slate-500 mt-0.5 max-w-[280px]">
+                  <p className="text-[13px] text-muted-foreground mt-0.5 max-w-[280px]">
                     Connect your GitHub account to sync repositories directly. Requires public and private repository access.
                   </p>
                 )}
@@ -133,14 +133,14 @@ export function ConnectionsSettings() {
               <button 
                 onClick={handleUnlinkGithub}
                 disabled={unlinking}
-                className="h-10 px-6 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-[13px] font-semibold transition-all w-full sm:w-auto disabled:opacity-50"
+                className="h-10 px-6 rounded-xl border border-border hover:bg-secondary text-foreground text-[13px] font-semibold transition-all w-full sm:w-auto disabled:opacity-50"
               >
                 {unlinking ? "Unlinking..." : "Unlink"}
               </button>
             ) : (
               <button 
                 onClick={handleConnectGithub}
-                className="h-10 px-6 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-[13px] font-semibold transition-all w-full sm:w-auto"
+                className="h-10 px-6 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-[13px] font-semibold transition-all w-full sm:w-auto"
               >
                 Connect
               </button>
@@ -148,19 +148,19 @@ export function ConnectionsSettings() {
           </div>
 
           {/* Google Connection */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl border border-slate-200/60 bg-white">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl border border-border/60 bg-background">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
-                <Mail className="w-6 h-6 text-slate-900" />
+              <div className="w-12 h-12 rounded-full bg-secondary/50 border border-border flex items-center justify-center shrink-0">
+                <Mail className="w-6 h-6 text-foreground" />
               </div>
               <div>
-                <h3 className="text-[15px] font-bold text-slate-900">Google</h3>
-                <p className="text-[13px] text-slate-500 mt-0.5 max-w-[280px]">
+                <h3 className="text-[15px] font-bold text-foreground">Google</h3>
+                <p className="text-[13px] text-muted-foreground mt-0.5 max-w-[280px]">
                   Use Google to securely log into your KodeDock account.
                 </p>
               </div>
             </div>
-            <button className="h-10 px-6 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-[13px] font-semibold transition-all w-full sm:w-auto">
+            <button className="h-10 px-6 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-[13px] font-semibold transition-all w-full sm:w-auto">
               Connect
             </button>
           </div>

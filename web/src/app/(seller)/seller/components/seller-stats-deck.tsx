@@ -29,8 +29,8 @@ export function SellerStatsDeck({
       value: activeProducts.toLocaleString(),
       subtitle: "Live in store catalog",
       icon: Package,
-      accent: "text-slate-900",
-      pillBg: "bg-slate-100 text-slate-700 border border-slate-200/60",
+      accent: "text-foreground",
+      pillBg: "bg-secondary text-foreground border border-border/60",
       tag: "Live Store",
       detail: "Publicly visible",
     },
@@ -39,8 +39,8 @@ export function SellerStatsDeck({
       value: totalSales.toLocaleString(),
       subtitle: "Automated fulfillment",
       icon: Download,
-      accent: "text-blue-600",
-      pillBg: "bg-blue-50 text-blue-700 border border-blue-100/80",
+      accent: "text-accent",
+      pillBg: "bg-accent/10 text-accent border border-accent/30",
       tag: "100% Delivery",
       detail: "Instant git sync",
     },
@@ -52,8 +52,8 @@ export function SellerStatsDeck({
       })}`,
       subtitle: "Total customer spend",
       icon: DollarSign,
-      accent: "text-slate-950",
-      pillBg: "bg-emerald-50 text-emerald-700 border border-emerald-100/80",
+      accent: "text-foreground",
+      pillBg: "bg-success/10 text-success border border-success/20",
       tag: "2.5% Fee",
       detail: "Platform fee",
     },
@@ -65,8 +65,8 @@ export function SellerStatsDeck({
       })}`,
       subtitle: "Credited to wallet",
       icon: Wallet,
-      accent: "text-emerald-600",
-      pillBg: "bg-emerald-50 text-emerald-800 border border-emerald-200/70",
+      accent: "text-success",
+      pillBg: "bg-success/10 text-success-foreground border border-success/30",
       tag: "Ready Payout",
       detail: "Direct to bank/UPI",
     },
@@ -102,11 +102,11 @@ export function SellerStatsDeck({
           <motion.div
             key={idx}
             variants={cardVariants}
-            className="group relative rounded-[2rem] bg-white p-1.5 ring-1 ring-slate-200/60 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-8px_rgba(0,0,0,0.1)] hover:ring-slate-300 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+            className="group relative rounded-[2rem] bg-background p-1.5 ring-1 ring-border/60 shadow-md hover:shadow-[0_8px_30px_-8px_rgba(0,0,0,0.1)] hover:ring-slate-300 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
           >
             <div className="rounded-[calc(2rem-0.375rem)] bg-gradient-to-b from-white to-slate-50/40 p-6 h-full flex flex-col justify-between relative overflow-hidden">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500">
+                <span className="text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground">
                   {card.title}
                 </span>
                 <span
@@ -123,16 +123,16 @@ export function SellerStatsDeck({
                   {card.value}
                 </div>
 
-                <div className="flex items-end justify-between pt-3 border-t border-slate-100">
+                <div className="flex items-end justify-between pt-3 border-t border-border">
                   <div>
-                    <p className="text-[13px] text-slate-700 font-bold leading-none mb-1">
+                    <p className="text-[13px] text-foreground font-bold leading-none mb-1">
                       {card.subtitle}
                     </p>
-                    <span className="text-[11px] text-slate-400 font-semibold">
+                    <span className="text-[11px] text-muted-foreground font-semibold">
                       {card.detail}
                     </span>
                   </div>
-                  <div className="w-10 h-10 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-400 group-hover:bg-slate-950 group-hover:text-white group-hover:border-slate-950 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]">
+                  <div className="w-10 h-10 rounded-2xl bg-secondary/50 border border-border/80 flex items-center justify-center text-muted-foreground group-hover:bg-slate-950 group-hover:text-white group-hover:border-slate-950 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]">
                     <Icon className="w-4 h-4 transition-transform duration-500 group-hover:scale-110" />
                   </div>
                 </div>

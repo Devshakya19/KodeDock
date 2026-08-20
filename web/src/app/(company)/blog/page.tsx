@@ -1,6 +1,6 @@
-import { StaticPageLayout } from "@/components/layout/static-layout";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { StaticPageLayout } from "@/shared/components/layout/static-layout";
+import { Card, CardContent } from "@/shared/ui/card";
+import { Badge } from "@/shared/ui/badge";
 
 const BLOG_POSTS = [
   {
@@ -56,14 +56,14 @@ export default function BlogPage() {
       <div className="space-y-6">
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {BLOG_POSTS.map((post) => (
-            <Card key={post.title} className="border-slate-200 hover:border-slate-300 transition-colors">
+            <Card key={post.title} className="border-border hover:border-border transition-colors">
               <CardContent className="p-6">
-                <Badge variant="secondary" className="mb-3 text-[10px] bg-slate-100 border-slate-200">
+                <Badge variant="secondary" className="mb-3 text-[10px] bg-secondary border-border">
                   {post.category}
                 </Badge>
-                <h3 className="font-semibold text-slate-950 mb-2 line-clamp-2">{post.title}</h3>
-                <p className="text-sm text-slate-600 line-clamp-2 mb-4">{post.excerpt}</p>
-                <div className="flex items-center justify-between text-xs text-slate-500">
+                <h3 className="font-semibold text-foreground mb-2 line-clamp-2">{post.title}</h3>
+                <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{post.excerpt}</p>
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>{post.date}</span>
                   <span>{post.readTime}</span>
                 </div>

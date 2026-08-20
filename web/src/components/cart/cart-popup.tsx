@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { X, ShoppingCart, Trash2, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 
 interface CartItem {
   id: string;
@@ -26,7 +26,7 @@ interface Props {
   onClose: () => void;
 }
 
-import { PopupWrapper } from "@/components/ui/popup-wrapper";
+import { PopupWrapper } from "@/shared/ui/popup-wrapper";
 
 export function CartPopup({ onClose }: Props) {
   const [items, setItems] = useState<CartItem[]>([]);
@@ -46,16 +46,16 @@ export function CartPopup({ onClose }: Props) {
       title="Cart" 
       icon={ShoppingCart} 
       onClose={onClose}
-      headerRight={items.length > 0 && <span className="text-xs text-slate-400">({items.length})</span>}
+      headerRight={items.length > 0 && <span className="text-xs text-muted-foreground">({items.length})</span>}
     >
 
         {items.length === 0 ? (
           <div className="py-10 text-center">
-            <ShoppingCart className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-            <p className="text-sm text-slate-500 mb-1">Your cart is empty</p>
-            <p className="text-xs text-slate-400 mb-4">Browse products and add them to your cart</p>
+            <ShoppingCart className="w-8 h-8 text-muted-foreground/80 mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground mb-1">Your cart is empty</p>
+            <p className="text-xs text-muted-foreground mb-4">Browse products and add them to your cart</p>
             <Link href="/browse" onClick={onClose}>
-              <Button size="sm" className="bg-slate-950 text-white hover:bg-slate-800 text-xs">Browse Products</Button>
+              <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs">Browse Products</Button>
             </Link>
           </div>
         ) : (
@@ -63,35 +63,35 @@ export function CartPopup({ onClose }: Props) {
             <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
               {items.map((item) => (
                 <div key={item.id} className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                  <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0 overflow-hidden">
                     {item.image_url ? (
                       <img src={item.image_url} alt="" className="w-full h-full object-contain" />
                     ) : (
-                      <ShoppingCart className="w-4 h-4 text-slate-400" />
+                      <ShoppingCart className="w-4 h-4 text-muted-foreground" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-slate-950 truncate">{item.title}</p>
-                    <p className={`text-xs ${item.price_paise === 0 ? "text-emerald-600 font-semibold" : "text-slate-500"}`}>
+                    <p className="text-sm font-medium text-foreground truncate">{item.title}</p>
+                    <p className={`text-xs ${item.price_paise === 0 ? "text-success font-semibold" : "text-muted-foreground"}`}>
                       {item.price_paise === 0 ? "Free" : `₹${(item.price_paise / 100).toLocaleString()}`}
                     </p>
                   </div>
-                  <button onClick={() => removeItem(item.id)} className="text-slate-400 hover:text-red-500 transition-colors p-1">
+                  <button onClick={() => removeItem(item.id)} className="text-muted-foreground hover:text-red-500 transition-colors p-1">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
               ))}
             </div>
 
-            <div className="border-t border-slate-100 px-4 py-3">
+            <div className="border-t border-border px-4 py-3">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-medium text-slate-600">Total</span>
-                <span className={`text-base font-bold ${total === 0 ? "text-emerald-600 font-extrabold" : "text-slate-950"}`}>
+                <span className="text-sm font-medium text-muted-foreground">Total</span>
+                <span className={`text-base font-bold ${total === 0 ? "text-success font-extrabold" : "text-foreground"}`}>
                   {total === 0 ? "Free" : `₹${(total / 100).toLocaleString()}`}
                 </span>
               </div>
               <Link href={`/checkout?product_id=${items[0]?.id}`} onClick={onClose}>
-                <Button className="w-full bg-slate-950 text-white hover:bg-slate-800 rounded-lg text-sm h-10">
+                <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg text-sm h-10">
                   Checkout <ArrowRight className="w-4 h-4 ml-1.5" />
                 </Button>
               </Link>
