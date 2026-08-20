@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Bell, Package, ArrowUpRight, DollarSign, Sparkles } from "lucide-react";
-import { apiPut } from "@/lib/api/client";
+import { apiPut } from "@/shared/lib/api/client";
 
 export interface Notification {
   id: string;
@@ -19,13 +19,13 @@ function getNotificationConfig(type: string) {
     case "order": 
       return { 
         icon: DollarSign, 
-        colorClass: "bg-emerald-100 text-emerald-600",
+        colorClass: "bg-success/20 text-success",
         borderClass: "border-emerald-200/60"
       };
     case "product": 
       return { 
         icon: Package, 
-        colorClass: "bg-blue-100 text-blue-600",
+        colorClass: "bg-accent/20 text-accent",
         borderClass: "border-blue-200/60" 
       };
     case "payout": 
@@ -37,14 +37,14 @@ function getNotificationConfig(type: string) {
     case "system": 
       return { 
         icon: Sparkles, 
-        colorClass: "bg-amber-100 text-amber-600",
+        colorClass: "bg-warning/20 text-warning",
         borderClass: "border-amber-200/60" 
       };
     default: 
       return { 
         icon: Bell, 
-        colorClass: "bg-slate-100 text-slate-600",
-        borderClass: "border-slate-200/60" 
+        colorClass: "bg-secondary text-muted-foreground",
+        borderClass: "border-border/60" 
       };
   }
 }
@@ -94,11 +94,11 @@ export function NotificationsList({ initialNotifications }: { initialNotificatio
   if (notifications.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full py-20 text-center">
-        <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mb-4 border border-slate-100">
-          <Bell className="w-8 h-8 text-slate-300" />
+        <div className="w-16 h-16 rounded-full bg-secondary/50 flex items-center justify-center mb-4 border border-border">
+          <Bell className="w-8 h-8 text-muted-foreground/80" />
         </div>
-        <h2 className="text-lg font-bold text-slate-900 mb-1">All caught up!</h2>
-        <p className="text-sm text-slate-500 max-w-xs mx-auto">
+        <h2 className="text-lg font-bold text-foreground mb-1">All caught up!</h2>
+        <p className="text-sm text-muted-foreground max-w-xs mx-auto">
           You have no new notifications. We'll alert you when there's an update.
         </p>
       </div>
@@ -107,12 +107,12 @@ export function NotificationsList({ initialNotifications }: { initialNotificatio
 
   return (
     <div className="space-y-1">
-      <div className="px-4 py-3 flex items-center justify-between border-b border-slate-100 mb-2">
-        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Recent Activity</span>
+      <div className="px-4 py-3 flex items-center justify-between border-b border-border mb-2">
+        <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Recent Activity</span>
         {unreadCount > 0 && (
           <button 
             onClick={handleMarkAllAsRead}
-            className="text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+            className="text-xs font-semibold text-accent hover:text-blue-700 transition-colors"
           >
             Mark all as read
           </button>
@@ -128,11 +128,11 @@ export function NotificationsList({ initialNotifications }: { initialNotificatio
             className={`group relative p-4 rounded-2xl transition-all flex items-start gap-4 ${
               !notif.is_read 
                 ? "bg-blue-50/40 hover:bg-blue-50/60 cursor-pointer" 
-                : "hover:bg-slate-50"
+                : "hover:bg-secondary"
             }`}
           >
             {!notif.is_read && (
-              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-blue-500 rounded-r-full" />
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-accent rounded-r-full" />
             )}
             
             <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 border ${colorClass} ${borderClass}`}>
@@ -141,16 +141,16 @@ export function NotificationsList({ initialNotifications }: { initialNotificatio
             
             <div className="flex-1 min-w-0 pt-0.5">
               <div className="flex items-start justify-between gap-2 mb-1">
-                <div className="text-[15px] font-bold text-slate-900 leading-tight">
+                <div className="text-[15px] font-bold text-foreground leading-tight">
                   {notif.title}
                 </div>
-                <span className="text-[11px] font-medium text-slate-400 flex-shrink-0 whitespace-nowrap mt-0.5">
+                <span className="text-[11px] font-medium text-muted-foreground flex-shrink-0 whitespace-nowrap mt-0.5">
                   {formatRelativeTime(notif.created_at)}
                 </span>
               </div>
               
               {notif.message && (
-                <p className={`text-[13px] leading-snug ${!notif.is_read ? 'text-slate-700 font-medium' : 'text-slate-500'}`}>
+                <p className={`text-[13px] leading-snug ${!notif.is_read ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>
                   {notif.message}
                 </p>
               )}

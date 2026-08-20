@@ -1,71 +1,38 @@
 "use client";
-import { FadeIn } from "@/components/layout/fade-in";
 
-import {
-  Layout,
-  Smartphone,
-  Code2,
-  GraduationCap,
-  Terminal,
-  FileCode2,
-  ArrowUpRight,
-} from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-
-
-const CATEGORIES = [
-  { icon: Layout, label: "Web Templates", count: "2,400+", desc: "Next.js, React, Vue" },
-  { icon: Smartphone, label: "Mobile Apps", count: "800+", desc: "React Native, Flutter" },
-  { icon: Code2, label: "UI Kits", count: "1,200+", desc: "Tailwind, shadcn/ui" },
-  { icon: GraduationCap, label: "B.Tech Projects", count: "3,500+", desc: "Verified, documented" },
-  { icon: Terminal, label: "Boilerplates", count: "900+", desc: "SaaS, E-commerce" },
-  { icon: FileCode2, label: "API Templates", count: "600+", desc: "REST, GraphQL" },
-];
+import Link from "next/link";
+import { ArrowRight, MonitorSmartphone, Server, Layers, Code2 } from "lucide-react";
+import { Card, CardContent } from "@/shared/ui/card";
 
 export function Categories() {
   return (
-    <section className="px-4 sm:px-6 lg:px-8 py-20 md:py-28">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <FadeIn>
-            <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-slate-100 border border-slate-300 text-xs font-semibold tracking-wide uppercase text-slate-900 mb-4">
-              Categories
-            </div>
-          </FadeIn>
-          <FadeIn delay={0.1}>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-950">
-              Find exactly what you need
-            </h2>
-          </FadeIn>
-          <FadeIn delay={0.2}>
-            <p className="mt-4 text-lg text-slate-600 leading-relaxed">
-              Browse by category and locate production-ready code without the noise.
-            </p>
-          </FadeIn>
+    <section id="categories" className="bg-secondary/30 py-24 border-y border-border/50">
+      <div className="container mx-auto flex flex-col gap-12">
+        <div className="flex items-center justify-between">
+          <h2 className="font-marketing text-3xl md:text-4xl font-bold tracking-tight">Explore Categories</h2>
+          <Link href="/browse" className="hidden md:flex items-center gap-2 text-primary font-medium hover:underline">
+            View all <ArrowRight size={16} />
+          </Link>
         </div>
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {CATEGORIES.map((cat, i) => (
-            <FadeIn key={cat.label} delay={i * 0.06}>
-              <Card className="group cursor-pointer border border-slate-200 hover:border-slate-950 hover:shadow-lg transition-all duration-300">
-                <CardContent className="p-5 flex items-center gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-slate-950/10 flex items-center justify-center group-hover:bg-slate-950/15 transition-colors">
-                    <cat.icon className="w-5.5 h-5.5 text-slate-950" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-sm text-slate-950">{cat.label}</h3>
-                      <Badge variant="secondary" className="text-[11px] px-2 py-0.5 font-medium bg-slate-100 text-slate-900 border border-slate-200">
-                        {cat.count}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-slate-500 mt-0.5">{cat.desc}</p>
-                  </div>
-                  <ArrowUpRight className="w-4 h-4 text-slate-500 transition-transform group-hover:text-slate-900" />
-                </CardContent>
-              </Card>
-            </FadeIn>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[
+            { icon: <MonitorSmartphone size={24} />, title: "Frontend Templates", count: "120+" },
+            { icon: <Server size={24} />, title: "Backend APIs", count: "85+" },
+            { icon: <Layers size={24} />, title: "Fullstack Boilerplates", count: "200+" },
+            { icon: <Code2 size={24} />, title: "UI Components", count: "450+" },
+          ].map((category, i) => (
+            <Card key={i} className="group hover:border-primary/50 transition-colors cursor-pointer bg-background">
+              <CardContent className="p-6 flex flex-col gap-4">
+                <div className="h-12 w-12 rounded-xl bg-secondary flex items-center justify-center text-foreground group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                  {category.icon}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg">{category.title}</h3>
+                  <p className="text-sm text-muted-foreground mt-1">{category.count} items</p>
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>

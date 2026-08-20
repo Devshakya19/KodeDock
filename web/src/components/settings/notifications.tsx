@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Bell, Save, Loader2, Mail, Smartphone } from "lucide-react";
-import { apiGet, apiPost } from "@/lib/api/client";
-import { theme } from "@/lib/theme";
+import { apiGet, apiPost } from "@/shared/lib/api/client";
+import { theme } from "@/shared/lib/theme";
 
 interface NotificationPrefs {
   email_sales: boolean;
@@ -72,7 +72,7 @@ export function NotificationsSettings() {
   if (loading) {
     return (
       <div className="w-full flex items-center justify-center p-12">
-        <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+        <Loader2 className="w-6 h-6 animate-spin text-accent" />
       </div>
     );
   }
@@ -80,21 +80,21 @@ export function NotificationsSettings() {
   return (
     <div className="w-full">
       <div className={theme.components.card}>
-        <div className="flex items-center gap-3 mb-8 border-b border-slate-100 pb-4">
-          <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-            <Bell className="w-5 h-5 text-blue-600" />
+        <div className="flex items-center gap-3 mb-8 border-b border-border pb-4">
+          <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
+            <Bell className="w-5 h-5 text-accent" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-slate-900">Notifications</h2>
-            <p className="text-[13px] text-slate-500 font-medium mt-0.5">Configure email and push alerts</p>
+            <h2 className="text-lg font-bold text-foreground">Notifications</h2>
+            <p className="text-[13px] text-muted-foreground font-medium mt-0.5">Configure email and push alerts</p>
           </div>
         </div>
 
         <div className="space-y-8">
           {/* Email Settings */}
           <div>
-            <h3 className="text-[15px] font-bold text-slate-900 flex items-center gap-2 mb-4">
-              <Mail className="w-4 h-4 text-slate-400" /> Email Notifications
+            <h3 className="text-[15px] font-bold text-foreground flex items-center gap-2 mb-4">
+              <Mail className="w-4 h-4 text-muted-foreground" /> Email Notifications
             </h3>
             <div className="space-y-3">
               <ToggleRow 
@@ -118,12 +118,12 @@ export function NotificationsSettings() {
             </div>
           </div>
 
-          <hr className="border-slate-100" />
+          <hr className="border-border" />
 
           {/* Push Settings */}
           <div>
-            <h3 className="text-[15px] font-bold text-slate-900 flex items-center gap-2 mb-4">
-              <Smartphone className="w-4 h-4 text-slate-400" /> Push Notifications
+            <h3 className="text-[15px] font-bold text-foreground flex items-center gap-2 mb-4">
+              <Smartphone className="w-4 h-4 text-muted-foreground" /> Push Notifications
             </h3>
             <div className="space-y-3">
               <ToggleRow 
@@ -147,14 +147,14 @@ export function NotificationsSettings() {
             </div>
           </div>
 
-          <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-            <span className={`text-[13px] font-medium ${message.includes('success') ? 'text-green-600' : 'text-red-500'}`}>
+          <div className="pt-4 border-t border-border flex items-center justify-between">
+            <span className={`text-[13px] font-medium ${message.includes('success') ? 'text-green-600' : 'text-destructive'}`}>
               {message}
             </span>
             <button
               onClick={handleSave}
               disabled={saving}
-              className="h-11 px-6 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-600/20 transition-all hover:-translate-y-0.5 flex items-center gap-2 disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none"
+              className="h-11 px-6 rounded-xl bg-accent text-primary-foreground font-bold hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-600/20 transition-all hover:-translate-y-0.5 flex items-center gap-2 disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none"
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               Save Preferences
@@ -168,10 +168,10 @@ export function NotificationsSettings() {
 
 function ToggleRow({ label, description, checked, onChange }: { label: string, description: string, checked: boolean, onChange: () => void }) {
   return (
-    <label className="flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-slate-50/50 cursor-pointer hover:border-slate-200 transition-colors">
+    <label className="flex items-center justify-between p-4 rounded-xl border border-border bg-slate-50/50 cursor-pointer hover:border-slate-200 transition-colors">
       <div>
-        <div className="font-bold text-[14px] text-slate-900">{label}</div>
-        <div className="text-[13px] text-slate-500 mt-0.5">{description}</div>
+        <div className="font-bold text-[14px] text-foreground">{label}</div>
+        <div className="text-[13px] text-muted-foreground mt-0.5">{description}</div>
       </div>
       <div className="relative inline-flex items-center">
         <input 

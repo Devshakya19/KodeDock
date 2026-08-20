@@ -1,5 +1,5 @@
-import { Navbar } from "@/components/landing/navbar";
-import { Footer } from "@/components/landing/footer";
+import { Navbar } from "@/shared/components/layout/navbar";
+import { Footer } from "@/shared/components/layout/footer";
 import { DevHero } from "@/app/(company)/developer/components/dev-hero";
 import { DevBenefits } from "@/app/(company)/developer/components/dev-benefits";
 import { DevCommission } from "@/app/(company)/developer/components/dev-commission";

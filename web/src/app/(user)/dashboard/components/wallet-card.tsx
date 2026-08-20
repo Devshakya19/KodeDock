@@ -13,11 +13,11 @@ export function WalletCard({ initialBalance }: WalletCardProps) {
 
   return (
     <>
-      <div onClick={() => setShowWallet(true)} className="bg-slate-900 text-white rounded-[24px] p-6 shadow-xl shadow-slate-900/10 relative overflow-hidden group cursor-pointer hover:shadow-2xl hover:shadow-slate-900/20 transition-all hover:-translate-y-0.5 flex flex-col justify-between h-full">
+      <div onClick={() => setShowWallet(true)} className="bg-primary text-primary-foreground rounded-[24px] p-6 shadow-xl shadow-slate-900/10 relative overflow-hidden group cursor-pointer hover:shadow-2xl hover:shadow-slate-900/20 transition-all hover:-translate-y-0.5 flex flex-col justify-between h-full">
         <div className="absolute -right-6 -top-6 w-32 h-32 bg-white/5 rounded-full blur-2xl group-hover:bg-white/10 transition-colors" />
         <div className="relative z-10 flex flex-col h-full justify-between">
           <div className="flex items-center justify-between mb-6">
-            <div className="w-12 h-12 rounded-2xl bg-white/10 text-white flex items-center justify-center border border-white/10 backdrop-blur-md">
+            <div className="w-12 h-12 rounded-2xl bg-white/10 text-primary-foreground flex items-center justify-center border border-border/10 backdrop-blur-md">
               <Wallet className="w-5.5 h-5.5" />
             </div>
             <div className="w-10 h-10 rounded-full flex items-center justify-center text-white/50 group-hover:text-white group-hover:bg-white/10 transition-colors">
@@ -25,9 +25,9 @@ export function WalletCard({ initialBalance }: WalletCardProps) {
             </div>
           </div>
           <div>
-            <p className="text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-1">Wallet Balance</p>
+            <p className="text-[13px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Wallet Balance</p>
             {initialBalance !== null ? (
-              <p className="text-3xl font-black text-white tracking-tight">₹{(initialBalance / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+              <p className="text-3xl font-black text-primary-foreground tracking-tight">₹{(initialBalance / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
             ) : (
               <div className="h-9 flex items-center"><div className="w-24 h-6 bg-white/10 rounded-lg animate-pulse" /></div>
             )}

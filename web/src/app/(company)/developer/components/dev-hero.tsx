@@ -1,11 +1,11 @@
 "use client";
-import { GithubIcon } from "@/components/icons/github-icon";
-import { FadeIn } from "@/components/layout/fade-in";
+import { GithubIcon } from "@/shared/components/icons/github";
+import { FadeIn } from "@/shared/components/layout/fade-in";
 
 import Link from "next/link";
 import { ArrowRight, Code2, TrendingUp } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/shared/ui/button";
+import { Badge } from "@/shared/ui/badge";
 
 
 export function DevHero() {
@@ -16,18 +16,18 @@ export function DevHero() {
 
       <div className="relative max-w-4xl mx-auto text-center">
         <FadeIn>
-          <Badge variant="secondary" className="mb-6 px-4 py-1.5 text-xs font-semibold tracking-wide uppercase bg-slate-100 border border-slate-300 text-slate-900">
+          <Badge variant="secondary" className="mb-6 px-4 py-1.5 text-xs font-semibold tracking-wide uppercase bg-secondary border border-border text-foreground">
             For Developers
           </Badge>
         </FadeIn>
         <FadeIn delay={0.1}>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-slate-950 leading-[1.1]">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-foreground leading-[1.1]">
             Sell your code.{" "}
             <span className="gradient-text">Earn from your skills.</span>
           </h1>
         </FadeIn>
         <FadeIn delay={0.2}>
-          <p className="mt-6 text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Turn your side projects into passive income. Link your GitHub repo, set a price, and let
             KodeDock handle payments, delivery, and support. Only 2.5% commission.
           </p>
@@ -35,20 +35,20 @@ export function DevHero() {
         <FadeIn delay={0.3}>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/developer-register">
-              <Button size="lg" className="bg-slate-950 text-white hover:bg-slate-800 shadow-lg shadow-slate-950/25 px-8 h-12 text-base font-semibold rounded-full">
+              <Button size="lg" className="bg-primary text-primary-foreground hover:bg-slate-800 shadow-lg shadow-slate-950/25 px-8 h-12 text-base font-semibold rounded-full">
                 Start Selling
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
             <Link href="/#how-it-works">
-              <Button size="lg" variant="outline" className="border-slate-300 text-slate-700 h-12 text-base font-semibold rounded-full">
+              <Button size="lg" variant="outline" className="border-border text-foreground h-12 text-base font-semibold rounded-full">
                 Learn More
               </Button>
             </Link>
           </div>
         </FadeIn>
         <FadeIn delay={0.4}>
-          <div className="mt-16 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-sm text-slate-500">
+          <div className="mt-16 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <Code2 className="w-4 h-4" />
               <span>2.5% commission</span>

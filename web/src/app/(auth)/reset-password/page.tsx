@@ -4,10 +4,10 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, Loader2, CheckCircle, AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
-import { apiPost } from "@/lib/api/client";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+import { Card, CardContent } from "@/shared/ui/card";
+import { apiPost } from "@/shared/lib/api/client";
 
 function ResetPasswordForm() {
   const router = useRouter();
@@ -87,18 +87,18 @@ function ResetPasswordForm() {
   if (success) {
     return (
       <div className="w-full max-w-md">
-        <Card className="border-slate-200 shadow-lg shadow-slate-200/20">
+        <Card className="border-border shadow-lg shadow-sm">
           <CardContent className="p-8 text-center">
-            <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
-              <CheckCircle className="w-7 h-7 text-emerald-600" />
+            <div className="w-14 h-14 rounded-full bg-success/20 flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-7 h-7 text-success" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-950">Password updated!</h1>
-            <p className="text-sm text-slate-600 mt-3 leading-relaxed">
+            <h1 className="text-2xl font-bold text-foreground">Password updated!</h1>
+            <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
               Your password has been successfully updated.
             </p>
             <Button
               onClick={() => router.push("/login")}
-              className="mt-6 bg-slate-950 text-white hover:bg-slate-800"
+              className="mt-6 bg-primary text-primary-foreground hover:bg-primary/90"
             >
               Sign in with new password
             </Button>
@@ -110,17 +110,17 @@ function ResetPasswordForm() {
 
   return (
     <div className="w-full max-w-md">
-      <Card className="border-slate-200 shadow-lg shadow-slate-200/20">
+      <Card className="border-border shadow-lg shadow-sm">
         <CardContent className="p-8">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-slate-950">Reset password</h1>
-            <p className="text-sm text-slate-600 mt-2">
+            <h1 className="text-2xl font-bold text-foreground">Reset password</h1>
+            <p className="text-sm text-muted-foreground mt-2">
               Enter your new password below
             </p>
           </div>
 
           {error && (
-            <div className="mb-6 p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700 flex items-center gap-2">
+            <div className="mb-6 p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-sm text-destructive flex items-center gap-2">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               {error}
             </div>
@@ -128,11 +128,11 @@ function ResetPasswordForm() {
 
           {!token ? (
             <div className="text-center">
-              <p className="text-sm text-slate-600 mb-4">
+              <p className="text-sm text-muted-foreground mb-4">
                 This password reset link is invalid or has expired.
               </p>
               <Link href="/forgot-password">
-                <Button variant="outline" className="border-slate-300 text-slate-700">
+                <Button variant="outline" className="border-border text-foreground">
                   Request a new reset link
                 </Button>
               </Link>
@@ -140,7 +140,7 @@ function ResetPasswordForm() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1.5">
+                <label htmlFor="password" className="block text-sm font-medium text-foreground mb-1.5">
                   New password
                 </label>
                 <div className="relative">
@@ -151,23 +151,23 @@ function ResetPasswordForm() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="h-11 border-slate-300 bg-white pr-10"
+                    className="h-11 border-border bg-background pr-10"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Min 8 characters, 1 uppercase, 1 lowercase, 1 number
                 </p>
               </div>
 
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-700 mb-1.5">
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-foreground mb-1.5">
                   Confirm password
                 </label>
                 <Input
@@ -177,14 +177,14 @@ function ResetPasswordForm() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
-                  className="h-11 border-slate-300 bg-white"
+                  className="h-11 border-border bg-background"
                 />
               </div>
 
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full h-11 bg-slate-950 text-white hover:bg-slate-800"
+                className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 {loading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -204,9 +204,9 @@ export default function ResetPasswordPage() {
   return (
     <Suspense fallback={
       <div className="w-full max-w-md">
-        <Card className="border-slate-200 shadow-lg shadow-slate-200/20">
+        <Card className="border-border shadow-lg shadow-sm">
           <CardContent className="p-8 text-center">
-            <Loader2 className="w-6 h-6 text-slate-400 animate-spin mx-auto" />
+            <Loader2 className="w-6 h-6 text-muted-foreground animate-spin mx-auto" />
           </CardContent>
         </Card>
       </div>

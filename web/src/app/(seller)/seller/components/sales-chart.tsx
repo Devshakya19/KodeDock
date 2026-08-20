@@ -53,13 +53,13 @@ function TimeFilterSelect({ filter, setFilter }: { filter: string, setFilter: (v
     <div className="relative z-50">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between gap-3 bg-white border border-slate-200 text-xs font-bold text-slate-700 py-2.5 px-4 rounded-xl outline-none cursor-pointer hover:border-slate-300 hover:bg-slate-50 focus:ring-2 focus:ring-blue-500/20 shadow-sm transition-all min-w-[150px]"
+        className="flex items-center justify-between gap-3 bg-background border border-border text-xs font-bold text-foreground py-2.5 px-4 rounded-xl outline-none cursor-pointer hover:border-border hover:bg-secondary focus:ring-2 focus:ring-blue-500/20 shadow-sm transition-all min-w-[150px]"
       >
         <div className="flex items-center gap-2">
-          <Calendar className="w-3.5 h-3.5 text-slate-400" />
+          <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
           {selectedLabel}
         </div>
-        <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       <AnimatePresence>
@@ -71,7 +71,7 @@ function TimeFilterSelect({ filter, setFilter }: { filter: string, setFilter: (v
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 8, scale: 0.96 }}
               transition={{ duration: 0.15, ease: "easeOut" }}
-              className="absolute right-0 top-full mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-lg z-50 overflow-hidden py-1"
+              className="absolute right-0 top-full mt-2 w-48 bg-background border border-border rounded-xl shadow-lg z-50 overflow-hidden py-1"
             >
               {options.map((option) => (
                 <button
@@ -82,8 +82,8 @@ function TimeFilterSelect({ filter, setFilter }: { filter: string, setFilter: (v
                   }}
                   className={`w-full text-left px-4 py-2.5 text-xs font-bold transition-colors ${
                     filter === option.value
-                      ? "bg-blue-50 text-blue-700"
-                      : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                      ? "bg-accent/10 text-accent"
+                      : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                   }`}
                 >
                   {option.label}
@@ -249,16 +249,16 @@ export function SalesChart({ orders }: SalesChartProps) {
 
   // Calculate momentum / run rate
   const momentumLabel = useMemo(() => {
-    if (totalPeriodSales === 0) return { text: "AWAITING SALES", color: "text-slate-500 bg-slate-100 border-slate-200" };
+    if (totalPeriodSales === 0) return { text: "AWAITING SALES", color: "text-muted-foreground bg-secondary border-border" };
     const secondHalf = chartData.slice(Math.floor(chartData.length / 2));
     const firstHalf = chartData.slice(0, Math.floor(chartData.length / 2));
     const rev2 = secondHalf.reduce((s, b) => s + b.revenue, 0);
     const rev1 = firstHalf.reduce((s, b) => s + b.revenue, 0);
 
     if (rev2 > rev1) {
-      return { text: "ACCELERATING", color: "text-emerald-700 bg-emerald-50 border-emerald-200" };
+      return { text: "ACCELERATING", color: "text-success bg-success/10 border-success/30" };
     }
-    return { text: "STEADY VELOCITY", color: "text-blue-700 bg-blue-50 border-blue-200" };
+    return { text: "STEADY VELOCITY", color: "text-accent bg-accent/10 border-accent/30" };
   }, [chartData, totalPeriodSales]);
 
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -268,28 +268,28 @@ export function SalesChart({ orders }: SalesChartProps) {
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-white/95 backdrop-blur-md border border-slate-200 p-4 rounded-2xl shadow-xl min-w-[200px]"
+          className="bg-background/95 backdrop-blur-md border border-border p-4 rounded-2xl shadow-xl min-w-[200px]"
         >
-          <div className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-3">
+          <div className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-3">
             {data.fullDateStr || data.label}
           </div>
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-4">
-              <span className="text-slate-600 font-medium text-sm flex items-center gap-1.5"><DollarSign className="w-4 h-4 text-slate-400" /> Revenue</span>
-              <span className="text-slate-900 font-bold tabular-nums">
+              <span className="text-muted-foreground font-medium text-sm flex items-center gap-1.5"><DollarSign className="w-4 h-4 text-muted-foreground" /> Revenue</span>
+              <span className="text-foreground font-bold tabular-nums">
                 ₹{data.revenue.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
               </span>
             </div>
             <div className="flex items-center justify-between gap-4">
-              <span className="text-slate-600 font-medium text-sm flex items-center gap-1.5"><ShoppingCart className="w-4 h-4 text-slate-400" /> Sales</span>
-              <span className="text-emerald-600 font-bold tabular-nums">
+              <span className="text-muted-foreground font-medium text-sm flex items-center gap-1.5"><ShoppingCart className="w-4 h-4 text-muted-foreground" /> Sales</span>
+              <span className="text-success font-bold tabular-nums">
                 {data.sales}
               </span>
             </div>
             {data.sales > 0 && (
-              <div className="flex items-center justify-between gap-4 pt-3 mt-3 border-t border-slate-100">
-                <span className="text-slate-500 font-medium text-xs flex items-center gap-1.5"><Percent className="w-3.5 h-3.5" /> AOV</span>
-                <span className="text-blue-600 font-bold text-xs tabular-nums">
+              <div className="flex items-center justify-between gap-4 pt-3 mt-3 border-t border-border">
+                <span className="text-muted-foreground font-medium text-xs flex items-center gap-1.5"><Percent className="w-3.5 h-3.5" /> AOV</span>
+                <span className="text-accent font-bold text-xs tabular-nums">
                   ₹{Math.round(data.aov).toLocaleString()}
                 </span>
               </div>
@@ -308,17 +308,17 @@ export function SalesChart({ orders }: SalesChartProps) {
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      className="bg-white rounded-3xl p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100"
+      className="bg-background rounded-3xl p-6 sm:p-8 shadow-lg border border-border"
     >
       {/* Top Header */}
       <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6 mb-10">
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500 flex items-center gap-1.5">
-              <Activity className="w-3.5 h-3.5 text-blue-600" />
+            <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground flex items-center gap-1.5">
+              <Activity className="w-3.5 h-3.5 text-accent" />
               Performance Velocity
             </span>
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
             <span
               className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${momentumLabel.color}`}
             >
@@ -331,7 +331,7 @@ export function SalesChart({ orders }: SalesChartProps) {
               key={metric}
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-4xl sm:text-5xl font-black text-slate-950 tracking-tight tabular-nums"
+              className="text-4xl sm:text-5xl font-black text-foreground tracking-tight tabular-nums"
             >
               {metric === "revenue"
                 ? `₹${totalPeriodRevenue.toLocaleString(undefined, {
@@ -345,7 +345,7 @@ export function SalesChart({ orders }: SalesChartProps) {
                     maximumFractionDigits: 2,
                   })}`}
             </motion.h2>
-            <span className="text-sm font-medium text-slate-500 mb-1.5 sm:mb-2">
+            <span className="text-sm font-medium text-muted-foreground mb-1.5 sm:mb-2">
               {metric === "revenue"
                 ? "gross revenue in window"
                 : metric === "sales"
@@ -357,20 +357,20 @@ export function SalesChart({ orders }: SalesChartProps) {
 
         <div className="flex flex-wrap items-center gap-3">
           {/* Metric Segmented Control */}
-          <div className="inline-flex p-1 rounded-xl bg-slate-50 border border-slate-200/60 relative">
+          <div className="inline-flex p-1 rounded-xl bg-secondary/50 border border-border/60 relative">
             {(["revenue", "sales", "aov"] as const).map((m) => (
               <button
                 key={m}
                 type="button"
                 onClick={() => setMetric(m)}
                 className={`relative flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all z-10 ${
-                  metric === m ? "text-slate-900" : "text-slate-500 hover:text-slate-700 hover:bg-slate-100"
+                  metric === m ? "text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-secondary/80"
                 }`}
               >
                 {metric === m && (
                   <motion.div
                     layoutId="active-metric-pill"
-                    className="absolute inset-0 bg-white rounded-lg shadow-sm border border-slate-200/50 -z-10"
+                    className="absolute inset-0 bg-background rounded-lg shadow-sm border border-border/50 -z-10"
                     transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                   />
                 )}
@@ -396,20 +396,20 @@ export function SalesChart({ orders }: SalesChartProps) {
             exit={{ opacity: 0, height: 0, marginBottom: 0 }}
             className="overflow-hidden"
           >
-            <div className="flex items-center gap-3 text-xs bg-slate-50 p-4 rounded-2xl border border-slate-200 w-fit shadow-sm">
-              <span className="text-slate-500 font-bold uppercase tracking-wider text-[10px]">From</span>
+            <div className="flex items-center gap-3 text-xs bg-secondary/50 p-4 rounded-2xl border border-border w-fit shadow-sm">
+              <span className="text-muted-foreground font-bold uppercase tracking-wider text-[10px]">From</span>
               <input
                 type="date"
                 value={customStart}
                 onChange={(e) => setCustomStart(e.target.value)}
-                className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 outline-none text-slate-800 font-semibold focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                className="bg-background border border-border rounded-lg px-3 py-1.5 outline-none text-foreground font-semibold focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all"
               />
-              <span className="text-slate-500 font-bold uppercase tracking-wider text-[10px] ml-2">To</span>
+              <span className="text-muted-foreground font-bold uppercase tracking-wider text-[10px] ml-2">To</span>
               <input
                 type="date"
                 value={customEnd}
                 onChange={(e) => setCustomEnd(e.target.value)}
-                className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 outline-none text-slate-800 font-semibold focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                className="bg-background border border-border rounded-lg px-3 py-1.5 outline-none text-foreground font-semibold focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all"
               />
             </div>
           </motion.div>
@@ -469,7 +469,7 @@ export function SalesChart({ orders }: SalesChartProps) {
       </div>
 
       {/* Velocity Metrics Micro-Deck */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 pt-10 mt-6 border-t border-slate-100">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 pt-10 mt-6 border-t border-border">
         {[
           {
             label: "Peak Velocity",
@@ -490,7 +490,7 @@ export function SalesChart({ orders }: SalesChartProps) {
           {
             label: "Fulfillment Speed",
             value: (
-              <span className="flex items-center gap-1.5 text-emerald-600">
+              <span className="flex items-center gap-1.5 text-success">
                 <Zap className="w-4 h-4 fill-current" /> Instant
               </span>
             ),
@@ -503,15 +503,15 @@ export function SalesChart({ orders }: SalesChartProps) {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.5 + item.delay, ease: [0.16, 1, 0.3, 1] }}
-            className="p-5 sm:p-6 rounded-3xl bg-slate-50/50 border border-slate-100 hover:shadow-md hover:bg-white transition-all duration-300"
+            className="p-5 sm:p-6 rounded-3xl bg-slate-50/50 border border-border hover:shadow-md hover:bg-background transition-all duration-300"
           >
-            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-[0.2em] block mb-2">
+            <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-[0.2em] block mb-2">
               {item.label}
             </span>
-            <div className="text-2xl font-black text-slate-900 tabular-nums">
+            <div className="text-2xl font-black text-foreground tabular-nums">
               {item.value}
             </div>
-            <span className="text-xs font-semibold text-slate-500 mt-1 block">
+            <span className="text-xs font-semibold text-muted-foreground mt-1 block">
               {item.subtext}
             </span>
           </motion.div>

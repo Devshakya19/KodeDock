@@ -32,15 +32,15 @@ export function BrowseFilters({ activeCategory }: BrowseFiltersProps) {
   }
 
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 bg-white p-2 rounded-[20px] border border-slate-200/80 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.03)]">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 bg-background p-2 rounded-[20px] border border-border/80 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.03)]">
       
       {/* Categories Scrollable Bar */}
       <div className="flex items-center gap-1.5 overflow-x-auto w-full scrollbar-none px-2 py-1">
-        <div className="flex items-center gap-2 pr-4 border-r border-slate-100 mr-2 shrink-0">
-          <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center border border-slate-100">
-            <Filter className="w-4 h-4 text-slate-400" />
+        <div className="flex items-center gap-2 pr-4 border-r border-border mr-2 shrink-0">
+          <div className="w-8 h-8 rounded-full bg-secondary/50 flex items-center justify-center border border-border">
+            <Filter className="w-4 h-4 text-muted-foreground" />
           </div>
-          <span className="text-[13px] font-bold text-slate-700">Filters</span>
+          <span className="text-[13px] font-bold text-foreground">Filters</span>
         </div>
         
         {CATEGORIES.map((cat) => {
@@ -51,8 +51,8 @@ export function BrowseFilters({ activeCategory }: BrowseFiltersProps) {
               onClick={() => handleCategoryChange(cat.value)}
               className={`px-4 py-2 text-[13px] font-bold rounded-xl transition-all whitespace-nowrap shrink-0 ${
                 isActive
-                  ? "bg-slate-900 text-white shadow-sm"
-                  : "bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "bg-transparent text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
               }`}
             >
               {cat.label}
@@ -63,7 +63,7 @@ export function BrowseFilters({ activeCategory }: BrowseFiltersProps) {
 
       {/* Optional Sort Button (UI Only for now) */}
       <div className="shrink-0 pl-2 pr-2 hidden lg:block">
-        <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-bold text-slate-600 border border-slate-200/80 hover:bg-slate-50 transition-all">
+        <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-bold text-muted-foreground border border-border/80 hover:bg-secondary/50 transition-all">
           <SlidersHorizontal className="w-4 h-4" />
           Sort by: Popular
         </button>

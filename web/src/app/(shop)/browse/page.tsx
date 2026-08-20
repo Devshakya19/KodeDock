@@ -2,7 +2,7 @@ import { ProductGrid } from "@/app/(shop)/browse/components/product-grid";
 import { BrowseFilters } from "@/app/(shop)/browse/components/browse-filters";
 import { Sparkles, ArrowRight, Zap, Code2, Cpu } from "lucide-react";
 import { cookies } from "next/headers";
-import { verifyToken } from "@/lib/auth/server";
+import { verifyToken } from "@/shared/lib/auth/server";
 import { redirect } from "next/navigation";
 
 interface BrowsePageProps {
@@ -28,7 +28,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
       <main className="w-full px-4 sm:px-6 lg:px-10 xl:px-14 py-8 md:py-10">
         
         {/* Clean Minimal Hero Section */}
-        <div className="bg-white rounded-3xl p-8 md:p-14 mb-10 border border-slate-200/60 shadow-sm relative overflow-hidden">
+        <div className="bg-background rounded-3xl p-8 md:p-14 mb-10 border border-border/60 shadow-sm relative overflow-hidden">
           
           {/* Subtle Grid Background */}
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#f1f5f9_1px,transparent_1px),linear-gradient(to_bottom,#f1f5f9_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-40 pointer-events-none" />
@@ -36,39 +36,39 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
           <div className="relative z-10 grid md:grid-cols-5 gap-8 items-center">
             
             <div className="md:col-span-3">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-[11px] font-bold uppercase tracking-wider mb-6 text-blue-600">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-[11px] font-bold uppercase tracking-wider mb-6 text-accent">
                 <Sparkles className="w-3.5 h-3.5" />
                 Premium Marketplace
               </div>
               
-              <h1 className="text-3xl md:text-5xl font-black mb-4 leading-tight tracking-tight text-slate-900">
+              <h1 className="text-3xl md:text-5xl font-black mb-4 leading-tight tracking-tight text-foreground">
                 Welcome back, {fullName ? fullName.split(" ")[0] : "Creator"}.
               </h1>
               
-              <p className="text-slate-500 text-[15px] md:text-[17px] leading-relaxed max-w-xl mb-8 font-medium">
+              <p className="text-muted-foreground text-[15px] md:text-[17px] leading-relaxed max-w-xl mb-8 font-medium">
                 Discover production-ready templates, UI kits, and boilerplates from top developers. Delivered instantly to your GitHub.
               </p>
               
               <div className="flex flex-wrap items-center gap-6">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center border border-slate-200/60">
-                    <Code2 className="w-4.5 h-4.5 text-slate-600" />
+                  <div className="w-10 h-10 rounded-full bg-secondary/50 flex items-center justify-center border border-border/60">
+                    <Code2 className="w-4.5 h-4.5 text-muted-foreground" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[15px] font-bold text-slate-900">2,400+</span>
-                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Premium Assets</span>
+                    <span className="text-[15px] font-bold text-foreground">2,400+</span>
+                    <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Premium Assets</span>
                   </div>
                 </div>
                 
                 <div className="w-px h-8 bg-slate-200/80 hidden sm:block" />
                 
                 <div className="flex items-center gap-2.5">
-                  <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center border border-slate-200/60">
+                  <div className="w-10 h-10 rounded-full bg-secondary/50 flex items-center justify-center border border-border/60">
                     <Zap className="w-4.5 h-4.5 text-amber-500" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[15px] font-bold text-slate-900">Instant</span>
-                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">GitHub Delivery</span>
+                    <span className="text-[15px] font-bold text-foreground">Instant</span>
+                    <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">GitHub Delivery</span>
                   </div>
                 </div>
               </div>
@@ -76,13 +76,13 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
 
             {/* Decorative Graphic Element (Hidden on small screens) */}
             <div className="hidden md:flex md:col-span-2 justify-end relative">
-              <div className="relative w-full max-w-[280px] aspect-square flex items-center justify-center bg-[#F8FAFC] rounded-3xl border border-slate-200/50 shadow-inner group overflow-hidden">
+              <div className="relative w-full max-w-[280px] aspect-square flex items-center justify-center bg-[#F8FAFC] rounded-3xl border border-border/50 shadow-inner group overflow-hidden">
                 <div className="absolute top-5 left-5 flex gap-1.5">
                   <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
                   <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
                   <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
                 </div>
-                <Cpu className="w-24 h-24 text-slate-200 group-hover:scale-110 group-hover:text-blue-100 transition-all duration-500" />
+                <Cpu className="w-24 h-24 text-muted-foreground/60 group-hover:scale-110 group-hover:text-blue-100 transition-all duration-500" />
                 
                 {/* Decorative Code Lines */}
                 <div className="absolute bottom-6 left-6 space-y-2 opacity-50">
@@ -99,7 +99,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
         {/* Dynamic Section Header */}
         <div className="flex items-end justify-between mb-8">
           <div>
-            <h2 className="text-[22px] md:text-[26px] font-extrabold text-slate-900 tracking-tight flex items-center gap-3">
+            <h2 className="text-[22px] md:text-[26px] font-extrabold text-foreground tracking-tight flex items-center gap-3">
               {searchQuery
                 ? `Search results for "${searchQuery}"`
                 : categoryFilter
@@ -107,16 +107,16 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                 : "Trending Products"}
               
               {!searchQuery && !categoryFilter && (
-                <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500" />
+                <span className="flex h-2.5 w-2.5 rounded-full bg-success" />
               )}
             </h2>
-            <p className="text-[15px] text-slate-500 font-medium mt-1">
+            <p className="text-[15px] text-muted-foreground font-medium mt-1">
               {searchQuery || categoryFilter ? "Showing filtered assets from the marketplace" : "Most popular digital assets this week"}
             </p>
           </div>
           
           {!searchQuery && !categoryFilter && (
-            <button className="hidden sm:flex items-center gap-1.5 text-[14px] font-bold text-blue-600 hover:text-blue-700 transition-colors group">
+            <button className="hidden sm:flex items-center gap-1.5 text-[14px] font-bold text-accent hover:text-blue-700 transition-colors group">
               View All <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
           )}

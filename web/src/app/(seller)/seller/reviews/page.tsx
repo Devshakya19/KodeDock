@@ -13,7 +13,7 @@ import {
   Sparkles,
   ShieldCheck,
 } from "lucide-react";
-import { apiGet } from "@/lib/api/client";
+import { apiGet } from "@/shared/lib/api/client";
 import { SellerHeader } from "../components/seller-header";
 
 interface SellerReviewItem {
@@ -89,8 +89,8 @@ export default function SellerReviewsPage() {
   if (loading) {
     return (
       <div className="w-full py-24 flex flex-col items-center justify-center gap-3">
-        <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
-        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+        <RefreshCw className="w-8 h-8 text-accent animate-spin" />
+        <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
           Loading Customer Feedback...
         </p>
       </div>
@@ -112,10 +112,10 @@ export default function SellerReviewsPage() {
       {/* 2. Rating Breakdown Deck */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
         {/* Left: Star Distribution Card */}
-        <div className="lg:col-span-5 rounded-[28px] bg-white p-2 ring-1 ring-slate-200/80 shadow-xs">
+        <div className="lg:col-span-5 rounded-[28px] bg-background p-2 ring-1 ring-slate-200/80 shadow-xs">
           <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/40 p-6 flex flex-col sm:flex-row items-center gap-6">
-            <div className="flex flex-col items-center justify-center min-w-[110px] text-center border-b sm:border-b-0 sm:border-r border-slate-100 pb-4 sm:pb-0 sm:pr-6">
-              <span className="text-5xl font-black text-slate-950 tracking-tight tabular-nums">
+            <div className="flex flex-col items-center justify-center min-w-[110px] text-center border-b sm:border-b-0 sm:border-r border-border pb-4 sm:pb-0 sm:pr-6">
+              <span className="text-5xl font-black text-foreground tracking-tight tabular-nums">
                 {avgRating}
               </span>
               <div className="flex items-center gap-1 mt-2 text-amber-400">
@@ -125,12 +125,12 @@ export default function SellerReviewsPage() {
                     className={`w-4 h-4 ${
                       star <= Math.round(Number(avgRating))
                         ? "fill-amber-400 text-amber-400"
-                        : "fill-slate-100 text-slate-200"
+                        : "fill-slate-100 text-muted-foreground/60"
                     }`}
                   />
                 ))}
               </div>
-              <span className="text-xs text-slate-500 mt-2 font-bold">
+              <span className="text-xs text-muted-foreground mt-2 font-bold">
                 {reviews.length} total reviews
               </span>
             </div>
@@ -143,8 +143,8 @@ export default function SellerReviewsPage() {
                   onClick={() => setStarFilter(starFilter === dist.stars ? "all" : dist.stars)}
                   className={`flex items-center gap-3 text-xs font-semibold w-full p-1.5 rounded-xl transition-all cursor-pointer ${
                     starFilter === dist.stars
-                      ? "bg-slate-900 text-white font-bold"
-                      : "hover:bg-slate-100 text-slate-700"
+                      ? "bg-primary text-primary-foreground font-bold"
+                      : "hover:bg-secondary/80 text-foreground"
                   }`}
                 >
                   <div className="flex items-center gap-1 w-7 shrink-0">
@@ -153,11 +153,11 @@ export default function SellerReviewsPage() {
                       className={`w-3 h-3 ${
                         starFilter === dist.stars
                           ? "fill-amber-400 text-amber-400"
-                          : "fill-slate-300 text-slate-300"
+                          : "fill-slate-300 text-muted-foreground/80"
                       }`}
                     />
                   </div>
-                  <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
+                  <div className="flex-1 h-2 rounded-full bg-secondary overflow-hidden">
                     <div
                       className="h-full rounded-full bg-amber-400 transition-all duration-500"
                       style={{ width: `${dist.percentage}%` }}
@@ -165,7 +165,7 @@ export default function SellerReviewsPage() {
                   </div>
                   <div
                     className={`w-6 text-right tabular-nums text-[11px] ${
-                      starFilter === dist.stars ? "text-white font-black" : "text-slate-400 font-bold"
+                      starFilter === dist.stars ? "text-primary-foreground font-black" : "text-muted-foreground font-bold"
                     }`}
                   >
                     {dist.count}
@@ -177,30 +177,30 @@ export default function SellerReviewsPage() {
         </div>
 
         {/* Right: Creator Trust Statement */}
-        <div className="lg:col-span-7 rounded-[28px] bg-white p-2 ring-1 ring-slate-200/80 shadow-xs">
-          <div className="rounded-[22px] bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 sm:p-7 text-white h-full flex flex-col justify-between relative overflow-hidden">
+        <div className="lg:col-span-7 rounded-[28px] bg-background p-2 ring-1 ring-slate-200/80 shadow-xs">
+          <div className="rounded-[22px] bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 sm:p-7 text-primary-foreground h-full flex flex-col justify-between relative overflow-hidden">
             <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
               <Star className="w-48 h-48 rotate-12 translate-x-8 -translate-y-8" />
             </div>
 
             <div className="relative z-10">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white text-[10px] font-black uppercase tracking-wider mb-3 border border-white/10">
-                <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-primary-foreground text-[10px] font-black uppercase tracking-wider mb-3 border border-border/10">
+                <ShieldCheck className="w-3.5 h-3.5 text-accent" />
                 <span>Verified Purchases</span>
               </div>
               <h3 className="text-xl sm:text-2xl font-black tracking-tight mb-2">
                 High ratings drive 3.2x higher conversion.
               </h3>
-              <p className="text-slate-300 text-xs sm:text-sm max-w-xl font-normal leading-relaxed">
+              <p className="text-muted-foreground/80 text-xs sm:text-sm max-w-xl font-normal leading-relaxed">
                 Every review on KodeDock is linked directly to a verified customer purchase. Maintaining detailed documentation and responsive updates helps keep your average above 4.8 stars.
               </p>
             </div>
 
-            <div className="relative z-10 pt-4 flex items-center gap-4 text-xs font-semibold text-slate-400 border-t border-white/10 mt-4">
+            <div className="relative z-10 pt-4 flex items-center gap-4 text-xs font-semibold text-muted-foreground border-t border-border/10 mt-4">
               <span className="flex items-center gap-1.5 text-emerald-400 font-bold">
                 <CheckCircle2 className="w-3.5 h-3.5" /> 100% Authentic
               </span>
-              <span className="w-1 h-1 rounded-full bg-slate-700" />
+              <span className="w-1 h-1 rounded-full bg-primary/80" />
               <span>Immutable blockchain-style order hash</span>
             </div>
           </div>
@@ -208,7 +208,7 @@ export default function SellerReviewsPage() {
       </div>
 
       {/* 3. Filter Tabs & Search */}
-      <div className="rounded-[28px] bg-white p-2 ring-1 ring-slate-200/80 shadow-xs mb-8">
+      <div className="rounded-[28px] bg-background p-2 ring-1 ring-slate-200/80 shadow-xs mb-8">
         <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/40 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
             <button
@@ -216,8 +216,8 @@ export default function SellerReviewsPage() {
               onClick={() => setStarFilter("all")}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 starFilter === "all"
-                  ? "bg-slate-950 text-white shadow-xs font-extrabold"
-                  : "text-slate-600 hover:text-slate-950 hover:bg-slate-100"
+                  ? "bg-primary text-primary-foreground shadow-xs font-extrabold"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/80"
               }`}
             >
               All Reviews ({reviews.length})
@@ -229,8 +229,8 @@ export default function SellerReviewsPage() {
                 onClick={() => setStarFilter(s)}
                 className={`flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   starFilter === s
-                    ? "bg-slate-950 text-white shadow-xs font-extrabold"
-                    : "text-slate-600 hover:text-slate-950 hover:bg-slate-100"
+                    ? "bg-primary text-primary-foreground shadow-xs font-extrabold"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/80"
                 }`}
               >
                 <span>{s}</span>
@@ -240,26 +240,26 @@ export default function SellerReviewsPage() {
           </div>
 
           <div className="relative w-full sm:w-64">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-muted-foreground absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search feedback..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white border border-slate-200/80 rounded-xl pl-9 pr-4 py-2 text-xs font-medium text-slate-900 outline-none focus:border-slate-900 shadow-2xs"
+              className="w-full bg-background border border-border/80 rounded-xl pl-9 pr-4 py-2 text-xs font-medium text-foreground outline-none focus:border-slate-900 shadow-2xs"
             />
           </div>
         </div>
       </div>
 
       {/* 4. Reviews List */}
-      <div className="rounded-[28px] bg-white p-2 ring-1 ring-slate-200/80 shadow-xs">
+      <div className="rounded-[28px] bg-background p-2 ring-1 ring-slate-200/80 shadow-xs">
         <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/40 p-5 sm:p-6">
           {filteredReviews.length === 0 ? (
-            <div className="py-20 text-center bg-slate-50/60 rounded-2xl border border-dashed border-slate-200">
-              <MessageSquare className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-              <h3 className="text-base font-black text-slate-900">No reviews found</h3>
-              <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">
+            <div className="py-20 text-center bg-slate-50/60 rounded-2xl border border-dashed border-border">
+              <MessageSquare className="w-10 h-10 text-muted-foreground/80 mx-auto mb-3" />
+              <h3 className="text-base font-black text-foreground">No reviews found</h3>
+              <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
                 {searchQuery || starFilter !== "all"
                   ? "No reviews match your selected filter criteria."
                   : "Buyers haven't left feedback on your products yet."}
@@ -277,11 +277,11 @@ export default function SellerReviewsPage() {
                 return (
                   <div
                     key={review.id}
-                    className="p-5 rounded-2xl bg-white border border-slate-200/60 hover:border-slate-300 hover:shadow-2xs transition-all flex flex-col gap-3 group"
+                    className="p-5 rounded-2xl bg-background border border-border/60 hover:border-border hover:shadow-2xs transition-all flex flex-col gap-3 group"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div className="flex items-center gap-3.5">
-                        <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200/80 flex items-center justify-center font-black text-slate-600 text-sm shrink-0 overflow-hidden">
+                        <div className="w-10 h-10 rounded-xl bg-secondary border border-border/80 flex items-center justify-center font-black text-muted-foreground text-sm shrink-0 overflow-hidden">
                           {review.user_avatar ? (
                             <img src={review.user_avatar} alt="" className="w-full h-full object-cover" />
                           ) : (
@@ -291,10 +291,10 @@ export default function SellerReviewsPage() {
 
                         <div>
                           <div className="flex items-center gap-2">
-                            <h4 className="text-sm font-bold text-slate-950">
+                            <h4 className="text-sm font-bold text-foreground">
                               {review.user_name || "Verified Buyer"}
                             </h4>
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-100">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-success/10 text-success text-[10px] font-bold border border-success/20">
                               <CheckCircle2 className="w-2.5 h-2.5" /> Verified Purchase
                             </span>
                           </div>
@@ -306,7 +306,7 @@ export default function SellerReviewsPage() {
                                 className={`w-3.5 h-3.5 ${
                                   star <= review.rating
                                     ? "fill-amber-400 text-amber-400"
-                                    : "fill-slate-100 text-slate-200"
+                                    : "fill-slate-100 text-muted-foreground/60"
                                 }`}
                               />
                             ))}
@@ -315,25 +315,25 @@ export default function SellerReviewsPage() {
                       </div>
 
                       <div className="flex items-center gap-3 self-start sm:self-auto">
-                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-50 border border-slate-200/80 text-[11px] font-bold text-slate-700">
-                          <Package className="w-3.5 h-3.5 text-slate-400" />
+                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-secondary/50 border border-border/80 text-[11px] font-bold text-foreground">
+                          <Package className="w-3.5 h-3.5 text-muted-foreground" />
                           <span className="truncate max-w-[180px]">{review.product_title}</span>
                         </div>
-                        <span className="text-[11px] text-slate-400 font-medium">
+                        <span className="text-[11px] text-muted-foreground font-medium">
                           {formattedDate}
                         </span>
                       </div>
                     </div>
 
                     {(review.title || review.comment) && (
-                      <div className="pt-2 border-t border-slate-100 mt-1">
+                      <div className="pt-2 border-t border-border mt-1">
                         {review.title && (
-                          <h5 className="text-sm font-bold text-slate-900 mb-1">
+                          <h5 className="text-sm font-bold text-foreground mb-1">
                             {review.title}
                           </h5>
                         )}
                         {review.comment && (
-                          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+                          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed font-normal">
                             {review.comment}
                           </p>
                         )}

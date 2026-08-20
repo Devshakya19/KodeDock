@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { updateSession } from "@/lib/auth/middleware";
+import { updateSession } from "@/shared/lib/auth/middleware";
 
 export async function proxy(request: NextRequest) {
   // 1. Generate a unique request ID for distributed tracing and observability

@@ -1,137 +1,158 @@
 @import "tailwindcss";
-@import "tw-animate-css";
+
+@plugin "tailwindcss-animate";
 
 @custom-variant dark (&:is(.dark *));
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+@theme {
+  /* Typography Architecture */
+  --font-marketing: var(--font-sora);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --font-display: var(--font-space-grotesk);
-  --font-heading: var(--font-inter);
-  --font-code: var(--font-jetbrains-mono);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  /* Brand Colors & Aliases */
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-success: hsl(var(--success));
+  --color-success-foreground: hsl(var(--success-foreground));
+
+  --color-warning: hsl(var(--warning));
+  --color-warning-foreground: hsl(var(--warning-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-
-  /* KodeDock Brand Colors */
-  --color-brand-blue: #2563EB;
-  --color-brand-dark: #1E293B;
-  --color-brand-light: #F8FAFC;
-  --color-brand-green: #10B981;
-  --color-brand-amber: #F59E0B;
-  --color-brand-red: #EF4444;
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
 }
 
-:root {
-  --radius: 0.625rem;
-  --background: #F8FAFC;
-  --foreground: #0F172A;
-  --card: #FFFFFF;
-  --card-foreground: #0F172A;
-  --popover: #FFFFFF;
-  --popover-foreground: #0F172A;
-  --primary: #000000;
-  --primary-foreground: #FFFFFF;
-  --secondary: #F1F5F9;
-  --secondary-foreground: #1E293B;
-  --muted: #F1F5F9;
-  --muted-foreground: #64748B;
-  --accent: #F1F5F9;
-  --accent-foreground: #1E293B;
-  --destructive: #EF4444;
-  --destructive-foreground: #FFFFFF;
-  --border: #E2E8F0;
-  --input: #E2E8F0;
-  --ring: #2563EB;
+@utility container {
+  margin-inline: auto;
+  padding-inline: 2rem;
+  @media (width >= --theme(--breakpoint-sm)) {
+    max-width: none;
+  }
+  @media (width >= 1400px) {
+    max-width: 1400px;
+  }
 }
 
-html {
-  scroll-behavior: smooth;
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-border, currentColor);
+  }
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+  :root {
+    /* --- 60% White --- */
+    --background: 0 0% 100%;       /* #FFFFFF */
+    --card: 0 0% 100%;             /* #FFFFFF */
+    --popover: 0 0% 100%;          /* #FFFFFF */
+
+    /* --- 30% Neutrals & Surfaces --- */
+    --secondary: 240 10% 96%;      /* #F1F1F3 */
+    --muted: 240 14% 97%;          /* #F8F8FA */
+    --border: 240 6% 90%;          /* #E5E5E7 */
+    --input: 240 6% 90%;           /* #E5E5E7 */
+
+    /* --- Typography (Not directly in 60-30-10 calculation) --- */
+    --foreground: 0 0% 4%;         /* #0A0A0A */
+    --card-foreground: 0 0% 4%;
+    --popover-foreground: 0 0% 4%;
+    --secondary-foreground: 0 0% 4%;
+    --muted-foreground: 240 5% 65%; /* #A1A1AA */
+
+    /* --- 10% Electric Purple --- */
+    --primary: 262 81% 58%;        /* #7C3AED */
+    --primary-foreground: 0 0% 100%;
+    --accent: 262 81% 58%;         /* #7C3AED */
+    --accent-foreground: 0 0% 100%;
+    --ring: 262 81% 58%;           /* #7C3AED */
+    
+    /* Semantic Actions */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --radius: 0.5rem;
   }
+
+  .dark {
+    /* --- 60% Black --- */
+    --background: 0 0% 4%;         /* #0A0A0A */
+
+    /* --- 30% Dark Surfaces --- */
+    --card: 240 6% 10%;            /* #18181B */
+    --popover: 240 6% 10%;         /* #18181B */
+    --secondary: 240 4% 16%;       /* #27272A */
+    --muted: 240 4% 16%;           /* #27272A */
+    --border: 240 5% 26%;          /* #3F3F46 */
+    --input: 240 5% 26%;           /* #3F3F46 */
+
+    /* --- Typography (Not directly in 60-30-10 calculation) --- */
+    --foreground: 0 0% 98%;        /* #FAFAFA */
+    --card-foreground: 0 0% 98%;
+    --popover-foreground: 0 0% 98%;
+    --secondary-foreground: 0 0% 98%;
+    --muted-foreground: 240 5% 65%; /* #A1A1AA */
+
+    /* --- 10% Electric Purple --- */
+    --primary: 262 81% 58%;        /* #7C3AED */
+    --primary-foreground: 0 0% 100%;
+    --accent: 262 81% 58%;         /* #7C3AED */
+    --accent-foreground: 0 0% 100%;
+    --ring: 262 81% 58%;           /* #7C3AED */
+    
+    /* Semantic Actions */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+  }
+}
+
+@layer base {
   body {
-    @apply bg-background text-foreground;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
   }
-}
-
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
-  border-radius: 999px;
-}
-
-.gradient-text {
-  background: black;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Landing page animated gradient mesh background */
-@keyframes gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
-}
-
-@keyframes blob-move {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(30px, -50px) scale(1.1); }
-  50% { transform: translate(-20px, 20px) scale(0.9); }
-  75% { transform: translate(50px, 30px) scale(1.05); }
-}
-
-.animate-gradient-shift {
-  animation: gradient-shift 8s ease infinite;
-  background-size: 200% 200%;
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-.animate-blob {
-  animation: blob-move 15s ease-in-out infinite;
-}
-
-.animate-blob-delay-2 {
-  animation: blob-move 15s ease-in-out 2s infinite;
-}
-
-.animate-blob-delay-4 {
-  animation: blob-move 15s ease-in-out 4s infinite;
 }

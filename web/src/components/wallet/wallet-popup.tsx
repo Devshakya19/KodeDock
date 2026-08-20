@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { X, ArrowUpRight, ArrowDownLeft, Loader2, Wallet as WalletIcon, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { apiGet } from "@/lib/api/client";
+import { Button } from "@/shared/ui/button";
+import { apiGet } from "@/shared/lib/api/client";
 import { AddMoneyModal } from "./add-money-modal";
 
 interface Wallet {
@@ -25,7 +25,7 @@ interface WalletPopupProps {
   onClose: () => void;
 }
 
-import { PopupWrapper } from "@/components/ui/popup-wrapper";
+import { PopupWrapper } from "@/shared/ui/popup-wrapper";
 
 export function WalletPopup({ onClose }: WalletPopupProps) {
   const [wallet, setWallet] = useState<Wallet | null>(null);
@@ -57,27 +57,27 @@ export function WalletPopup({ onClose }: WalletPopupProps) {
 
           {loading ? (
             <div className="flex items-center justify-center py-8">
-              <Loader2 className="w-5 h-5 text-slate-400 animate-spin" />
+              <Loader2 className="w-5 h-5 text-muted-foreground animate-spin" />
             </div>
           ) : (
             <>
               {/* Balance + Add Money */}
-              <div className="px-4 py-4 bg-slate-50 border-b border-slate-100">
-                <div className="text-xs text-slate-500 mb-1">Available Balance</div>
+              <div className="px-4 py-4 bg-secondary/50 border-b border-border">
+                <div className="text-xs text-muted-foreground mb-1">Available Balance</div>
                 <div className="flex items-center justify-between">
-                  <div className="text-2xl font-bold text-slate-950">
+                  <div className="text-2xl font-bold text-foreground">
                     ₹{((wallet?.balance_paise ?? 0) / 100).toLocaleString()}
                   </div>
                   <Button
                     size="sm"
                     onClick={() => setShowAddMoney(true)}
-                    className="bg-slate-950 text-white hover:bg-slate-800 h-8 text-xs"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 h-8 text-xs"
                   >
                     <Plus className="w-3 h-3 mr-1" /> Add Money
                   </Button>
                 </div>
                 {(wallet?.pending_paise ?? 0) > 0 && (
-                  <div className="text-xs text-amber-600 mt-1">
+                  <div className="text-xs text-warning mt-1">
                     ₹{(wallet!.pending_paise / 100).toLocaleString()} pending in escrow
                   </div>
                 )}
@@ -85,27 +85,27 @@ export function WalletPopup({ onClose }: WalletPopupProps) {
 
               {/* Transactions */}
               <div className="px-4 py-3">
-                <div className="text-xs font-medium text-slate-500 mb-2">Recent Activity</div>
+                <div className="text-xs font-medium text-muted-foreground mb-2">Recent Activity</div>
                 {transactions.length === 0 ? (
-                  <p className="text-xs text-slate-400 py-4 text-center">No transactions yet</p>
+                  <p className="text-xs text-muted-foreground py-4 text-center">No transactions yet</p>
                 ) : (
                   <div className="space-y-2 max-h-60 overflow-y-auto">
                     {transactions.slice(0, 5).map((tx) => (
                       <div key={tx.id} className="flex items-center justify-between py-1.5">
                         <div className="flex items-center gap-2 min-w-0">
                           <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
-                            tx.amount_paise > 0 ? "bg-emerald-100" : "bg-red-100"
+                            tx.amount_paise > 0 ? "bg-success/20" : "bg-destructive/20"
                           }`}>
                             {tx.amount_paise > 0 ? (
-                              <ArrowDownLeft className="w-3 h-3 text-emerald-600" />
+                              <ArrowDownLeft className="w-3 h-3 text-success" />
                             ) : (
-                              <ArrowUpRight className="w-3 h-3 text-red-600" />
+                              <ArrowUpRight className="w-3 h-3 text-destructive" />
                             )}
                           </div>
-                          <span className="text-xs text-slate-700 truncate">{tx.description || tx.type}</span>
+                          <span className="text-xs text-foreground truncate">{tx.description || tx.type}</span>
                         </div>
                         <span className={`text-xs font-semibold flex-shrink-0 ml-2 ${
-                          tx.amount_paise > 0 ? "text-emerald-600" : "text-red-600"
+                          tx.amount_paise > 0 ? "text-success" : "text-destructive"
                         }`}>
                           {tx.amount_paise > 0 ? "+" : ""}₹{(Math.abs(tx.amount_paise) / 100).toLocaleString()}
                         </span>
@@ -116,10 +116,10 @@ export function WalletPopup({ onClose }: WalletPopupProps) {
               </div>
 
               {/* Footer */}
-              <div className="px-4 py-3 border-t border-slate-100">
+              <div className="px-4 py-3 border-t border-border">
                 <a
                   href="/dashboard/wallet"
-                  className="block w-full text-center text-xs font-medium text-slate-600 hover:text-slate-950"
+                  className="block w-full text-center text-xs font-medium text-muted-foreground hover:text-foreground"
                 >
                   View Full Wallet →
                 </a>

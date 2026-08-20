@@ -1,14 +1,14 @@
 "use client";
-import { GithubIcon } from "@/components/icons/github-icon";
+import { GithubIcon } from "@/shared/components/icons/github";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
-import { auth } from "@/lib/auth/client";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+import { Card, CardContent } from "@/shared/ui/card";
+import { auth } from "@/shared/lib/auth/client";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -59,24 +59,24 @@ export default function LoginPage() {
 
   return (
     <div className="w-full max-w-md">
-      <Card className="border-slate-200 shadow-lg shadow-slate-200/20">
+      <Card className="border-border shadow-lg shadow-sm">
         <CardContent className="p-8">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-slate-950">Welcome back</h1>
-            <p className="text-sm text-slate-600 mt-2">
+            <h1 className="text-2xl font-bold text-foreground">Welcome back</h1>
+            <p className="text-sm text-muted-foreground mt-2">
               Sign in to your KodeDock account
             </p>
           </div>
 
           {error && (
-            <div className="mb-6 p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+            <div className="mb-6 p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-sm text-destructive">
               {error}
             </div>
           )}
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1.5">
+              <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1.5">
                 Email address
               </label>
               <Input
@@ -86,18 +86,18 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="h-11 border-slate-300 bg-white"
+                className="h-11 border-border bg-background"
               />
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label htmlFor="password" className="text-sm font-medium text-slate-700">
+                <label htmlFor="password" className="text-sm font-medium text-foreground">
                   Password
                 </label>
                 <Link
                   href="/forgot-password"
-                  className="text-xs font-medium text-slate-500 hover:text-slate-950 transition-colors"
+                  className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Forgot password?
                 </Link>
@@ -110,12 +110,12 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="h-11 border-slate-300 bg-white pr-10"
+                  className="h-11 border-border bg-background pr-10"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -125,7 +125,7 @@ export default function LoginPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full h-11 bg-slate-950 text-white hover:bg-slate-800"
+              className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90"
             >
               {loading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -137,10 +137,10 @@ export default function LoginPage() {
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200" />
+              <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-white px-2 text-slate-500">or continue with</span>
+              <span className="bg-background px-2 text-muted-foreground">or continue with</span>
             </div>
           </div>
 
@@ -148,24 +148,24 @@ export default function LoginPage() {
             variant="outline"
             onClick={handleGithubLogin}
             disabled={loading}
-            className="w-full h-11 border-slate-300 text-slate-700 hover:bg-slate-50"
+            className="w-full h-11 border-border text-foreground hover:bg-secondary"
           >
             <GithubIcon className="w-4 h-4 mr-2" />
             GitHub
           </Button>
 
-          <p className="mt-6 text-center text-sm text-slate-600">
+          <p className="mt-6 text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}
             <Link
               href="/register"
-              className="font-semibold text-slate-950 hover:underline"
+              className="font-semibold text-foreground hover:underline"
             >
               Create account
             </Link>
           </p>
-          <p className="mt-2 text-center text-xs text-slate-500">
+          <p className="mt-2 text-center text-xs text-muted-foreground">
             Want to sell code?{" "}
-            <Link href="/developer-register" className="font-medium text-slate-700 hover:underline">
+            <Link href="/developer-register" className="font-medium text-foreground hover:underline">
               Create seller account
             </Link>
           </p>
