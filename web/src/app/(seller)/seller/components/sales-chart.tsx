@@ -97,6 +97,45 @@ function TimeFilterSelect({ filter, setFilter }: { filter: string, setFilter: (v
   );
 }
 
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-background/95 backdrop-blur-md border border-border p-4 rounded-2xl shadow-xl min-w-[200px]"
+      >
+        <div className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-3">
+          {data.fullDateStr || data.label}
+        </div>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-muted-foreground font-medium text-sm flex items-center gap-1.5"><DollarSign className="w-4 h-4 text-muted-foreground" /> Revenue</span>
+            <span className="text-foreground font-bold tabular-nums">
+              ₹{data.revenue.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+            </span>
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-muted-foreground font-medium text-sm flex items-center gap-1.5"><ShoppingCart className="w-4 h-4 text-muted-foreground" /> Sales</span>
+            <span className="text-success font-bold tabular-nums">
+              {data.sales}
+            </span>
+          </div>
+          {data.sales > 0 && (
+            <div className="flex items-center justify-between gap-4 pt-3 mt-3 border-t border-border">
+              <span className="text-muted-foreground font-medium text-xs flex items-center gap-1.5"><Percent className="w-3.5 h-3.5" /> AOV</span>
+              <span className="text-accent font-bold text-xs tabular-nums">
+                ₹{Math.round(data.aov).toLocaleString()}
+              </span>
+            </div>
+          )}
+        </div>
+      </motion.div>
+    );
+  }
+  return null;
+};
 export function SalesChart({ orders }: SalesChartProps) {
   const [filter, setFilter] = useState("6m");
   const [metric, setMetric] = useState<"revenue" | "sales" | "aov">("revenue");
