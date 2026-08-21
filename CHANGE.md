@@ -2,21 +2,6 @@
 
 All notable changes to the KodeDock backend project will be documented in this file.
 
-
-## [v1.4.0] - 2026-08-18
-
-### 🎨 UI/UX Redesigns & Enhancements
-- **Seller Dashboard UI Overhaul:**
-  - Fully redesigned `/seller/page.tsx` adopting the "Asymmetrical Bento" grid layout and "Double-Bezel" component architecture.
-  - Implemented the "Ethereal Glass" dark aesthetic for the Wallet Hub card with a deep OLED black background (`#050505`), custom noise filters, and glowing emerald highlights.
-  - Integrated `recharts` for the Sales Chart with custom glassmorphic tooltips and fluid transitions.
-- **Cinematic Framer Motion Animations:**
-  - Added staggering, spring-based cascade reveals for the main Dashboard Stats Deck.
-  - **Seller Navbar:** Integrated `framer-motion` layout animations for the active menu pill, ensuring it glides smoothly between tabs with organic spring physics.
-  - **Seller Welcome Header:** Built an ultra-premium staggered typo-animation engine. The welcome text splits into word groups and fades in with dynamic blur reduction on load, intelligently handling responsive word wrapping.
-  - **Animated Financials:** Created a new `AnimatedNumber` component using `useSpring` that smoothly rolls up the Wallet Balance, Escrow, and Total Earned metrics from zero to their actual values on page load.
-
-
 ## [v1.2.0] - 2026-08-11
 
 ### 🎨 UI/UX Redesigns & Enhancements
@@ -224,6 +209,37 @@ All notable changes to the KodeDock backend project will be documented in this f
   - Added high-impact destructive delete flow for existing listings.
 - **Double-Bezel Loading State (`/seller/loading`):**
   - Replaced basic pulse boxes with an exact layout-matching double-bezel skeleton deck.
+
+## [v1.4.0] - 2026-08-18
+
+### 🎨 UI/UX Redesigns & Enhancements
+- **Seller Dashboard UI Overhaul:**
+  - Fully redesigned `/seller/page.tsx` adopting the "Asymmetrical Bento" grid layout and "Double-Bezel" component architecture.
+  - Implemented the "Ethereal Glass" dark aesthetic for the Wallet Hub card with a deep OLED black background (`#050505`), custom noise filters, and glowing emerald highlights.
+  - Integrated `recharts` for the Sales Chart with custom glassmorphic tooltips and fluid transitions.
+- **Cinematic Framer Motion Animations:**
+  - Added staggering, spring-based cascade reveals for the main Dashboard Stats Deck.
+  - **Seller Navbar:** Integrated `framer-motion` layout animations for the active menu pill, ensuring it glides smoothly between tabs with organic spring physics.
+  - **Seller Welcome Header:** Built an ultra-premium staggered typo-animation engine. The welcome text splits into word groups and fades in with dynamic blur reduction on load, intelligently handling responsive word wrapping.
+  - **Animated Financials:** Created a new `AnimatedNumber` component using `useSpring` that smoothly rolls up the Wallet Balance, Escrow, and Total Earned metrics from zero to their actual values on page load.
+
+## [v1.4.1] - 2026-08-21
+
+### 🌓 Advanced Theming & Dark Mode Perfection
+- **Seller Dashboard Dark Mode Audit:**
+  - Globally refactored all hardcoded light-mode classes (`bg-slate-50`, `hover:bg-slate-200`, `text-slate-900`, `border-slate-300`) across the entire `(seller)` route group to use semantic HSL variables (`bg-secondary`, `bg-background`, `border-border`, `text-foreground`).
+  - Fixed a critical legibility bug where Double-Bezel cards and Recent Activity sections used literal `from-white` to `to-slate-50` gradients. Upgraded them to theme-aware `bg-gradient-to-b from-background to-secondary/20`, resolving bright white boxes blinding users in Dark Mode.
+  - Optimized the **Sales Chart (Recharts)** by mapping axes, grids, and tooltips to Tailwind CSS variables (`hsl(var(--border))` and `hsl(var(--muted-foreground))`) instead of fixed hex codes.
+  - Excluded the 3D Digital Creator Card from the theme switch, preserving its signature `from-slate-950 to-black` premium OLED look in both modes.
+
+### ⚙️ Settings & Performance
+- **Appearance Settings Tab:** 
+  - Created a brand-new `Appearance` section within Account Settings, matching the layout of other panels.
+  - Added native Next-Themes integration for toggling between `Light`, `Dark`, and `System` modes with clean, visual option cards.
+- **Brand Consistency:** 
+  - Updated `README.md` to perfectly center the KodeDock visual SVGs and appended the marketplace motto for an instantly recognizable branding experience.
+- **Bug Fixes:**
+  - Fixed an `Uncaught TypeError: Failed to execute 'measure' on 'Performance'` on `GET /seller/settings` caused by a Next.js dev-mode quirk with synchronous redirects. The `SellerSettingsIndex` component is now fully `async` to safely execute the router redirect to `/seller/settings/profile`.
 
 ---
 *End of Changelog.*
