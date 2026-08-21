@@ -1,8 +1,8 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
-import { KodeDockLogo } from "@/shared/components/brand/kodedock-logo";
 import { verifyToken } from "@/shared/lib/auth/server";
 import { NotificationsList, Notification } from "@/components/notifications/notifications-list";
 import { theme } from "@/shared/lib/theme";

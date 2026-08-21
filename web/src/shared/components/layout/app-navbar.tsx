@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Search, Menu, ShoppingCart, Bell, Wallet, User, Package, ChevronDown,
   Settings, LogOut, LayoutDashboard, LifeBuoy, Store, Star, Sparkles,
@@ -12,7 +13,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
-import { KodeDockLogo } from "@/shared/components/brand/kodedock-logo";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/shared/ui/sheet";
 import { apiGet } from "@/shared/lib/api/client";
 import { WalletPopup } from "@/components/wallet/wallet-popup";
@@ -192,7 +192,9 @@ export function AppNavbar({ variant, email = "", fullName, searchQuery = "" }: N
           
           {/* LEFT: Logo */}
           <div className="flex items-center flex-1 min-w-0">
-            <KodeDockLogo href={variant === "seller" ? "/seller" : variant === "dashboard" ? "/dashboard" : "/browse"} />
+            <Link href={variant === "seller" ? "/seller" : variant === "dashboard" ? "/dashboard" : "/browse"} className="flex items-center gap-2.5 hover:opacity-90 transition-opacity">
+              <Image src="/icons/logo/full-logo.svg" alt="KodeDock" width={175} height={24} className="h-7 w-auto object-contain" priority />
+            </Link>
           </div>
 
           {/* MIDDLE: Search */}

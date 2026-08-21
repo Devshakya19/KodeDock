@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { KodeDockLogo } from "@/shared/components/brand/kodedock-logo";
+import Image from "next/image";
 
 interface StaticPageLayoutProps {
   children: React.ReactNode;
@@ -13,7 +13,9 @@ export function StaticPageLayout({ children, title, description }: StaticPageLay
       {/* Header */}
       <header className="border-b border-border bg-background">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <KodeDockLogo />
+          <Link href="/" className="flex items-center gap-2.5 hover:opacity-90 transition-opacity">
+              <Image src="/icons/logo/full-logo.svg" alt="KodeDock" width={175} height={24} className="h-7 w-auto object-contain" priority />
+            </Link>
           <Link href="/" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Back to home
           </Link>

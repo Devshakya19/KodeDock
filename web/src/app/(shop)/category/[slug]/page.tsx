@@ -1,9 +1,9 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Package, ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
-import { KodeDockLogo } from "@/shared/components/brand/kodedock-logo";
 import { serverApiGet } from "@/shared/lib/auth/client";
 import { theme } from "@/shared/lib/theme";
 
@@ -41,7 +41,9 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
               <ArrowLeft className="w-4 h-4" />
               <span className="text-sm font-medium">Back</span>
             </Link>
-            <KodeDockLogo href="/browse" />
+            <Link href="/browse" className="flex items-center gap-2.5 hover:opacity-90 transition-opacity">
+              <Image src="/icons/logo/full-logo.svg" alt="KodeDock" width={175} height={24} className="h-7 w-auto object-contain" priority />
+            </Link>
           </div>
         </nav>
       </header>

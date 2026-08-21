@@ -1,10 +1,10 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Search, ArrowLeft, Package } from "lucide-react";
 import { Input } from "@/shared/ui/input";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Badge } from "@/shared/ui/badge";
-import { KodeDockLogo } from "@/shared/components/brand/kodedock-logo";
 import { serverApiGet } from "@/shared/lib/auth/client";
 import { theme } from "@/shared/lib/theme";
 
@@ -43,7 +43,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             <ArrowLeft className="w-4 h-4" />
             <span className="text-sm font-medium">Back</span>
           </Link>
-          <KodeDockLogo href="/browse" />
+          <Link href="/browse" className="flex items-center gap-2.5 hover:opacity-90 transition-opacity">
+              <Image src="/icons/logo/full-logo.svg" alt="KodeDock" width={175} height={24} className="h-7 w-auto object-contain" priority />
+            </Link>
           <form className="hidden md:flex flex-1 max-w-xl" action="/search" method="get">
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
