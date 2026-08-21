@@ -280,7 +280,7 @@ export default function SellerWalletPage() {
 
         {/* Right (Col 7): Balance & Payout Action Hub */}
         <div className="lg:col-span-7 rounded-[28px] bg-background p-2 ring-1 ring-slate-200/80 shadow-xs flex flex-col">
-          <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/40 p-6 sm:p-8 flex-1 flex flex-col justify-between">
+          <div className="rounded-[22px] bg-gradient-to-b from-background to-secondary/20 p-6 sm:p-8 flex-1 flex flex-col justify-between">
             {/* Top Balance Stat */}
             <div>
               <div className="flex items-center justify-between mb-2">
@@ -357,13 +357,13 @@ export default function SellerWalletPage() {
                       placeholder="Enter amount (min. ₹500)"
                       min="500"
                       disabled={!payoutAccount || withdrawing}
-                      className="w-full h-12 pl-9 pr-16 bg-background border border-border/80 rounded-xl text-sm font-bold text-foreground outline-none focus:border-slate-950 shadow-2xs"
+                      className="w-full h-12 pl-9 pr-16 bg-background border border-border/80 rounded-xl text-sm font-bold text-foreground outline-none focus:border-primary shadow-2xs"
                     />
                     <button
                       type="button"
                       onClick={setMaxAmount}
                       disabled={!payoutAccount || withdrawing}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-lg bg-secondary hover:bg-slate-200 text-[10px] font-black text-foreground uppercase tracking-wider transition-colors cursor-pointer"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-lg bg-secondary hover:bg-secondary/80 text-[10px] font-black text-foreground uppercase tracking-wider transition-colors cursor-pointer"
                     >
                       MAX
                     </button>
@@ -394,7 +394,7 @@ export default function SellerWalletPage() {
                       key={amt}
                       type="button"
                       onClick={() => setPresetAmount(amt)}
-                      className="px-2.5 py-0.5 rounded-md bg-secondary hover:bg-slate-200 text-[11px] font-bold text-foreground transition-colors cursor-pointer"
+                      className="px-2.5 py-0.5 rounded-md bg-secondary hover:bg-secondary/80 text-[11px] font-bold text-foreground transition-colors cursor-pointer"
                     >
                       ₹{amt.toLocaleString()}
                     </button>
@@ -407,7 +407,7 @@ export default function SellerWalletPage() {
                 <span className="text-muted-foreground font-medium">Payout Destination:</span>
                 <Link
                   href="/seller/settings/payouts"
-                  className="font-bold text-accent hover:text-blue-700 flex items-center gap-1"
+                  className="font-bold text-accent hover:text-primary flex items-center gap-1"
                 >
                   {payoutAccount ? (
                     payoutAccount.account_type === "upi" ? (
@@ -428,7 +428,7 @@ export default function SellerWalletPage() {
 
       {/* 3. Transaction History Ledger */}
       <div className="rounded-[28px] bg-background p-2 ring-1 ring-slate-200/80 shadow-xs">
-        <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/40 p-5 sm:p-6">
+        <div className="rounded-[22px] bg-gradient-to-b from-background to-secondary/20 p-5 sm:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
               <h3 className="text-lg font-black text-foreground tracking-tight">
@@ -462,7 +462,7 @@ export default function SellerWalletPage() {
           </div>
 
           {filteredTransactions.length === 0 ? (
-            <div className="py-16 text-center bg-slate-50/60 rounded-2xl border border-dashed border-border">
+            <div className="py-16 text-center bg-secondary/40 rounded-2xl border border-dashed border-border">
               <Activity className="w-8 h-8 text-muted-foreground/80 mx-auto mb-2" />
               <p className="text-sm font-bold text-foreground">No transactions recorded</p>
               <p className="text-xs text-muted-foreground mt-0.5">
@@ -476,7 +476,7 @@ export default function SellerWalletPage() {
                 return (
                   <div
                     key={tx.id}
-                    className="py-4 sm:py-4.5 flex items-center justify-between gap-4 hover:bg-slate-50/50 px-2 rounded-xl transition-colors"
+                    className="py-4 sm:py-4.5 flex items-center justify-between gap-4 hover:bg-secondary/50 px-2 rounded-xl transition-colors"
                   >
                     <div className="flex items-center gap-3.5">
                       <div

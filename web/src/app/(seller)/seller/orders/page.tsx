@@ -140,7 +140,7 @@ export default function SellerOrdersPage() {
       {/* 2. Metrics Deck */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mb-8">
         <div className="rounded-[26px] bg-background p-1.5 ring-1 ring-slate-200/80 shadow-xs">
-          <div className="rounded-[calc(26px-6px)] bg-gradient-to-b from-white to-slate-50/60 p-5 flex flex-col justify-between">
+          <div className="rounded-[calc(26px-6px)] bg-gradient-to-b from-background to-secondary/40 p-5 flex flex-col justify-between">
             <div className="flex justify-between items-start mb-3">
               <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                 Total Orders
@@ -159,7 +159,7 @@ export default function SellerOrdersPage() {
         </div>
 
         <div className="rounded-[26px] bg-background p-1.5 ring-1 ring-slate-200/80 shadow-xs">
-          <div className="rounded-[calc(26px-6px)] bg-gradient-to-b from-white to-slate-50/60 p-5 flex flex-col justify-between">
+          <div className="rounded-[calc(26px-6px)] bg-gradient-to-b from-background to-secondary/40 p-5 flex flex-col justify-between">
             <div className="flex justify-between items-start mb-3">
               <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                 Completed & Disbursed
@@ -178,7 +178,7 @@ export default function SellerOrdersPage() {
         </div>
 
         <div className="rounded-[26px] bg-background p-1.5 ring-1 ring-slate-200/80 shadow-xs">
-          <div className="rounded-[calc(26px-6px)] bg-gradient-to-b from-white to-slate-50/60 p-5 flex flex-col justify-between">
+          <div className="rounded-[calc(26px-6px)] bg-gradient-to-b from-background to-secondary/40 p-5 flex flex-col justify-between">
             <div className="flex justify-between items-start mb-3">
               <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                 Net Sales Disbursed
@@ -197,7 +197,7 @@ export default function SellerOrdersPage() {
         </div>
 
         <div className="rounded-[26px] bg-background p-1.5 ring-1 ring-slate-200/80 shadow-xs">
-          <div className="rounded-[calc(26px-6px)] bg-gradient-to-b from-white to-slate-50/60 p-5 flex flex-col justify-between">
+          <div className="rounded-[calc(26px-6px)] bg-gradient-to-b from-background to-secondary/40 p-5 flex flex-col justify-between">
             <div className="flex justify-between items-start mb-3">
               <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                 Delivery Integrity
@@ -218,7 +218,7 @@ export default function SellerOrdersPage() {
 
       {/* 3. Orders Search & Filter Bar */}
       <div className="rounded-[28px] bg-background p-2 ring-1 ring-slate-200/80 shadow-xs mb-8">
-        <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/40 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="rounded-[22px] bg-gradient-to-b from-background to-secondary/20 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           {/* Status Tabs */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
             {[
@@ -249,7 +249,7 @@ export default function SellerOrdersPage() {
               placeholder="Search by order ID or product..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-background border border-border/80 rounded-xl pl-9 pr-4 py-2 text-xs font-medium text-foreground outline-none focus:border-slate-900 shadow-2xs"
+              className="w-full bg-background border border-border/80 rounded-xl pl-9 pr-4 py-2 text-xs font-medium text-foreground outline-none focus:border-primary shadow-2xs"
             />
           </div>
         </div>
@@ -257,9 +257,9 @@ export default function SellerOrdersPage() {
 
       {/* 4. Orders List Deck */}
       <div className="rounded-[28px] bg-background p-2 ring-1 ring-slate-200/80 shadow-xs">
-        <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/40 p-5 sm:p-6">
+        <div className="rounded-[22px] bg-gradient-to-b from-background to-secondary/20 p-5 sm:p-6">
           {filteredOrders.length === 0 ? (
-            <div className="py-20 text-center bg-slate-50/60 rounded-2xl border border-dashed border-border">
+            <div className="py-20 text-center bg-secondary/40 rounded-2xl border border-dashed border-border">
               <Package className="w-10 h-10 text-muted-foreground/80 mx-auto mb-3" />
               <h3 className="text-base font-black text-foreground">No orders found</h3>
               <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
@@ -300,14 +300,14 @@ export default function SellerOrdersPage() {
                       </div>
 
                       <div className="min-w-0">
-                        <h4 className="text-sm font-bold text-foreground truncate group-hover:text-blue-600 transition-colors">
+                        <h4 className="text-sm font-bold text-foreground truncate group-hover:text-primary transition-colors">
                           {order.product?.title || "Digital Code Asset"}
                         </h4>
                         <div className="flex items-center gap-2 mt-1 flex-wrap">
                           <button
                             type="button"
                             onClick={(e) => copyToClipboard(order.id, e)}
-                            className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-secondary hover:bg-slate-200 text-[11px] font-mono text-foreground transition-colors cursor-pointer"
+                            className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-secondary hover:bg-secondary/80 text-[11px] font-mono text-foreground transition-colors cursor-pointer"
                             title="Click to copy full Order ID"
                           >
                             <span>#{order.id.slice(0, 8)}</span>

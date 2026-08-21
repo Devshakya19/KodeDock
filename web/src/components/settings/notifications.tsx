@@ -168,7 +168,7 @@ export function NotificationsSettings() {
 
 function ToggleRow({ label, description, checked, onChange }: { label: string, description: string, checked: boolean, onChange: () => void }) {
   return (
-    <label className="flex items-center justify-between p-4 rounded-xl border border-border bg-slate-50/50 cursor-pointer hover:border-slate-200 transition-colors">
+    <label className="flex items-center justify-between p-4 rounded-xl border border-border bg-secondary/30 cursor-pointer hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
       <div>
         <div className="font-bold text-[14px] text-foreground">{label}</div>
         <div className="text-[13px] text-muted-foreground mt-0.5">{description}</div>
@@ -180,7 +180,7 @@ function ToggleRow({ label, description, checked, onChange }: { label: string, d
           checked={checked} 
           onChange={onChange} 
         />
-        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+        <div className="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary peer-checked:dark:bg-primary"></div>
       </div>
     </label>
   );

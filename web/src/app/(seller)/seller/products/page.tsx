@@ -200,8 +200,8 @@ export default function ProductsPage() {
       {/* 2. Catalog Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-5 mb-8">
         <div className="rounded-[26px] bg-background p-1.5 ring-1 ring-slate-200/80 shadow-xs">
-          <div className="rounded-[calc(26px-6px)] bg-gradient-to-b from-white to-slate-50/60 p-5 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-blue-50/80 border border-accent/20 flex items-center justify-center text-accent shrink-0">
+          <div className="rounded-[calc(26px-6px)] bg-gradient-to-b from-background to-secondary/40 p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-accent/20 flex items-center justify-center text-accent shrink-0">
               <Package className="w-6 h-6" />
             </div>
             <div>
@@ -219,7 +219,7 @@ export default function ProductsPage() {
         </div>
 
         <div className="rounded-[26px] bg-background p-1.5 ring-1 ring-slate-200/80 shadow-xs">
-          <div className="rounded-[calc(26px-6px)] bg-gradient-to-b from-white to-slate-50/60 p-5 flex items-center gap-4">
+          <div className="rounded-[calc(26px-6px)] bg-gradient-to-b from-background to-secondary/40 p-5 flex items-center gap-4">
             <div className="w-12 h-12 rounded-2xl bg-emerald-50/80 border border-success/20 flex items-center justify-center text-success shrink-0">
               <ShoppingCart className="w-6 h-6" />
             </div>
@@ -238,7 +238,7 @@ export default function ProductsPage() {
         </div>
 
         <div className="rounded-[26px] bg-background p-1.5 ring-1 ring-slate-200/80 shadow-xs">
-          <div className="rounded-[calc(26px-6px)] bg-gradient-to-b from-white to-slate-50/60 p-5 flex items-center gap-4">
+          <div className="rounded-[calc(26px-6px)] bg-gradient-to-b from-background to-secondary/40 p-5 flex items-center gap-4">
             <div className="w-12 h-12 rounded-2xl bg-amber-50/80 border border-amber-100 flex items-center justify-center text-warning shrink-0">
               <Eye className="w-6 h-6" />
             </div>
@@ -259,7 +259,7 @@ export default function ProductsPage() {
 
       {/* 3. Filter Deck & Search Toolbar */}
       <div className="rounded-[28px] bg-background p-2 ring-1 ring-slate-200/80 shadow-xs mb-8">
-        <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/40 p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div className="rounded-[22px] bg-gradient-to-b from-background to-secondary/20 p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           {/* Status Tabs */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
             {[
@@ -322,7 +322,7 @@ export default function ProductsPage() {
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-background border border-border/80 rounded-xl pl-9 pr-3 py-2 text-xs font-medium text-foreground outline-none focus:border-slate-900 shadow-2xs"
+                className="w-full bg-background border border-border/80 rounded-xl pl-9 pr-3 py-2 text-xs font-medium text-foreground outline-none focus:border-primary shadow-2xs"
               />
             </div>
           </div>
@@ -364,7 +364,7 @@ export default function ProductsPage() {
               setStatusFilter("all");
               setCategoryFilter("all");
             }}
-            className="px-4 py-2 rounded-xl bg-secondary text-xs font-bold text-foreground hover:bg-slate-200 transition-colors"
+            className="px-4 py-2 rounded-xl bg-secondary text-xs font-bold text-foreground hover:bg-secondary/80 transition-colors"
           >
             Clear Filters
           </button>
@@ -380,9 +380,9 @@ export default function ProductsPage() {
                   : "ring-slate-200/80 hover:ring-slate-300"
               }`}
             >
-              <div className="rounded-[calc(26px-6px)] bg-gradient-to-b from-white to-slate-50/50 flex-1 flex flex-col overflow-hidden">
+              <div className="rounded-[calc(26px-6px)] bg-gradient-to-b from-background to-secondary/30 flex-1 flex flex-col overflow-hidden">
                 {/* Image Section */}
-                <div className="aspect-[16/10] w-full bg-slate-100/80 relative overflow-hidden flex items-center justify-center border-b border-border">
+                <div className="aspect-[16/10] w-full bg-secondary/50 relative overflow-hidden flex items-center justify-center border-b border-border">
                   {product.image_url ? (
                     <img
                       src={product.image_url}
@@ -403,7 +403,7 @@ export default function ProductsPage() {
                           ? "bg-rose-500/90 text-primary-foreground border-rose-400/50"
                           : product.status === "paused"
                           ? "bg-amber-500/90 text-primary-foreground border-amber-400/50"
-                          : "bg-slate-800/90 text-primary-foreground border-slate-700/50"
+                          : "bg-secondary text-foreground border-border"
                       }`}
                     >
                       {product.status.toUpperCase()}
@@ -415,7 +415,7 @@ export default function ProductsPage() {
                     <button
                       type="button"
                       onClick={(e) => copyProductLink(product.id, e)}
-                      className="w-8 h-8 rounded-full bg-white/90 backdrop-blur-md text-foreground flex items-center justify-center hover:bg-background shadow-xs border border-border/60 transition-transform active:scale-90 cursor-pointer"
+                      className="w-8 h-8 rounded-full bg-background/90 backdrop-blur-md text-foreground flex items-center justify-center hover:bg-background shadow-xs border border-border/60 transition-transform active:scale-90 cursor-pointer"
                       title="Copy Public Link"
                     >
                       {copiedId === product.id ? (
@@ -440,7 +440,7 @@ export default function ProductsPage() {
                     )}
                   </div>
 
-                  <h3 className="font-black text-foreground text-[15px] leading-snug mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                  <h3 className="font-black text-foreground text-[15px] leading-snug mb-2 line-clamp-2 group-hover:text-primary transition-colors">
                     {product.title}
                   </h3>
 

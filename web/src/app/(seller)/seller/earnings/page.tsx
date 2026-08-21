@@ -123,7 +123,7 @@ export default function SellerEarningsPage() {
       {/* 2. Metrics Deck */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mb-8">
         <div className="rounded-[26px] bg-background p-1.5 ring-1 ring-slate-200/80 shadow-xs">
-          <div className="rounded-[calc(26px-6px)] bg-gradient-to-b from-white to-slate-50/60 p-5 flex flex-col justify-between">
+          <div className="rounded-[calc(26px-6px)] bg-gradient-to-b from-background to-secondary/40 p-5 flex flex-col justify-between">
             <div className="flex justify-between items-start mb-3">
               <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                 Total Net Earned
@@ -146,7 +146,7 @@ export default function SellerEarningsPage() {
         </div>
 
         <div className="rounded-[26px] bg-background p-1.5 ring-1 ring-slate-200/80 shadow-xs">
-          <div className="rounded-[calc(26px-6px)] bg-gradient-to-b from-white to-slate-50/60 p-5 flex flex-col justify-between">
+          <div className="rounded-[calc(26px-6px)] bg-gradient-to-b from-background to-secondary/40 p-5 flex flex-col justify-between">
             <div className="flex justify-between items-start mb-3">
               <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                 Available Balance
@@ -169,7 +169,7 @@ export default function SellerEarningsPage() {
         </div>
 
         <div className="rounded-[26px] bg-background p-1.5 ring-1 ring-slate-200/80 shadow-xs">
-          <div className="rounded-[calc(26px-6px)] bg-gradient-to-b from-white to-slate-50/60 p-5 flex flex-col justify-between">
+          <div className="rounded-[calc(26px-6px)] bg-gradient-to-b from-background to-secondary/40 p-5 flex flex-col justify-between">
             <div className="flex justify-between items-start mb-3">
               <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                 Pending in Escrow
@@ -188,7 +188,7 @@ export default function SellerEarningsPage() {
         </div>
 
         <div className="rounded-[26px] bg-background p-1.5 ring-1 ring-slate-200/80 shadow-xs">
-          <div className="rounded-[calc(26px-6px)] bg-gradient-to-b from-white to-slate-50/60 p-5 flex flex-col justify-between">
+          <div className="rounded-[calc(26px-6px)] bg-gradient-to-b from-background to-secondary/40 p-5 flex flex-col justify-between">
             <div className="flex justify-between items-start mb-3">
               <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                 Total Disbursed
@@ -238,13 +238,13 @@ export default function SellerEarningsPage() {
 
       {/* 4. Earnings Ledger */}
       <div className="rounded-[28px] bg-background p-2 ring-1 ring-slate-200/80 shadow-xs">
-        <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/40 p-5 sm:p-6">
+        <div className="rounded-[22px] bg-gradient-to-b from-background to-secondary/20 p-5 sm:p-6">
           <h3 className="text-lg font-black text-foreground tracking-tight mb-4">
             Earnings History Ledger
           </h3>
 
           {earningTxs.length === 0 ? (
-            <div className="py-16 text-center bg-slate-50/60 rounded-2xl border border-dashed border-border">
+            <div className="py-16 text-center bg-secondary/40 rounded-2xl border border-dashed border-border">
               <TrendingUp className="w-8 h-8 text-muted-foreground/80 mx-auto mb-2" />
               <p className="text-sm font-bold text-foreground">No earnings recorded</p>
               <p className="text-xs text-muted-foreground mt-0.5">
@@ -258,7 +258,7 @@ export default function SellerEarningsPage() {
                 return (
                   <div
                     key={tx.id}
-                    className="py-4 flex items-center justify-between gap-4 hover:bg-slate-50/50 px-2 rounded-xl transition-colors"
+                    className="py-4 flex items-center justify-between gap-4 hover:bg-secondary/50 px-2 rounded-xl transition-colors"
                   >
                     <div className="flex items-center gap-3.5">
                       <div

@@ -125,7 +125,7 @@ export function AppNavbar({ variant, email = "", fullName, searchQuery = "" }: N
     <>
       <div className="fixed inset-0 z-40" onClick={() => setProfileDropdownOpen(false)} />
       <div className="absolute right-0 mt-2.5 w-[280px] bg-background rounded-2xl shadow-[0_12px_40px_-12px_rgba(0,0,0,0.15)] border border-border p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
-        <div className="flex items-center gap-3 px-3 py-3.5 mb-1.5 rounded-xl bg-slate-50/80 border border-border">
+        <div className="flex items-center gap-3 px-3 py-3.5 mb-1.5 rounded-xl bg-secondary/80 border border-border">
           <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0 shadow-sm ring-2 ring-background">
             <span className="text-sm font-bold text-primary-foreground">{shortName[0]?.toUpperCase() || "U"}</span>
           </div>
@@ -141,7 +141,7 @@ export function AppNavbar({ variant, email = "", fullName, searchQuery = "" }: N
               const isActive = item.href === "/seller" ? pathname === "/seller" : pathname.startsWith(item.href);
               return (
                 <Link key={item.href} href={item.href} onClick={() => setProfileDropdownOpen(false)}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] transition-colors ${isActive ? "bg-slate-100/80 text-foreground font-semibold" : "text-muted-foreground hover:bg-secondary hover:text-foreground font-medium"}`}>
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] transition-colors ${isActive ? "bg-secondary text-foreground font-semibold" : "text-muted-foreground hover:bg-secondary hover:text-foreground font-medium"}`}>
                   <item.icon className={`w-[18px] h-[18px] ${isActive ? "text-foreground" : "text-muted-foreground"}`} />
                   {item.label}
                 </Link>
@@ -164,7 +164,7 @@ export function AppNavbar({ variant, email = "", fullName, searchQuery = "" }: N
           {variant === "seller" ? (
             <>
               <Link href="/browse" onClick={() => setProfileDropdownOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"><Store className="w-[18px] h-[18px] text-muted-foreground" /> Browse Shop</Link>
-              <Link href="/seller/settings" onClick={() => setProfileDropdownOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] transition-colors ${pathname.startsWith("/seller/settings") ? "bg-slate-100/80 text-foreground font-semibold" : "text-muted-foreground hover:bg-secondary hover:text-foreground font-medium"}`}><Settings className={`w-[18px] h-[18px] ${pathname.startsWith("/seller/settings") ? "text-foreground" : "text-muted-foreground"}`} /> Account Settings</Link>
+              <Link href="/seller/settings" onClick={() => setProfileDropdownOpen(false)} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] transition-colors ${pathname.startsWith("/seller/settings") ? "bg-secondary text-foreground font-semibold" : "text-muted-foreground hover:bg-secondary hover:text-foreground font-medium"}`}><Settings className={`w-[18px] h-[18px] ${pathname.startsWith("/seller/settings") ? "text-foreground" : "text-muted-foreground"}`} /> Account Settings</Link>
             </>
           ) : (
             <>
@@ -187,13 +187,14 @@ export function AppNavbar({ variant, email = "", fullName, searchQuery = "" }: N
 
   return (
     <>
-      <header className={`sticky top-0 z-50 transition-all duration-200 ${scrolled ? "bg-background/95 backdrop-blur-md shadow-sm border-b border-border/50" : "bg-[#F8FAFC] border-b border-transparent"}`}>
+      <header className={`sticky top-0 z-50 transition-all duration-200 ${scrolled ? "bg-background/95 backdrop-blur-md shadow-sm border-b border-border/50" : "bg-background border-b border-transparent"}`}>
         <nav className="w-full px-4 sm:px-6 lg:px-10 xl:px-14 h-16 md:h-20 flex items-center justify-between">
           
           {/* LEFT: Logo */}
           <div className="flex items-center flex-1 min-w-0">
             <Link href={variant === "seller" ? "/seller" : variant === "dashboard" ? "/dashboard" : "/browse"} className="flex items-center gap-2.5 hover:opacity-90 transition-opacity">
-              <Image src="/icons/logo/full-logo.svg" alt="KodeDock" width={175} height={24} className="h-7 w-auto object-contain" priority />
+              <Image src="/icons/logo/full-logo.svg" alt="KodeDock" width={175} height={24} className="h-7 w-auto object-contain dark:hidden" priority />
+              <Image src="/icons/logo/full-logo-light.svg" alt="KodeDock" width={175} height={24} className="h-7 w-auto object-contain hidden dark:block" priority />
             </Link>
           </div>
 
@@ -204,7 +205,7 @@ export function AppNavbar({ variant, email = "", fullName, searchQuery = "" }: N
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <Search className="w-4 h-4 text-muted-foreground group-focus-within:text-blue-600 transition-colors" />
                 </div>
-                <Input placeholder="Search templates, UI kits, projects..." value={search} onChange={(e) => setSearch(e.target.value)} className="h-11 md:h-12 pl-11 pr-24 rounded-full border-border/60 bg-white/60 focus:bg-white shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)] focus-visible:ring-4 focus-visible:ring-blue-600/10 focus-visible:border-blue-600 transition-all text-[15px] font-medium" />
+                <Input placeholder="Search templates, UI kits, projects..." value={search} onChange={(e) => setSearch(e.target.value)} className="h-11 md:h-12 pl-11 pr-24 rounded-full border-border/60 bg-secondary/60 focus:bg-background shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)] focus-visible:ring-4 focus-visible:ring-blue-600/10 focus-visible:border-blue-600 transition-all text-[15px] font-medium" />
                 <div className="absolute inset-y-0 right-1.5 flex items-center">
                   <Button type="submit" size="sm" className="h-8 md:h-9 px-4 md:px-5 rounded-full bg-primary text-primary-foreground text-[13px] font-bold hover:bg-blue-600 shadow-sm hover:shadow-blue-600/20 transition-all">Search</Button>
                 </div>
@@ -213,7 +214,7 @@ export function AppNavbar({ variant, email = "", fullName, searchQuery = "" }: N
           )}
           
           {variant === "seller" && (
-            <div className="hidden lg:flex items-center gap-1 bg-white/90 backdrop-blur-md px-1.5 py-1.5 rounded-full border border-border shadow-sm relative">
+            <div className="hidden lg:flex items-center gap-1 bg-background/90 backdrop-blur-md px-1.5 py-1.5 rounded-full border border-border shadow-sm relative">
               {SELLER_NAV_ITEMS.map((item) => {
                 const isActive = item.href === "/seller" ? pathname === "/seller" : pathname.startsWith(item.href);
                 const Icon = item.icon;
@@ -224,7 +225,7 @@ export function AppNavbar({ variant, email = "", fullName, searchQuery = "" }: N
                     className={`relative flex items-center gap-2 px-4 py-2.5 rounded-full text-[13px] font-bold transition-all z-10 group ${
                       isActive
                         ? "text-primary-foreground"
-                        : "text-muted-foreground hover:text-foreground hover:bg-slate-50/80"
+                        : "text-muted-foreground hover:text-foreground hover:bg-secondary/80"
                     }`}
                   >
                     {isActive && (
@@ -252,7 +253,7 @@ export function AppNavbar({ variant, email = "", fullName, searchQuery = "" }: N
                     {walletBalance !== null ? <span className="text-[13px] font-bold text-success-foreground tracking-tight">₹{(walletBalance / 100).toLocaleString()}</span> : <span className="text-[13px] font-bold text-emerald-900/50 tracking-tight">...</span>}
                   </div>
                 </button>
-                <div className="w-px h-5 bg-slate-200/80" />
+                <div className="w-px h-5 bg-border/80" />
                 <button onClick={() => setShowCart(true)} className="relative flex items-center justify-center w-8 h-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary/80 transition-colors cursor-pointer">
                   <ShoppingCart className="w-4 h-4" />
                   {cartCount > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-accent text-primary-foreground text-[10px] font-bold flex items-center justify-center shadow-sm ring-2 ring-background">{cartCount}</span>}
@@ -295,7 +296,7 @@ export function AppNavbar({ variant, email = "", fullName, searchQuery = "" }: N
               <SheetContent side="right" className="w-[300px] p-0 border-l border-border">
                 <SheetTitle className="sr-only">Mobile Navigation Menu</SheetTitle>
                 <div className="flex flex-col h-full bg-background">
-                  <div className="p-6 pb-4 border-b border-border bg-slate-50/50">
+                  <div className="p-6 pb-4 border-b border-border bg-secondary/50">
                     <Link href={variant === "seller" ? "/seller/settings/profile" : "/dashboard/profile"} onClick={closeMobile} className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shadow-md ring-4 ring-background">
                         <span className="text-lg font-bold text-primary-foreground">{shortName[0]?.toUpperCase() || "U"}</span>
@@ -364,7 +365,7 @@ export function AppNavbar({ variant, email = "", fullName, searchQuery = "" }: N
                     )}
                   </div>
 
-                  <div className="p-4 border-t border-border bg-slate-50/50">
+                  <div className="p-4 border-t border-border bg-secondary/50">
                     <form action="/api/auth/logout" method="post">
                       <Button variant="outline" className="w-full h-12 rounded-xl border-border text-foreground font-bold shadow-sm bg-background hover:bg-secondary">
                         <LogOut className="w-4 h-4 mr-2.5 text-rose-500" /> Log out

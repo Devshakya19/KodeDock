@@ -104,7 +104,7 @@ export function SellerStatsDeck({
             variants={cardVariants}
             className="group relative rounded-[2rem] bg-background p-1.5 ring-1 ring-border/60 shadow-md hover:shadow-[0_8px_30px_-8px_rgba(0,0,0,0.1)] hover:ring-slate-300 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
           >
-            <div className="rounded-[calc(2rem-0.375rem)] bg-gradient-to-b from-white to-slate-50/40 p-6 h-full flex flex-col justify-between relative overflow-hidden">
+            <div className="rounded-[calc(2rem-0.375rem)] bg-gradient-to-b from-background to-secondary/20 p-6 h-full flex flex-col justify-between relative overflow-hidden">
               <div className="flex items-center justify-between mb-4">
                 <span className="text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground">
                   {card.title}
@@ -132,7 +132,7 @@ export function SellerStatsDeck({
                       {card.detail}
                     </span>
                   </div>
-                  <div className="w-10 h-10 rounded-2xl bg-secondary/50 border border-border/80 flex items-center justify-center text-muted-foreground group-hover:bg-slate-950 group-hover:text-white group-hover:border-slate-950 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]">
+                  <div className="w-10 h-10 rounded-2xl bg-secondary/50 border border-border/80 flex items-center justify-center text-muted-foreground group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]">
                     <Icon className="w-4 h-4 transition-transform duration-500 group-hover:scale-110" />
                   </div>
                 </div>

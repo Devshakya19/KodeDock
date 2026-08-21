@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { User, Shield, CreditCard, Bell, ArrowLeft, Link as LinkIcon } from "lucide-react";
+import { User, Shield, CreditCard, Bell, ArrowLeft, Link as LinkIcon, Palette } from "lucide-react";
 
 interface SettingsLayoutProps {
   children: React.ReactNode;
@@ -43,6 +43,12 @@ export function SettingsLayout({ children, basePath, backLink }: SettingsLayoutP
       icon: Bell,
       description: "Configure email and push alerts",
     },
+    {
+      name: "Appearance",
+      href: `${basePath}/appearance`,
+      icon: Palette,
+      description: "Customize your theme and display",
+    },
   ];
 
   return (
@@ -82,7 +88,7 @@ export function SettingsLayout({ children, basePath, backLink }: SettingsLayoutP
                 )}
                 
                 <div className={`relative z-10 mt-0.5 w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
-                  isActive ? "bg-white/20 text-primary-foreground backdrop-blur-md border border-border/20" : "bg-secondary text-muted-foreground group-hover:bg-white group-hover:shadow-sm"
+                  isActive ? "bg-white/20 text-primary-foreground backdrop-blur-md border border-border/20" : "bg-secondary text-muted-foreground group-hover:bg-background group-hover:shadow-sm"
                 }`}>
                   <Icon className="w-5 h-5" />
                 </div>

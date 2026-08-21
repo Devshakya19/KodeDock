@@ -125,14 +125,14 @@ export function PayoutSettings() {
       </div>
 
       {success && (
-        <div className="mb-6 p-4 rounded-2xl bg-success/10 border border-emerald-100/50 text-sm font-medium text-success-foreground flex items-center gap-3">
+        <div className="mb-6 p-4 rounded-2xl bg-success/10 border border-success/20 text-sm font-medium text-success-foreground flex items-center gap-3">
           <CheckCircle className="w-5 h-5 text-emerald-500" />
           {success}
         </div>
       )}
 
       {error && (
-        <div className="mb-6 p-4 rounded-2xl bg-destructive/10 border border-red-100/50 text-sm font-medium text-red-800 flex items-center gap-3">
+        <div className="mb-6 p-4 rounded-2xl bg-destructive/10 border border-destructive/20 text-sm font-medium text-destructive flex items-center gap-3">
           <AlertTriangle className="w-5 h-5 text-destructive" />
           {error}
         </div>
@@ -145,8 +145,8 @@ export function PayoutSettings() {
             onClick={() => setAccountType("bank_account")}
             className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
               accountType === "bank_account"
-                ? "border-blue-600 bg-blue-50/50 shadow-sm"
-                : "border-border hover:border-slate-200 bg-background"
+                ? "border-primary bg-primary/10 shadow-sm"
+                : "border-border hover:border-slate-300 dark:hover:border-slate-700 bg-background"
             }`}
           >
             <Landmark className={`w-6 h-6 ${accountType === "bank_account" ? "text-accent" : "text-muted-foreground"}`} />
@@ -159,8 +159,8 @@ export function PayoutSettings() {
             onClick={() => setAccountType("upi")}
             className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
               accountType === "upi"
-                ? "border-blue-600 bg-blue-50/50 shadow-sm"
-                : "border-border hover:border-slate-200 bg-background"
+                ? "border-primary bg-primary/10 shadow-sm"
+                : "border-border hover:border-slate-300 dark:hover:border-slate-700 bg-background"
             }`}
           >
             <Smartphone className={`w-6 h-6 ${accountType === "upi" ? "text-accent" : "text-muted-foreground"}`} />
@@ -204,7 +204,7 @@ export function PayoutSettings() {
                   value={ifscCode}
                   onChange={(e) => setIfscCode(e.target.value.toUpperCase())}
                   placeholder="SBIN0001234"
-                  className="h-12 border-border bg-slate-50/50 focus-visible:bg-white rounded-xl text-[15px] uppercase"
+                  className="h-12 border-border bg-secondary/50 focus-visible:bg-background rounded-xl text-[15px] uppercase"
                   maxLength={11}
                 />
               </div>

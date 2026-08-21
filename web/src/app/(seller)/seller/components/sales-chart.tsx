@@ -53,7 +53,7 @@ function TimeFilterSelect({ filter, setFilter }: { filter: string, setFilter: (v
     <div className="relative z-50">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between gap-3 bg-background border border-border text-xs font-bold text-foreground py-2.5 px-4 rounded-xl outline-none cursor-pointer hover:border-border hover:bg-secondary focus:ring-2 focus:ring-blue-500/20 shadow-sm transition-all min-w-[150px]"
+        className="flex items-center justify-between gap-3 bg-background border border-border text-xs font-bold text-foreground py-2.5 px-4 rounded-xl outline-none cursor-pointer hover:border-border hover:bg-secondary focus:ring-2 focus:ring-primary/20 shadow-sm transition-all min-w-[150px]"
       >
         <div className="flex items-center gap-2">
           <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
@@ -441,14 +441,14 @@ export function SalesChart({ orders }: SalesChartProps) {
                 type="date"
                 value={customStart}
                 onChange={(e) => setCustomStart(e.target.value)}
-                className="bg-background border border-border rounded-lg px-3 py-1.5 outline-none text-foreground font-semibold focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                className="bg-background border border-border rounded-lg px-3 py-1.5 outline-none text-foreground font-semibold focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
               />
               <span className="text-muted-foreground font-bold uppercase tracking-wider text-[10px] ml-2">To</span>
               <input
                 type="date"
                 value={customEnd}
                 onChange={(e) => setCustomEnd(e.target.value)}
-                className="bg-background border border-border rounded-lg px-3 py-1.5 outline-none text-foreground font-semibold focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                className="bg-background border border-border rounded-lg px-3 py-1.5 outline-none text-foreground font-semibold focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
               />
             </div>
           </motion.div>
@@ -468,18 +468,18 @@ export function SalesChart({ orders }: SalesChartProps) {
                 <stop offset="95%" stopColor={chartColor} stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
             <XAxis 
               dataKey="label" 
               axisLine={false} 
               tickLine={false} 
-              tick={{ fontSize: 11, fill: '#64748b', fontWeight: 600 }} 
+              tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))", fontWeight: 600 }} 
               dy={15} 
             />
             <YAxis 
               axisLine={false} 
               tickLine={false} 
-              tick={{ fontSize: 11, fill: '#64748b', fontWeight: 600 }}
+              tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))", fontWeight: 600 }}
               tickFormatter={(value) => {
                 if (value === 0) return "0";
                 if (metric === "sales") return value.toString();
@@ -490,7 +490,7 @@ export function SalesChart({ orders }: SalesChartProps) {
             />
             <Tooltip 
               content={<CustomTooltip />} 
-              cursor={{ stroke: '#cbd5e1', strokeWidth: 1.5, strokeDasharray: '4 4' }}
+              cursor={{ stroke: "hsl(var(--border))", strokeWidth: 1.5, strokeDasharray: '4 4' }}
             />
             <Area
               key={metric}
@@ -542,7 +542,7 @@ export function SalesChart({ orders }: SalesChartProps) {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.5 + item.delay, ease: [0.16, 1, 0.3, 1] }}
-            className="p-5 sm:p-6 rounded-3xl bg-slate-50/50 border border-border hover:shadow-md hover:bg-background transition-all duration-300"
+            className="p-5 sm:p-6 rounded-3xl bg-secondary/30 border border-border hover:shadow-md hover:bg-background transition-all duration-300"
           >
             <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-[0.2em] block mb-2">
               {item.label}

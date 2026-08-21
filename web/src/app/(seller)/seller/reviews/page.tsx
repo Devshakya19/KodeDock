@@ -113,7 +113,7 @@ export default function SellerReviewsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
         {/* Left: Star Distribution Card */}
         <div className="lg:col-span-5 rounded-[28px] bg-background p-2 ring-1 ring-slate-200/80 shadow-xs">
-          <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/40 p-6 flex flex-col sm:flex-row items-center gap-6">
+          <div className="rounded-[22px] bg-gradient-to-b from-background to-secondary/20 p-6 flex flex-col sm:flex-row items-center gap-6">
             <div className="flex flex-col items-center justify-center min-w-[110px] text-center border-b sm:border-b-0 sm:border-r border-border pb-4 sm:pb-0 sm:pr-6">
               <span className="text-5xl font-black text-foreground tracking-tight tabular-nums">
                 {avgRating}
@@ -209,7 +209,7 @@ export default function SellerReviewsPage() {
 
       {/* 3. Filter Tabs & Search */}
       <div className="rounded-[28px] bg-background p-2 ring-1 ring-slate-200/80 shadow-xs mb-8">
-        <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/40 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="rounded-[22px] bg-gradient-to-b from-background to-secondary/20 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
             <button
               type="button"
@@ -246,7 +246,7 @@ export default function SellerReviewsPage() {
               placeholder="Search feedback..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-background border border-border/80 rounded-xl pl-9 pr-4 py-2 text-xs font-medium text-foreground outline-none focus:border-slate-900 shadow-2xs"
+              className="w-full bg-background border border-border/80 rounded-xl pl-9 pr-4 py-2 text-xs font-medium text-foreground outline-none focus:border-primary shadow-2xs"
             />
           </div>
         </div>
@@ -254,9 +254,9 @@ export default function SellerReviewsPage() {
 
       {/* 4. Reviews List */}
       <div className="rounded-[28px] bg-background p-2 ring-1 ring-slate-200/80 shadow-xs">
-        <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/40 p-5 sm:p-6">
+        <div className="rounded-[22px] bg-gradient-to-b from-background to-secondary/20 p-5 sm:p-6">
           {filteredReviews.length === 0 ? (
-            <div className="py-20 text-center bg-slate-50/60 rounded-2xl border border-dashed border-border">
+            <div className="py-20 text-center bg-secondary/40 rounded-2xl border border-dashed border-border">
               <MessageSquare className="w-10 h-10 text-muted-foreground/80 mx-auto mb-3" />
               <h3 className="text-base font-black text-foreground">No reviews found</h3>
               <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">

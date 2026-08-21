@@ -130,7 +130,7 @@ export function ProfileSettings() {
                   onChange={(e) => updateField("github_username", e.target.value)}
                   placeholder="username"
                   disabled={formData.is_github_connected}
-                  className={`h-12 border-border bg-slate-50/50 focus-visible:bg-white rounded-xl text-[15px] pl-9 ${formData.is_github_connected ? "opacity-70 cursor-not-allowed bg-secondary" : ""}`}
+                  className={`h-12 border-border bg-secondary/50 focus-visible:bg-background rounded-xl text-[15px] pl-9 ${formData.is_github_connected ? "opacity-70 cursor-not-allowed bg-secondary" : ""}`}
                 />
               </div>
               {formData.github_username && (

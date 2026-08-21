@@ -208,7 +208,7 @@ export default function NewProductPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Step 1: Basic Information */}
             <div className="rounded-[28px] bg-background p-2 ring-1 ring-slate-200/80 shadow-xs">
-              <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/40 p-6 space-y-5">
+              <div className="rounded-[22px] bg-gradient-to-b from-background to-secondary/20 p-6 space-y-5">
                 <div className="flex items-center gap-2.5 pb-3 border-b border-border">
                   <div className="w-6 h-6 rounded-lg bg-primary text-primary-foreground flex items-center justify-center text-xs font-black">
                     1
@@ -230,7 +230,7 @@ export default function NewProductPage() {
                     onChange={(e) => setTitle(e.target.value)}
                     required
                     maxLength={200}
-                    className="w-full h-11 bg-background border border-border/80 rounded-xl px-3.5 text-sm font-medium text-foreground outline-none focus:border-slate-950 shadow-2xs transition-colors"
+                    className="w-full h-11 bg-background border border-border/80 rounded-xl px-3.5 text-sm font-medium text-foreground outline-none focus:border-primary shadow-2xs transition-colors"
                   />
                 </div>
 
@@ -247,7 +247,7 @@ export default function NewProductPage() {
                     onChange={(e) => setDescription(e.target.value)}
                     required
                     maxLength={5000}
-                    className="w-full bg-background border border-border/80 rounded-xl p-3.5 text-sm font-medium text-foreground outline-none focus:border-slate-950 shadow-2xs transition-colors resize-y"
+                    className="w-full bg-background border border-border/80 rounded-xl p-3.5 text-sm font-medium text-foreground outline-none focus:border-primary shadow-2xs transition-colors resize-y"
                   />
                 </div>
 
@@ -263,7 +263,7 @@ export default function NewProductPage() {
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
                         required
-                        className="w-full h-11 appearance-none bg-background border border-border/80 rounded-xl pl-10 pr-8 text-xs font-bold text-foreground outline-none focus:border-slate-950 shadow-2xs cursor-pointer"
+                        className="w-full h-11 appearance-none bg-background border border-border/80 rounded-xl pl-10 pr-8 text-xs font-bold text-foreground outline-none focus:border-primary shadow-2xs cursor-pointer"
                       >
                         <option value="" disabled>
                           Select category
@@ -288,7 +288,7 @@ export default function NewProductPage() {
                         placeholder="React, Tailwind, Auth..."
                         value={tags}
                         onChange={(e) => setTags(e.target.value)}
-                        className="w-full h-11 bg-background border border-border/80 rounded-xl pl-10 pr-3.5 text-xs font-medium text-foreground outline-none focus:border-slate-950 shadow-2xs"
+                        className="w-full h-11 bg-background border border-border/80 rounded-xl pl-10 pr-3.5 text-xs font-medium text-foreground outline-none focus:border-primary shadow-2xs"
                       />
                       <Tag className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                     </div>
@@ -299,7 +299,7 @@ export default function NewProductPage() {
 
             {/* Step 2: Media & Code Repository */}
             <div className="rounded-[28px] bg-background p-2 ring-1 ring-slate-200/80 shadow-xs">
-              <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/40 p-6 space-y-5">
+              <div className="rounded-[22px] bg-gradient-to-b from-background to-secondary/20 p-6 space-y-5">
                 <div className="flex items-center gap-2.5 pb-3 border-b border-border">
                   <div className="w-6 h-6 rounded-lg bg-primary text-primary-foreground flex items-center justify-center text-xs font-black">
                     2
@@ -332,7 +332,7 @@ export default function NewProductPage() {
                       <button
                         type="button"
                         onClick={handleRemoveImage}
-                        className="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-950/80 text-primary-foreground flex items-center justify-center hover:bg-rose-600 transition-colors shadow-md cursor-pointer"
+                        className="absolute top-3 right-3 w-8 h-8 rounded-full bg-secondary text-foreground flex items-center justify-center hover:bg-rose-600 transition-colors shadow-md cursor-pointer"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -340,7 +340,7 @@ export default function NewProductPage() {
                   ) : (
                     <div
                       onClick={() => fileInputRef.current?.click()}
-                      className="group flex flex-col items-center justify-center w-full aspect-[16/8] border-2 border-dashed border-border/80 rounded-2xl bg-background hover:border-slate-400 transition-all cursor-pointer p-6 text-center shadow-2xs"
+                      className="group flex flex-col items-center justify-center w-full aspect-[16/8] border-2 border-dashed border-border/80 rounded-2xl bg-background hover:border-primary/50 transition-all cursor-pointer p-6 text-center shadow-2xs"
                     >
                       <div className="w-12 h-12 rounded-2xl bg-accent/10 text-accent flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
                         <ImageIcon className="w-6 h-6" />
@@ -367,7 +367,7 @@ export default function NewProductPage() {
                       placeholder="https://github.com/your-username/your-repo"
                       value={githubUrl}
                       onChange={(e) => setGithubUrl(e.target.value)}
-                      className="w-full h-11 bg-background border border-border/80 rounded-xl pl-10 pr-3.5 text-xs font-medium text-foreground outline-none focus:border-slate-950 shadow-2xs"
+                      className="w-full h-11 bg-background border border-border/80 rounded-xl pl-10 pr-3.5 text-xs font-medium text-foreground outline-none focus:border-primary shadow-2xs"
                     />
                   </div>
                   <p className="text-[11px] text-muted-foreground mt-1.5 leading-relaxed">
@@ -379,7 +379,7 @@ export default function NewProductPage() {
 
             {/* Step 3: Pricing & Availability */}
             <div className="rounded-[28px] bg-background p-2 ring-1 ring-slate-200/80 shadow-xs">
-              <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/40 p-6 space-y-5">
+              <div className="rounded-[22px] bg-gradient-to-b from-background to-secondary/20 p-6 space-y-5">
                 <div className="flex items-center gap-2.5 pb-3 border-b border-border">
                   <div className="w-6 h-6 rounded-lg bg-primary text-primary-foreground flex items-center justify-center text-xs font-black">
                     3
@@ -442,7 +442,7 @@ export default function NewProductPage() {
                         onChange={(e) => setPrice(e.target.value)}
                         min={isFree ? "0" : "49"}
                         disabled={isFree}
-                        className="w-full h-11 bg-background border border-border/80 rounded-xl pl-9 pr-3.5 text-sm font-bold text-foreground outline-none focus:border-slate-950 shadow-2xs disabled:opacity-40"
+                        className="w-full h-11 bg-background border border-border/80 rounded-xl pl-9 pr-3.5 text-sm font-bold text-foreground outline-none focus:border-primary shadow-2xs disabled:opacity-40"
                       />
                     </div>
                     {!isFree && (
@@ -464,7 +464,7 @@ export default function NewProductPage() {
                       id="status"
                       value={status}
                       onChange={(e) => setStatus(e.target.value)}
-                      className="w-full h-11 bg-background border border-border/80 rounded-xl px-3.5 text-xs font-bold text-foreground outline-none focus:border-slate-950 shadow-2xs cursor-pointer"
+                      className="w-full h-11 bg-background border border-border/80 rounded-xl px-3.5 text-xs font-bold text-foreground outline-none focus:border-primary shadow-2xs cursor-pointer"
                     >
                       <option value="active">Active (Available to all)</option>
                       <option value="limited">Limited Edition (Capped Units)</option>
@@ -485,7 +485,7 @@ export default function NewProductPage() {
                         value={stockLimit}
                         onChange={(e) => setStockLimit(e.target.value)}
                         min="1"
-                        className="w-full h-11 bg-background border border-border/80 rounded-xl px-3.5 text-xs font-bold text-foreground outline-none focus:border-slate-950 shadow-2xs"
+                        className="w-full h-11 bg-background border border-border/80 rounded-xl px-3.5 text-xs font-bold text-foreground outline-none focus:border-primary shadow-2xs"
                       />
                     </div>
                   )}
@@ -532,7 +532,7 @@ export default function NewProductPage() {
           </div>
 
           <div className="rounded-[28px] bg-background p-2 ring-1 ring-slate-200/80 shadow-lg">
-            <div className="rounded-[22px] bg-gradient-to-b from-white to-slate-50/50 overflow-hidden flex flex-col">
+            <div className="rounded-[22px] bg-gradient-to-b from-background to-secondary/30 overflow-hidden flex flex-col">
               <div className="aspect-[16/10] w-full bg-secondary flex items-center justify-center relative overflow-hidden">
                 {imagePreview ? (
                   <img
@@ -546,7 +546,7 @@ export default function NewProductPage() {
 
                 {category && (
                   <div className="absolute top-3 left-3 z-10">
-                    <span className="bg-slate-950/80 text-primary-foreground text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur-md">
+                    <span className="bg-secondary text-foreground text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur-md">
                       {category}
                     </span>
                   </div>
