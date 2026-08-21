@@ -1,4 +1,4 @@
-# KodeDock — India's Digital Code Marketplace
+# <img src="assets/icons/kd.svg" alt="KD" height="60" align="center"> <img src="assets/icons/KodeDock-theme.svg" alt="KodeDock" height="40" align="center"> — India's Digital Code Marketplace
 
 <p align="center">
   <picture>
