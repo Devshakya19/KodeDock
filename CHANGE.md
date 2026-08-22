@@ -245,7 +245,10 @@ All notable changes to the KodeDock backend project will be documented in this f
 - **Brand Consistency:** 
   - Updated `README.md` to perfectly center the KodeDock visual SVGs and appended the marketplace motto for an instantly recognizable branding experience.
 - **Bug Fixes:**
-  - Fixed an `Uncaught TypeError: Failed to execute 'measure' on 'Performance'` on `GET /seller/settings` caused by a Next.js dev-mode quirk with synchronous redirects. The `SellerSettingsIndex` component is now fully `async` to safely execute the router redirect to `/seller/settings/profile`.
+  - Fixed an `Uncaught TypeError: Failed to execute 'measure' on 'Performance'` on `GET /seller/settings` caused by a Next.js dev-mode quirk with synchronous redirects.
+  - **Cross-Account Cart Leak:** Fixed a bug where a buyer's shopping cart state persisted across sessions. Local storage (`kodedock_cart`) is now securely wiped upon logging out.
+  - **Seller Routing & Layout Isolation:** Fixed a critical UI bug where the seller's notification bell linked to the generic `/notifications` route, causing the buyer's layout (with wallet and cart) to leak into the seller's view. Created a strict `/seller/notifications` route to maintain correct layout boundaries.
+  - **Redundant UI Cleanup:** Added smart routing logic to dynamically hide the notification bell icon from the seller navbar when the user is actively viewing the notifications page, eliminating UX redundancy.
 
 ---
 *End of Changelog.*
