@@ -176,7 +176,7 @@ export function AppNavbar({ variant, email = "", fullName, searchQuery = "" }: N
         </div>
 
         <div className="h-px bg-secondary my-2 mx-3" />
-        <form action="/api/auth/logout" method="post" className="px-1 pb-1 pt-0.5">
+        <form action="/api/auth/logout" method="post" className="px-1 pb-1 pt-0.5" onSubmit={() => { try { localStorage.removeItem("kodedock_cart"); } catch {} }}>
           <button type="submit" className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[14px] font-medium text-rose-600 hover:bg-rose-50 hover:text-rose-700 transition-colors">
             <LogOut className="w-[18px] h-[18px] text-rose-500" /> Log out
           </button>
@@ -265,7 +265,7 @@ export function AppNavbar({ variant, email = "", fullName, searchQuery = "" }: N
             )}
 
             {variant === "seller" && (
-              <Link href="/notifications" className="flex items-center justify-center w-10 h-10 rounded-full text-muted-foreground hover:text-foreground hover:bg-background border border-transparent hover:border-border/60 transition-colors cursor-pointer relative shadow-sm">
+              <Link href="/seller/notifications" className="flex items-center justify-center w-10 h-10 rounded-full text-muted-foreground hover:text-foreground hover:bg-background border border-transparent hover:border-border/60 transition-colors cursor-pointer relative shadow-sm">
                 <Bell className="w-4.5 h-4.5" />
                 {unreadCount > 0 && <span className="absolute -top-1 -right-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-primary-foreground ring-2 ring-background">{unreadCount > 99 ? '99+' : unreadCount}</span>}
               </Link>
@@ -366,7 +366,7 @@ export function AppNavbar({ variant, email = "", fullName, searchQuery = "" }: N
                   </div>
 
                   <div className="p-4 border-t border-border bg-secondary/50">
-                    <form action="/api/auth/logout" method="post">
+                    <form action="/api/auth/logout" method="post" onSubmit={() => { try { localStorage.removeItem("kodedock_cart"); } catch {} }}>
                       <Button variant="outline" className="w-full h-12 rounded-xl border-border text-foreground font-bold shadow-sm bg-background hover:bg-secondary">
                         <LogOut className="w-4 h-4 mr-2.5 text-rose-500" /> Log out
                       </Button>
