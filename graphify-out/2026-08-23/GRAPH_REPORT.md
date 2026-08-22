@@ -1,25 +1,25 @@
 # Graph Report - KodeDock  (2026-08-23)
 
 ## Corpus Check
-- 333 files · ~863,461 words
+- 332 files · ~863,211 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1881 nodes · 3135 edges · 171 communities (105 shown, 66 thin omitted)
+- 1878 nodes · 3133 edges · 165 communities (99 shown, 66 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 51 edges (avg confidence: 0.86)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `67e7d9b6`
+- Built from commit: `f646f14f`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - Changelog
-- product-grid.tsx
+- verifyToken
 - services/auth.rs
 - search
-- app-navbar.tsx
+- cn
 - fontSize
 - slide_search_core.py
 - extract_user_id
@@ -45,7 +45,7 @@
 - design_system.py
 - color
 - DesignSystemGenerator
-- card.tsx
+- button.tsx
 - fetch-background.py
 - components.json
 - dependencies
@@ -62,7 +62,7 @@
 - primitive
 - validate-tokens.cjs
 - button
-- button.tsx
+- wallet-popup.tsx
 - ShadcnInstaller
 - .check_shadcn_config
 - .generate_config_string
@@ -73,7 +73,7 @@
 - patch
 - test_tailwind_config_gen.py
 - search
-- useProfile
+- profile.tsx
 - logo/generate.py
 - generate-tokens.cjs
 - badge.tsx
@@ -81,17 +81,14 @@
 - ApiResponse
 - sync-brand-to-tokens.cjs
 - _run
-- verifyToken
 - BM25
 - web/package.json
 - proxy/[...path]/route.ts
-- seller/notifications/page.tsx
 - main.go
 - app/layout.tsx
 - appearance.tsx
 - PayoutSettings
 - ProductDetailPage
-- server.ts
 - ConnectionsSettings
 - components/settings/layout.tsx
 - shadow
@@ -99,14 +96,12 @@
 - .test_init_dry_run
 - _generate_intelligent_overrides
 - .test_add_components_no_components
-- footer.tsx
 - health_check
 - fix-new-components-theme.js
 - fix-seller-theme.js
 - fix-ultimate-theme.js
 - test_sync_brand_to_tokens.py
 - main
-- EditProductPage
 - none
 - LoginPage
 - lg
@@ -149,7 +144,6 @@
 - Json
 - sonner
 - Option
-- test-docker.sh
 - eslint.config.mjs
 - next.config.ts
 - postcss.config.mjs
@@ -179,33 +173,33 @@
 6. `TestShadcnInstaller` - 26 edges
 7. `apiGet()` - 26 edges
 8. `Card()` - 23 edges
-9. `extract_user_id()` - 22 edges
-10. `CardContent()` - 22 edges
+9. `CardContent()` - 22 edges
+10. `extract_user_id()` - 22 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `create_order()` --calls--> `extract_user_id()`  [INFERRED]
-  services/core-engine/src/handlers/orders.rs → services/core-engine/src/middleware/mod.rs
-- `verify_order()` --calls--> `extract_user_id()`  [INFERRED]
-  services/core-engine/src/handlers/orders.rs → services/core-engine/src/middleware/mod.rs
-- `list_orders()` --calls--> `extract_user_id()`  [INFERRED]
-  services/core-engine/src/handlers/orders.rs → services/core-engine/src/middleware/mod.rs
-- `get_order()` --calls--> `extract_user_id()`  [INFERRED]
-  services/core-engine/src/handlers/orders.rs → services/core-engine/src/middleware/mod.rs
-- `get_product()` --calls--> `extract_user_id()`  [INFERRED]
-  services/core-engine/src/handlers/products.rs → services/core-engine/src/middleware/mod.rs
+- `TestTailwindConfigGenerator` --uses--> `TailwindConfigGenerator`  [INFERRED]
+  .agents/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py → .agents/skills/ui-styling/scripts/tailwind_config_gen.py
+- `TestGeneratedConfigIsValidJs` --uses--> `TailwindConfigGenerator`  [INFERRED]
+  .agents/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py → .agents/skills/ui-styling/scripts/tailwind_config_gen.py
+- `TestShadcnInstaller` --uses--> `ShadcnInstaller`  [INFERRED]
+  .agents/skills/ui-styling/scripts/tests/test_shadcn_add.py → .agents/skills/ui-styling/scripts/shadcn_add.py
+- `handleWithdraw()` --calls--> `apiPost()`  [EXTRACTED]
+  web/src/app/(seller)/seller/wallet/page.tsx → web/src/shared/lib/api/client.ts
+- `handleReviewSubmit()` --calls--> `apiPost()`  [EXTRACTED]
+  web/src/app/(shop)/products/[id]/page.tsx → web/src/shared/lib/api/client.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (171 total, 66 thin omitted)
+## Communities (165 total, 66 thin omitted)
 
 ### Community 0 - "Changelog"
 Cohesion: 0.05
 Nodes (39): [2026-08-11 / 2026-08-12] - Core Engine Initial Fixes & Rate Limiting, [2026-08-13] - Core Engine Security & Deep Audit Fixes, [2026-08-14] - Core Engine Final Deep Scan & Refinements, [2026-08-15] - Deferred Uploads, Schema Synchronization & UI Fixes, [2026-08-17] - Buyer Dashboard UI/UX Redesign & Navbar Updates, 🌓 Advanced Theming & Dark Mode Perfection, 🤖 Agent Guidelines & Open Source Workflows, 🛠️ Architecture & Build Verification (+31 more)
 
-### Community 1 - "product-grid.tsx"
-Cohesion: 0.16
-Nodes (10): BrowseFilters(), BrowseFiltersProps, CATEGORIES, ProductCard(), ProductCardProps, Product, ProductGrid(), ProductGridProps (+2 more)
+### Community 1 - "verifyToken"
+Cohesion: 0.06
+Nodes (33): SellerLayout(), fetchNotifications(), NotificationsPage(), BrowseFilters(), BrowseFiltersProps, CATEGORIES, ProductCard(), ProductCardProps (+25 more)
 
 ### Community 2 - "services/auth.rs"
 Cohesion: 0.09
@@ -215,9 +209,9 @@ Nodes (47): dotenv, ioredis, jsonwebtoken, Key, KeyExtractionError, KeyExtractor
 Cohesion: 0.07
 Nodes (42): BM25, detect_domain(), get_cip_brief(), _load_csv(), Load CSV and return list of dicts, Core search function using BM25, Auto-detect the most relevant domain from query, Main search function with auto-domain detection (+34 more)
 
-### Community 4 - "app-navbar.tsx"
-Cohesion: 0.08
-Nodes (25): CartItem, CartPopup(), getCart(), Props, saveCart(), getIcon(), Notification, NotificationPopup() (+17 more)
+### Community 4 - "cn"
+Cohesion: 0.09
+Nodes (23): AppNavbar(), BUYER_NAV_PILLS, getCartCount(), getShortName(), NavbarProps, SELLER_NAV_ITEMS, cn(), CardAction() (+15 more)
 
 ### Community 5 - "fontSize"
 Cohesion: 0.12
@@ -232,12 +226,12 @@ Cohesion: 0.05
 Nodes (68): Client, Clone, get_preferences(), list_notifications(), mark_all_read(), mark_read(), Data, HttpRequest (+60 more)
 
 ### Community 8 - "api/client.ts"
-Cohesion: 0.08
-Nodes (29): DeveloperRegisterPage(), handleRegister(), SellerHeader(), SellerHeaderProps, SellerEarningsPage(), Transaction, WalletData, OrderItem (+21 more)
+Cohesion: 0.06
+Nodes (33): DeveloperRegisterPage(), handleRegister(), SellerHeader(), SellerHeaderProps, SellerEarningsPage(), Transaction, WalletData, OrderItem (+25 more)
 
 ### Community 9 - "seller/page.tsx"
-Cohesion: 0.06
-Nodes (27): GET(), Order, SalesChart(), SalesChartProps, SellerStatsDeck(), SellerStatsDeckProps, dynamic, Order (+19 more)
+Cohesion: 0.07
+Nodes (25): GET(), Order, SalesChart(), SalesChartProps, SellerStatsDeck(), SellerStatsDeckProps, dynamic, Order (+17 more)
 
 ### Community 10 - "models/mod.rs"
 Cohesion: 0.18
@@ -251,10 +245,6 @@ Nodes (34): $type, $value, $type, $value, $type, $value, $type, $value (+26 more
 Cohesion: 0.07
 Nodes (28): exempt, middleware, post, health_check(), limit_body_size(), get, Request, AnalyticsResponse (+20 more)
 
-### Community 13 - "static-layout.tsx"
-Cohesion: 0.13
-Nodes (3): OPENINGS, StaticPageLayout(), StaticPageLayoutProps
-
 ### Community 14 - "TestTailwindConfigGenerator"
 Cohesion: 0.06
 Nodes (16): Test adding colors multiple times., Test adding full color palette., Test adding custom spacing., Test adding custom breakpoints., Test TailwindConfigGenerator class., Test generating TypeScript configuration., Test validating config with empty theme extensions., Test writing configuration to file. (+8 more)
@@ -264,8 +254,8 @@ Cohesion: 0.15
 Nodes (30): Box, HashMap, Order, Product, complete_order_atomic(), create_order(), dispatch_order_events(), get_order() (+22 more)
 
 ### Community 16 - "apiPost"
-Cohesion: 0.08
-Nodes (14): ForgotPasswordPage(), handleSubmit(), ResetPasswordForm(), handleSubmit(), handleWithdraw(), NotificationPrefs, NotificationsSettings(), PayoutAccountData (+6 more)
+Cohesion: 0.09
+Nodes (15): ForgotPasswordPage(), handleSubmit(), ResetPasswordForm(), handleSubmit(), handleDelete(), NotificationPrefs, NotificationsSettings(), SecuritySettings() (+7 more)
 
 ### Community 17 - "compilerOptions"
 Cohesion: 0.07
@@ -285,14 +275,14 @@ Nodes (37): Display, Formatter, complete_topup_atomic(), create_topup(), get_bal
 
 ### Community 21 - "(main)/page.tsx"
 Cohesion: 0.08
-Nodes (24): BENEFITS, DevBenefits(), COMPARISON, DevCommission(), DevCTA(), DevHero(), Categories(), Features (+16 more)
+Nodes (25): BENEFITS, DevBenefits(), COMPARISON, DevCommission(), DevCTA(), DevHero(), CATEGORIES, Categories() (+17 more)
 
 ### Community 22 - "BM25"
 Cohesion: 0.11
 Nodes (19): BM25, detect_domain(), _load_csv(), Load CSV and return list of dicts, Core search function using BM25, Auto-detect the most relevant domain from query, Main search function with auto-domain detection, Search across all domains and combine results (+11 more)
 
 ### Community 23 - "auth/client.ts"
-Cohesion: 0.15
+Cohesion: 0.16
 Nodes (15): CategoryPage(), formatSlug(), getCategoryProducts(), Product, getSellerProducts(), getSellerProfile(), Product, SellerProfile (+7 more)
 
 ### Community 24 - "TailwindConfigGenerator"
@@ -319,9 +309,9 @@ Nodes (46): $type, $value, background, destructive, destructive-foreground, fore
 Cohesion: 0.14
 Nodes (11): DesignSystemGenerator, Find matching reasoning rule for a category., Apply reasoning rules to search results., Select best matching result based on priority keywords., Extract results list from search result dict., Generate complete design system recommendation. variance/motion/density are…, Bucket a 1-10 dial value into its tier config. Returns None if value is None., Generates design system recommendations from aggregated searches. (+3 more)
 
-### Community 30 - "card.tsx"
-Cohesion: 0.14
-Nodes (19): PASSWORD_REQUIREMENTS, PASSWORD_REQUIREMENTS, TODO: Implement email verification via backend, SearchPage(), SearchPageProps, searchProducts(), auth, cn() (+11 more)
+### Community 30 - "button.tsx"
+Cohesion: 0.13
+Nodes (16): PASSWORD_REQUIREMENTS, PASSWORD_REQUIREMENTS, TODO: Implement email verification via backend, OPENINGS, SearchPage(), SearchPageProps, searchProducts(), fetchOrder() (+8 more)
 
 ### Community 31 - "fetch-background.py"
 Cohesion: 0.17
@@ -387,9 +377,9 @@ Nodes (11): extensions, formatReport(), fs, getFiles(), main(), parseArgs(), pat
 Cohesion: 0.06
 Nodes (45): $type, $value, $type, $value, bg, fg, font-size, hover-bg (+37 more)
 
-### Community 47 - "button.tsx"
-Cohesion: 0.13
-Nodes (14): Transaction, Wallet, WalletPage(), AddMoneyModal(), handleAddMoney(), AddMoneyModalProps, loadRazorpayScript(), QUICK_AMOUNTS (+6 more)
+### Community 47 - "wallet-popup.tsx"
+Cohesion: 0.09
+Nodes (24): Transaction, Wallet, WalletPage(), CartItem, CartPopup(), getCart(), Props, saveCart() (+16 more)
 
 ### Community 48 - "ShadcnInstaller"
 Cohesion: 0.20
@@ -431,8 +421,8 @@ Nodes (8): Tests for tailwind_config_gen.py, Reduce a generated TS/JS config to 
 Cohesion: 0.25
 Nodes (10): detect_domain(), _load_csv(), Load CSV and return list of dicts, Core search function using BM25, Auto-detect the most relevant domain from query, Main search function with auto-domain detection, Search stack-specific guidelines, search() (+2 more)
 
-### Community 58 - "useProfile"
-Cohesion: 0.27
+### Community 58 - "profile.tsx"
+Cohesion: 0.29
 Nodes (5): ProfileSettings(), useProfile(), handleAutoFetchLocation(), handleAvatarUpload(), updateField()
 
 ### Community 59 - "logo/generate.py"
@@ -444,8 +434,8 @@ Cohesion: 0.36
 Nodes (9): flattenTokens(), fs, generateCSS(), generateTailwind(), main(), parseArgs(), path, resolveReference() (+1 more)
 
 ### Community 61 - "badge.tsx"
-Cohesion: 0.14
-Nodes (11): BLOG_POSTS, Product, Review, fetchOrder(), Order, OrderDetailPage(), fadeInUp, Hero() (+3 more)
+Cohesion: 0.17
+Nodes (8): BLOG_POSTS, Product, Review, fadeInUp, Hero(), staggerContainer, Badge(), badgeVariants
 
 ### Community 62 - "._base_config"
 Cohesion: 0.22
@@ -463,10 +453,6 @@ Nodes (8): adjustBrightness(), { execFileSync }, extractColorsFromMarkdown(), fs
 Cohesion: 0.28
 Nodes (8): Path, Regression tests for validate-tokens.cjs. The validator used to skip any line…, A hardcoded hex on the same line as a var() token is still a violation., A line that references only tokens produces no false positives., _run(), test_flags_hardcoded_hex_sharing_line_with_token(), test_token_only_line_reports_no_violation(), CompletedProcess
 
-### Community 66 - "verifyToken"
-Cohesion: 0.33
-Nodes (7): SellerLayout(), ShopLayout(), DashboardLayout(), Navbar(), NavbarProps, getSigningKey(), verifyToken()
-
 ### Community 67 - "BM25"
 Cohesion: 0.28
 Nodes (5): BM25, BM25 ranking algorithm for text search, Lowercase, split, remove punctuation, filter short words, Build BM25 index from documents, Score all documents against query
@@ -478,10 +464,6 @@ Nodes (9): name, private, scripts, build, dev, format:check, lint, start (+1 mor
 ### Community 69 - "proxy/[...path]/route.ts"
 Cohesion: 0.39
 Nodes (8): ALLOWED_PREFIXES, DELETE(), GET(), isAllowedPath(), PATCH(), POST(), proxyRequest(), PUT()
-
-### Community 70 - "seller/notifications/page.tsx"
-Cohesion: 0.29
-Nodes (9): fetchNotifications(), NotificationsPage(), handleSubmit(), formatRelativeTime(), getNotificationConfig(), Notification, NotificationsList(), handleSubmit() (+1 more)
 
 ### Community 71 - "main.go"
 Cohesion: 0.43
@@ -499,10 +481,6 @@ Nodes (3): PayoutSettings(), handleSave(), validate()
 Cohesion: 0.39
 Nodes (7): getCart(), ProductDetailPage(), handleAddToCart(), handleBuy(), handleRemoveFromCart(), handleReviewSubmit(), saveCart()
 
-### Community 76 - "server.ts"
-Cohesion: 0.36
-Nodes (6): config, proxy(), ROLES, updateSession(), TokenClaims, verifyRequest()
-
 ### Community 79 - "shadow"
 Cohesion: 0.47
 Nodes (6): sm, shadow, sm, sm, $type, $value
@@ -514,10 +492,6 @@ Nodes (8): $type, $value, $type, $value, radius, default, full, default
 ### Community 82 - "_generate_intelligent_overrides"
 Cohesion: 0.33
 Nodes (6): _detect_page_type(), format_page_override_md(), _generate_intelligent_overrides(), Format a page-specific override file with intelligent AI-generated content., Generate intelligent overrides based on page type using layered search. Uses…, Detect page type from context and search results.
-
-### Community 84 - "footer.tsx"
-Cohesion: 0.36
-Nodes (3): LinkedinIcon(), TwitterIcon(), Footer()
 
 ### Community 85 - "health_check"
 Cohesion: 0.60
@@ -535,10 +509,6 @@ Nodes (3): fs, path, replacements
 Cohesion: 0.40
 Nodes (3): fs, path, replacements
 
-### Community 91 - "EditProductPage"
-Cohesion: 0.40
-Nodes (3): EditProductPage(), handleDelete(), handleImageSelect()
-
 ### Community 92 - "none"
 Cohesion: 0.67
 Nodes (4): $type, $value, none, none
@@ -552,24 +522,24 @@ Cohesion: 0.67
 Nodes (4): xl, xl, $type, $value
 
 ## Knowledge Gaps
-- **351 isolated node(s):** `SellerStats`, `name`, `version`, `private`, `dev` (+346 more)
+- **350 isolated node(s):** `BrowseFiltersProps`, `ProductCardProps`, `Product`, `ProductGridProps`, `BrowsePageProps` (+345 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **66 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `extract_user_id()` connect `extract_user_id` to `get_product`, `wallet.rs`, `create_review`, `orders.rs`?**
-  _High betweenness centrality (0.018) - this node is a cross-community bridge._
 - **Why does `primitive` connect `primitive` to `fontSize`, `gray`, `spacing`, `shadow`, `radius`, `duration`?**
-  _High betweenness centrality (0.012) - this node is a cross-community bridge._
-- **Why does `Button()` connect `button.tsx` to `app-navbar.tsx`, `api/client.ts`, `static-layout.tsx`, `apiPost`, `(main)/page.tsx`, `auth/client.ts`, `checkout/page.tsx`, `badge.tsx`, `card.tsx`?**
+  _High betweenness centrality (0.014) - this node is a cross-community bridge._
+- **Why does `extract_user_id()` connect `extract_user_id` to `get_product`, `wallet.rs`, `create_review`, `orders.rs`?**
+  _High betweenness centrality (0.011) - this node is a cross-community bridge._
+- **Why does `Button()` connect `button.tsx` to `cn`, `api/client.ts`, `wallet-popup.tsx`, `apiPost`, `(main)/page.tsx`, `auth/client.ts`, `checkout/page.tsx`, `profile.tsx`, `badge.tsx`?**
   _High betweenness centrality (0.008) - this node is a cross-community bridge._
 - **Are the 2 inferred relationships involving `TailwindConfigGenerator` (e.g. with `TestGeneratedConfigIsValidJs` and `TestTailwindConfigGenerator`) actually correct?**
   _`TailwindConfigGenerator` has 2 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `SellerStats`, `name`, `version` to the rest of the system?**
-  _351 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **What connects `BrowseFiltersProps`, `ProductCardProps`, `Product` to the rest of the system?**
+  _350 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Changelog` be split into smaller, more focused modules?**
   _Cohesion score 0.05 - nodes in this community are weakly interconnected._
-- **Should `services/auth.rs` be split into smaller, more focused modules?**
-  _Cohesion score 0.08784313725490196 - nodes in this community are weakly interconnected._
+- **Should `verifyToken` be split into smaller, more focused modules?**
+  _Cohesion score 0.0641025641025641 - nodes in this community are weakly interconnected._
