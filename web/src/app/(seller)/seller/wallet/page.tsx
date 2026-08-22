@@ -178,7 +178,6 @@ export default function SellerWalletPage() {
     <div className="w-full font-sans">
       {/* 1. Header */}
       <SellerHeader
-        badge="Financial Engine"
         title="Seller Wallet & Payouts"
         description="View real-time balances, manage escrow holdings, and request direct bank or UPI payouts."
         lastUpdated={lastUpdated}

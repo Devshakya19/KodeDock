@@ -101,7 +101,6 @@ export default function SellerReviewsPage() {
     <div className="w-full font-sans">
       {/* 1. Header */}
       <SellerHeader
-        badge="Reputation & Trust"
         title="Product Reviews"
         description="Monitor buyer feedback, rating distributions, and customer satisfaction across your catalog."
         lastUpdated={lastUpdated}

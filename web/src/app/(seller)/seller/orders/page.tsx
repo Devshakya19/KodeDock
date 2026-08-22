@@ -129,7 +129,6 @@ export default function SellerOrdersPage() {
     <div className="w-full font-sans">
       {/* 1. Header */}
       <SellerHeader
-        badge="Fulfillment Center"
         title="Customer Orders"
         description="Real-time ledger of completed purchases, customer delivery events, and payout status."
         lastUpdated={lastUpdated}

@@ -188,7 +188,6 @@ export default function NewProductPage() {
     <div className="w-full font-sans">
       {/* 1. Header */}
       <SellerHeader
-        badge="Asset Studio"
         title="Publish New Code Asset"
         description="List your templates, boilerplate code, or full-stack projects for buyers across the marketplace."
         backHref="/seller/products"

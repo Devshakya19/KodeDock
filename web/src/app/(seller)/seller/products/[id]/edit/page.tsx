@@ -256,7 +256,6 @@ export default function EditProductPage() {
     <div className="w-full font-sans">
       {/* 1. Header */}
       <SellerHeader
-        badge="Listing Editor"
         title="Edit Code Product"
         description="Update your pricing, cover asset, product metadata, and inventory availability status."
         backHref="/seller/products"

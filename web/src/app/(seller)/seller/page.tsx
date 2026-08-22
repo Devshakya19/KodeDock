@@ -102,7 +102,6 @@ export default async function SellerDashboardPage() {
     <div className="w-full font-sans min-h-[100dvh] pb-24">
       {/* 1. Header with Actions */}
       <SellerHeader
-        badge="Creator Studio"
         title={`Welcome back, ${sellerFirstName}.`}
         description="Monitor your code assets, track customer orders, and manage financial payouts in real-time."
         actions={

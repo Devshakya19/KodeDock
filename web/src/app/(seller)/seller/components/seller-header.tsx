@@ -6,7 +6,6 @@ import { Sparkles, RefreshCw, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface SellerHeaderProps {
-  badge?: string;
   title: string;
   description?: string;
   backHref?: string;
@@ -18,7 +17,6 @@ interface SellerHeaderProps {
 }
 
 export function SellerHeader({
-  badge = "Creator Studio",
   title,
   description,
   backHref,
@@ -53,12 +51,6 @@ export function SellerHeader({
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
           className="max-w-2xl"
         >
-          {badge && (
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-[0.2em] mb-4 shadow-md">
-              <Sparkles className="w-3.5 h-3.5 text-accent" />
-              <span>{badge}</span>
-            </div>
-          )}
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-foreground tracking-tighter leading-[1.1] flex flex-wrap" aria-label={title}>
             {title.split(" ").map((word, wordIndex, wordsArray) => {
               const previousCharsCount = wordsArray.slice(0, wordIndex).join("").length;

@@ -176,7 +176,6 @@ export default function ProductsPage() {
     <div className="w-full font-sans">
       {/* 1. Header */}
       <SellerHeader
-        badge="Product Inventory"
         title="Products & Assets"
         description="Manage your code packages, monitor views, and track individual sales performance."
         lastUpdated={lastUpdated}

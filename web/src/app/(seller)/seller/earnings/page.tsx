@@ -101,7 +101,6 @@ export default function SellerEarningsPage() {
     <div className="w-full font-sans">
       {/* 1. Header */}
       <SellerHeader
-        badge="Revenue Analytics"
         title="Creator Earnings"
         description="Track your net revenue velocity, withdrawal history, and platform commission breakdown."
         lastUpdated={lastUpdated}
