@@ -273,5 +273,26 @@ All notable changes to the KodeDock backend project will be documented in this f
   - **Rust (`core-engine`):** Integrated the `redis` crate. Replaced mocked placeholder logs with the actual `dispatch_order_events` function. Upon successful Razorpay payment, Rust now securely pushes structural JSON payloads into Redis Task Queues (`repo_transfer`, `email`) and broadcasts to Pub/Sub (`order_updates`).
   - **Go (`infra-worker`):** Replaced skeleton TODO comments with active Redis `BLPOP` consumer loops for handling background email sending and GitHub repository transfers without blocking the main checkout thread.
 
+## [v1.5.1] - 2026-08-23
+
+### 🚀 Enterprise CI/CD & Formatting
+- **101% Enterprise-Grade GitHub Actions Pipeline:**
+  - **Dynamic Release Bot (`release.yml`):** Fixed hardcoded release messages. The bot now dynamically extracts exact release notes directly from `CHANGE.md` when a new version tag is pushed.
+  - **Codebase Formatter Job:** Upgraded `ci.yml` with strict code standard checks including `cargo fmt --check`, `gofmt -l`, and `npm run format:check`.
+  - **Production Simulator (`docker-build-test`):** Added a rigorous Docker Compose build stage to the CI pipeline to prevent deployment regressions across Rust, Go, and Next.js microservices.
+  - **Auto-Labeler Bot (`labeler.yml`):** Implemented an automated PR labeling system to categorize PRs based on the microservice directory modified (e.g., `frontend`, `backend`, `go-worker`).
+  - **Stale PR & Issue Bot (`stale.yml`):** Implemented a cron job to automatically warn and close abandoned issues/PRs after 30 days of inactivity.
+
+### 🎨 Codebase Standardization
+- **Global Prettier Rollout:**
+  - Integrated `prettier` across the Next.js `web/` workspace.
+  - Automatically reformatted 150+ React files, guaranteeing a strict standard for indentation, trailing commas, and line wrapping.
+- **Rust & Go Formatting:** Executed global `cargo fmt` and `gofmt` to align backend and infrastructure logic with standard language styles.
+
+### 🐛 Bug Fixes
+- **TypeScript & ESLint (Invoice API):** Fixed a strict TS compilation error (`[number, number, number]`) for `primaryColor` and properly described the `@ts-expect-error` override for `jsPDF`.
+- **Docker Build Error:** Renamed the web service pointer from `web` to `frontend` in `ci.yml` and injected a dummy `NEXT_PUBLIC_GITHUB_CLIENT_ID` to unblock Docker Compose verification.
+- **Rust Compilation:** Updated legacy `amount_usd` references to `amount_paise` in `orders.rs` ensuring seamless PubSub and Redis integration.
+
 ---
 *End of Changelog.*
