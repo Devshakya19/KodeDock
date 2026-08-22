@@ -178,7 +178,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     });
 
     // --- Total Calculation Section ---
-    // @ts-expect-error
+    // @ts-expect-error: doc.lastAutoTable is added dynamically by jspdf-autotable plugin
     const finalY = doc.lastAutoTable?.finalY || 110;
 
     // Background for total
