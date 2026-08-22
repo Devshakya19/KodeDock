@@ -5,31 +5,38 @@ import { GithubIcon } from "@/shared/components/icons/github";
 
 const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
 };
 
 const staggerContainer: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.1 }
-  }
+    transition: { staggerChildren: 0.1 },
+  },
 };
 
 export function WhatIsKodeDock() {
   return (
     <section id="what-is-kodedock" className="container mx-auto py-24 lg:py-32">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-        <motion.div 
-          initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }}
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
           variants={staggerContainer}
           className="flex flex-col gap-6"
         >
-          <motion.h2 variants={fadeInUp} className="font-marketing text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight">
+          <motion.h2
+            variants={fadeInUp}
+            className="font-marketing text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight"
+          >
             Where code meets commerce.
           </motion.h2>
           <motion.p variants={fadeInUp} className="text-lg text-muted-foreground leading-relaxed">
-            KodeDock is designed for modern developers. We eliminate the friction of buying and selling code. No more 50% marketplace cuts. No more downloading outdated static zip files.
+            KodeDock is designed for modern developers. We eliminate the friction of buying and
+            selling code. No more 50% marketplace cuts. No more downloading outdated static zip
+            files.
           </motion.p>
           <motion.div variants={fadeInUp} className="flex items-center gap-4 pt-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
@@ -37,12 +44,14 @@ export function WhatIsKodeDock() {
             </div>
             <div>
               <h4 className="font-semibold text-foreground">Native GitHub Integration</h4>
-              <p className="text-sm text-muted-foreground">Every purchase clones the repo instantly to your account.</p>
+              <p className="text-sm text-muted-foreground">
+                Every purchase clones the repo instantly to your account.
+              </p>
             </div>
           </motion.div>
         </motion.div>
-        
-        <motion.div 
+
+        <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6 }}
@@ -55,7 +64,9 @@ export function WhatIsKodeDock() {
               <div className="w-3 h-3 rounded-full bg-destructive" />
               <div className="w-3 h-3 rounded-full bg-warning" />
               <div className="w-3 h-3 rounded-full bg-success" />
-              <span className="font-mono text-xs text-muted-foreground ml-4">github.com/buyer/new-project</span>
+              <span className="font-mono text-xs text-muted-foreground ml-4">
+                github.com/buyer/new-project
+              </span>
             </div>
             <div className="pt-6 font-mono text-sm">
               <p className="text-primary">$ git clone https://github.com/buyer/new-project</p>

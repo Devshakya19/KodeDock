@@ -114,9 +114,7 @@ function ResetPasswordForm() {
         <CardContent className="p-8">
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-foreground">Reset password</h1>
-            <p className="text-sm text-muted-foreground mt-2">
-              Enter your new password below
-            </p>
+            <p className="text-sm text-muted-foreground mt-2">Enter your new password below</p>
           </div>
 
           {error && (
@@ -140,7 +138,10 @@ function ResetPasswordForm() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-foreground mb-1.5">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-foreground mb-1.5"
+                >
                   New password
                 </label>
                 <div className="relative">
@@ -167,7 +168,10 @@ function ResetPasswordForm() {
               </div>
 
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-foreground mb-1.5">
+                <label
+                  htmlFor="confirmPassword"
+                  className="block text-sm font-medium text-foreground mb-1.5"
+                >
                   Confirm password
                 </label>
                 <Input
@@ -186,11 +190,7 @@ function ResetPasswordForm() {
                 disabled={loading}
                 className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90"
               >
-                {loading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  "Update password"
-                )}
+                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Update password"}
               </Button>
             </form>
           )}
@@ -202,15 +202,17 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense fallback={
-      <div className="w-full max-w-md">
-        <Card className="border-border shadow-lg shadow-sm">
-          <CardContent className="p-8 text-center">
-            <Loader2 className="w-6 h-6 text-muted-foreground animate-spin mx-auto" />
-          </CardContent>
-        </Card>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="w-full max-w-md">
+          <Card className="border-border shadow-lg shadow-sm">
+            <CardContent className="p-8 text-center">
+              <Loader2 className="w-6 h-6 text-muted-foreground animate-spin mx-auto" />
+            </CardContent>
+          </Card>
+        </div>
+      }
+    >
       <ResetPasswordForm />
     </Suspense>
   );

@@ -26,10 +26,7 @@ async function proxyRequest(request: NextRequest, method: string) {
 
   // SSRF protection — only allow whitelisted backend paths
   if (!isAllowedPath(rawPath)) {
-    return NextResponse.json(
-      { success: false, error: "Path not allowed" },
-      { status: 403 }
-    );
+    return NextResponse.json({ success: false, error: "Path not allowed" }, { status: 403 });
   }
 
   const backendUrl = `${RUST_BACKEND}/api/${rawPath}`;

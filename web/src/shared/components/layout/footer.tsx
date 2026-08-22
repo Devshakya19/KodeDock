@@ -13,37 +13,104 @@ export function Footer() {
               Kode<span className="text-primary">Dock</span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
-              India's first developer marketplace. Buy and sell premium code assets with instant GitHub delivery.
+              India's first developer marketplace. Buy and sell premium code assets with instant
+              GitHub delivery.
             </p>
             <div className="flex items-center gap-4 mt-2">
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors"><TwitterIcon size={20} /></a>
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors"><GithubIcon size={20} /></a>
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors"><LinkedinIcon size={20} /></a>
+              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+                <TwitterIcon size={20} />
+              </a>
+              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+                <GithubIcon size={20} />
+              </a>
+              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+                <LinkedinIcon size={20} />
+              </a>
             </div>
           </div>
-          
+
           <div className="flex flex-col gap-3">
             <h4 className="font-semibold text-foreground mb-2">Marketplace</h4>
-            <Link href="/browse" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Browse Code</Link>
-            <Link href="/categories" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Categories</Link>
-            <Link href="/seller" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Start Selling</Link>
-            <Link href="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Pricing</Link>
+            <Link
+              href="/browse"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Browse Code
+            </Link>
+            <Link
+              href="/categories"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Categories
+            </Link>
+            <Link
+              href="/seller"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Start Selling
+            </Link>
+            <Link
+              href="/pricing"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Pricing
+            </Link>
           </div>
 
           <div className="flex flex-col gap-3">
             <h4 className="font-semibold text-foreground mb-2">Company</h4>
-            <Link href="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">About Us</Link>
-            <Link href="/blog" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Blog</Link>
-            <Link href="/careers" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Careers</Link>
-            <Link href="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Contact</Link>
+            <Link
+              href="/about"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              About Us
+            </Link>
+            <Link
+              href="/blog"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Blog
+            </Link>
+            <Link
+              href="/careers"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Careers
+            </Link>
+            <Link
+              href="/contact"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Contact
+            </Link>
           </div>
 
           <div className="flex flex-col gap-3">
             <h4 className="font-semibold text-foreground mb-2">Legal</h4>
-            <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Terms of Service</Link>
-            <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Privacy Policy</Link>
-            <Link href="/refund" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Refund Policy</Link>
-            <Link href="/license" className="text-sm text-muted-foreground hover:text-foreground transition-colors">License Agreement</Link>
+            <Link
+              href="/terms"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Terms of Service
+            </Link>
+            <Link
+              href="/privacy"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Privacy Policy
+            </Link>
+            <Link
+              href="/refund"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Refund Policy
+            </Link>
+            <Link
+              href="/license"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              License Agreement
+            </Link>
           </div>
         </div>
 

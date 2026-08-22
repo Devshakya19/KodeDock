@@ -104,14 +104,20 @@ export function useProfile() {
 
     setFetchingLocation(true);
     setError("");
-    
+
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         try {
-          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}&zoom=10`);
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}&zoom=10`
+          );
           const data = await res.json();
           if (data && data.address) {
-            const city = data.address.city || data.address.town || data.address.state_district || data.address.county;
+            const city =
+              data.address.city ||
+              data.address.town ||
+              data.address.state_district ||
+              data.address.county;
             const country = data.address.country;
             if (city && country) {
               updateField("location", `${city}, ${country}`);
@@ -129,10 +135,14 @@ export function useProfile() {
         setFetchingLocation(false);
         switch (err.code) {
           case err.PERMISSION_DENIED:
-            setError("Permission to access location was denied. Please allow location access in your browser settings and try again.");
+            setError(
+              "Permission to access location was denied. Please allow location access in your browser settings and try again."
+            );
             break;
           case err.POSITION_UNAVAILABLE:
-            setError("Location information is unavailable. Please check your network or try again later.");
+            setError(
+              "Location information is unavailable. Please check your network or try again later."
+            );
             break;
           case err.TIMEOUT:
             setError("The request to get your location timed out.");
@@ -155,7 +165,7 @@ export function useProfile() {
 
     const result = await apiPut("/profile", {
       id: userId,
-      ...formData
+      ...formData,
     });
 
     if (result.error) {
@@ -178,6 +188,6 @@ export function useProfile() {
     updateField,
     handleAvatarUpload,
     handleAutoFetchLocation,
-    handleSubmit
+    handleSubmit,
   };
 }

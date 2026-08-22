@@ -1,8 +1,8 @@
-use actix_web::{web, HttpRequest, HttpResponse};
-use sqlx::PgPool;
+use crate::middleware::extract_user_id;
 use crate::models::PublicProduct;
 use crate::services::ApiResponse;
-use crate::middleware::extract_user_id;
+use actix_web::{web, HttpRequest, HttpResponse};
+use sqlx::PgPool;
 
 #[derive(serde::Deserialize)]
 pub struct ListProductsQuery {
@@ -37,7 +37,8 @@ pub async fn list_products(
     if query.search.is_some() {
         sql.push_str(&format!(
             " AND (title ILIKE ${} OR description ILIKE ${})",
-            bind_index, bind_index + 1
+            bind_index,
+            bind_index + 1
         ));
         bind_index += 2;
     }
@@ -50,7 +51,11 @@ pub async fn list_products(
         _ => sql.push_str(" ORDER BY p.created_at DESC"),
     }
 
-    sql.push_str(&format!(" LIMIT ${} OFFSET ${}", bind_index, bind_index + 1));
+    sql.push_str(&format!(
+        " LIMIT ${} OFFSET ${}",
+        bind_index,
+        bind_index + 1
+    ));
 
     let mut query_builder = sqlx::query_as::<_, PublicProduct>(&sql);
 
@@ -60,7 +65,9 @@ pub async fn list_products(
 
     if let Some(ref s) = query.search {
         let search_pattern = format!("%{}%", s);
-        query_builder = query_builder.bind(search_pattern.clone()).bind(search_pattern);
+        query_builder = query_builder
+            .bind(search_pattern.clone())
+            .bind(search_pattern);
     }
 
     query_builder = query_builder.bind(limit as i64).bind(offset as i64);
@@ -69,7 +76,8 @@ pub async fn list_products(
         Ok(products) => HttpResponse::Ok().json(ApiResponse::success(products, "Products fetched")),
         Err(e) => {
             log::error!("Failed to fetch products: {}", e);
-            HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to fetch products"))
+            HttpResponse::InternalServerError()
+                .json(ApiResponse::<()>::error("Failed to fetch products"))
         }
     }
 }
@@ -81,7 +89,9 @@ pub async fn get_product(
 ) -> HttpResponse {
     let id = match uuid::Uuid::parse_str(&path.into_inner()) {
         Ok(uuid) => uuid,
-        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid product ID")),
+        Err(_) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid product ID"))
+        }
     };
 
     // Track unique views per user (not per request)
@@ -102,10 +112,12 @@ pub async fn get_product(
 
             if let Ok(result) = inserted {
                 if result.rows_affected() > 0 {
-                    let _ = sqlx::query("UPDATE products SET view_count = view_count + 1 WHERE id = $1")
-                        .bind(id)
-                        .execute(pool.get_ref())
-                        .await;
+                    let _ = sqlx::query(
+                        "UPDATE products SET view_count = view_count + 1 WHERE id = $1",
+                    )
+                    .bind(id)
+                    .execute(pool.get_ref())
+                    .await;
                 }
             }
         }
@@ -120,11 +132,14 @@ pub async fn get_product(
         .fetch_optional(pool.get_ref())
         .await
     {
-        Ok(Some(product)) => HttpResponse::Ok().json(ApiResponse::success(product, "Product fetched")),
+        Ok(Some(product)) => {
+            HttpResponse::Ok().json(ApiResponse::success(product, "Product fetched"))
+        }
         Ok(None) => HttpResponse::NotFound().json(ApiResponse::<()>::error("Product not found")),
         Err(e) => {
             log::error!("Failed to fetch product: {}", e);
-            HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to fetch product"))
+            HttpResponse::InternalServerError()
+                .json(ApiResponse::<()>::error("Failed to fetch product"))
         }
     }
 }

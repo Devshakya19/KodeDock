@@ -1,23 +1,27 @@
+use crate::middleware::{extract_user_id, require_developer};
+use crate::models::{
+    ListTransactionsQuery, TopupOrderResponse, TopupRequest, TopupVerifyRequest, Wallet,
+    WalletTopup, WalletTransaction, WithdrawRequest,
+};
+use crate::services::payment;
+use crate::services::ApiResponse;
 use actix_web::{web, HttpRequest, HttpResponse};
 use serde::Deserialize;
 use sqlx::PgPool;
-use crate::models::{Wallet, WalletTransaction, TopupRequest, TopupVerifyRequest, TopupOrderResponse, WithdrawRequest, ListTransactionsQuery, WalletTopup};
-use crate::services::ApiResponse;
-use crate::services::payment;
-use crate::middleware::{extract_user_id, require_developer};
 
-pub async fn get_balance(
-    pool: web::Data<PgPool>,
-    req: HttpRequest,
-) -> HttpResponse {
+pub async fn get_balance(pool: web::Data<PgPool>, req: HttpRequest) -> HttpResponse {
     let user_id = match extract_user_id(&req) {
         Ok(id) => id,
-        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized")),
+        Err(_) => {
+            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized"))
+        }
     };
 
     let user_uuid = match uuid::Uuid::parse_str(&user_id) {
         Ok(uuid) => uuid,
-        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID")),
+        Err(_) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID"))
+        }
     };
 
     let wallet = match sqlx::query_as::<_, Wallet>("SELECT * FROM wallets WHERE user_id = $1")
@@ -66,19 +70,29 @@ pub async fn create_topup(
 ) -> HttpResponse {
     let user_id = match extract_user_id(&req) {
         Ok(id) => id,
-        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized")),
+        Err(_) => {
+            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized"))
+        }
     };
 
     if body.amount_paise < 100 || body.amount_paise > 5000000 {
-        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Amount must be between ₹1 and ₹50,000"));
+        return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+            "Amount must be between ₹1 and ₹50,000",
+        ));
     }
 
     let user_uuid = match uuid::Uuid::parse_str(&user_id) {
         Ok(uuid) => uuid,
-        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID")),
+        Err(_) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID"))
+        }
     };
 
-    let receipt = format!("tp_{}_{}", &user_id[..8], &uuid::Uuid::new_v4().to_string()[..8]);
+    let receipt = format!(
+        "tp_{}_{}",
+        &user_id[..8],
+        &uuid::Uuid::new_v4().to_string()[..8]
+    );
     match payment::create_razorpay_order(body.amount_paise, &receipt).await {
         Ok(razorpay_order) => {
             // Store the topup order in our database
@@ -102,12 +116,13 @@ pub async fn create_topup(
         }
         Err(e) => {
             log::error!("Failed to create topup order: {:?}", e);
-            HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to create payment order"))
+            HttpResponse::InternalServerError()
+                .json(ApiResponse::<()>::error("Failed to create payment order"))
         }
     }
 }
 
-/// Atomically completes a wallet topup. Returns `Ok(Some(new_balance))` if successful, 
+/// Atomically completes a wallet topup. Returns `Ok(Some(new_balance))` if successful,
 /// `Ok(None)` if already processed or not found.
 async fn complete_topup_atomic(
     pool: &PgPool,
@@ -126,7 +141,7 @@ async fn complete_topup_atomic(
                razorpay_signature = COALESCE($2, razorpay_signature), 
                updated_at = NOW() 
            WHERE razorpay_order_id = $3 AND user_id = $4 AND status = 'pending' 
-           RETURNING *"#
+           RETURNING *"#,
     )
     .bind(razorpay_payment_id)
     .bind(razorpay_signature)
@@ -154,7 +169,7 @@ async fn complete_topup_atomic(
         r#"UPDATE wallets 
            SET balance_paise = balance_paise + $1, updated_at = NOW() 
            WHERE user_id = $2 
-           RETURNING balance_paise"#
+           RETURNING balance_paise"#,
     )
     .bind(topup.amount_paise)
     .bind(user_uuid)
@@ -165,12 +180,15 @@ async fn complete_topup_atomic(
     sqlx::query(
         r#"INSERT INTO wallet_transactions 
            (wallet_user_id, type, amount_paise, balance_after_paise, description, reference_id) 
-           VALUES ($1, 'topup', $2, $3, $4, $5)"#
+           VALUES ($1, 'topup', $2, $3, $4, $5)"#,
     )
     .bind(user_uuid)
     .bind(topup.amount_paise)
     .bind(new_balance)
-    .bind(format!("Razorpay topup successful - {}", razorpay_payment_id))
+    .bind(format!(
+        "Razorpay topup successful - {}",
+        razorpay_payment_id
+    ))
     .bind(topup.id)
     .execute(&mut *tx)
     .await?;
@@ -186,12 +204,16 @@ pub async fn verify_topup(
 ) -> HttpResponse {
     let user_id = match extract_user_id(&req) {
         Ok(id) => id,
-        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized")),
+        Err(_) => {
+            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized"))
+        }
     };
 
     let user_uuid = match uuid::Uuid::parse_str(&user_id) {
         Ok(uuid) => uuid,
-        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID")),
+        Err(_) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID"))
+        }
     };
 
     // Verify payment signature first
@@ -201,7 +223,8 @@ pub async fn verify_topup(
         &body.razorpay_signature,
     ) {
         log::error!("Payment verification error: {:?}", e);
-        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid payment signature"));
+        return HttpResponse::BadRequest()
+            .json(ApiResponse::<()>::error("Invalid payment signature"));
     }
 
     match complete_topup_atomic(
@@ -213,16 +236,17 @@ pub async fn verify_topup(
     )
     .await
     {
-        Ok(Some(new_balance)) => {
-            HttpResponse::Ok().json(ApiResponse::success(serde_json::json!({
+        Ok(Some(new_balance)) => HttpResponse::Ok().json(ApiResponse::success(
+            serde_json::json!({
                 "status": "success",
                 "message": "Topup successful",
                 "new_balance": new_balance
-            }), "Topup verified and credited"))
-        }
-        Ok(None) => {
-            HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid or already processed topup order"))
-        }
+            }),
+            "Topup verified and credited",
+        )),
+        Ok(None) => HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+            "Invalid or already processed topup order",
+        )),
         Err(e) => {
             log::error!("Database error during atomic topup: {}", e);
             HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Database error"))
@@ -237,12 +261,16 @@ pub async fn list_transactions(
 ) -> HttpResponse {
     let user_id = match extract_user_id(&req) {
         Ok(id) => id,
-        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized")),
+        Err(_) => {
+            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized"))
+        }
     };
 
     let user_uuid = match uuid::Uuid::parse_str(&user_id) {
         Ok(uuid) => uuid,
-        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID")),
+        Err(_) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID"))
+        }
     };
 
     let page = query.page.unwrap_or(1).max(1);
@@ -278,16 +306,19 @@ pub async fn withdraw(
 
     let user_uuid = match uuid::Uuid::parse_str(&user_id) {
         Ok(uuid) => uuid,
-        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID")),
+        Err(_) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID"))
+        }
     };
 
     if body.amount_paise < 50000 {
-        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Minimum withdrawal is ₹500"));
+        return HttpResponse::BadRequest()
+            .json(ApiResponse::<()>::error("Minimum withdrawal is ₹500"));
     }
 
     // Require a payout account (bank account or UPI) before allowing withdrawal
     let payout = match sqlx::query_scalar::<_, String>(
-        "SELECT account_type FROM seller_payout_accounts WHERE seller_id = $1"
+        "SELECT account_type FROM seller_payout_accounts WHERE seller_id = $1",
     )
     .bind(user_uuid)
     .fetch_optional(pool.get_ref())
@@ -296,12 +327,13 @@ pub async fn withdraw(
         Ok(Some(t)) => t,
         Ok(None) => {
             return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
-                "Please add a bank account or UPI ID before withdrawing funds"
+                "Please add a bank account or UPI ID before withdrawing funds",
             ));
         }
         Err(e) => {
             log::error!("Failed to fetch payout account: {}", e);
-            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Database error"));
+            return HttpResponse::InternalServerError()
+                .json(ApiResponse::<()>::error("Database error"));
         }
     };
 
@@ -309,7 +341,8 @@ pub async fn withdraw(
         Ok(tx) => tx,
         Err(e) => {
             log::error!("Failed to start transaction: {}", e);
-            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Database error"));
+            return HttpResponse::InternalServerError()
+                .json(ApiResponse::<()>::error("Database error"));
         }
     };
 
@@ -318,7 +351,7 @@ pub async fn withdraw(
         r#"UPDATE wallets 
            SET balance_paise = balance_paise - $1, updated_at = NOW() 
            WHERE user_id = $2 AND balance_paise >= $1 
-           RETURNING balance_paise"#
+           RETURNING balance_paise"#,
     )
     .bind(body.amount_paise)
     .bind(user_uuid)
@@ -328,12 +361,14 @@ pub async fn withdraw(
         Ok(Some(bal)) => bal,
         Ok(None) => {
             let _ = tx.rollback().await;
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Insufficient balance"));
+            return HttpResponse::BadRequest()
+                .json(ApiResponse::<()>::error("Insufficient balance"));
         }
         Err(e) => {
             log::error!("Failed to debit wallet: {}", e);
             let _ = tx.rollback().await;
-            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Wallet error"));
+            return HttpResponse::InternalServerError()
+                .json(ApiResponse::<()>::error("Wallet error"));
         }
     };
 
@@ -357,12 +392,13 @@ pub async fn withdraw(
     }
 
     match tx.commit().await {
-        Ok(_) => {
-            HttpResponse::Ok().json(ApiResponse::success(serde_json::json!({
+        Ok(_) => HttpResponse::Ok().json(ApiResponse::success(
+            serde_json::json!({
                 "balance_paise": new_balance,
                 "withdrawn_paise": body.amount_paise
-            }), "Withdrawal successful"))
-        }
+            }),
+            "Withdrawal successful",
+        )),
         Err(e) => {
             log::error!("Failed to commit transaction: {}", e);
             HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Transaction failed"))
@@ -370,10 +406,7 @@ pub async fn withdraw(
     }
 }
 
-pub async fn release_escrow(
-    pool: web::Data<PgPool>,
-    req: HttpRequest,
-) -> HttpResponse {
+pub async fn release_escrow(pool: web::Data<PgPool>, req: HttpRequest) -> HttpResponse {
     let _user_id = match require_developer(&req) {
         Ok(id) => id,
         Err(resp) => return resp,
@@ -403,16 +436,15 @@ pub async fn release_escrow(
             }
         };
 
-        let seller_id = match sqlx::query_scalar::<_, uuid::Uuid>(
-            "SELECT seller_id FROM orders WHERE id = $1"
-        )
-        .bind(order_id)
-        .fetch_one(&mut *tx)
-        .await
-        {
-            Ok(id) => id,
-            Err(_) => continue,
-        };
+        let seller_id =
+            match sqlx::query_scalar::<_, uuid::Uuid>("SELECT seller_id FROM orders WHERE id = $1")
+                .bind(order_id)
+                .fetch_one(&mut *tx)
+                .await
+            {
+                Ok(id) => id,
+                Err(_) => continue,
+            };
 
         let update_result = sqlx::query(
             "UPDATE escrow SET status = 'released', released_at = NOW() WHERE id = $1 AND status = 'held'"
@@ -448,13 +480,12 @@ pub async fn release_escrow(
             continue;
         }
 
-        let new_balance = sqlx::query_scalar::<_, i32>(
-            "SELECT balance_paise FROM wallets WHERE user_id = $1"
-        )
-        .bind(seller_id)
-        .fetch_one(&mut *tx)
-        .await
-        .unwrap_or(0);
+        let new_balance =
+            sqlx::query_scalar::<_, i32>("SELECT balance_paise FROM wallets WHERE user_id = $1")
+                .bind(seller_id)
+                .fetch_one(&mut *tx)
+                .await
+                .unwrap_or(0);
 
         if let Err(e) = sqlx::query(
             "INSERT INTO wallet_transactions (wallet_user_id, type, amount_paise, balance_after_paise, description, reference_id) VALUES ($1, 'sale', $2, $3, $4, $5)"
@@ -483,10 +514,13 @@ pub async fn release_escrow(
         }
     }
 
-    HttpResponse::Ok().json(ApiResponse::success(serde_json::json!({
-        "released_count": released_count,
-        "total_released_paise": total_released,
-    }), &format!("Released {} escrow entries", released_count)))
+    HttpResponse::Ok().json(ApiResponse::success(
+        serde_json::json!({
+            "released_count": released_count,
+            "total_released_paise": total_released,
+        }),
+        &format!("Released {} escrow entries", released_count),
+    ))
 }
 
 /// Webhook payload structures for Razorpay wallet topup webhooks
@@ -519,7 +553,11 @@ pub async fn wallet_topup_webhook(
     req: HttpRequest,
     body: web::Bytes,
 ) -> HttpResponse {
-    let signature = match req.headers().get("X-Razorpay-Signature").and_then(|v| v.to_str().ok()) {
+    let signature = match req
+        .headers()
+        .get("X-Razorpay-Signature")
+        .and_then(|v| v.to_str().ok())
+    {
         Some(s) => s,
         None => return HttpResponse::BadRequest().body("missing signature"),
     };
@@ -563,7 +601,7 @@ pub async fn wallet_topup_webhook(
 
     // First fetch the topup user_id to run atomic completion
     let user_id = match sqlx::query_scalar::<_, uuid::Uuid>(
-        "SELECT user_id FROM wallet_topups WHERE razorpay_order_id = $1"
+        "SELECT user_id FROM wallet_topups WHERE razorpay_order_id = $1",
     )
     .bind(&razorpay_order_id)
     .fetch_optional(pool.get_ref())
@@ -590,7 +628,11 @@ pub async fn wallet_topup_webhook(
     .await
     {
         Ok(Some(_)) => {
-            log::info!("Wallet topup {} completed via webhook for user {}", razorpay_order_id, user_id);
+            log::info!(
+                "Wallet topup {} completed via webhook for user {}",
+                razorpay_order_id,
+                user_id
+            );
             HttpResponse::Ok().body("ok")
         }
         Ok(None) => {

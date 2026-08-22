@@ -33,9 +33,15 @@ interface SalesChartProps {
   orders: Order[];
 }
 
-function TimeFilterSelect({ filter, setFilter }: { filter: string, setFilter: (val: string) => void }) {
+function TimeFilterSelect({
+  filter,
+  setFilter,
+}: {
+  filter: string;
+  setFilter: (val: string) => void;
+}) {
   const [isOpen, setIsOpen] = useState(false);
-  
+
   const options = [
     { value: "today", label: "Today" },
     { value: "yesterday", label: "Yesterday" },
@@ -47,7 +53,7 @@ function TimeFilterSelect({ filter, setFilter }: { filter: string, setFilter: (v
     { value: "custom", label: "Custom Range..." },
   ];
 
-  const selectedLabel = options.find(o => o.value === filter)?.label || "Select";
+  const selectedLabel = options.find((o) => o.value === filter)?.label || "Select";
 
   return (
     <div className="relative z-50">
@@ -59,7 +65,9 @@ function TimeFilterSelect({ filter, setFilter }: { filter: string, setFilter: (v
           <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
           {selectedLabel}
         </div>
-        <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown
+          className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`}
+        />
       </button>
 
       <AnimatePresence>
@@ -101,7 +109,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="bg-background/95 backdrop-blur-md border border-border p-4 rounded-2xl shadow-xl min-w-[200px]"
@@ -111,20 +119,28 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         </div>
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-4">
-            <span className="text-muted-foreground font-medium text-sm flex items-center gap-1.5"><DollarSign className="w-4 h-4 text-muted-foreground" /> Revenue</span>
+            <span className="text-muted-foreground font-medium text-sm flex items-center gap-1.5">
+              <DollarSign className="w-4 h-4 text-muted-foreground" /> Revenue
+            </span>
             <span className="text-foreground font-bold tabular-nums">
-              ₹{data.revenue.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+              ₹
+              {data.revenue.toLocaleString(undefined, {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2,
+              })}
             </span>
           </div>
           <div className="flex items-center justify-between gap-4">
-            <span className="text-muted-foreground font-medium text-sm flex items-center gap-1.5"><ShoppingCart className="w-4 h-4 text-muted-foreground" /> Sales</span>
-            <span className="text-success font-bold tabular-nums">
-              {data.sales}
+            <span className="text-muted-foreground font-medium text-sm flex items-center gap-1.5">
+              <ShoppingCart className="w-4 h-4 text-muted-foreground" /> Sales
             </span>
+            <span className="text-success font-bold tabular-nums">{data.sales}</span>
           </div>
           {data.sales > 0 && (
             <div className="flex items-center justify-between gap-4 pt-3 mt-3 border-t border-border">
-              <span className="text-muted-foreground font-medium text-xs flex items-center gap-1.5"><Percent className="w-3.5 h-3.5" /> AOV</span>
+              <span className="text-muted-foreground font-medium text-xs flex items-center gap-1.5">
+                <Percent className="w-3.5 h-3.5" /> AOV
+              </span>
               <span className="text-accent font-bold text-xs tabular-nums">
                 ₹{Math.round(data.aov).toLocaleString()}
               </span>
@@ -279,8 +295,7 @@ export function SalesChart({ orders }: SalesChartProps) {
     let max = chartData[0];
     chartData.forEach((b) => {
       const val = metric === "revenue" ? b.revenue : metric === "sales" ? b.sales : b.aov;
-      const maxVal =
-        metric === "revenue" ? max.revenue : metric === "sales" ? max.sales : max.aov;
+      const maxVal = metric === "revenue" ? max.revenue : metric === "sales" ? max.sales : max.aov;
       if (val > maxVal) max = b;
     });
     return max;
@@ -288,7 +303,8 @@ export function SalesChart({ orders }: SalesChartProps) {
 
   // Calculate momentum / run rate
   const momentumLabel = useMemo(() => {
-    if (totalPeriodSales === 0) return { text: "AWAITING SALES", color: "text-muted-foreground bg-secondary border-border" };
+    if (totalPeriodSales === 0)
+      return { text: "AWAITING SALES", color: "text-muted-foreground bg-secondary border-border" };
     const secondHalf = chartData.slice(Math.floor(chartData.length / 2));
     const firstHalf = chartData.slice(0, Math.floor(chartData.length / 2));
     const rev2 = secondHalf.reduce((s, b) => s + b.revenue, 0);
@@ -304,7 +320,7 @@ export function SalesChart({ orders }: SalesChartProps) {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           className="bg-background/95 backdrop-blur-md border border-border p-4 rounded-2xl shadow-xl min-w-[200px]"
@@ -314,20 +330,28 @@ export function SalesChart({ orders }: SalesChartProps) {
           </div>
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-4">
-              <span className="text-muted-foreground font-medium text-sm flex items-center gap-1.5"><DollarSign className="w-4 h-4 text-muted-foreground" /> Revenue</span>
+              <span className="text-muted-foreground font-medium text-sm flex items-center gap-1.5">
+                <DollarSign className="w-4 h-4 text-muted-foreground" /> Revenue
+              </span>
               <span className="text-foreground font-bold tabular-nums">
-                ₹{data.revenue.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                ₹
+                {data.revenue.toLocaleString(undefined, {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 2,
+                })}
               </span>
             </div>
             <div className="flex items-center justify-between gap-4">
-              <span className="text-muted-foreground font-medium text-sm flex items-center gap-1.5"><ShoppingCart className="w-4 h-4 text-muted-foreground" /> Sales</span>
-              <span className="text-success font-bold tabular-nums">
-                {data.sales}
+              <span className="text-muted-foreground font-medium text-sm flex items-center gap-1.5">
+                <ShoppingCart className="w-4 h-4 text-muted-foreground" /> Sales
               </span>
+              <span className="text-success font-bold tabular-nums">{data.sales}</span>
             </div>
             {data.sales > 0 && (
               <div className="flex items-center justify-between gap-4 pt-3 mt-3 border-t border-border">
-                <span className="text-muted-foreground font-medium text-xs flex items-center gap-1.5"><Percent className="w-3.5 h-3.5" /> AOV</span>
+                <span className="text-muted-foreground font-medium text-xs flex items-center gap-1.5">
+                  <Percent className="w-3.5 h-3.5" /> AOV
+                </span>
                 <span className="text-accent font-bold text-xs tabular-nums">
                   ₹{Math.round(data.aov).toLocaleString()}
                 </span>
@@ -343,7 +367,7 @@ export function SalesChart({ orders }: SalesChartProps) {
   const chartColor = metric === "revenue" ? "#2563eb" : metric === "sales" ? "#10b981" : "#6366f1";
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
@@ -366,7 +390,7 @@ export function SalesChart({ orders }: SalesChartProps) {
           </div>
 
           <div className="flex items-end gap-3">
-            <motion.h2 
+            <motion.h2
               key={metric}
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -378,18 +402,18 @@ export function SalesChart({ orders }: SalesChartProps) {
                     maximumFractionDigits: 2,
                   })}`
                 : metric === "sales"
-                ? `${totalPeriodSales.toLocaleString()} Sales`
-                : `₹${periodAOV.toLocaleString(undefined, {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 2,
-                  })}`}
+                  ? `${totalPeriodSales.toLocaleString()} Sales`
+                  : `₹${periodAOV.toLocaleString(undefined, {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 2,
+                    })}`}
             </motion.h2>
             <span className="text-sm font-medium text-muted-foreground mb-1.5 sm:mb-2">
               {metric === "revenue"
                 ? "gross revenue in window"
                 : metric === "sales"
-                ? "total completed orders"
-                : "average order value"}
+                  ? "total completed orders"
+                  : "average order value"}
             </span>
           </div>
         </div>
@@ -403,7 +427,9 @@ export function SalesChart({ orders }: SalesChartProps) {
                 type="button"
                 onClick={() => setMetric(m)}
                 className={`relative flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all z-10 ${
-                  metric === m ? "text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-secondary/80"
+                  metric === m
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/80"
                 }`}
               >
                 {metric === m && (
@@ -414,7 +440,13 @@ export function SalesChart({ orders }: SalesChartProps) {
                   />
                 )}
                 <span className="flex items-center gap-1.5 capitalize">
-                  {m === "revenue" ? <DollarSign className="w-3.5 h-3.5" /> : m === "sales" ? <ShoppingCart className="w-3.5 h-3.5" /> : <Percent className="w-3.5 h-3.5" />}
+                  {m === "revenue" ? (
+                    <DollarSign className="w-3.5 h-3.5" />
+                  ) : m === "sales" ? (
+                    <ShoppingCart className="w-3.5 h-3.5" />
+                  ) : (
+                    <Percent className="w-3.5 h-3.5" />
+                  )}
                   {m}
                 </span>
               </button>
@@ -429,21 +461,25 @@ export function SalesChart({ orders }: SalesChartProps) {
       {/* Custom date range row */}
       <AnimatePresence>
         {filter === "custom" && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, height: 0, marginBottom: 0 }}
             animate={{ opacity: 1, height: "auto", marginBottom: 24 }}
             exit={{ opacity: 0, height: 0, marginBottom: 0 }}
             className="overflow-hidden"
           >
             <div className="flex items-center gap-3 text-xs bg-secondary/50 p-4 rounded-2xl border border-border w-fit shadow-sm">
-              <span className="text-muted-foreground font-bold uppercase tracking-wider text-[10px]">From</span>
+              <span className="text-muted-foreground font-bold uppercase tracking-wider text-[10px]">
+                From
+              </span>
               <input
                 type="date"
                 value={customStart}
                 onChange={(e) => setCustomStart(e.target.value)}
                 className="bg-background border border-border rounded-lg px-3 py-1.5 outline-none text-foreground font-semibold focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
               />
-              <span className="text-muted-foreground font-bold uppercase tracking-wider text-[10px] ml-2">To</span>
+              <span className="text-muted-foreground font-bold uppercase tracking-wider text-[10px] ml-2">
+                To
+              </span>
               <input
                 type="date"
                 value={customEnd}
@@ -458,10 +494,7 @@ export function SalesChart({ orders }: SalesChartProps) {
       {/* Recharts Canvas */}
       <div className="h-[320px] w-full mt-6">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart
-            data={chartData}
-            margin={{ top: 10, right: 0, left: -20, bottom: 0 }}
-          >
+          <AreaChart data={chartData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="colorMetric" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor={chartColor} stopOpacity={0.25} />
@@ -469,16 +502,16 @@ export function SalesChart({ orders }: SalesChartProps) {
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-            <XAxis 
-              dataKey="label" 
-              axisLine={false} 
-              tickLine={false} 
-              tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))", fontWeight: 600 }} 
-              dy={15} 
+            <XAxis
+              dataKey="label"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))", fontWeight: 600 }}
+              dy={15}
             />
-            <YAxis 
-              axisLine={false} 
-              tickLine={false} 
+            <YAxis
+              axisLine={false}
+              tickLine={false}
               tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))", fontWeight: 600 }}
               tickFormatter={(value) => {
                 if (value === 0) return "0";
@@ -488,9 +521,9 @@ export function SalesChart({ orders }: SalesChartProps) {
               }}
               dx={-10}
             />
-            <Tooltip 
-              content={<CustomTooltip />} 
-              cursor={{ stroke: "hsl(var(--border))", strokeWidth: 1.5, strokeDasharray: '4 4' }}
+            <Tooltip
+              content={<CustomTooltip />}
+              cursor={{ stroke: "hsl(var(--border))", strokeWidth: 1.5, strokeDasharray: "4 4" }}
             />
             <Area
               key={metric}
@@ -512,19 +545,20 @@ export function SalesChart({ orders }: SalesChartProps) {
         {[
           {
             label: "Peak Velocity",
-            value: metric === "revenue"
-              ? `₹${peakBucket.revenue.toLocaleString()}`
-              : metric === "sales"
-              ? `${peakBucket.sales} Sales`
-              : `₹${Math.round(peakBucket.aov).toLocaleString()}`,
+            value:
+              metric === "revenue"
+                ? `₹${peakBucket.revenue.toLocaleString()}`
+                : metric === "sales"
+                  ? `${peakBucket.sales} Sales`
+                  : `₹${Math.round(peakBucket.aov).toLocaleString()}`,
             subtext: `on ${peakBucket.label}`,
-            delay: 0.1
+            delay: 0.1,
           },
           {
             label: "Daily Run Rate",
             value: `₹${Math.round(totalPeriodRevenue / Math.max(chartData.length, 1)).toLocaleString()}`,
             subtext: "average per bucket",
-            delay: 0.2
+            delay: 0.2,
           },
           {
             label: "Fulfillment Speed",
@@ -534,10 +568,10 @@ export function SalesChart({ orders }: SalesChartProps) {
               </span>
             ),
             subtext: "automated execution",
-            delay: 0.3
-          }
+            delay: 0.3,
+          },
         ].map((item, idx) => (
-          <motion.div 
+          <motion.div
             key={idx}
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
@@ -547,9 +581,7 @@ export function SalesChart({ orders }: SalesChartProps) {
             <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-[0.2em] block mb-2">
               {item.label}
             </span>
-            <div className="text-2xl font-black text-foreground tabular-nums">
-              {item.value}
-            </div>
+            <div className="text-2xl font-black text-foreground tabular-nums">{item.value}</div>
             <span className="text-xs font-semibold text-muted-foreground mt-1 block">
               {item.subtext}
             </span>

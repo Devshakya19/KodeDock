@@ -1,8 +1,8 @@
-use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 use chrono::{DateTime, Utc};
-use sqlx::FromRow;
 use rust_decimal::Decimal;
+use serde::{Deserialize, Serialize};
+use sqlx::FromRow;
+use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Profile {

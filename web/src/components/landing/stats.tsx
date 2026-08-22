@@ -3,7 +3,6 @@ import { FadeIn } from "@/shared/components/layout/fade-in";
 
 import { Users, TrendingUp, GraduationCap, Wallet } from "lucide-react";
 
-
 const STATS = [
   { value: "8M+", label: "Indian Developers", icon: Users },
   { value: "2.5%", label: "Lowest Commission", icon: TrendingUp },
@@ -21,7 +20,9 @@ export function Stats() {
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-foreground/10 mb-3 text-foreground">
                 <stat.icon className="w-5.5 h-5.5" />
               </div>
-              <div className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">{stat.value}</div>
+              <div className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
+                {stat.value}
+              </div>
               <div className="mt-1 text-sm text-muted-foreground font-medium">{stat.label}</div>
             </FadeIn>
           ))}

@@ -1,12 +1,18 @@
-use argon2::{password_hash::{rand_core::OsRng, PasswordHasher, SaltString}, Argon2, PasswordHash, PasswordVerifier};
-use jsonwebtoken::{encode as jwt_encode, decode as jwt_decode, Header, EncodingKey, DecodingKey, Validation, Algorithm};
-use serde::{Deserialize, Serialize};
-use sqlx::{PgPool, FromRow};
-use uuid::Uuid;
-use chrono::{Utc, Duration};
-use std::env;
+use argon2::{
+    password_hash::{rand_core::OsRng, PasswordHasher, SaltString},
+    Argon2, PasswordHash, PasswordVerifier,
+};
+use chrono::{Duration, Utc};
 use hex::encode as hex_encode;
-use sha2::{Sha256, Digest};
+use jsonwebtoken::{
+    decode as jwt_decode, encode as jwt_encode, Algorithm, DecodingKey, EncodingKey, Header,
+    Validation,
+};
+use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
+use sqlx::{FromRow, PgPool};
+use std::env;
+use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct User {
@@ -31,15 +37,18 @@ pub struct Claims {
 pub fn hash_password(password: &str) -> Result<String, String> {
     let salt = SaltString::generate(&mut OsRng);
     let argon2 = Argon2::default();
-    let hash = argon2.hash_password(password.as_bytes(), &salt)
+    let hash = argon2
+        .hash_password(password.as_bytes(), &salt)
         .map_err(|e| format!("Password hash error: {}", e))?;
     Ok(hash.to_string())
 }
 
 pub fn verify_password(password: &str, hash: &str) -> Result<bool, String> {
-    let parsed_hash = PasswordHash::new(hash)
-        .map_err(|e| format!("Password hash parse error: {}", e))?;
-    Ok(Argon2::default().verify_password(password.as_bytes(), &parsed_hash).is_ok())
+    let parsed_hash =
+        PasswordHash::new(hash).map_err(|e| format!("Password hash parse error: {}", e))?;
+    Ok(Argon2::default()
+        .verify_password(password.as_bytes(), &parsed_hash)
+        .is_ok())
 }
 
 pub fn generate_token(user: &User, secret: &str) -> Result<String, String> {
@@ -84,26 +93,32 @@ pub fn encrypt_github_token(token: &str) -> String {
     hasher.update(secret.as_bytes());
     let key_result = hasher.finalize();
     let key = key_result.as_slice();
-    
+
     // XOR the token with the key (repeating if necessary)
     let token_bytes = token.as_bytes();
     let mut encrypted = Vec::with_capacity(token_bytes.len());
     for (i, byte) in token_bytes.iter().enumerate() {
         encrypted.push(byte ^ key[i % key.len()]);
     }
-    
+
     // Return as hex string for storage
     hex_encode(encrypted)
 }
 
-pub async fn create_user(pool: &PgPool, email: &str, password: &str, full_name: &str, role: &str) -> Result<User, String> {
+pub async fn create_user(
+    pool: &PgPool,
+    email: &str,
+    password: &str,
+    full_name: &str,
+    role: &str,
+) -> Result<User, String> {
     let password_hash = hash_password(password)?;
     let id = Uuid::new_v4();
 
     let user = sqlx::query_as::<_, User>(
         r#"INSERT INTO users (id, email, password_hash, full_name, role)
            VALUES ($1, $2, $3, $4, $5)
-           RETURNING id, email, full_name, role, github_username"#
+           RETURNING id, email, full_name, role, github_username"#,
     )
     .bind(id)
     .bind(email)
@@ -117,9 +132,12 @@ pub async fn create_user(pool: &PgPool, email: &str, password: &str, full_name: 
     Ok(user)
 }
 
-pub async fn get_user_by_email(pool: &PgPool, email: &str) -> Result<(Uuid, String, Option<String>, String, Option<String>), String> {
+pub async fn get_user_by_email(
+    pool: &PgPool,
+    email: &str,
+) -> Result<(Uuid, String, Option<String>, String, Option<String>), String> {
     sqlx::query_as::<_, (Uuid, String, Option<String>, String, Option<String>)>(
-        "SELECT id, email, full_name, role, password_hash FROM users WHERE email = $1"
+        "SELECT id, email, full_name, role, password_hash FROM users WHERE email = $1",
     )
     .bind(email)
     .fetch_optional(pool)
@@ -130,7 +148,7 @@ pub async fn get_user_by_email(pool: &PgPool, email: &str) -> Result<(Uuid, Stri
 
 pub async fn get_user_by_id(pool: &PgPool, user_id: Uuid) -> Result<User, String> {
     sqlx::query_as::<_, User>(
-        "SELECT id, email, full_name, role, github_username FROM users WHERE id = $1"
+        "SELECT id, email, full_name, role, github_username FROM users WHERE id = $1",
     )
     .bind(user_id)
     .fetch_optional(pool)
@@ -139,7 +157,11 @@ pub async fn get_user_by_id(pool: &PgPool, user_id: Uuid) -> Result<User, String
     .ok_or_else(|| "User not found".to_string())
 }
 
-pub async fn update_password(pool: &PgPool, user_id: Uuid, new_password: &str) -> Result<(), String> {
+pub async fn update_password(
+    pool: &PgPool,
+    user_id: Uuid,
+    new_password: &str,
+) -> Result<(), String> {
     let password_hash = hash_password(new_password)?;
     sqlx::query("UPDATE users SET password_hash = $1 WHERE id = $2")
         .bind(&password_hash)
@@ -150,9 +172,12 @@ pub async fn update_password(pool: &PgPool, user_id: Uuid, new_password: &str) -
     Ok(())
 }
 
-pub async fn get_user_by_id_with_hash(pool: &PgPool, user_id: Uuid) -> Result<(Uuid, String, Option<String>, String, Option<String>), String> {
+pub async fn get_user_by_id_with_hash(
+    pool: &PgPool,
+    user_id: Uuid,
+) -> Result<(Uuid, String, Option<String>, String, Option<String>), String> {
     sqlx::query_as::<_, (Uuid, String, Option<String>, String, Option<String>)>(
-        "SELECT id, email, full_name, role, password_hash FROM users WHERE id = $1"
+        "SELECT id, email, full_name, role, password_hash FROM users WHERE id = $1",
     )
     .bind(user_id)
     .fetch_optional(pool)
@@ -177,8 +202,10 @@ pub struct GithubUser {
 /// Exchange an authorization `code` for an access token via GitHub's
 /// "web application" OAuth flow (RFC 6749).
 pub async fn exchange_github_code(code: &str) -> Result<String, String> {
-    let client_id = std::env::var("GITHUB_CLIENT_ID").map_err(|_| "GITHUB_CLIENT_ID not set".to_string())?;
-    let client_secret = std::env::var("GITHUB_CLIENT_SECRET").map_err(|_| "GITHUB_CLIENT_SECRET not set".to_string())?;
+    let client_id =
+        std::env::var("GITHUB_CLIENT_ID").map_err(|_| "GITHUB_CLIENT_ID not set".to_string())?;
+    let client_secret = std::env::var("GITHUB_CLIENT_SECRET")
+        .map_err(|_| "GITHUB_CLIENT_SECRET not set".to_string())?;
 
     let client = reqwest::Client::new();
     let resp = client
@@ -226,7 +253,7 @@ pub async fn fetch_github_user(access_token: &str) -> Result<GithubUser, String>
 /// Find an existing user linked to this GitHub ID.
 pub async fn get_user_by_github_id(pool: &PgPool, github_id: i64) -> Result<User, String> {
     sqlx::query_as::<_, User>(
-        "SELECT id, email, full_name, role, github_username FROM users WHERE github_id = $1"
+        "SELECT id, email, full_name, role, github_username FROM users WHERE github_id = $1",
     )
     .bind(github_id.to_string())
     .fetch_optional(pool)
@@ -249,7 +276,7 @@ pub async fn create_github_user(
     sqlx::query_as::<_, User>(
         r#"INSERT INTO users (id, email, full_name, role, github_id, github_username)
            VALUES ($1, $2, $3, $4, $5, $6)
-           RETURNING id, email, full_name, role, github_username"#
+           RETURNING id, email, full_name, role, github_username"#,
     )
     .bind(id)
     .bind(email)
@@ -283,7 +310,7 @@ pub async fn link_github_to_user(
         .execute(pool)
         .await
         .map_err(|e| format!("Failed to update profile: {}", e))?;
-        
+
     Ok(())
 }
 

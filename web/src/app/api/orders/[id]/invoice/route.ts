@@ -8,10 +8,7 @@ import sharp from "sharp";
 
 const RUST_BACKEND = process.env.CORE_ENGINE_URL || "http://localhost:4001";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await getServerUser();
     if (!user) {
@@ -104,15 +101,19 @@ export async function GET(
     doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
     doc.setFont("helvetica", "bold");
     doc.text("INVOICE", 145, 24);
-    
+
     doc.setFontSize(10);
     doc.setTextColor(lightGray[0], lightGray[1], lightGray[2]);
     doc.setFont("helvetica", "normal");
     doc.text(`Invoice No: INV-${order.id.substring(0, 8).toUpperCase()}`, 145, 30);
-    doc.text(`Date: ${new Date(order.created_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}`, 145, 35);
-    
+    doc.text(
+      `Date: ${new Date(order.created_at).toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" })}`,
+      145,
+      35
+    );
+
     // Status Badge background
-    const isCompleted = order.status === 'completed';
+    const isCompleted = order.status === "completed";
     doc.setFillColor(isCompleted ? 230 : 255, isCompleted ? 245 : 240, isCompleted ? 235 : 240);
     doc.roundedRect(145, 38, 45, 7, 1.5, 1.5, "F");
     doc.setTextColor(isCompleted ? 30 : 100, isCompleted ? 130 : 100, isCompleted ? 50 : 100);
@@ -149,46 +150,46 @@ export async function GET(
         order.product?.title || "Digital Product Software",
         "Source Code Delivery",
         `Rs. ${(order.amount_paise / 100).toFixed(2)}`,
-        `Rs. ${(order.amount_paise / 100).toFixed(2)}`
-      ]
+        `Rs. ${(order.amount_paise / 100).toFixed(2)}`,
+      ],
     ];
 
     autoTable(doc, {
       startY: 85,
-      head: [['Product Description', 'Type', 'Price', 'Total']],
+      head: [["Product Description", "Type", "Price", "Total"]],
       body: tableData,
-      theme: 'grid',
-      headStyles: { 
-        fillColor: primaryColor, 
+      theme: "grid",
+      headStyles: {
+        fillColor: primaryColor,
         textColor: 255,
-        fontStyle: 'bold',
-        halign: 'left'
+        fontStyle: "bold",
+        halign: "left",
       },
       bodyStyles: {
         textColor: [50, 50, 50],
-        fontSize: 10
+        fontSize: 10,
       },
       columnStyles: {
-        2: { halign: 'right' },
-        3: { halign: 'right', fontStyle: 'bold' }
+        2: { halign: "right" },
+        3: { halign: "right", fontStyle: "bold" },
       },
-      margin: { left: 14, right: 14 }
+      margin: { left: 14, right: 14 },
     });
 
     // --- Total Calculation Section ---
     // @ts-ignore
     const finalY = doc.lastAutoTable?.finalY || 110;
-    
+
     // Background for total
     doc.setFillColor(248, 249, 250);
     doc.rect(130, finalY + 10, 66, 25, "F");
-    
+
     doc.setFontSize(11);
     doc.setTextColor(100, 100, 100);
     doc.setFont("helvetica", "normal");
     doc.text("Subtotal", 135, finalY + 18);
     doc.text(`Rs. ${(order.amount_paise / 100).toFixed(2)}`, 190, finalY + 18, { align: "right" });
-    
+
     doc.setFontSize(13);
     doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
     doc.setFont("helvetica", "bold");
@@ -197,12 +198,12 @@ export async function GET(
 
     // --- Footer Section ---
     const pageHeight = doc.internal.pageSize.height;
-    
+
     // Footer Divider
     doc.setDrawColor(240, 240, 240);
     doc.setLineWidth(1);
     doc.line(14, pageHeight - 30, 196, pageHeight - 30);
-    
+
     doc.setFontSize(12);
     doc.setTextColor(30, 30, 30);
     doc.setFont("helvetica", "bold");
@@ -211,11 +212,18 @@ export async function GET(
     doc.setFontSize(9);
     doc.setTextColor(130, 130, 130);
     doc.setFont("helvetica", "normal");
-    doc.text("This is a computer generated invoice and does not require a physical signature.", 105, pageHeight - 15, { align: "center" });
-    doc.text("For support, contact support@kodedock.com | www.kodedock.com", 105, pageHeight - 10, { align: "center" });
+    doc.text(
+      "This is a computer generated invoice and does not require a physical signature.",
+      105,
+      pageHeight - 15,
+      { align: "center" }
+    );
+    doc.text("For support, contact support@kodedock.com | www.kodedock.com", 105, pageHeight - 10, {
+      align: "center",
+    });
 
     // Output as array buffer
-    const pdfBuffer = doc.output('arraybuffer');
+    const pdfBuffer = doc.output("arraybuffer");
 
     // Return as PDF Response
     return new NextResponse(pdfBuffer, {
@@ -225,7 +233,6 @@ export async function GET(
         "Content-Disposition": `attachment; filename="Invoice-KodeDock-${order.id.substring(0, 8).toUpperCase()}.pdf"`,
       },
     });
-
   } catch (err) {
     console.error("PDF Generation Error:", err);
     return NextResponse.json({ error: "Failed to generate invoice" }, { status: 500 });

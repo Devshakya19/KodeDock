@@ -57,7 +57,10 @@ export function ProductGrid({ searchQuery = "", categoryFilter = "" }: ProductGr
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-8">
         {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="animate-pulse bg-background p-2 rounded-[20px] border border-border">
+          <div
+            key={i}
+            className="animate-pulse bg-background p-2 rounded-[20px] border border-border"
+          >
             <div className="aspect-[4/3] bg-secondary rounded-[14px] mb-4" />
             <div className="px-2 space-y-3 pb-2">
               <div className="h-4 bg-secondary rounded w-3/4" />
@@ -78,7 +81,8 @@ export function ProductGrid({ searchQuery = "", categoryFilter = "" }: ProductGr
         </div>
         <p className="text-foreground text-xl font-bold mb-2">No templates found</p>
         <p className="text-muted-foreground text-[15px] max-w-sm">
-          We couldn't find any products matching your current search filters. Try adjusting your search terms.
+          We couldn't find any products matching your current search filters. Try adjusting your
+          search terms.
         </p>
       </div>
     );
@@ -93,7 +97,9 @@ export function ProductGrid({ searchQuery = "", categoryFilter = "" }: ProductGr
           title={product.title}
           description={product.description || ""}
           price={product.price_paise / 100}
-          originalPrice={product.original_price_paise ? product.original_price_paise / 100 : undefined}
+          originalPrice={
+            product.original_price_paise ? product.original_price_paise / 100 : undefined
+          }
           category={product.category_name || "Uncategorized"}
           seller={product.seller_name || "Unknown"}
           rating={product.rating}

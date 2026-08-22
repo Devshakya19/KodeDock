@@ -12,7 +12,6 @@ import { WhatIsKodeDock } from "@/components/landing/what-is-kodedock";
 import { TrustEscrow } from "@/components/landing/trust-escrow";
 import { Trust } from "@/components/landing/trust";
 
-
 export default function Home() {
   return (
     <div className="flex flex-col w-full">

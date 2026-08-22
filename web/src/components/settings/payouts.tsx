@@ -1,7 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Landmark, Smartphone, Loader2, CheckCircle, AlertTriangle, CreditCard } from "lucide-react";
+import {
+  Landmark,
+  Smartphone,
+  Loader2,
+  CheckCircle,
+  AlertTriangle,
+  CreditCard,
+} from "lucide-react";
 import { Input } from "@/shared/ui/input";
 import { Button } from "@/shared/ui/button";
 import { apiGet, apiPost } from "@/shared/lib/api/client";
@@ -52,20 +59,37 @@ export function PayoutSettings() {
   function validate(): boolean {
     setError("");
     if (accountType === "bank_account") {
-      if (!holderName.trim()) { setError("Account holder name is required"); return false; }
-      if (!accountNumber && !loading) { 
+      if (!holderName.trim()) {
+        setError("Account holder name is required");
+        return false;
+      }
+      if (!accountNumber && !loading) {
         // if editing, we might not have account number in state, but let's say if they want to save, they need to provide it?
         // Actually, the backend requires account number. If it's already there and they just want to update name, they still need to re-enter account number.
-        // Wait, backend requires it for bank_account. 
-        setError("Account number is required"); return false; 
+        // Wait, backend requires it for bank_account.
+        setError("Account number is required");
+        return false;
       }
-      if (accountNumber && (accountNumber.length < 9 || accountNumber.length > 18 || !/^\d+$/.test(accountNumber))) {
-        setError("Account number must be 9-18 digits"); return false;
+      if (
+        accountNumber &&
+        (accountNumber.length < 9 || accountNumber.length > 18 || !/^\d+$/.test(accountNumber))
+      ) {
+        setError("Account number must be 9-18 digits");
+        return false;
       }
-      if (!ifscCode || ifscCode.length !== 11) { setError("IFSC code must be 11 characters"); return false; }
-      if (!bankName.trim()) { setError("Bank name is required"); return false; }
+      if (!ifscCode || ifscCode.length !== 11) {
+        setError("IFSC code must be 11 characters");
+        return false;
+      }
+      if (!bankName.trim()) {
+        setError("Bank name is required");
+        return false;
+      }
     } else {
-      if (!upiId || !upiId.includes("@")) { setError("Invalid UPI ID format"); return false; }
+      if (!upiId || !upiId.includes("@")) {
+        setError("Invalid UPI ID format");
+        return false;
+      }
     }
     return true;
   }
@@ -73,7 +97,7 @@ export function PayoutSettings() {
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     if (!validate()) return;
-    
+
     setSaving(true);
     setError("");
     setSuccess("");
@@ -120,7 +144,9 @@ export function PayoutSettings() {
         </div>
         <div>
           <h2 className="text-lg font-bold text-foreground">Payout Details</h2>
-          <p className="text-[13px] text-muted-foreground font-medium mt-0.5">Configure where you want to receive your earnings</p>
+          <p className="text-[13px] text-muted-foreground font-medium mt-0.5">
+            Configure where you want to receive your earnings
+          </p>
         </div>
       </div>
 
@@ -149,8 +175,12 @@ export function PayoutSettings() {
                 : "border-border hover:border-border/80 bg-background"
             }`}
           >
-            <Landmark className={`w-6 h-6 ${accountType === "bank_account" ? "text-accent" : "text-muted-foreground"}`} />
-            <span className={`text-[13px] font-semibold ${accountType === "bank_account" ? "text-accent" : "text-muted-foreground"}`}>
+            <Landmark
+              className={`w-6 h-6 ${accountType === "bank_account" ? "text-accent" : "text-muted-foreground"}`}
+            />
+            <span
+              className={`text-[13px] font-semibold ${accountType === "bank_account" ? "text-accent" : "text-muted-foreground"}`}
+            >
               Bank Account
             </span>
           </button>
@@ -163,8 +193,12 @@ export function PayoutSettings() {
                 : "border-border hover:border-border/80 bg-background"
             }`}
           >
-            <Smartphone className={`w-6 h-6 ${accountType === "upi" ? "text-accent" : "text-muted-foreground"}`} />
-            <span className={`text-[13px] font-semibold ${accountType === "upi" ? "text-accent" : "text-muted-foreground"}`}>
+            <Smartphone
+              className={`w-6 h-6 ${accountType === "upi" ? "text-accent" : "text-muted-foreground"}`}
+            />
+            <span
+              className={`text-[13px] font-semibold ${accountType === "upi" ? "text-accent" : "text-muted-foreground"}`}
+            >
               UPI ID
             </span>
           </button>
@@ -173,7 +207,9 @@ export function PayoutSettings() {
         {accountType === "bank_account" && (
           <div className="space-y-5">
             <div>
-              <label className="block text-[14px] font-semibold text-foreground mb-2">Account Holder Name</label>
+              <label className="block text-[14px] font-semibold text-foreground mb-2">
+                Account Holder Name
+              </label>
               <Input
                 type="text"
                 value={holderName}
@@ -184,7 +220,9 @@ export function PayoutSettings() {
               />
             </div>
             <div>
-              <label className="block text-[14px] font-semibold text-foreground mb-2">Account Number</label>
+              <label className="block text-[14px] font-semibold text-foreground mb-2">
+                Account Number
+              </label>
               <Input
                 type="text"
                 inputMode="numeric"
@@ -194,11 +232,15 @@ export function PayoutSettings() {
                 className={theme.inputs.base}
                 maxLength={18}
               />
-              <p className="text-[12px] font-medium text-muted-foreground mt-2">For security reasons, please re-enter your full account number to update.</p>
+              <p className="text-[12px] font-medium text-muted-foreground mt-2">
+                For security reasons, please re-enter your full account number to update.
+              </p>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-[14px] font-semibold text-foreground mb-2">IFSC Code</label>
+                <label className="block text-[14px] font-semibold text-foreground mb-2">
+                  IFSC Code
+                </label>
                 <Input
                   type="text"
                   value={ifscCode}
@@ -209,7 +251,9 @@ export function PayoutSettings() {
                 />
               </div>
               <div>
-                <label className="block text-[14px] font-semibold text-foreground mb-2">Bank Name</label>
+                <label className="block text-[14px] font-semibold text-foreground mb-2">
+                  Bank Name
+                </label>
                 <Input
                   type="text"
                   value={bankName}
@@ -235,7 +279,10 @@ export function PayoutSettings() {
                 className={theme.inputs.base}
                 maxLength={100}
               />
-              <p className="text-[12px] font-medium text-muted-foreground mt-2">Make sure this UPI ID is linked to your bank account to receive payouts successfully.</p>
+              <p className="text-[12px] font-medium text-muted-foreground mt-2">
+                Make sure this UPI ID is linked to your bank account to receive payouts
+                successfully.
+              </p>
             </div>
           </div>
         )}

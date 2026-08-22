@@ -45,13 +45,16 @@ export function SellerHeader({
       )}
 
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
           className="max-w-2xl"
         >
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-foreground tracking-tighter leading-[1.1] flex flex-wrap" aria-label={title}>
+          <h1
+            className="text-4xl sm:text-5xl md:text-6xl font-black text-foreground tracking-tighter leading-[1.1] flex flex-wrap"
+            aria-label={title}
+          >
             {title.split(" ").map((word, wordIndex, wordsArray) => {
               const previousCharsCount = wordsArray.slice(0, wordIndex).join("").length;
               return (
@@ -81,7 +84,7 @@ export function SellerHeader({
           )}
         </motion.div>
 
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
@@ -107,9 +110,7 @@ export function SellerHeader({
                     title="Sync with live database"
                   >
                     <RefreshCw
-                      className={`w-3.5 h-3.5 ${
-                        refreshing ? "animate-spin text-accent" : ""
-                      }`}
+                      className={`w-3.5 h-3.5 ${refreshing ? "animate-spin text-accent" : ""}`}
                     />
                     <span>Sync</span>
                   </button>

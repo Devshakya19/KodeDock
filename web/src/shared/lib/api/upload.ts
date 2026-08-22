@@ -18,10 +18,7 @@ export interface UploadResult {
   key: string;
 }
 
-export async function uploadFile(
-  file: File,
-  purpose: "product" | "avatar"
-): Promise<UploadResult> {
+export async function uploadFile(file: File, purpose: "product" | "avatar"): Promise<UploadResult> {
   if (!file.type.startsWith("image/")) {
     throw new Error("File must be an image");
   }

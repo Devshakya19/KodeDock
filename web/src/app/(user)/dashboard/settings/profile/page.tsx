@@ -1,2 +1,4 @@
 import { ProfileSettings } from "@/components/settings/profile";
-export default function DashboardProfileSettingsPage() { return <ProfileSettings />; }
+export default function DashboardProfileSettingsPage() {
+  return <ProfileSettings />;
+}

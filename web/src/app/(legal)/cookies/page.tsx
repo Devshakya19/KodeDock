@@ -2,18 +2,17 @@ import { StaticPageLayout } from "@/shared/components/layout/static-layout";
 
 export default function CookiesPage() {
   return (
-    <StaticPageLayout
-      title="Cookie Policy"
-      description="How we use cookies on KodeDock."
-    >
+    <StaticPageLayout title="Cookie Policy" description="How we use cookies on KodeDock.">
       <div className="space-y-8 text-sm text-muted-foreground leading-relaxed">
-        <p><em>Last updated: July 2026</em></p>
+        <p>
+          <em>Last updated: July 2026</em>
+        </p>
 
         <section>
           <h2 className="text-xl font-semibold text-foreground mb-3">1. What Are Cookies?</h2>
           <p>
-            Cookies are small text files stored on your device when you visit a website.
-            They help us remember your preferences and provide a better experience.
+            Cookies are small text files stored on your device when you visit a website. They help
+            us remember your preferences and provide a better experience.
           </p>
         </section>
 
@@ -70,8 +69,8 @@ export default function CookiesPage() {
         <section>
           <h2 className="text-xl font-semibold text-foreground mb-3">4. Managing Cookies</h2>
           <p>
-            You can control cookies through your browser settings. However, disabling
-            essential cookies may affect platform functionality.
+            You can control cookies through your browser settings. However, disabling essential
+            cookies may affect platform functionality.
           </p>
         </section>
       </div>

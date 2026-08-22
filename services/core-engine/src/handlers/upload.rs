@@ -1,8 +1,8 @@
-use actix_web::{web, HttpRequest, HttpResponse};
-use serde::{Deserialize, Serialize};
-use crate::storage::StorageClient;
 use crate::middleware::extract_user_id;
 use crate::services::ApiResponse;
+use crate::storage::StorageClient;
+use actix_web::{web, HttpRequest, HttpResponse};
+use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize)]
 pub struct PresignRequest {
@@ -19,9 +19,7 @@ pub struct PresignResponse {
     pub key: String,
 }
 
-const ALLOWED_TYPES: &[&str] = &[
-    "image/jpeg", "image/png", "image/gif", "image/webp",
-];
+const ALLOWED_TYPES: &[&str] = &["image/jpeg", "image/png", "image/gif", "image/webp"];
 
 pub async fn presign_upload(
     storage: web::Data<StorageClient>,
@@ -30,7 +28,9 @@ pub async fn presign_upload(
 ) -> HttpResponse {
     let _user_id = match extract_user_id(&req) {
         Ok(id) => id,
-        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized")),
+        Err(_) => {
+            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized"))
+        }
     };
 
     if !ALLOWED_TYPES.contains(&body.content_type.as_str()) {
@@ -55,13 +55,18 @@ pub async fn presign_upload(
         Ok(upload_url) => {
             let public_url = storage.public_url(&key);
             HttpResponse::Ok().json(ApiResponse::success(
-                PresignResponse { upload_url, public_url, key },
+                PresignResponse {
+                    upload_url,
+                    public_url,
+                    key,
+                },
                 "Upload URL generated",
             ))
         }
         Err(e) => {
             log::error!("Failed to generate presigned URL: {}", e);
-            HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to generate upload URL"))
+            HttpResponse::InternalServerError()
+                .json(ApiResponse::<()>::error("Failed to generate upload URL"))
         }
     }
 }

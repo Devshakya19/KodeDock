@@ -4,7 +4,8 @@ const RUST_BACKEND = process.env.CORE_ENGINE_URL || "http://localhost:4001";
 
 function setAuthCookie(response: NextResponse, request: Request, token: string) {
   // Detect HTTPS from x-forwarded-proto (reverse proxy) or request URL
-  const proto = request.headers.get("x-forwarded-proto") || new URL(request.url).protocol.replace(":", "");
+  const proto =
+    request.headers.get("x-forwarded-proto") || new URL(request.url).protocol.replace(":", "");
   const isSecure = proto === "https";
 
   response.cookies.set("kodedock_token", token, {

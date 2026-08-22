@@ -2,7 +2,17 @@ import { getServerUser } from "@/shared/lib/auth/client";
 import { serverApiGet } from "@/shared/lib/auth/client";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { ShoppingCart, ExternalLink, Package, ArrowLeft, Search, ArrowUpRight, Calendar, GitBranch, DownloadCloud } from "lucide-react";
+import {
+  ShoppingCart,
+  ExternalLink,
+  Package,
+  ArrowLeft,
+  Search,
+  ArrowUpRight,
+  Calendar,
+  GitBranch,
+  DownloadCloud,
+} from "lucide-react";
 import { Badge } from "@/shared/ui/badge";
 
 export default async function PurchasesPage() {
@@ -10,24 +20,32 @@ export default async function PurchasesPage() {
   if (!user) redirect("/login");
 
   const res = await serverApiGet<any[]>(`/orders?buyer_id=${user.id}`);
-  const orders = (res.success && res.data) ? res.data : [];
+  const orders = res.success && res.data ? res.data : [];
 
   return (
     <div className="w-full">
       {/* Header */}
       <div className="mb-10">
-        <Link href="/dashboard" className="inline-flex items-center gap-2 text-[13px] font-semibold text-muted-foreground hover:text-foreground mb-6 transition-colors group">
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back to Dashboard
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center gap-2 text-[13px] font-semibold text-muted-foreground hover:text-foreground mb-6 transition-colors group"
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back to
+          Dashboard
         </Link>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-black text-foreground tracking-tight">My Purchases</h1>
-            <p className="text-muted-foreground mt-2 text-base font-medium">Access your purchased products and repositories.</p>
+            <h1 className="text-3xl sm:text-4xl font-black text-foreground tracking-tight">
+              My Purchases
+            </h1>
+            <p className="text-muted-foreground mt-2 text-base font-medium">
+              Access your purchased products and repositories.
+            </p>
           </div>
           {orders.length > 0 && (
             <div className="relative group">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-hover:text-accent transition-colors" />
-              <input 
+              <input
                 type="text"
                 placeholder="Search purchases..."
                 className="pl-10 pr-4 h-11 bg-background border border-border rounded-xl text-sm font-medium focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all w-full md:w-64"
@@ -44,31 +62,40 @@ export default async function PurchasesPage() {
           </div>
           <h3 className="text-2xl font-bold text-foreground mb-3">No purchases yet</h3>
           <p className="text-muted-foreground text-base max-w-md mx-auto mb-8 font-medium">
-            You haven&apos;t bought anything yet. Explore our marketplace to find high-quality, production-ready code assets.
+            You haven&apos;t bought anything yet. Explore our marketplace to find high-quality,
+            production-ready code assets.
           </p>
-          <Link href="/browse" className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-8 text-base font-bold text-primary-foreground transition-colors hover:bg-primary/90 shadow-lg shadow-foreground/10 hover:-translate-y-0.5">
+          <Link
+            href="/browse"
+            className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-8 text-base font-bold text-primary-foreground transition-colors hover:bg-primary/90 shadow-lg shadow-foreground/10 hover:-translate-y-0.5"
+          >
             Browse Products
           </Link>
         </div>
       ) : (
         <div className="grid gap-4">
           {orders.map((order: any) => (
-            <div key={order.id} className="bg-background rounded-3xl border border-border/60 shadow-sm shadow-slate-100 hover:shadow-md hover:border-border transition-all p-6 group">
+            <div
+              key={order.id}
+              className="bg-background rounded-3xl border border-border/60 shadow-sm shadow-slate-100 hover:shadow-md hover:border-border transition-all p-6 group"
+            >
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                
                 {/* Left side: Icon + Details */}
                 <div className="flex items-start md:items-center gap-5">
                   <div className="w-16 h-16 rounded-2xl bg-secondary/50 border border-border flex items-center justify-center shrink-0">
                     <Package className="w-7 h-7 text-muted-foreground group-hover:text-accent transition-colors" />
                   </div>
-                  
+
                   <div>
-                    <Link href={`/orders/${order.id}`} className="hover:underline decoration-2 underline-offset-4 decoration-blue-500">
+                    <Link
+                      href={`/orders/${order.id}`}
+                      className="hover:underline decoration-2 underline-offset-4 decoration-blue-500"
+                    >
                       <h3 className="text-lg font-bold text-foreground group-hover:text-accent transition-colors">
                         {order.product?.title || "Digital Product"}
                       </h3>
                     </Link>
-                    
+
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-2 mt-2">
                       <Badge
                         variant="secondary"
@@ -76,22 +103,29 @@ export default async function PurchasesPage() {
                           order.status === "completed"
                             ? "bg-success/10 text-success border-success/20"
                             : order.status === "refunded"
-                            ? "bg-destructive/10 text-destructive border-red-100/50"
-                            : "bg-secondary/50 text-muted-foreground border-border"
+                              ? "bg-destructive/10 text-destructive border-red-100/50"
+                              : "bg-secondary/50 text-muted-foreground border-border"
                         }`}
                       >
                         {order.status}
                       </Badge>
-                      
+
                       <div className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
                         <Calendar className="w-4 h-4 text-muted-foreground" />
-                        {new Date(order.created_at).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" })}
+                        {new Date(order.created_at).toLocaleDateString("en-IN", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
                       </div>
-                      
+
                       <div className="hidden sm:block w-1 h-1 rounded-full bg-border/80" />
-                      
+
                       <span className="text-sm font-medium text-muted-foreground">
-                        by <span className="text-foreground font-semibold">{order.seller?.full_name || "Seller"}</span>
+                        by{" "}
+                        <span className="text-foreground font-semibold">
+                          {order.seller?.full_name || "Seller"}
+                        </span>
                       </span>
                     </div>
                   </div>
@@ -100,9 +134,12 @@ export default async function PurchasesPage() {
                 {/* Right side: Price & Action */}
                 <div className="flex md:flex-col items-center md:items-end justify-between md:justify-center border-t md:border-t-0 border-border pt-4 md:pt-0">
                   <div className="text-xl font-black text-foreground mb-3">
-                    ₹{(order.amount_paise / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    ₹
+                    {(order.amount_paise / 100).toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                    })}
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
                     <a
                       href={`/api/orders/${order.id}/invoice`}
@@ -110,9 +147,10 @@ export default async function PurchasesPage() {
                       className="inline-flex items-center justify-center gap-2 h-10 px-3 rounded-xl bg-secondary/80 text-foreground hover:bg-secondary text-sm font-bold transition-colors shadow-sm border border-border"
                       title="Download Invoice"
                     >
-                      <DownloadCloud className="w-4 h-4 text-muted-foreground" /> <span className="hidden sm:inline">Invoice</span>
+                      <DownloadCloud className="w-4 h-4 text-muted-foreground" />{" "}
+                      <span className="hidden sm:inline">Invoice</span>
                     </a>
-                    
+
                     {order.github_repo_url ? (
                       <a
                         href={order.github_repo_url}
@@ -120,10 +158,12 @@ export default async function PurchasesPage() {
                         rel="noopener noreferrer"
                         className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-bold hover:bg-primary/90 transition-colors shadow-sm"
                       >
-                        <GitBranch className="w-4 h-4" /> <span className="hidden sm:inline">Access Repo</span><span className="sm:hidden">Repo</span>
+                        <GitBranch className="w-4 h-4" />{" "}
+                        <span className="hidden sm:inline">Access Repo</span>
+                        <span className="sm:hidden">Repo</span>
                       </a>
                     ) : (
-                      <Link 
+                      <Link
                         href={`/orders/${order.id}`}
                         className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-xl bg-secondary text-foreground text-sm font-bold hover:bg-secondary transition-colors border border-border"
                       >

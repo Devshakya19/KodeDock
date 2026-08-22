@@ -95,10 +95,10 @@ func processRepoTransferJobs(ctx context.Context, rdb *redis.Client) {
 			if len(result) >= 2 {
 				jobData := result[1]
 				log.Printf("[WORKER] Started Repo Transfer: %s", jobData)
-				
+
 				// Simulate heavy GitHub API work
 				time.Sleep(2 * time.Second)
-				
+
 				log.Printf("[WORKER] Success! Repository cloned and transferred to buyer.")
 			}
 		}
@@ -123,11 +123,11 @@ func processEmailJobs(ctx context.Context, rdb *redis.Client) {
 			if len(result) >= 2 {
 				jobData := result[1]
 				log.Printf("[WORKER] Started Invoice Generation: %s", jobData)
-				
+
 				// Simulate PDF generation
 				time.Sleep(1 * time.Second)
 				log.Printf("[WORKER] Generated PDF Invoice: invoice_KodeDock.pdf")
-				
+
 				// Simulate Email Sending
 				time.Sleep(1 * time.Second)
 				log.Printf("[WORKER] Success! Sent Email with Invoice attached to buyer.")

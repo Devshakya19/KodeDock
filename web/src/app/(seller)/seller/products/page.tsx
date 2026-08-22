@@ -157,8 +157,10 @@ export default function ProductsPage() {
   }, [products, statusFilter, categoryFilter, searchQuery, sortBy]);
 
   // Derived stats
-  const totalViews = stats?.total_views ?? products.reduce((acc, p) => acc + (p.view_count || 0), 0);
-  const totalSales = stats?.total_sales ?? products.reduce((acc, p) => acc + (p.sales_count || 0), 0);
+  const totalViews =
+    stats?.total_views ?? products.reduce((acc, p) => acc + (p.view_count || 0), 0);
+  const totalSales =
+    stats?.total_sales ?? products.reduce((acc, p) => acc + (p.sales_count || 0), 0);
   const activeCount = products.filter((p) => p.status === "active").length;
 
   if (loading) {
@@ -264,9 +266,21 @@ export default function ProductsPage() {
             {[
               { id: "all", label: "All", count: products.length },
               { id: "active", label: "Active", count: activeCount },
-              { id: "limited", label: "Limited", count: products.filter((p) => p.status === "limited").length },
-              { id: "paused", label: "Paused", count: products.filter((p) => p.status === "paused").length },
-              { id: "draft", label: "Drafts", count: products.filter((p) => p.status === "draft").length },
+              {
+                id: "limited",
+                label: "Limited",
+                count: products.filter((p) => p.status === "limited").length,
+              },
+              {
+                id: "paused",
+                label: "Paused",
+                count: products.filter((p) => p.status === "paused").length,
+              },
+              {
+                id: "draft",
+                label: "Drafts",
+                count: products.filter((p) => p.status === "draft").length,
+              },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -338,7 +352,8 @@ export default function ProductsPage() {
             Your catalog is currently empty
           </h3>
           <p className="text-muted-foreground mb-8 max-w-sm mx-auto text-sm leading-relaxed font-normal">
-            You haven't published any digital code assets yet. Upload your first boilerplate, UI kit, or project to begin selling.
+            You haven't published any digital code assets yet. Upload your first boilerplate, UI
+            kit, or project to begin selling.
           </p>
           <Link href="/seller/products/new">
             <button
@@ -399,10 +414,10 @@ export default function ProductsPage() {
                         product.status === "active"
                           ? "bg-emerald-500/90 text-primary-foreground border-emerald-400/50"
                           : product.status === "limited"
-                          ? "bg-rose-500/90 text-primary-foreground border-rose-400/50"
-                          : product.status === "paused"
-                          ? "bg-amber-500/90 text-primary-foreground border-amber-400/50"
-                          : "bg-secondary text-foreground border-border"
+                            ? "bg-rose-500/90 text-primary-foreground border-rose-400/50"
+                            : product.status === "paused"
+                              ? "bg-amber-500/90 text-primary-foreground border-amber-400/50"
+                              : "bg-secondary text-foreground border-border"
                       }`}
                     >
                       {product.status.toUpperCase()}

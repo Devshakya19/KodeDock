@@ -19,37 +19,30 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Extract Release Notes
+        id: extract_notes
+        run: |
+          # Get the tag name (e.g., v1.5.0)
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          
+          # Extract notes from CHANGE.md between current tag and the next tag/footer
+          # We look for "## [$TAG_NAME]" and print until we hit the next "## [" or "---"
+          awk -v tag="## [$TAG_NAME]" '
+            $0 ~ tag {flag=1; next}
+            /^## \[/ && flag {flag=0; exit}
+            /^---/ && flag {flag=0; exit}
+            flag {print}
+          ' CHANGE.md > release_notes.md
+          
+          echo "Extracted notes:"
+          cat release_notes.md
+
       - name: Create Professional Release
-        uses: actions/github-script@v7
+        uses: softprops/action-gh-release@v2
         with:
-          script: |
-            const tag = context.ref.replace('refs/tags/', '');
-            
-            const releaseBody = `
-            # 🚀 KodeDock ${tag} is officially live!
-
-            Welcome to the latest major release of **KodeDock**, packed with massive UI upgrades, real-time sync, and critical core engine improvements.
-
-            ## ✨ Key Features & Upgrades
-            * 🌟 **Seller Reviews Dashboard**: Brand new analytics page with star distributions and average rating metrics.
-            * 🔔 **Interactive Notifications**: Upgraded the static notifications into a Client Component with optimistic "Mark all as read" state management.
-            * 🔴 **Dynamic Navbar Badge**: Added a live unread notifications counter badge to the \`SellerNavbar\` that polls automatically.
-            * 📦 **Deferred Uploads (Plan A)**: Product images are now safely held in memory until the seller explicitly publishes, preventing storage leaks in SeaweedFS.
-
-            ## 🛡️ Security & Core Engine Fixes
-            * **Escrow Exploit Fixed**: Fully authenticated the \`release_escrow\` endpoint.
-            * **Atomic Row Locks**: Eliminated double-spending race conditions in wallet and order endpoints.
-            * **Database Synchronization**: Successfully rebuilt the volume to guarantee row-level triggers (like \`updated_at\` and \`sales_count\`) fire correctly.
-
-            *Thank you for supporting KodeDock! Built with passion for the Indian developer community 🇮🇳*
-            `;
-
-            await github.rest.repos.createRelease({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              tag_name: tag,
-              name: `Release ${tag}`,
-              body: releaseBody,
-              draft: false,
-              prerelease: tag.includes('-rc') || tag.includes('-beta'),
-            });
+          name: KodeDock ${{ github.ref_name }}
+          body_path: release_notes.md
+          draft: false
+          prerelease: contains(github.ref_name, '-rc') || contains(github.ref_name, '-beta')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

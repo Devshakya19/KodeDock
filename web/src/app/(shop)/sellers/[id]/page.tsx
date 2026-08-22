@@ -49,10 +49,7 @@ async function getSellerProducts(sellerId: string): Promise<Product[]> {
 
 export default async function SellerPublicPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [profile, products] = await Promise.all([
-    getSellerProfile(id),
-    getSellerProducts(id),
-  ]);
+  const [profile, products] = await Promise.all([getSellerProfile(id), getSellerProducts(id)]);
 
   if (!profile) {
     return notFound();
@@ -63,12 +60,25 @@ export default async function SellerPublicPage({ params }: { params: Promise<{ i
       <header className="border-b border-border bg-background">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/browse" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+            <Link
+              href="/browse"
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+            >
               <ArrowLeft className="w-4 h-4" />
               <span className="text-sm font-medium">Back</span>
             </Link>
-            <Link href="/browse" className="flex items-center gap-2.5 hover:opacity-90 transition-opacity">
-              <Image src="/icons/logo/full-logo.svg" alt="KodeDock" width={175} height={24} className="h-7 w-auto object-contain" priority />
+            <Link
+              href="/browse"
+              className="flex items-center gap-2.5 hover:opacity-90 transition-opacity"
+            >
+              <Image
+                src="/icons/logo/full-logo.svg"
+                alt="KodeDock"
+                width={175}
+                height={24}
+                className="h-7 w-auto object-contain"
+                priority
+              />
             </Link>
           </div>
         </nav>
@@ -86,10 +96,10 @@ export default async function SellerPublicPage({ params }: { params: Promise<{ i
                 )}
               </div>
               <div className="flex-1">
-                <h1 className="text-2xl font-bold text-foreground">{profile.full_name || "Seller"}</h1>
-                {profile.bio && (
-                  <p className="text-muted-foreground mt-2">{profile.bio}</p>
-                )}
+                <h1 className="text-2xl font-bold text-foreground">
+                  {profile.full_name || "Seller"}
+                </h1>
+                {profile.bio && <p className="text-muted-foreground mt-2">{profile.bio}</p>}
                 <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-muted-foreground">
                   {profile.location && (
                     <div className="flex items-center gap-1">
@@ -104,8 +114,7 @@ export default async function SellerPublicPage({ params }: { params: Promise<{ i
                       rel="noopener noreferrer"
                       className="flex items-center gap-1 hover:text-foreground"
                     >
-                      <GithubIcon className="w-4 h-4" />
-                      @{profile.github_username}
+                      <GithubIcon className="w-4 h-4" />@{profile.github_username}
                     </a>
                   )}
                   {profile.website && (
@@ -142,17 +151,29 @@ export default async function SellerPublicPage({ params }: { params: Promise<{ i
                 <Card className="group border border-border hover:border-foreground/50 hover:shadow-lg transition-all cursor-pointer h-full">
                   <div className="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center overflow-hidden">
                     {product.image_url ? (
-                      <img src={product.image_url} alt={product.title} className="w-full h-full object-contain" />
+                      <img
+                        src={product.image_url}
+                        alt={product.title}
+                        className="w-full h-full object-contain"
+                      />
                     ) : (
                       <Package className="w-8 h-8 text-muted-foreground" />
                     )}
                   </div>
                   <CardContent className="p-4">
-                    <h3 className="font-semibold text-foreground text-sm line-clamp-2">{product.title}</h3>
-                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{product.description}</p>
+                    <h3 className="font-semibold text-foreground text-sm line-clamp-2">
+                      {product.title}
+                    </h3>
+                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                      {product.description}
+                    </p>
                     <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
-                      <span className={`text-base font-bold ${product.price_paise === 0 ? "text-success font-extrabold" : "text-foreground"}`}>
-                        {product.price_paise === 0 ? "Free" : `INR ${(product.price_paise / 100).toLocaleString()}`}
+                      <span
+                        className={`text-base font-bold ${product.price_paise === 0 ? "text-success font-extrabold" : "text-foreground"}`}
+                      >
+                        {product.price_paise === 0
+                          ? "Free"
+                          : `INR ${(product.price_paise / 100).toLocaleString()}`}
                       </span>
                       <span className="text-[11px] text-muted-foreground">
                         {product.rating?.toFixed(1) || "0.0"} stars ({product.review_count})

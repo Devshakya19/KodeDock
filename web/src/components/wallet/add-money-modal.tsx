@@ -33,7 +33,9 @@ export function AddMoneyModal({ onClose, onSuccess }: AddMoneyModalProps) {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
     document.addEventListener("keydown", handleEsc);
     return () => document.removeEventListener("keydown", handleEsc);
   }, [onClose]);
@@ -56,10 +58,12 @@ export function AddMoneyModal({ onClose, onSuccess }: AddMoneyModalProps) {
         return;
       }
 
-      const result = await apiPost<{ razorpay_order_id: string; amount_paise: number; currency: string; key_id: string }>(
-        "/wallet/topup",
-        { amount_paise: amountPaise }
-      );
+      const result = await apiPost<{
+        razorpay_order_id: string;
+        amount_paise: number;
+        currency: string;
+        key_id: string;
+      }>("/wallet/topup", { amount_paise: amountPaise });
 
       if (!result.success || !result.data) {
         setError(result.error || "Failed to create topup order");
@@ -74,7 +78,11 @@ export function AddMoneyModal({ onClose, onSuccess }: AddMoneyModalProps) {
         name: "KodeDock",
         description: "Add money to wallet",
         order_id: result.data.razorpay_order_id,
-        handler: async (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => {
+        handler: async (response: {
+          razorpay_order_id: string;
+          razorpay_payment_id: string;
+          razorpay_signature: string;
+        }) => {
           try {
             const verifyResult = await apiPost("/wallet/topup/verify", {
               razorpay_order_id: response.razorpay_order_id,
@@ -106,17 +114,28 @@ export function AddMoneyModal({ onClose, onSuccess }: AddMoneyModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
-      <div className="bg-background rounded-xl p-6 w-full max-w-md shadow-xl" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      onClick={onClose}
+    >
+      <div
+        className="bg-background rounded-xl p-6 w-full max-w-md shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-foreground">Add Money to Wallet</h2>
-          <button onClick={onClose} className="w-8 h-8 rounded-full hover:bg-secondary/80 flex items-center justify-center">
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full hover:bg-secondary/80 flex items-center justify-center"
+          >
             <X className="w-4 h-4 text-muted-foreground" />
           </button>
         </div>
 
         {error && (
-          <div className="mb-4 p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-sm text-destructive">{error}</div>
+          <div className="mb-4 p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-sm text-destructive">
+            {error}
+          </div>
         )}
 
         <div className="mb-4">
@@ -147,7 +166,11 @@ export function AddMoneyModal({ onClose, onSuccess }: AddMoneyModalProps) {
           ))}
         </div>
 
-        <Button onClick={handleAddMoney} disabled={loading || !amount} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+        <Button
+          onClick={handleAddMoney}
+          disabled={loading || !amount}
+          className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+        >
           {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
           Add Money
         </Button>

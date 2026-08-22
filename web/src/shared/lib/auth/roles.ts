@@ -5,9 +5,7 @@ export const ROLES = {
 
 export type UserRole = (typeof ROLES)[keyof typeof ROLES];
 
-export function getUserRole(
-  user: { role?: string } | null
-): UserRole {
+export function getUserRole(user: { role?: string } | null): UserRole {
   if (!user) return ROLES.USER;
   return (user.role as UserRole) || ROLES.USER;
 }

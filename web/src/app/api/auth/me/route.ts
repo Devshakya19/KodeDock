@@ -9,10 +9,7 @@ export async function GET(request: Request) {
     const token = tokenMatch?.[1];
 
     if (!token) {
-      return NextResponse.json(
-        { success: false, error: "Not authenticated" },
-        { status: 401 }
-      );
+      return NextResponse.json({ success: false, error: "Not authenticated" }, { status: 401 });
     }
 
     const backendRes = await fetch(`${RUST_BACKEND}/api/auth/me`, {

@@ -1,8 +1,8 @@
-use actix_web::{web, HttpRequest, HttpResponse};
-use sqlx::PgPool;
-use serde::{Deserialize, Serialize};
 use crate::services::auth;
 use crate::services::ApiResponse;
+use actix_web::{web, HttpRequest, HttpResponse};
+use serde::{Deserialize, Serialize};
+use sqlx::PgPool;
 
 #[derive(Debug, Deserialize)]
 pub struct RegisterRequest {
@@ -25,10 +25,7 @@ pub struct AuthResponse {
     pub token: String,
 }
 
-pub async fn register(
-    pool: web::Data<PgPool>,
-    body: web::Json<RegisterRequest>,
-) -> HttpResponse {
+pub async fn register(pool: web::Data<PgPool>, body: web::Json<RegisterRequest>) -> HttpResponse {
     // Allow "user" or "developer" role from self-registration — no other roles
     let role = match body.role.as_deref() {
         Some("developer") => "developer",
@@ -37,16 +34,24 @@ pub async fn register(
 
     // Validate password strength
     if body.password.len() < 8 {
-        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Password must be at least 8 characters"));
+        return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+            "Password must be at least 8 characters",
+        ));
     }
     if !body.password.chars().any(|c| c.is_uppercase()) {
-        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Password must contain at least one uppercase letter"));
+        return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+            "Password must contain at least one uppercase letter",
+        ));
     }
     if !body.password.chars().any(|c| c.is_lowercase()) {
-        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Password must contain at least one lowercase letter"));
+        return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+            "Password must contain at least one lowercase letter",
+        ));
     }
     if !body.password.chars().any(|c| c.is_numeric()) {
-        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Password must contain at least one number"));
+        return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+            "Password must contain at least one number",
+        ));
     }
 
     // Validate email format
@@ -56,26 +61,46 @@ pub async fn register(
         return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid email format"));
     }
     let parts: Vec<&str> = email.split('@').collect();
-    if parts.len() != 2 || parts[0].is_empty() || !parts[1].contains('.') || parts[1].starts_with('.') || parts[1].ends_with('.') {
+    if parts.len() != 2
+        || parts[0].is_empty()
+        || !parts[1].contains('.')
+        || parts[1].starts_with('.')
+        || parts[1].ends_with('.')
+    {
         return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid email format"));
     }
 
     // Validate name length
     if body.full_name.trim().is_empty() || body.full_name.len() > 100 {
-        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Name must be 1-100 characters"));
+        return HttpResponse::BadRequest()
+            .json(ApiResponse::<()>::error("Name must be 1-100 characters"));
     }
 
     // Check if user already exists
-    if auth::get_user_by_email(pool.get_ref(), &email).await.is_ok() {
-        return HttpResponse::Conflict().json(ApiResponse::<()>::error("User with this email already exists"));
+    if auth::get_user_by_email(pool.get_ref(), &email)
+        .await
+        .is_ok()
+    {
+        return HttpResponse::Conflict().json(ApiResponse::<()>::error(
+            "User with this email already exists",
+        ));
     }
 
     // Create user — use lowercased email for consistency
-    let user = match auth::create_user(pool.get_ref(), &email, &body.password, &body.full_name, role).await {
+    let user = match auth::create_user(
+        pool.get_ref(),
+        &email,
+        &body.password,
+        &body.full_name,
+        role,
+    )
+    .await
+    {
         Ok(user) => user,
         Err(e) => {
             log::error!("Failed to create user: {}", e);
-            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to create user"));
+            return HttpResponse::InternalServerError()
+                .json(ApiResponse::<()>::error("Failed to create user"));
         }
     };
 
@@ -85,7 +110,8 @@ pub async fn register(
         Ok(token) => token,
         Err(e) => {
             log::error!("Failed to generate token: {}", e);
-            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to generate token"));
+            return HttpResponse::InternalServerError()
+                .json(ApiResponse::<()>::error("Failed to generate token"));
         }
     };
 
@@ -109,30 +135,31 @@ pub async fn register(
     ))
 }
 
-pub async fn login(
-    pool: web::Data<PgPool>,
-    body: web::Json<LoginRequest>,
-) -> HttpResponse {
+pub async fn login(pool: web::Data<PgPool>, body: web::Json<LoginRequest>) -> HttpResponse {
     let cleaned_email = body.email.trim().to_lowercase();
 
     // Get user by email
-    let (user_id, email, full_name, role, password_hash) = match auth::get_user_by_email(pool.get_ref(), &cleaned_email).await {
-        Ok(user) => user,
-        Err(_) => {
-            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid email or password"));
-        }
-    };
+    let (user_id, email, full_name, role, password_hash) =
+        match auth::get_user_by_email(pool.get_ref(), &cleaned_email).await {
+            Ok(user) => user,
+            Err(_) => {
+                return HttpResponse::Unauthorized()
+                    .json(ApiResponse::<()>::error("Invalid email or password"));
+            }
+        };
 
     // Verify password
     let password_hash = match password_hash {
         Some(hash) => hash,
         None => {
-            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid email or password"));
+            return HttpResponse::Unauthorized()
+                .json(ApiResponse::<()>::error("Invalid email or password"));
         }
     };
 
     if !auth::verify_password(&body.password, &password_hash).unwrap_or(false) {
-        return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid email or password"));
+        return HttpResponse::Unauthorized()
+            .json(ApiResponse::<()>::error("Invalid email or password"));
     }
 
     let user = auth::User {
@@ -149,7 +176,8 @@ pub async fn login(
         Ok(token) => token,
         Err(e) => {
             log::error!("Failed to generate token: {}", e);
-            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to generate token"));
+            return HttpResponse::InternalServerError()
+                .json(ApiResponse::<()>::error("Failed to generate token"));
         }
     };
 
@@ -159,10 +187,7 @@ pub async fn login(
     ))
 }
 
-pub async fn me(
-    pool: web::Data<PgPool>,
-    req: HttpRequest,
-) -> HttpResponse {
+pub async fn me(pool: web::Data<PgPool>, req: HttpRequest) -> HttpResponse {
     // Extract token from Authorization header
     let auth_header = req.headers().get("Authorization");
     let token = match auth_header {
@@ -171,7 +196,8 @@ pub async fn me(
             header_str.strip_prefix("Bearer ").unwrap_or(header_str)
         }
         None => {
-            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Missing Authorization header"));
+            return HttpResponse::Unauthorized()
+                .json(ApiResponse::<()>::error("Missing Authorization header"));
         }
     };
 
@@ -188,7 +214,8 @@ pub async fn me(
     let user_id = match uuid::Uuid::parse_str(&claims.sub) {
         Ok(id) => id,
         Err(_) => {
-            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid user ID in token"));
+            return HttpResponse::Unauthorized()
+                .json(ApiResponse::<()>::error("Invalid user ID in token"));
         }
     };
 
@@ -222,7 +249,9 @@ pub async fn forgot_password(
     let success_response = HttpResponse::Ok().json(ApiResponse::<()> {
         success: true,
         data: None,
-        message: Some("If an account with that email exists, a reset link has been sent".to_string()),
+        message: Some(
+            "If an account with that email exists, a reset link has been sent".to_string(),
+        ),
         error: None,
     });
 
@@ -244,7 +273,7 @@ pub async fn forgot_password(
     // Store token in database with 1-hour expiry
     let expires_at = chrono::Utc::now() + chrono::Duration::hours(1);
     if let Err(e) = sqlx::query(
-        "INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)"
+        "INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)",
     )
     .bind(user_id)
     .bind(&token)
@@ -257,9 +286,13 @@ pub async fn forgot_password(
     }
 
     // Build reset URL using APP_BASE_URL env var (no token in logs)
-    let base_url = std::env::var("APP_BASE_URL").unwrap_or_else(|_| "http://localhost:3000".to_string());
+    let base_url =
+        std::env::var("APP_BASE_URL").unwrap_or_else(|_| "http://localhost:3000".to_string());
     let _reset_url = format!("{}/reset-password?token={}", base_url, token);
-    log::info!("Password reset requested for {} (token generated)", body.email);
+    log::info!(
+        "Password reset requested for {} (token generated)",
+        body.email
+    );
 
     success_response
 }
@@ -276,16 +309,24 @@ pub async fn reset_password(
 ) -> HttpResponse {
     // Validate password strength
     if body.password.len() < 8 {
-        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Password must be at least 8 characters"));
+        return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+            "Password must be at least 8 characters",
+        ));
     }
     if !body.password.chars().any(|c| c.is_uppercase()) {
-        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Password must contain at least one uppercase letter"));
+        return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+            "Password must contain at least one uppercase letter",
+        ));
     }
     if !body.password.chars().any(|c| c.is_lowercase()) {
-        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Password must contain at least one lowercase letter"));
+        return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+            "Password must contain at least one lowercase letter",
+        ));
     }
     if !body.password.chars().any(|c| c.is_numeric()) {
-        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Password must contain at least one number"));
+        return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+            "Password must contain at least one number",
+        ));
     }
 
     // Atomically claim the token: mark it used in one query.
@@ -295,7 +336,7 @@ pub async fn reset_password(
         r#"UPDATE password_reset_tokens 
            SET used = TRUE 
            WHERE token = $1 AND used = FALSE AND expires_at > NOW() 
-           RETURNING user_id"#
+           RETURNING user_id"#,
     )
     .bind(&body.token)
     .fetch_optional(pool.get_ref())
@@ -303,17 +344,23 @@ pub async fn reset_password(
 
     let user_id = match token_record {
         Ok(Some((uid,))) => uid,
-        Ok(None) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid, expired, or already used reset token")),
+        Ok(None) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+                "Invalid, expired, or already used reset token",
+            ))
+        }
         Err(e) => {
             log::error!("Failed to claim reset token: {}", e);
-            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Database error"));
+            return HttpResponse::InternalServerError()
+                .json(ApiResponse::<()>::error("Database error"));
         }
     };
 
     // Update the password
     if let Err(e) = auth::update_password(pool.get_ref(), user_id, &body.password).await {
         log::error!("Failed to update password: {}", e);
-        return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to update password"));
+        return HttpResponse::InternalServerError()
+            .json(ApiResponse::<()>::error("Failed to update password"));
     }
 
     HttpResponse::Ok().json(ApiResponse::<()> {
@@ -343,7 +390,8 @@ pub async fn change_password(
             header_str.strip_prefix("Bearer ").unwrap_or(header_str)
         }
         None => {
-            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Missing Authorization header"));
+            return HttpResponse::Unauthorized()
+                .json(ApiResponse::<()>::error("Missing Authorization header"));
         }
     };
 
@@ -358,48 +406,61 @@ pub async fn change_password(
     let user_id = match uuid::Uuid::parse_str(&claims.sub) {
         Ok(id) => id,
         Err(_) => {
-            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid user ID in token"));
+            return HttpResponse::Unauthorized()
+                .json(ApiResponse::<()>::error("Invalid user ID in token"));
         }
     };
 
     // Validate new password strength
     if body.new_password.len() < 8 {
-        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("New password must be at least 8 characters"));
+        return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+            "New password must be at least 8 characters",
+        ));
     }
     if !body.new_password.chars().any(|c| c.is_uppercase()) {
-        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("New password must contain at least one uppercase letter"));
+        return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+            "New password must contain at least one uppercase letter",
+        ));
     }
     if !body.new_password.chars().any(|c| c.is_lowercase()) {
-        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("New password must contain at least one lowercase letter"));
+        return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+            "New password must contain at least one lowercase letter",
+        ));
     }
     if !body.new_password.chars().any(|c| c.is_numeric()) {
-        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("New password must contain at least one number"));
+        return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+            "New password must contain at least one number",
+        ));
     }
 
     // Fetch current password hash
-    let (_, _, _, _, password_hash) = match auth::get_user_by_id_with_hash(pool.get_ref(), user_id).await {
-        Ok(user) => user,
-        Err(_) => {
-            return HttpResponse::NotFound().json(ApiResponse::<()>::error("User not found"));
-        }
-    };
+    let (_, _, _, _, password_hash) =
+        match auth::get_user_by_id_with_hash(pool.get_ref(), user_id).await {
+            Ok(user) => user,
+            Err(_) => {
+                return HttpResponse::NotFound().json(ApiResponse::<()>::error("User not found"));
+            }
+        };
 
     let password_hash = match password_hash {
         Some(hash) => hash,
         None => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("User has no password set"));
+            return HttpResponse::BadRequest()
+                .json(ApiResponse::<()>::error("User has no password set"));
         }
     };
 
     // Verify current password
     if !auth::verify_password(&body.current_password, &password_hash).unwrap_or(false) {
-        return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Current password is incorrect"));
+        return HttpResponse::Unauthorized()
+            .json(ApiResponse::<()>::error("Current password is incorrect"));
     }
 
     // Update password
     if let Err(e) = auth::update_password(pool.get_ref(), user_id, &body.new_password).await {
         log::error!("Failed to update password: {}", e);
-        return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to update password"));
+        return HttpResponse::InternalServerError()
+            .json(ApiResponse::<()>::error("Failed to update password"));
     }
 
     HttpResponse::Ok().json(ApiResponse::<()> {
@@ -410,10 +471,7 @@ pub async fn change_password(
     })
 }
 
-pub async fn delete_account(
-    pool: web::Data<PgPool>,
-    req: HttpRequest,
-) -> HttpResponse {
+pub async fn delete_account(pool: web::Data<PgPool>, req: HttpRequest) -> HttpResponse {
     // Extract user ID from JWT
     let auth_header = req.headers().get("Authorization");
     let token = match auth_header {
@@ -422,7 +480,8 @@ pub async fn delete_account(
             header_str.strip_prefix("Bearer ").unwrap_or(header_str)
         }
         None => {
-            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Missing Authorization header"));
+            return HttpResponse::Unauthorized()
+                .json(ApiResponse::<()>::error("Missing Authorization header"));
         }
     };
 
@@ -437,7 +496,8 @@ pub async fn delete_account(
     let user_id = match uuid::Uuid::parse_str(&claims.sub) {
         Ok(id) => id,
         Err(_) => {
-            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid user ID in token"));
+            return HttpResponse::Unauthorized()
+                .json(ApiResponse::<()>::error("Invalid user ID in token"));
         }
     };
 
@@ -446,17 +506,19 @@ pub async fn delete_account(
         Ok(tx) => tx,
         Err(e) => {
             log::error!("Failed to start transaction: {}", e);
-            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Database error"));
+            return HttpResponse::InternalServerError()
+                .json(ApiResponse::<()>::error("Database error"));
         }
     };
 
     // 1. Check wallet balance
-    let balance = sqlx::query_scalar::<_, i32>("SELECT balance_paise FROM wallets WHERE user_id = $1")
-        .bind(user_id)
-        .fetch_optional(&mut *tx)
-        .await
-        .unwrap_or(Some(0))
-        .unwrap_or(0);
+    let balance =
+        sqlx::query_scalar::<_, i32>("SELECT balance_paise FROM wallets WHERE user_id = $1")
+            .bind(user_id)
+            .fetch_optional(&mut *tx)
+            .await
+            .unwrap_or(Some(0))
+            .unwrap_or(0);
 
     if balance > 0 {
         let _ = tx.rollback().await;
@@ -468,7 +530,7 @@ pub async fn delete_account(
     // deleting a user with ANY order history will cause a foreign key violation.
     // For a production app, we would soft-delete or anonymize the user, but for now we block it.
     let order_count = sqlx::query_scalar::<_, i64>(
-        "SELECT COUNT(*) FROM orders WHERE buyer_id = $1 OR seller_id = $1"
+        "SELECT COUNT(*) FROM orders WHERE buyer_id = $1 OR seller_id = $1",
     )
     .bind(user_id)
     .fetch_one(&mut *tx)
@@ -477,7 +539,9 @@ pub async fn delete_account(
 
     if order_count > 0 {
         let _ = tx.rollback().await;
-        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Cannot delete account with existing order history."));
+        return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+            "Cannot delete account with existing order history.",
+        ));
     }
 
     // 3. Delete the user
@@ -488,13 +552,15 @@ pub async fn delete_account(
         .await
     {
         log::error!("Failed to delete user: {}", e);
-        return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to delete account"));
+        return HttpResponse::InternalServerError()
+            .json(ApiResponse::<()>::error("Failed to delete account"));
     }
 
     // Commit transaction
     if let Err(e) = tx.commit().await {
         log::error!("Failed to commit transaction: {}", e);
-        return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to delete account"));
+        return HttpResponse::InternalServerError()
+            .json(ApiResponse::<()>::error("Failed to delete account"));
     }
 
     HttpResponse::Ok().json(ApiResponse::<()> {
@@ -531,7 +597,8 @@ pub async fn github_oauth(
         Ok(token) => token,
         Err(e) => {
             log::error!("GitHub code exchange failed: {}", e);
-            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("GitHub authentication failed"));
+            return HttpResponse::Unauthorized()
+                .json(ApiResponse::<()>::error("GitHub authentication failed"));
         }
     };
 
@@ -540,7 +607,8 @@ pub async fn github_oauth(
         Ok(user) => user,
         Err(e) => {
             log::error!("GitHub user fetch failed: {}", e);
-            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Failed to fetch GitHub profile"));
+            return HttpResponse::Unauthorized()
+                .json(ApiResponse::<()>::error("Failed to fetch GitHub profile"));
         }
     };
 
@@ -551,10 +619,14 @@ pub async fn github_oauth(
     };
 
     // Derive email and name from GitHub profile
-    let email = gh_user.email.clone().unwrap_or_else(|| {
-        format!("{}@github.kodedock.app", gh_user.login)
-    });
-    let full_name = gh_user.name.clone().unwrap_or_else(|| gh_user.login.clone());
+    let email = gh_user
+        .email
+        .clone()
+        .unwrap_or_else(|| format!("{}@github.kodedock.app", gh_user.login));
+    let full_name = gh_user
+        .name
+        .clone()
+        .unwrap_or_else(|| gh_user.login.clone());
 
     // 3. Check if a user is already linked to this GitHub ID
     let user = match auth::get_user_by_github_id(pool.get_ref(), gh_user.id).await {
@@ -564,9 +636,17 @@ pub async fn github_oauth(
             match auth::get_user_by_email(pool.get_ref(), &email).await {
                 Ok((user_id, _, existing_name, existing_role, _)) => {
                     // Link GitHub to this existing account
-                    if let Err(e) = auth::link_github_to_user(pool.get_ref(), user_id, gh_user.id, &gh_user.login).await {
+                    if let Err(e) = auth::link_github_to_user(
+                        pool.get_ref(),
+                        user_id,
+                        gh_user.id,
+                        &gh_user.login,
+                    )
+                    .await
+                    {
                         log::error!("Failed to link GitHub to user: {}", e);
-                        return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to link GitHub account"));
+                        return HttpResponse::InternalServerError()
+                            .json(ApiResponse::<()>::error("Failed to link GitHub account"));
                     }
 
                     // If the user registered with a role different from what they're
@@ -588,11 +668,14 @@ pub async fn github_oauth(
                         &email,
                         &full_name,
                         role,
-                    ).await {
+                    )
+                    .await
+                    {
                         Ok(u) => u,
                         Err(e) => {
                             log::error!("Failed to create GitHub user: {}", e);
-                            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to create account"));
+                            return HttpResponse::InternalServerError()
+                                .json(ApiResponse::<()>::error("Failed to create account"));
                         }
                     };
 
@@ -626,7 +709,8 @@ pub async fn github_oauth(
         Ok(token) => token,
         Err(e) => {
             log::error!("Failed to generate token: {}", e);
-            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to generate token"));
+            return HttpResponse::InternalServerError()
+                .json(ApiResponse::<()>::error("Failed to generate token"));
         }
     };
 
@@ -649,19 +733,31 @@ pub async fn github_link(
     // 1. Authenticate user
     let auth_header = req.headers().get("Authorization");
     let token = match auth_header {
-        Some(header) => header.to_str().unwrap_or("").strip_prefix("Bearer ").unwrap_or(header.to_str().unwrap_or("")),
-        None => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Missing Authorization header")),
+        Some(header) => header
+            .to_str()
+            .unwrap_or("")
+            .strip_prefix("Bearer ")
+            .unwrap_or(header.to_str().unwrap_or("")),
+        None => {
+            return HttpResponse::Unauthorized()
+                .json(ApiResponse::<()>::error("Missing Authorization header"))
+        }
     };
 
     let secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set");
     let claims = match auth::verify_token(token, &secret) {
         Ok(claims) => claims,
-        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid token")),
+        Err(_) => {
+            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid token"))
+        }
     };
 
     let user_id = match uuid::Uuid::parse_str(&claims.sub) {
         Ok(id) => id,
-        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid user ID in token")),
+        Err(_) => {
+            return HttpResponse::Unauthorized()
+                .json(ApiResponse::<()>::error("Invalid user ID in token"))
+        }
     };
 
     // 2. Exchange code for GitHub access token
@@ -669,7 +765,8 @@ pub async fn github_link(
         Ok(token) => token,
         Err(e) => {
             log::error!("GitHub code exchange failed: {}", e);
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("GitHub authentication failed"));
+            return HttpResponse::BadRequest()
+                .json(ApiResponse::<()>::error("GitHub authentication failed"));
         }
     };
 
@@ -678,7 +775,8 @@ pub async fn github_link(
         Ok(user) => user,
         Err(e) => {
             log::error!("GitHub user fetch failed: {}", e);
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Failed to fetch GitHub profile"));
+            return HttpResponse::BadRequest()
+                .json(ApiResponse::<()>::error("Failed to fetch GitHub profile"));
         }
     };
 
@@ -686,15 +784,20 @@ pub async fn github_link(
     match auth::get_user_by_github_id(pool.get_ref(), gh_user.id).await {
         Ok(existing) => {
             if existing.id != user_id {
-                return HttpResponse::Conflict().json(ApiResponse::<()>::error("This GitHub account is already linked to another KodeDock account."));
+                return HttpResponse::Conflict().json(ApiResponse::<()>::error(
+                    "This GitHub account is already linked to another KodeDock account.",
+                ));
             }
             // If it's the same user, just update the token
         }
         Err(_) => {
             // Not linked, so we link it
-            if let Err(e) = auth::link_github_to_user(pool.get_ref(), user_id, gh_user.id, &gh_user.login).await {
+            if let Err(e) =
+                auth::link_github_to_user(pool.get_ref(), user_id, gh_user.id, &gh_user.login).await
+            {
                 log::error!("Failed to link GitHub: {}", e);
-                return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to link GitHub account"));
+                return HttpResponse::InternalServerError()
+                    .json(ApiResponse::<()>::error("Failed to link GitHub account"));
             }
         }
     }
@@ -702,7 +805,8 @@ pub async fn github_link(
     // 5. Store GitHub access token
     if let Err(e) = auth::store_github_token(pool.get_ref(), user_id, &access_token).await {
         log::error!("Failed to store GitHub token: {}", e);
-        return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to store GitHub token"));
+        return HttpResponse::InternalServerError()
+            .json(ApiResponse::<()>::error("Failed to store GitHub token"));
     }
 
     HttpResponse::Ok().json(ApiResponse::<()> {
@@ -713,26 +817,35 @@ pub async fn github_link(
     })
 }
 
-pub async fn github_unlink(
-    pool: web::Data<PgPool>,
-    req: HttpRequest,
-) -> HttpResponse {
+pub async fn github_unlink(pool: web::Data<PgPool>, req: HttpRequest) -> HttpResponse {
     // 1. Authenticate user
     let auth_header = req.headers().get("Authorization");
     let token = match auth_header {
-        Some(header) => header.to_str().unwrap_or("").strip_prefix("Bearer ").unwrap_or(header.to_str().unwrap_or("")),
-        None => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Missing Authorization header")),
+        Some(header) => header
+            .to_str()
+            .unwrap_or("")
+            .strip_prefix("Bearer ")
+            .unwrap_or(header.to_str().unwrap_or("")),
+        None => {
+            return HttpResponse::Unauthorized()
+                .json(ApiResponse::<()>::error("Missing Authorization header"))
+        }
     };
 
     let secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set");
     let claims = match auth::verify_token(token, &secret) {
         Ok(claims) => claims,
-        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid token")),
+        Err(_) => {
+            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid token"))
+        }
     };
 
     let user_id = match uuid::Uuid::parse_str(&claims.sub) {
         Ok(id) => id,
-        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid user ID in token")),
+        Err(_) => {
+            return HttpResponse::Unauthorized()
+                .json(ApiResponse::<()>::error("Invalid user ID in token"))
+        }
     };
 
     // Unlink in database
@@ -741,10 +854,12 @@ pub async fn github_unlink(
         .execute(pool.get_ref())
         .await;
 
-    let _ = sqlx::query("UPDATE profiles SET github_username = NULL, github_access_token = NULL WHERE id = $1")
-        .bind(user_id)
-        .execute(pool.get_ref())
-        .await;
+    let _ = sqlx::query(
+        "UPDATE profiles SET github_username = NULL, github_access_token = NULL WHERE id = $1",
+    )
+    .bind(user_id)
+    .execute(pool.get_ref())
+    .await;
 
     HttpResponse::Ok().json(ApiResponse::<()> {
         success: true,

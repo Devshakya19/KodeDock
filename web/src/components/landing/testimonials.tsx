@@ -4,7 +4,6 @@ import { FadeIn } from "@/shared/components/layout/fade-in";
 import { Star } from "lucide-react";
 import { Card, CardContent } from "@/shared/ui/card";
 
-
 const TESTIMONIALS = [
   {
     quote: "I sold my B.Tech project for ₹499 and made ₹20,000 in my first month.",
@@ -55,13 +54,12 @@ export function Testimonials() {
                 <CardContent className="p-6">
                   <div className="flex gap-1 mb-4">
                     {Array.from({ length: 5 }).map((_, j) => (
-                    <Star
-                        key={j}
-                        className="w-4 h-4 fill-amber-400 text-amber-400"
-                      />
+                      <Star key={j} className="w-4 h-4 fill-amber-400 text-amber-400" />
                     ))}
                   </div>
-                  <p className="text-sm leading-relaxed text-foreground mb-6">&ldquo;{t.quote}&rdquo;</p>
+                  <p className="text-sm leading-relaxed text-foreground mb-6">
+                    &ldquo;{t.quote}&rdquo;
+                  </p>
                   <div className="flex items-center gap-3 pt-4 border-t border-border">
                     <div className="w-10 h-10 rounded-full bg-foreground/10 flex items-center justify-center text-sm font-bold text-foreground">
                       {t.avatar}

@@ -16,12 +16,12 @@
 //! row, seller wallet balance, wallet transaction, and notification are all
 //! applied atomically — or all rolled back.
 
+use crate::middleware::extract_user_id;
+use crate::models::{CheckoutOrderResponse, CreateOrderRequest, Order, VerifyOrderRequest};
+use crate::services::{payment, ApiResponse};
 use actix_web::{web, HttpRequest, HttpResponse};
 use serde::Deserialize;
 use sqlx::PgPool;
-use crate::models::{CheckoutOrderResponse, Order, CreateOrderRequest, VerifyOrderRequest};
-use crate::services::{ApiResponse, payment};
-use crate::middleware::extract_user_id;
 
 /// 7-day escrow hold window.
 const ESCROW_HOLD_DAYS: i64 = 7;
@@ -33,12 +33,16 @@ pub async fn create_order(
 ) -> HttpResponse {
     let buyer_id = match extract_user_id(&req) {
         Ok(id) => id,
-        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized")),
+        Err(_) => {
+            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized"))
+        }
     };
 
     let buyer_uuid = match uuid::Uuid::parse_str(&buyer_id) {
         Ok(uuid) => uuid,
-        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid buyer ID")),
+        Err(_) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid buyer ID"))
+        }
     };
 
     // Fetch the product
@@ -56,20 +60,24 @@ pub async fn create_order(
     };
 
     if product.status != "active" && product.status != "limited" {
-        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Product is not available for purchase"));
+        return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+            "Product is not available for purchase",
+        ));
     }
 
     if product.status == "limited" {
         if let Some(limit) = product.stock_limit {
             let sales = product.sales_count.unwrap_or(0);
             if sales >= limit {
-                return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Product is out of stock"));
+                return HttpResponse::BadRequest()
+                    .json(ApiResponse::<()>::error("Product is out of stock"));
             }
         }
     }
 
     if product.seller_id == buyer_uuid {
-        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Cannot purchase your own product"));
+        return HttpResponse::BadRequest()
+            .json(ApiResponse::<()>::error("Cannot purchase your own product"));
     }
 
     let price_paise = product.price_paise;
@@ -78,7 +86,7 @@ pub async fn create_order(
 
     // Check buyer's wallet balance
     let wallet_balance = match sqlx::query_as::<_, crate::models::Wallet>(
-        "SELECT * FROM wallets WHERE user_id = $1"
+        "SELECT * FROM wallets WHERE user_id = $1",
     )
     .bind(buyer_uuid)
     .fetch_optional(pool.get_ref())
@@ -90,7 +98,15 @@ pub async fn create_order(
 
     // If wallet has enough balance, pay from wallet (instant completion)
     if wallet_balance >= price_paise {
-        return pay_from_wallet(pool.get_ref(), buyer_uuid, &product, price_paise, platform_fee, seller_amount).await;
+        return pay_from_wallet(
+            pool.get_ref(),
+            buyer_uuid,
+            &product,
+            price_paise,
+            platform_fee,
+            seller_amount,
+        )
+        .await;
     }
 
     // Otherwise, create Razorpay order for Checkout.js
@@ -99,8 +115,9 @@ pub async fn create_order(
         Ok(o) => o,
         Err(payment::Error::NotConfigured) => {
             log::warn!("Payment requested but RAZORPAY_KEY_ID/SECRET not configured");
-            return HttpResponse::ServiceUnavailable()
-                .json(ApiResponse::<()>::error("Payments are not configured on this server"));
+            return HttpResponse::ServiceUnavailable().json(ApiResponse::<()>::error(
+                "Payments are not configured on this server",
+            ));
         }
         Err(e) => {
             log::error!("Failed to create Razorpay order: {}", e);
@@ -111,8 +128,11 @@ pub async fn create_order(
 
     let key_id = match payment::public_key_id() {
         Some(k) => k,
-        None => return HttpResponse::ServiceUnavailable()
-            .json(ApiResponse::<()>::error("Payments are not configured on this server")),
+        None => {
+            return HttpResponse::ServiceUnavailable().json(ApiResponse::<()>::error(
+                "Payments are not configured on this server",
+            ))
+        }
     };
 
     // Insert DB order as pending
@@ -165,7 +185,8 @@ async fn pay_from_wallet(
         Ok(tx) => tx,
         Err(e) => {
             log::error!("Failed to start transaction: {}", e);
-            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Database error"));
+            return HttpResponse::InternalServerError()
+                .json(ApiResponse::<()>::error("Database error"));
         }
     };
 
@@ -184,7 +205,7 @@ async fn pay_from_wallet(
                total_spent_paise = total_spent_paise + $1, 
                updated_at = NOW() 
            WHERE user_id = $2 AND balance_paise >= $1 
-           RETURNING balance_paise"#
+           RETURNING balance_paise"#,
     )
     .bind(price_paise)
     .bind(buyer_uuid)
@@ -194,12 +215,14 @@ async fn pay_from_wallet(
         Ok(Some(bal)) => bal,
         Ok(None) => {
             let _ = tx.rollback().await;
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Insufficient wallet balance"));
+            return HttpResponse::BadRequest()
+                .json(ApiResponse::<()>::error("Insufficient wallet balance"));
         }
         Err(e) => {
             log::error!("Failed to debit buyer wallet: {}", e);
             let _ = tx.rollback().await;
-            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Wallet error"));
+            return HttpResponse::InternalServerError()
+                .json(ApiResponse::<()>::error("Wallet error"));
         }
     };
 
@@ -287,10 +310,11 @@ async fn pay_from_wallet(
     .await;
 
     // Increment product sales_count
-    let _ = sqlx::query("UPDATE products SET sales_count = COALESCE(sales_count, 0) + 1 WHERE id = $1")
-        .bind(product.id)
-        .execute(&mut *tx)
-        .await;
+    let _ =
+        sqlx::query("UPDATE products SET sales_count = COALESCE(sales_count, 0) + 1 WHERE id = $1")
+            .bind(product.id)
+            .execute(&mut *tx)
+            .await;
 
     match tx.commit().await {
         Ok(_) => {
@@ -381,7 +405,10 @@ async fn complete_order_atomic(
            VALUES ($1, 'sale', 'New sale!', $2, $3)"#,
     )
     .bind(order_row.seller_id)
-    .bind(format!("You made a sale of ₹{}!", order_row.seller_amount_paise / 100))
+    .bind(format!(
+        "You made a sale of ₹{}!",
+        order_row.seller_amount_paise / 100
+    ))
     .bind(serde_json::json!({ "order_id": order_row.id }))
     .execute(&mut *tx)
     .await?;
@@ -397,12 +424,16 @@ pub async fn verify_order(
 ) -> HttpResponse {
     let buyer_id = match extract_user_id(&req) {
         Ok(id) => id,
-        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized")),
+        Err(_) => {
+            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized"))
+        }
     };
 
     let buyer_uuid = match uuid::Uuid::parse_str(&buyer_id) {
         Ok(uuid) => uuid,
-        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid buyer ID")),
+        Err(_) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid buyer ID"))
+        }
     };
 
     if let Err(e) = payment::verify_payment_signature(
@@ -412,8 +443,9 @@ pub async fn verify_order(
     ) {
         match e {
             payment::Error::NotConfigured => {
-                return HttpResponse::ServiceUnavailable()
-                    .json(ApiResponse::<()>::error("Payments are not configured on this server"));
+                return HttpResponse::ServiceUnavailable().json(ApiResponse::<()>::error(
+                    "Payments are not configured on this server",
+                ));
             }
             payment::Error::InvalidSignature => {
                 log::warn!("Invalid payment signature for order {}", body.order_id);
@@ -438,10 +470,13 @@ pub async fn verify_order(
     .await
     {
         Ok(Some(o)) => o,
-        Ok(None) => return HttpResponse::NotFound().json(ApiResponse::<()>::error("Order not found")),
+        Ok(None) => {
+            return HttpResponse::NotFound().json(ApiResponse::<()>::error("Order not found"))
+        }
         Err(e) => {
             log::error!("Failed to fetch order for verify: {}", e);
-            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Database error"));
+            return HttpResponse::InternalServerError()
+                .json(ApiResponse::<()>::error("Database error"));
         }
     };
 
@@ -457,16 +492,18 @@ pub async fn verify_order(
         }
         Err(e) => {
             log::error!("Failed to complete order {}: {}", order.id, e);
-            HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to complete order"))
+            HttpResponse::InternalServerError()
+                .json(ApiResponse::<()>::error("Failed to complete order"))
         }
     }
 }
 
 async fn dispatch_order_events(order: &Order) -> Result<(), Box<dyn std::error::Error>> {
-    let redis_url = std::env::var("REDIS_URL").unwrap_or_else(|_| "redis://localhost:6379".to_string());
+    let redis_url =
+        std::env::var("REDIS_URL").unwrap_or_else(|_| "redis://localhost:6379".to_string());
     let client = redis::Client::open(redis_url)?;
     let mut con = client.get_multiplexed_async_connection().await?;
-    
+
     // 1. Job for Go Infra Worker (Repo Transfer)
     let repo_job = serde_json::json!({
         "order_id": order.id,
@@ -474,8 +511,13 @@ async fn dispatch_order_events(order: &Order) -> Result<(), Box<dyn std::error::
         "seller_id": order.seller_id,
         "product_id": order.product_id,
         "github_repo_url": order.github_repo_url,
-    }).to_string();
-    let _: () = redis::cmd("LPUSH").arg("repo_transfer").arg(&repo_job).query_async(&mut con).await?;
+    })
+    .to_string();
+    let _: () = redis::cmd("LPUSH")
+        .arg("repo_transfer")
+        .arg(&repo_job)
+        .query_async(&mut con)
+        .await?;
     log::info!("Queued repo_transfer job for order {}", order.id);
 
     // 2. Job for Go Infra Worker (Invoice & Email)
@@ -483,8 +525,13 @@ async fn dispatch_order_events(order: &Order) -> Result<(), Box<dyn std::error::
         "order_id": order.id,
         "buyer_id": order.buyer_id,
         "amount": order.amount_usd,
-    }).to_string();
-    let _: () = redis::cmd("LPUSH").arg("email").arg(&email_job).query_async(&mut con).await?;
+    })
+    .to_string();
+    let _: () = redis::cmd("LPUSH")
+        .arg("email")
+        .arg(&email_job)
+        .query_async(&mut con)
+        .await?;
     log::info!("Queued email (invoice) job for order {}", order.id);
 
     // 3. PubSub Event for Node.js (Real-time Live Notification)
@@ -492,16 +539,29 @@ async fn dispatch_order_events(order: &Order) -> Result<(), Box<dyn std::error::
         "userId": order.buyer_id,
         "message": "Payment Successful! Invoice has been sent to your email.",
         "orderId": order.id,
-    }).to_string();
-    let _: () = redis::cmd("PUBLISH").arg("order_updates").arg(&ws_event).query_async(&mut con).await?;
-    
+    })
+    .to_string();
+    let _: () = redis::cmd("PUBLISH")
+        .arg("order_updates")
+        .arg(&ws_event)
+        .query_async(&mut con)
+        .await?;
+
     let seller_ws_event = serde_json::json!({
         "userId": order.seller_id,
         "message": format!("Cha-Ching! You just made a sale of ${}!", order.amount_usd),
         "orderId": order.id,
-    }).to_string();
-    let _: () = redis::cmd("PUBLISH").arg("order_updates").arg(&seller_ws_event).query_async(&mut con).await?;
-    log::info!("Published order_updates to Redis PubSub for order {}", order.id);
+    })
+    .to_string();
+    let _: () = redis::cmd("PUBLISH")
+        .arg("order_updates")
+        .arg(&seller_ws_event)
+        .query_async(&mut con)
+        .await?;
+    log::info!(
+        "Published order_updates to Redis PubSub for order {}",
+        order.id
+    );
 
     Ok(())
 }
@@ -513,12 +573,16 @@ pub async fn list_orders(
 ) -> HttpResponse {
     let user_id = match extract_user_id(&req) {
         Ok(id) => id,
-        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized")),
+        Err(_) => {
+            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized"))
+        }
     };
 
     let user_uuid = match uuid::Uuid::parse_str(&user_id) {
         Ok(uuid) => uuid,
-        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID")),
+        Err(_) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID"))
+        }
     };
 
     let mut sql = String::from("SELECT * FROM orders WHERE (buyer_id = $1 OR seller_id = $1)");
@@ -537,7 +601,8 @@ pub async fn list_orders(
                 query_builder = query_builder.bind(status);
             }
             _ => {
-                return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid status value"));
+                return HttpResponse::BadRequest()
+                    .json(ApiResponse::<()>::error("Invalid status value"));
             }
         }
     }
@@ -546,7 +611,8 @@ pub async fn list_orders(
         Ok(orders) => HttpResponse::Ok().json(ApiResponse::success(orders, "Orders fetched")),
         Err(e) => {
             log::error!("Failed to fetch orders: {}", e);
-            HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to fetch orders"))
+            HttpResponse::InternalServerError()
+                .json(ApiResponse::<()>::error("Failed to fetch orders"))
         }
     }
 }
@@ -558,21 +624,27 @@ pub async fn get_order(
 ) -> HttpResponse {
     let user_id = match extract_user_id(&req) {
         Ok(id) => id,
-        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized")),
+        Err(_) => {
+            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized"))
+        }
     };
 
     let user_uuid = match uuid::Uuid::parse_str(&user_id) {
         Ok(uuid) => uuid,
-        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID")),
+        Err(_) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID"))
+        }
     };
 
     let order_id = match uuid::Uuid::parse_str(&path.into_inner()) {
         Ok(uuid) => uuid,
-        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid order ID")),
+        Err(_) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid order ID"))
+        }
     };
 
     match sqlx::query_as::<_, Order>(
-        "SELECT * FROM orders WHERE id = $1 AND (buyer_id = $2 OR seller_id = $2)"
+        "SELECT * FROM orders WHERE id = $1 AND (buyer_id = $2 OR seller_id = $2)",
     )
     .bind(order_id)
     .bind(user_uuid)
@@ -583,7 +655,8 @@ pub async fn get_order(
         Ok(None) => HttpResponse::NotFound().json(ApiResponse::<()>::error("Order not found")),
         Err(e) => {
             log::error!("Failed to fetch order: {}", e);
-            HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to fetch order"))
+            HttpResponse::InternalServerError()
+                .json(ApiResponse::<()>::error("Failed to fetch order"))
         }
     }
 }
@@ -636,7 +709,11 @@ pub async fn razorpay_webhook(
     req: HttpRequest,
     body: web::Bytes,
 ) -> HttpResponse {
-    let signature = match req.headers().get("X-Razorpay-Signature").and_then(|v| v.to_str().ok()) {
+    let signature = match req
+        .headers()
+        .get("X-Razorpay-Signature")
+        .and_then(|v| v.to_str().ok())
+    {
         Some(s) => s,
         None => return HttpResponse::BadRequest().body("missing signature"),
     };
@@ -677,23 +754,22 @@ pub async fn razorpay_webhook(
     };
     let payment_id = payment_entity.id;
 
-    let order = match sqlx::query_as::<_, Order>(
-        "SELECT * FROM orders WHERE razorpay_order_id = $1",
-    )
-    .bind(&razorpay_order_id)
-    .fetch_optional(pool.get_ref())
-    .await
-    {
-        Ok(Some(o)) => o,
-        Ok(None) => {
-            log::warn!("Webhook for unknown razorpay order {}", razorpay_order_id);
-            return HttpResponse::Ok().body("order not found");
-        }
-        Err(e) => {
-            log::error!("Webhook DB lookup failed: {}", e);
-            return HttpResponse::InternalServerError().body("db error");
-        }
-    };
+    let order =
+        match sqlx::query_as::<_, Order>("SELECT * FROM orders WHERE razorpay_order_id = $1")
+            .bind(&razorpay_order_id)
+            .fetch_optional(pool.get_ref())
+            .await
+        {
+            Ok(Some(o)) => o,
+            Ok(None) => {
+                log::warn!("Webhook for unknown razorpay order {}", razorpay_order_id);
+                return HttpResponse::Ok().body("order not found");
+            }
+            Err(e) => {
+                log::error!("Webhook DB lookup failed: {}", e);
+                return HttpResponse::InternalServerError().body("db error");
+            }
+        };
 
     match complete_order_atomic(pool.get_ref(), order.id, &payment_id).await {
         Ok(true) => {

@@ -5,10 +5,14 @@ import { Check, X } from "lucide-react";
 import { Card } from "@/shared/ui/card";
 import { Badge } from "@/shared/ui/badge";
 
-
 const COMPARISON = [
   { feature: "Commission Rate", kodedock: "2.5%", codecanyon: "20-55%", gumroad: "10%" },
-  { feature: "Delivery Method", kodedock: "GitHub Repo", codecanyon: ".zip File", gumroad: "File Download" },
+  {
+    feature: "Delivery Method",
+    kodedock: "GitHub Repo",
+    codecanyon: ".zip File",
+    gumroad: "File Download",
+  },
   { feature: "Live Preview", kodedock: true, codecanyon: false, gumroad: false },
   { feature: "Escrow System", kodedock: true, codecanyon: false, gumroad: false },
   { feature: "Wallet System", kodedock: true, codecanyon: false, gumroad: false },
@@ -58,7 +62,9 @@ export function PricingComparison() {
               <table className="w-full text-left text-foreground">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="px-6 py-4 text-sm font-semibold text-muted-foreground w-1/3">Feature</th>
+                    <th className="px-6 py-4 text-sm font-semibold text-muted-foreground w-1/3">
+                      Feature
+                    </th>
                     <th className="px-6 py-4 text-center">
                       <div className="inline-flex flex-col items-center gap-1">
                         <Badge className="bg-primary text-primary-foreground border-0 px-3 py-1 text-xs font-bold shadow-sm shadow-slate-200/50">
@@ -67,14 +73,23 @@ export function PricingComparison() {
                         <span className="text-base font-bold">KodeDock</span>
                       </div>
                     </th>
-                    <th className="px-6 py-4 text-center text-sm font-semibold text-muted-foreground">CodeCanyon</th>
-                    <th className="px-6 py-4 text-center text-sm font-semibold text-muted-foreground">Gumroad</th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-muted-foreground">
+                      CodeCanyon
+                    </th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-muted-foreground">
+                      Gumroad
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {COMPARISON.map((row, i) => (
-                    <tr key={row.feature} className={`border-b border-border last:border-0 ${i % 2 === 0 ? "bg-secondary/50" : ""}`}>
-                      <td className="px-6 py-3.5 text-sm font-medium text-foreground">{row.feature}</td>
+                    <tr
+                      key={row.feature}
+                      className={`border-b border-border last:border-0 ${i % 2 === 0 ? "bg-secondary/50" : ""}`}
+                    >
+                      <td className="px-6 py-3.5 text-sm font-medium text-foreground">
+                        {row.feature}
+                      </td>
                       <td className="px-6 py-3.5 text-center font-semibold text-foreground">
                         <CellValue value={row.kodedock} />
                       </td>

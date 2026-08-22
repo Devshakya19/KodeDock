@@ -1,0 +1,23 @@
+frontend:
+  - changed-files:
+    - any-glob-to-any-file: 'web/**/*'
+
+backend:
+  - changed-files:
+    - any-glob-to-any-file: 'services/core-engine/**/*'
+
+go-worker:
+  - changed-files:
+    - any-glob-to-any-file: 'services/infra-worker/**/*'
+
+ai-service:
+  - changed-files:
+    - any-glob-to-any-file: 'services/ai-service/**/*'
+
+realtime:
+  - changed-files:
+    - any-glob-to-any-file: 'services/realtime-service/**/*'
+
+ci-cd:
+  - changed-files:
+    - any-glob-to-any-file: '.github/**/*'

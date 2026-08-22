@@ -13,7 +13,7 @@ export async function proxy(request: NextRequest) {
     response.headers.set("x-request-id", requestId);
     return response;
   }
-  
+
   // 3. Delegate core authentication and role-based routing
   const response = await updateSession(request);
 
@@ -27,7 +27,10 @@ export async function proxy(request: NextRequest) {
   // Strict Referrer Policy
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   // Permissions Policy (Floc, Camera, Mic etc)
-  response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), browsing-topics=()");
+  response.headers.set(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=(), browsing-topics=()"
+  );
   // Inject the Request ID into the response for client-side debugging
   response.headers.set("x-request-id", requestId);
   // Ensure sensitive routes are never cached by intermediate proxies

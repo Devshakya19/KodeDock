@@ -79,9 +79,7 @@ export default async function SellerDashboardPage() {
   const orders = ordersRes.success ? ordersRes.data || [] : [];
   const wallet = walletRes.success ? walletRes.data : null;
 
-  const topProducts = [...products]
-    .sort((a, b) => b.sales_count - a.sales_count)
-    .slice(0, 5);
+  const topProducts = [...products].sort((a, b) => b.sales_count - a.sales_count).slice(0, 5);
 
   const maxProductSales = Math.max(...products.map((p) => p.sales_count || 0), 1);
 
@@ -132,7 +130,9 @@ export default async function SellerDashboardPage() {
 
       {/* 2. Top Double-Bezel Metrics Deck */}
       <SellerStatsDeck
-        activeProducts={stats.active_products ?? products.filter((p) => p.status === "active").length}
+        activeProducts={
+          stats.active_products ?? products.filter((p) => p.status === "active").length
+        }
         totalSales={stats.total_sales ?? orders.length}
         totalRevenuePaise={stats.total_revenue_paise ?? 0}
         totalEarnedPaise={stats.total_earned_paise ?? 0}
@@ -141,7 +141,6 @@ export default async function SellerDashboardPage() {
 
       {/* 3. Asymmetrical Bento Workspace */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-        
         {/* Left Column (Span 8): Performance Velocity Chart & Recent Sales Activity */}
         <div className="xl:col-span-8 space-y-8">
           {/* Main Analytics Spline */}
@@ -161,7 +160,8 @@ export default async function SellerDashboardPage() {
                 </div>
                 <Link href="/seller/orders">
                   <span className="group text-[11px] font-black uppercase tracking-widest text-foreground bg-secondary hover:bg-secondary/80 px-4 py-2 rounded-full transition-colors flex items-center gap-2">
-                    All Orders <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    All Orders{" "}
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                   </span>
                 </Link>
               </div>
@@ -200,7 +200,9 @@ export default async function SellerDashboardPage() {
                             isFree ? "text-success" : "text-foreground"
                           }`}
                         >
-                          {isFree ? "Free" : `+₹${(order.seller_amount_paise / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                          {isFree
+                            ? "Free"
+                            : `+₹${(order.seller_amount_paise / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                         </div>
                         <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-success bg-success/10 px-2 py-1 rounded-md mt-1 border border-emerald-200/50">
                           <CheckCircle2 className="w-3 h-3" /> Fulfilled
@@ -215,7 +217,8 @@ export default async function SellerDashboardPage() {
                     <Package className="w-10 h-10 text-muted-foreground/80 mx-auto mb-3" />
                     <p className="text-base font-bold text-foreground">No recent sales yet</p>
                     <p className="text-sm font-medium text-muted-foreground mt-1 max-w-sm mx-auto">
-                      Your customer purchases and real-time fulfillments will appear here once you make a sale.
+                      Your customer purchases and real-time fulfillments will appear here once you
+                      make a sale.
                     </p>
                   </div>
                 )}
@@ -228,9 +231,15 @@ export default async function SellerDashboardPage() {
         <div className="xl:col-span-4 space-y-8">
           {/* 1. Wallet Hub (Ethereal Glass Design) */}
           <div className="rounded-[2rem] bg-[#050505] p-2 ring-1 ring-slate-900 shadow-2xl relative overflow-hidden group">
-            <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}></div>
+            <div
+              className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay"
+              style={{
+                backgroundImage:
+                  'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")',
+              }}
+            ></div>
             <div className="absolute -top-32 -right-32 w-64 h-64 bg-emerald-500/20 blur-[80px] rounded-full pointer-events-none group-hover:bg-emerald-500/30 transition-colors duration-700" />
-            
+
             <div className="rounded-[calc(2rem-0.5rem)] bg-gradient-to-br from-white/5 to-white/[0.02] p-8 text-primary-foreground relative z-10 border border-border/10 backdrop-blur-2xl">
               <div className="flex flex-col justify-between h-full">
                 <div>
@@ -244,7 +253,12 @@ export default async function SellerDashboardPage() {
                   </div>
 
                   <div className="text-5xl sm:text-6xl font-black tracking-tighter mb-8 tabular-nums">
-                    <AnimatedNumber value={(wallet?.balance_paise ?? 0) / 100} prefix="₹" decimals={2} duration={2} />
+                    <AnimatedNumber
+                      value={(wallet?.balance_paise ?? 0) / 100}
+                      prefix="₹"
+                      decimals={2}
+                      duration={2}
+                    />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 mb-8">
@@ -253,7 +267,11 @@ export default async function SellerDashboardPage() {
                         <Clock className="w-3 h-3 text-amber-400" /> Escrow
                       </p>
                       <p className="font-bold text-primary-foreground text-lg mt-1.5 tabular-nums tracking-tight">
-                        <AnimatedNumber value={(wallet?.pending_paise ?? 0) / 100} prefix="₹" duration={2} />
+                        <AnimatedNumber
+                          value={(wallet?.pending_paise ?? 0) / 100}
+                          prefix="₹"
+                          duration={2}
+                        />
                       </p>
                     </div>
                     <div className="p-4 rounded-2xl bg-white/5 border border-white/5 backdrop-blur-sm">
@@ -261,7 +279,11 @@ export default async function SellerDashboardPage() {
                         <TrendingUp className="w-3 h-3 text-emerald-400" /> Earned
                       </p>
                       <p className="font-bold text-primary-foreground text-lg mt-1.5 tabular-nums tracking-tight">
-                        <AnimatedNumber value={(wallet?.total_earned_paise ?? 0) / 100} prefix="₹" duration={2} />
+                        <AnimatedNumber
+                          value={(wallet?.total_earned_paise ?? 0) / 100}
+                          prefix="₹"
+                          duration={2}
+                        />
                       </p>
                     </div>
                   </div>
@@ -288,9 +310,7 @@ export default async function SellerDashboardPage() {
                   <div className="w-8 h-8 rounded-lg bg-accent/20 text-accent flex items-center justify-center">
                     <BarChart2 className="w-4 h-4" />
                   </div>
-                  <h3 className="text-lg font-black text-foreground tracking-tight">
-                    Top Assets
-                  </h3>
+                  <h3 className="text-lg font-black text-foreground tracking-tight">Top Assets</h3>
                 </div>
                 <Link href="/seller/products">
                   <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors">
@@ -306,7 +326,9 @@ export default async function SellerDashboardPage() {
                   </div>
                 ) : (
                   topProducts.map((product, rank) => {
-                    const salesShare = Math.round(((product.sales_count || 0) / maxProductSales) * 100);
+                    const salesShare = Math.round(
+                      ((product.sales_count || 0) / maxProductSales) * 100
+                    );
 
                     return (
                       <Link href={`/seller/products/${product.id}/edit`} key={product.id}>

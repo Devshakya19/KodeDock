@@ -200,7 +200,12 @@ export default function EditProductPage() {
         price_paise: pricePaise,
         category_id: category || undefined,
         github_repo_url: githubUrl || undefined,
-        tags: tags ? tags.split(",").map((t) => t.trim()).filter(Boolean) : [],
+        tags: tags
+          ? tags
+              .split(",")
+              .map((t) => t.trim())
+              .filter(Boolean)
+          : [],
         image_url: imageUrl || undefined,
         status,
         stock_limit: stockLimitValue,
@@ -220,7 +225,8 @@ export default function EditProductPage() {
   }
 
   const parsedPrice = parseFloat(price);
-  const sellerEarnings = !isNaN(parsedPrice) && parsedPrice >= 49 ? (parsedPrice * 0.975).toFixed(2) : "0.00";
+  const sellerEarnings =
+    !isNaN(parsedPrice) && parsedPrice >= 49 ? (parsedPrice * 0.975).toFixed(2) : "0.00";
 
   if (loading) {
     return (
@@ -277,7 +283,11 @@ export default function EditProductPage() {
               onClick={handleDelete}
               className="h-11 px-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold hover:bg-rose-100 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
             >
-              {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4 text-rose-600" />}
+              {deleting ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Trash2 className="w-4 h-4 text-rose-600" />
+              )}
               <span>Delete Asset</span>
             </button>
           </div>
@@ -324,7 +334,10 @@ export default function EditProductPage() {
 
                 {/* Description */}
                 <div>
-                  <label htmlFor="description" className="block text-xs font-bold text-foreground mb-1.5">
+                  <label
+                    htmlFor="description"
+                    className="block text-xs font-bold text-foreground mb-1.5"
+                  >
                     Short Description <span className="text-rose-500">*</span>
                   </label>
                   <textarea
@@ -341,7 +354,10 @@ export default function EditProductPage() {
                 {/* Category & Tags Grid */}
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="category" className="block text-xs font-bold text-foreground mb-1.5">
+                    <label
+                      htmlFor="category"
+                      className="block text-xs font-bold text-foreground mb-1.5"
+                    >
                       Category <span className="text-rose-500">*</span>
                     </label>
                     <div className="relative">
@@ -366,7 +382,10 @@ export default function EditProductPage() {
                   </div>
 
                   <div>
-                    <label htmlFor="tags" className="block text-xs font-bold text-foreground mb-1.5">
+                    <label
+                      htmlFor="tags"
+                      className="block text-xs font-bold text-foreground mb-1.5"
+                    >
                       Tags (Comma separated)
                     </label>
                     <div className="relative">
@@ -443,7 +462,10 @@ export default function EditProductPage() {
 
                 {/* GitHub Repo */}
                 <div>
-                  <label htmlFor="githubUrl" className="block text-xs font-bold text-foreground mb-1.5">
+                  <label
+                    htmlFor="githubUrl"
+                    className="block text-xs font-bold text-foreground mb-1.5"
+                  >
                     GitHub Private Repository (Optional)
                   </label>
                   <div className="relative">
@@ -540,7 +562,10 @@ export default function EditProductPage() {
                 {/* Status selector */}
                 <div className="grid sm:grid-cols-2 gap-4 pt-2">
                   <div>
-                    <label htmlFor="status" className="block text-xs font-bold text-foreground mb-1.5">
+                    <label
+                      htmlFor="status"
+                      className="block text-xs font-bold text-foreground mb-1.5"
+                    >
                       Catalog Status
                     </label>
                     <select
@@ -558,7 +583,10 @@ export default function EditProductPage() {
 
                   {status === "limited" && (
                     <div>
-                      <label htmlFor="stockLimit" className="block text-xs font-bold text-foreground mb-1.5">
+                      <label
+                        htmlFor="stockLimit"
+                        className="block text-xs font-bold text-foreground mb-1.5"
+                      >
                         Stock Limit (Available Copies) <span className="text-rose-500">*</span>
                       </label>
                       <input
@@ -618,11 +646,7 @@ export default function EditProductPage() {
             <div className="rounded-[22px] bg-gradient-to-b from-background to-secondary/30 overflow-hidden flex flex-col">
               <div className="aspect-[16/10] w-full bg-secondary flex items-center justify-center relative overflow-hidden">
                 {imagePreview ? (
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                 ) : (
                   <ImageIcon className="w-12 h-12 text-muted-foreground/80" />
                 )}
@@ -641,10 +665,10 @@ export default function EditProductPage() {
                       status === "active"
                         ? "bg-emerald-500/90 text-primary-foreground border-emerald-400/50"
                         : status === "limited"
-                        ? "bg-rose-500/90 text-primary-foreground border-rose-400/50"
-                        : status === "paused"
-                        ? "bg-amber-500/90 text-primary-foreground border-amber-400/50"
-                        : "bg-secondary text-foreground border-border"
+                          ? "bg-rose-500/90 text-primary-foreground border-rose-400/50"
+                          : status === "paused"
+                            ? "bg-amber-500/90 text-primary-foreground border-amber-400/50"
+                            : "bg-secondary text-foreground border-border"
                     }`}
                   >
                     {status.toUpperCase()}
@@ -671,7 +695,8 @@ export default function EditProductPage() {
                   {title || "Your Code Product Title"}
                 </h3>
                 <p className="text-xs text-muted-foreground line-clamp-2 mb-4 leading-relaxed font-normal">
-                  {description || "A concise summary of your boilerplate code, components, and design assets..."}
+                  {description ||
+                    "A concise summary of your boilerplate code, components, and design assets..."}
                 </p>
 
                 <div className="flex items-center justify-between pt-3 border-t border-border">

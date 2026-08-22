@@ -3,20 +3,14 @@ import { GithubIcon } from "@/shared/components/icons/github";
 import { FadeIn } from "@/shared/components/layout/fade-in";
 
 import { Badge } from "@/shared/ui/badge";
-import {
-  Percent,
-  BarChart3,
-  Zap,
-  Shield,
-  Users,
-} from "lucide-react";
-
+import { Percent, BarChart3, Zap, Shield, Users } from "lucide-react";
 
 const BENEFITS = [
   {
     icon: Percent,
     title: "2.5% Commission",
-    description: "Keep 97.5% of every sale. The lowest commission in the market — CodeCanyon takes 50%.",
+    description:
+      "Keep 97.5% of every sale. The lowest commission in the market — CodeCanyon takes 50%.",
   },
   {
     icon: GithubIcon,
@@ -31,7 +25,8 @@ const BENEFITS = [
   {
     icon: Zap,
     title: "Instant Setup",
-    description: "Link your repo, write a description, set your price — go live in under 5 minutes.",
+    description:
+      "Link your repo, write a description, set your price — go live in under 5 minutes.",
   },
   {
     icon: Shield,
@@ -51,7 +46,10 @@ export function DevBenefits() {
       <div className="max-w-7xl mx-auto">
         <FadeIn>
           <div className="text-center mb-16">
-            <Badge variant="secondary" className="mb-4 px-4 py-1.5 text-xs font-semibold tracking-wide uppercase bg-secondary border border-border text-foreground">
+            <Badge
+              variant="secondary"
+              className="mb-4 px-4 py-1.5 text-xs font-semibold tracking-wide uppercase bg-secondary border border-border text-foreground"
+            >
               Why KodeDock
             </Badge>
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
@@ -70,7 +68,9 @@ export function DevBenefits() {
                   <benefit.icon className="w-5 h-5 text-foreground" />
                 </div>
                 <h3 className="text-lg font-semibold text-foreground">{benefit.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{benefit.description}</p>
+                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                  {benefit.description}
+                </p>
               </div>
             </FadeIn>
           ))}

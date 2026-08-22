@@ -1,16 +1,16 @@
 use actix_cors::Cors;
-use actix_web::{web, App, HttpServer, middleware::Logger};
 use actix_governor::{Governor, GovernorConfigBuilder, KeyExtractor};
+use actix_web::{middleware::Logger, web, App, HttpServer};
 use dotenvy::dotenv;
 use sqlx::postgres::PgPoolOptions;
 use std::env;
 
 mod handlers;
+mod middleware;
 mod models;
 mod services;
-mod middleware;
-mod utils;
 mod storage;
+mod utils;
 
 /// Custom key extractor that reads the client IP from X-Forwarded-For header
 /// (set by the Next.js proxy) or falls back to the direct connection IP.
@@ -22,7 +22,10 @@ impl KeyExtractor for ForwardedIpKeyExtractor {
     type Key = String;
     type KeyExtractionError = std::convert::Infallible;
 
-    fn extract(&self, req: &actix_web::dev::ServiceRequest) -> Result<Self::Key, Self::KeyExtractionError> {
+    fn extract(
+        &self,
+        req: &actix_web::dev::ServiceRequest,
+    ) -> Result<Self::Key, Self::KeyExtractionError> {
         let ip = req
             .headers()
             .get("x-forwarded-for")
@@ -100,7 +103,11 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         let mut cors = Cors::default()
             .allowed_methods(vec!["GET", "POST", "PUT", "DELETE", "OPTIONS"])
-            .allowed_headers(vec!["Authorization", "Content-Type", "X-Razorpay-Signature"])
+            .allowed_headers(vec![
+                "Authorization",
+                "Content-Type",
+                "X-Razorpay-Signature",
+            ])
             .max_age(3600);
 
         for origin in &cors_origins {
@@ -141,8 +148,14 @@ async fn main() -> std::io::Result<()> {
             )
             .route("/api/auth/logout", web::post().to(handlers::auth::logout))
             .route("/api/auth/me", web::get().to(handlers::auth::me))
-            .route("/api/auth/change-password", web::post().to(handlers::auth::change_password))
-            .route("/api/auth/delete-account", web::delete().to(handlers::auth::delete_account))
+            .route(
+                "/api/auth/change-password",
+                web::post().to(handlers::auth::change_password),
+            )
+            .route(
+                "/api/auth/delete-account",
+                web::delete().to(handlers::auth::delete_account),
+            )
             .route(
                 "/api/auth/github",
                 web::post()
@@ -157,48 +170,103 @@ async fn main() -> std::io::Result<()> {
             )
             .route(
                 "/api/auth/github/unlink",
-                web::post()
-                    .to(handlers::auth::github_unlink)
+                web::post().to(handlers::auth::github_unlink),
             )
             // Profile
-            .route("/api/profile/{id}", web::get().to(handlers::profile::get_profile))
-            .route("/api/profile", web::put().to(handlers::profile::update_profile))
-            // Products (public)
-            .route("/api/products", web::get().to(handlers::products::list_products))
-            .route("/api/products/{id}", web::get().to(handlers::products::get_product))
-            // Seller products
-            .route("/api/seller/products", web::get().to(handlers::seller::list_seller_products))
             .route(
-                "/api/seller/products", 
+                "/api/profile/{id}",
+                web::get().to(handlers::profile::get_profile),
+            )
+            .route(
+                "/api/profile",
+                web::put().to(handlers::profile::update_profile),
+            )
+            // Products (public)
+            .route(
+                "/api/products",
+                web::get().to(handlers::products::list_products),
+            )
+            .route(
+                "/api/products/{id}",
+                web::get().to(handlers::products::get_product),
+            )
+            // Seller products
+            .route(
+                "/api/seller/products",
+                web::get().to(handlers::seller::list_seller_products),
+            )
+            .route(
+                "/api/seller/products",
                 web::post()
                     .to(handlers::seller::create_product)
-                    .wrap(Governor::new(&upload_limiter))
+                    .wrap(Governor::new(&upload_limiter)),
             )
-            .route("/api/seller/products/{id}", web::put().to(handlers::seller::update_product))
-            .route("/api/seller/products/{id}", web::delete().to(handlers::seller::delete_product))
-            .route("/api/seller/stats", web::get().to(handlers::seller::get_stats))
-            .route("/api/seller/reviews", web::get().to(handlers::seller::get_seller_reviews))
+            .route(
+                "/api/seller/products/{id}",
+                web::put().to(handlers::seller::update_product),
+            )
+            .route(
+                "/api/seller/products/{id}",
+                web::delete().to(handlers::seller::delete_product),
+            )
+            .route(
+                "/api/seller/stats",
+                web::get().to(handlers::seller::get_stats),
+            )
+            .route(
+                "/api/seller/reviews",
+                web::get().to(handlers::seller::get_seller_reviews),
+            )
             // Seller payout account
-            .route("/api/seller/payout-account", web::get().to(handlers::payout::get_payout_account))
-            .route("/api/seller/payout-account", web::post().to(handlers::payout::create_or_update_payout_account))
-            .route("/api/seller/payout-account", web::delete().to(handlers::payout::delete_payout_account))
-            
+            .route(
+                "/api/seller/payout-account",
+                web::get().to(handlers::payout::get_payout_account),
+            )
+            .route(
+                "/api/seller/payout-account",
+                web::post().to(handlers::payout::create_or_update_payout_account),
+            )
+            .route(
+                "/api/seller/payout-account",
+                web::delete().to(handlers::payout::delete_payout_account),
+            )
             // Seller Notification Preferences
-            .route("/api/seller/notification-preferences", web::get().to(handlers::notifications::get_preferences))
-            .route("/api/seller/notification-preferences", web::post().to(handlers::notifications::update_preferences))
+            .route(
+                "/api/seller/notification-preferences",
+                web::get().to(handlers::notifications::get_preferences),
+            )
+            .route(
+                "/api/seller/notification-preferences",
+                web::post().to(handlers::notifications::update_preferences),
+            )
             // Wallet
             .route("/api/wallet", web::get().to(handlers::wallet::get_balance))
-            .route("/api/wallet/topup", web::post().to(handlers::wallet::create_topup))
-            .route("/api/wallet/topup/verify", web::post().to(handlers::wallet::verify_topup))
-            .route("/api/wallet/transactions", web::get().to(handlers::wallet::list_transactions))
-            .route("/api/wallet/withdraw", web::post().to(handlers::wallet::withdraw))
-            .route("/api/wallet/release-escrow", web::post().to(handlers::wallet::release_escrow))
+            .route(
+                "/api/wallet/topup",
+                web::post().to(handlers::wallet::create_topup),
+            )
+            .route(
+                "/api/wallet/topup/verify",
+                web::post().to(handlers::wallet::verify_topup),
+            )
+            .route(
+                "/api/wallet/transactions",
+                web::get().to(handlers::wallet::list_transactions),
+            )
+            .route(
+                "/api/wallet/withdraw",
+                web::post().to(handlers::wallet::withdraw),
+            )
+            .route(
+                "/api/wallet/release-escrow",
+                web::post().to(handlers::wallet::release_escrow),
+            )
             // Orders
             .route(
-                "/api/orders", 
+                "/api/orders",
                 web::post()
                     .to(handlers::orders::create_order)
-                    .wrap(Governor::new(&order_limiter))
+                    .wrap(Governor::new(&order_limiter)),
             )
             .route(
                 "/api/orders/verify",
@@ -207,17 +275,41 @@ async fn main() -> std::io::Result<()> {
                     .wrap(Governor::new(&verify_limiter)),
             )
             .route("/api/orders", web::get().to(handlers::orders::list_orders))
-            .route("/api/orders/{id}", web::get().to(handlers::orders::get_order))
+            .route(
+                "/api/orders/{id}",
+                web::get().to(handlers::orders::get_order),
+            )
             // Razorpay webhooks
-            .route("/api/webhooks/razorpay", web::post().to(handlers::orders::razorpay_webhook))
-            .route("/api/webhooks/wallet-topup", web::post().to(handlers::wallet::wallet_topup_webhook))
+            .route(
+                "/api/webhooks/razorpay",
+                web::post().to(handlers::orders::razorpay_webhook),
+            )
+            .route(
+                "/api/webhooks/wallet-topup",
+                web::post().to(handlers::wallet::wallet_topup_webhook),
+            )
             // Reviews
-            .route("/api/reviews/{product_id}", web::get().to(handlers::reviews::list_reviews))
-            .route("/api/reviews", web::post().to(handlers::reviews::create_review))
+            .route(
+                "/api/reviews/{product_id}",
+                web::get().to(handlers::reviews::list_reviews),
+            )
+            .route(
+                "/api/reviews",
+                web::post().to(handlers::reviews::create_review),
+            )
             // Notifications
-            .route("/api/notifications", web::get().to(handlers::notifications::list_notifications))
-            .route("/api/notifications/{id}/read", web::put().to(handlers::notifications::mark_read))
-            .route("/api/notifications/read-all", web::put().to(handlers::notifications::mark_all_read))
+            .route(
+                "/api/notifications",
+                web::get().to(handlers::notifications::list_notifications),
+            )
+            .route(
+                "/api/notifications/{id}/read",
+                web::put().to(handlers::notifications::mark_read),
+            )
+            .route(
+                "/api/notifications/read-all",
+                web::put().to(handlers::notifications::mark_all_read),
+            )
             // Upload (rate-limited)
             .route(
                 "/api/upload/presign",

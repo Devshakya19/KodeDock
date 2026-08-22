@@ -42,7 +42,7 @@ export function ConnectionsSettings() {
       setError("GitHub Client ID is not configured in environment variables.");
       return;
     }
-    
+
     // Pass 'link' in state so the callback knows this is a linking action, not a login action
     const state = btoa("link|/seller/settings/connections");
     window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${window.location.origin}/api/auth/callback&scope=repo&state=${state}`;
@@ -88,7 +88,9 @@ export function ConnectionsSettings() {
           </div>
           <div>
             <h2 className="text-lg font-bold text-foreground">Connected Accounts</h2>
-            <p className="text-[13px] text-muted-foreground font-medium mt-0.5">Link third-party accounts for login and integrations</p>
+            <p className="text-[13px] text-muted-foreground font-medium mt-0.5">
+              Link third-party accounts for login and integrations
+            </p>
           </div>
         </div>
 
@@ -106,31 +108,39 @@ export function ConnectionsSettings() {
 
         <div className="space-y-6">
           {/* GitHub Connection */}
-          <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl border transition-colors ${
-            isGithubLinked ? "border-success/30 bg-success/10" : "border-border/60 bg-background"
-          }`}>
+          <div
+            className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl border transition-colors ${
+              isGithubLinked ? "border-success/30 bg-success/10" : "border-border/60 bg-background"
+            }`}
+          >
             <div className="flex items-center gap-4">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 border ${
-                isGithubLinked ? "bg-background border-success/20" : "bg-secondary/50 border-border"
-              }`}>
+              <div
+                className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 border ${
+                  isGithubLinked
+                    ? "bg-background border-success/20"
+                    : "bg-secondary/50 border-border"
+                }`}
+              >
                 <GithubIcon className="w-6 h-6 text-foreground" />
               </div>
               <div>
                 <h3 className="text-[15px] font-bold text-foreground">GitHub</h3>
                 {isGithubLinked ? (
                   <p className="text-[13px] text-success font-medium mt-0.5">
-                    Linked to <span className="font-bold text-success">@{user?.github_username}</span>
+                    Linked to{" "}
+                    <span className="font-bold text-success">@{user?.github_username}</span>
                   </p>
                 ) : (
                   <p className="text-[13px] text-muted-foreground mt-0.5 max-w-[280px]">
-                    Connect your GitHub account to sync repositories directly. Requires public and private repository access.
+                    Connect your GitHub account to sync repositories directly. Requires public and
+                    private repository access.
                   </p>
                 )}
               </div>
             </div>
-            
+
             {isGithubLinked ? (
-              <button 
+              <button
                 onClick={handleUnlinkGithub}
                 disabled={unlinking}
                 className="h-10 px-6 rounded-xl border border-border hover:bg-secondary text-foreground text-[13px] font-semibold transition-all w-full sm:w-auto disabled:opacity-50"
@@ -138,7 +148,7 @@ export function ConnectionsSettings() {
                 {unlinking ? "Unlinking..." : "Unlink"}
               </button>
             ) : (
-              <button 
+              <button
                 onClick={handleConnectGithub}
                 className="h-10 px-6 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-[13px] font-semibold transition-all w-full sm:w-auto"
               >
@@ -164,7 +174,6 @@ export function ConnectionsSettings() {
               Connect
             </button>
           </div>
-          
         </div>
       </div>
     </div>

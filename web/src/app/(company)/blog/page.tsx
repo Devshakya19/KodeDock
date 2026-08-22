@@ -19,7 +19,8 @@ const BLOG_POSTS = [
   },
   {
     title: "Why GitHub Delivery Beats .zip Files",
-    excerpt: "The technical advantages of delivering code as GitHub repositories instead of static downloads.",
+    excerpt:
+      "The technical advantages of delivering code as GitHub repositories instead of static downloads.",
     date: "July 2026",
     category: "Technical",
     readTime: "6 min read",

@@ -7,7 +7,9 @@ export function FinalCTA() {
   return (
     <section className="container mx-auto pb-32">
       <div className="bg-secondary rounded-[2.5rem] p-12 md:p-20 text-center flex flex-col items-center border border-border/50">
-        <h2 className="font-marketing text-4xl md:text-5xl font-bold tracking-tight mb-6">Ready to dock your code?</h2>
+        <h2 className="font-marketing text-4xl md:text-5xl font-bold tracking-tight mb-6">
+          Ready to dock your code?
+        </h2>
         <p className="text-lg text-muted-foreground mb-10 max-w-xl">
           Join thousands of Indian developers buying and selling premium code assets on KodeDock.
         </p>

@@ -1,9 +1,9 @@
-use actix_web::{web, HttpRequest, HttpResponse};
-use sqlx::PgPool;
+use crate::middleware::extract_user_id;
 use crate::models::Profile;
 use crate::services::ApiResponse;
 use crate::storage::StorageClient;
-use crate::middleware::extract_user_id;
+use actix_web::{web, HttpRequest, HttpResponse};
+use sqlx::PgPool;
 
 pub async fn get_profile(
     pool: web::Data<PgPool>,
@@ -17,7 +17,9 @@ pub async fn get_profile(
 
     let id = match uuid::Uuid::parse_str(&path.into_inner()) {
         Ok(uuid) => uuid,
-        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid profile ID")),
+        Err(_) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid profile ID"))
+        }
     };
 
     match sqlx::query_as::<_, Profile>("SELECT *, (github_access_token IS NOT NULL) AS is_github_connected FROM profiles WHERE id = $1")
@@ -42,31 +44,42 @@ pub async fn update_profile(
 ) -> HttpResponse {
     let user_id = match extract_user_id(&req) {
         Ok(id) => id,
-        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized")),
+        Err(_) => {
+            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized"))
+        }
     };
 
     let user_uuid = match uuid::Uuid::parse_str(&user_id) {
         Ok(uuid) => uuid,
-        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID")),
+        Err(_) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID"))
+        }
     };
 
     // ID from body must match authenticated user
     let body_id = match body.get("id").and_then(|v| v.as_str()) {
         Some(id_str) => match uuid::Uuid::parse_str(id_str) {
             Ok(uuid) => uuid,
-            Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid profile ID")),
+            Err(_) => {
+                return HttpResponse::BadRequest()
+                    .json(ApiResponse::<()>::error("Invalid profile ID"))
+            }
         },
-        None => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Missing profile ID")),
+        None => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Missing profile ID"))
+        }
     };
 
     if body_id != user_uuid {
-        return HttpResponse::Forbidden().json(ApiResponse::<()>::error("Cannot update another user's profile"));
+        return HttpResponse::Forbidden().json(ApiResponse::<()>::error(
+            "Cannot update another user's profile",
+        ));
     }
 
     // If new avatar_url is being set, delete old avatar from storage
     if let Some(new_avatar) = body.get("avatar_url").and_then(|v| v.as_str()) {
         if let Ok(Some(old_url)) = sqlx::query_scalar::<_, String>(
-            "SELECT avatar_url FROM profiles WHERE id = $1 AND avatar_url IS NOT NULL"
+            "SELECT avatar_url FROM profiles WHERE id = $1 AND avatar_url IS NOT NULL",
         )
         .bind(user_uuid)
         .fetch_optional(pool.get_ref())
@@ -92,7 +105,7 @@ pub async fn update_profile(
            website = COALESCE($6, website),
            location = COALESCE($7, location),
            updated_at = NOW()
-           WHERE id = $1 RETURNING *"#
+           WHERE id = $1 RETURNING *"#,
     )
     .bind(user_uuid)
     .bind(body.get("full_name").and_then(|v| v.as_str()))
@@ -105,7 +118,9 @@ pub async fn update_profile(
     .await;
 
     match result {
-        Ok(Some(profile)) => HttpResponse::Ok().json(ApiResponse::success(profile, "Profile updated")),
+        Ok(Some(profile)) => {
+            HttpResponse::Ok().json(ApiResponse::success(profile, "Profile updated"))
+        }
         Ok(None) => {
             // Profile doesn't exist, create it
             match sqlx::query_as::<_, Profile>(
@@ -132,7 +147,8 @@ pub async fn update_profile(
         }
         Err(e) => {
             log::error!("Failed to update profile: {}", e);
-            HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to update profile"))
+            HttpResponse::InternalServerError()
+                .json(ApiResponse::<()>::error("Failed to update profile"))
         }
     }
 }

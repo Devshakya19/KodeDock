@@ -3,7 +3,8 @@ import { NextResponse } from "next/server";
 const RUST_BACKEND = process.env.CORE_ENGINE_URL || "http://localhost:4001";
 
 function setAuthCookie(response: NextResponse, request: Request, token: string) {
-  const proto = request.headers.get("x-forwarded-proto") || new URL(request.url).protocol.replace(":", "");
+  const proto =
+    request.headers.get("x-forwarded-proto") || new URL(request.url).protocol.replace(":", "");
   const isSecure = proto === "https";
 
   response.cookies.set("kodedock_token", token, {

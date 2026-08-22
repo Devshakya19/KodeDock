@@ -37,12 +37,25 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
       <header className="border-b border-border bg-background">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/browse" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+            <Link
+              href="/browse"
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+            >
               <ArrowLeft className="w-4 h-4" />
               <span className="text-sm font-medium">Back</span>
             </Link>
-            <Link href="/browse" className="flex items-center gap-2.5 hover:opacity-90 transition-opacity">
-              <Image src="/icons/logo/full-logo.svg" alt="KodeDock" width={175} height={24} className="h-7 w-auto object-contain" priority />
+            <Link
+              href="/browse"
+              className="flex items-center gap-2.5 hover:opacity-90 transition-opacity"
+            >
+              <Image
+                src="/icons/logo/full-logo.svg"
+                alt="KodeDock"
+                width={175}
+                height={24}
+                className="h-7 w-auto object-contain"
+                priority
+              />
             </Link>
           </div>
         </nav>
@@ -50,7 +63,9 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
-          <Badge variant="secondary" className="mb-2 bg-secondary border-border">Category</Badge>
+          <Badge variant="secondary" className="mb-2 bg-secondary border-border">
+            Category
+          </Badge>
           <h1 className="text-2xl font-bold text-foreground">{formatSlug(slug)}</h1>
           <p className="text-muted-foreground mt-1">{products.length} products available</p>
         </div>
@@ -58,7 +73,9 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
         {products.length === 0 ? (
           <div className="text-center py-16">
             <Package className="w-12 h-12 text-muted-foreground/80 mx-auto mb-4" />
-            <h2 className="text-lg font-semibold text-foreground mb-2">No products in this category</h2>
+            <h2 className="text-lg font-semibold text-foreground mb-2">
+              No products in this category
+            </h2>
             <Link href="/browse">
               <Button className="mt-4 bg-primary text-primary-foreground hover:bg-primary/90">
                 Browse All Products
@@ -74,11 +91,19 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                     <Package className="w-8 h-8 text-muted-foreground" />
                   </div>
                   <CardContent className="p-4">
-                    <h3 className="font-semibold text-foreground text-sm line-clamp-2">{product.title}</h3>
-                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{product.description}</p>
+                    <h3 className="font-semibold text-foreground text-sm line-clamp-2">
+                      {product.title}
+                    </h3>
+                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                      {product.description}
+                    </p>
                     <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
-                      <span className={`text-base font-bold ${product.price_paise === 0 ? "text-success font-extrabold" : "text-foreground"}`}>
-                        {product.price_paise === 0 ? "Free" : `₹${(product.price_paise / 100).toLocaleString()}`}
+                      <span
+                        className={`text-base font-bold ${product.price_paise === 0 ? "text-success font-extrabold" : "text-foreground"}`}
+                      >
+                        {product.price_paise === 0
+                          ? "Free"
+                          : `₹${(product.price_paise / 100).toLocaleString()}`}
                       </span>
                       <span className="text-[11px] text-muted-foreground">
                         {product.rating?.toFixed(1) || "0.0"} ★

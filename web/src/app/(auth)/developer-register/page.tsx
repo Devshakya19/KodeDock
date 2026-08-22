@@ -115,7 +115,10 @@ export default function DeveloperRegisterPage() {
 
           <form onSubmit={handleRegister} className="space-y-4">
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-foreground mb-1.5">
+              <label
+                htmlFor="fullName"
+                className="block text-sm font-medium text-foreground mb-1.5"
+              >
                 Full name
               </label>
               <Input
@@ -146,11 +149,16 @@ export default function DeveloperRegisterPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="githubUsername" className="block text-sm font-medium text-foreground mb-1.5">
+                <label
+                  htmlFor="githubUsername"
+                  className="block text-sm font-medium text-foreground mb-1.5"
+                >
                   GitHub Username
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">@</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">
+                    @
+                  </span>
                   <Input
                     id="githubUsername"
                     type="text"
@@ -162,7 +170,10 @@ export default function DeveloperRegisterPage() {
                 </div>
               </div>
               <div>
-                <label htmlFor="techStack" className="block text-sm font-medium text-foreground mb-1.5">
+                <label
+                  htmlFor="techStack"
+                  className="block text-sm font-medium text-foreground mb-1.5"
+                >
                   Primary Skill
                 </label>
                 <Input
@@ -177,7 +188,10 @@ export default function DeveloperRegisterPage() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-foreground mb-1.5">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-foreground mb-1.5"
+              >
                 Password
               </label>
               <div className="relative">
@@ -210,7 +224,9 @@ export default function DeveloperRegisterPage() {
                     >
                       {req.test(password) && <Check className="w-2.5 h-2.5" />}
                     </div>
-                    <span className={req.test(password) ? "text-foreground" : "text-muted-foreground"}>
+                    <span
+                      className={req.test(password) ? "text-foreground" : "text-muted-foreground"}
+                    >
                       {req.label}
                     </span>
                   </div>
@@ -223,11 +239,7 @@ export default function DeveloperRegisterPage() {
               disabled={loading}
               className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              {loading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                "Create seller account"
-              )}
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create seller account"}
             </Button>
           </form>
 
@@ -252,10 +264,7 @@ export default function DeveloperRegisterPage() {
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link
-              href="/login"
-              className="font-semibold text-foreground hover:underline"
-            >
+            <Link href="/login" className="font-semibold text-foreground hover:underline">
               Sign in
             </Link>
           </p>

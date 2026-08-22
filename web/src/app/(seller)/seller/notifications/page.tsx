@@ -40,7 +40,6 @@ export default async function NotificationsPage() {
 
   return (
     <div className="flex-1">
-
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         <div className="bg-background rounded-[24px] p-2 sm:p-4 border border-border shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] min-h-[60vh]">
           <NotificationsList initialNotifications={notifications} />

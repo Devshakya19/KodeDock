@@ -4,7 +4,8 @@ const RUST_BACKEND = process.env.CORE_ENGINE_URL || "http://localhost:4001";
 
 function setAuthCookie(response: NextResponse, request: NextRequest, token: string) {
   // Detect HTTPS from x-forwarded-proto (reverse proxy) or request URL
-  const proto = request.headers.get("x-forwarded-proto") || new URL(request.url).protocol.replace(":", "");
+  const proto =
+    request.headers.get("x-forwarded-proto") || new URL(request.url).protocol.replace(":", "");
   const isSecure = proto === "https";
 
   response.cookies.set("kodedock_token", token, {
@@ -50,12 +51,14 @@ export async function GET(request: NextRequest) {
     if (action === "link") {
       const token = request.cookies.get("kodedock_token")?.value;
       if (!token) {
-        return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent("You must be logged in to link an account")}`);
+        return NextResponse.redirect(
+          `${origin}/login?error=${encodeURIComponent("You must be logged in to link an account")}`
+        );
       }
 
       const backendRes = await fetch(`${RUST_BACKEND}/api/auth/github/link`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ code }),
       });
 
@@ -65,7 +68,9 @@ export async function GET(request: NextRequest) {
         return NextResponse.redirect(`${origin}${nextUrl}?error=${encodeURIComponent(errorMsg)}`);
       }
 
-      return NextResponse.redirect(`${origin}${nextUrl}?success=${encodeURIComponent("GitHub account linked successfully!")}`);
+      return NextResponse.redirect(
+        `${origin}${nextUrl}?success=${encodeURIComponent("GitHub account linked successfully!")}`
+      );
     }
 
     // Normal login flow

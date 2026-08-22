@@ -14,9 +14,19 @@ export function StaticPageLayout({ children, title, description }: StaticPageLay
       <header className="border-b border-border bg-background">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 hover:opacity-90 transition-opacity">
-              <Image src="/icons/logo/full-logo.svg" alt="KodeDock" width={175} height={24} className="h-7 w-auto object-contain" priority />
-            </Link>
-          <Link href="/" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            <Image
+              src="/icons/logo/full-logo.svg"
+              alt="KodeDock"
+              width={175}
+              height={24}
+              className="h-7 w-auto object-contain"
+              priority
+            />
+          </Link>
+          <Link
+            href="/"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
             Back to home
           </Link>
         </nav>
@@ -26,13 +36,9 @@ export function StaticPageLayout({ children, title, description }: StaticPageLay
       <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 w-full">
         <div className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-foreground">{title}</h1>
-          {description && (
-            <p className="text-lg text-muted-foreground mt-3">{description}</p>
-          )}
+          {description && <p className="text-lg text-muted-foreground mt-3">{description}</p>}
         </div>
-        <div className="prose prose-slate max-w-none">
-          {children}
-        </div>
+        <div className="prose prose-slate max-w-none">{children}</div>
       </main>
 
       {/* Footer */}

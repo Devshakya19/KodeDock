@@ -10,9 +10,9 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       <aside className="hidden lg:flex lg:w-[45%] relative flex-col justify-between overflow-hidden p-12 text-primary-foreground">
         {/* Abstract Premium Background Image */}
         <div className="absolute inset-0 z-0 bg-primary">
-          <Image 
-            src="/images/auth-bg.jpg" 
-            alt="Premium Abstract Background" 
+          <Image
+            src="/images/auth-bg.jpg"
+            alt="Premium Abstract Background"
             fill
             sizes="(min-width: 1024px) 45vw, 100vw"
             priority
@@ -28,7 +28,9 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-background/10 border border-border/20 backdrop-blur-md text-primary-foreground transition-all group-hover:bg-background group-hover:text-foreground shadow-2xl">
               <Code2 className="h-5 w-5" />
             </div>
-            <span className="text-2xl font-bold tracking-tight text-primary-foreground">KodeDock</span>
+            <span className="text-2xl font-bold tracking-tight text-primary-foreground">
+              KodeDock
+            </span>
           </Link>
         </div>
 
@@ -45,13 +47,16 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           </p>
         </div>
 
-      
         {/* Footer */}
         <div className="relative z-10 flex items-center justify-between text-xs font-medium text-muted-foreground/80 mt-8 pt-8 border-t border-border/10">
           <p>© {new Date().getFullYear()} KodeDock. All rights reserved.</p>
           <div className="flex gap-6">
-            <Link href="/terms" className="hover:text-primary-foreground transition-colors">Terms of Service</Link>
-            <Link href="/privacy" className="hover:text-primary-foreground transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-primary-foreground transition-colors">
+              Terms of Service
+            </Link>
+            <Link href="/privacy" className="hover:text-primary-foreground transition-colors">
+              Privacy Policy
+            </Link>
           </div>
         </div>
       </aside>
@@ -74,9 +79,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           </Link>
         </div>
 
-        <div className="relative w-full max-w-md z-10 pt-16 lg:pt-0">
-          {children}
-        </div>
+        <div className="relative w-full max-w-md z-10 pt-16 lg:pt-0">{children}</div>
       </main>
     </div>
   );

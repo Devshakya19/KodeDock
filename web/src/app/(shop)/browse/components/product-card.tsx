@@ -34,24 +34,27 @@ export function ProductCard({
   return (
     <Link href={`/products/${id}`} className="group h-full flex flex-col relative">
       <div className="bg-background rounded-[20px] p-2 sm:p-2.5 border border-border/80 hover:border-accent/40 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_-4px_rgba(var(--accent),0.1)] transition-all duration-300 h-full flex flex-col relative z-10 hover:-translate-y-1">
-        
         {/* Image Container */}
         <div className="relative aspect-[4/3] rounded-[14px] bg-secondary/50 overflow-hidden mb-4 border border-border">
           {image ? (
-            <img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" />
+            <img
+              src={image}
+              alt={title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+            />
           ) : (
             <div className="w-full h-full bg-gradient-to-tr from-secondary/50 to-secondary flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
               <Code className="w-10 h-10 text-muted-foreground/80" />
             </div>
           )}
-          
+
           <Badge
             variant="secondary"
             className="absolute top-2.5 left-2.5 text-[10px] font-bold px-2.5 py-1 bg-background/95 backdrop-blur-md border border-border/20 text-foreground shadow-sm"
           >
             {category}
           </Badge>
-          
+
           {originalPrice && originalPrice > price && (
             <Badge className="absolute top-2.5 right-2.5 text-[10px] font-bold px-2 py-1 bg-success text-primary-foreground border-0 shadow-md shadow-success/20">
               -{Math.round(((originalPrice - price) / originalPrice) * 100)}%
@@ -79,7 +82,10 @@ export function ProductCard({
           {tags.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-3 mb-1">
               {tags.slice(0, 3).map((tag) => (
-                <span key={tag} className="text-[10px] font-medium px-2 py-0.5 bg-secondary text-muted-foreground rounded-md">
+                <span
+                  key={tag}
+                  className="text-[10px] font-medium px-2 py-0.5 bg-secondary text-muted-foreground rounded-md"
+                >
                   {tag}
                 </span>
               ))}
@@ -101,11 +107,15 @@ export function ProductCard({
 
             <div className="flex items-end justify-between">
               <div className="flex items-center gap-2">
-                <span className={`text-lg font-black tracking-tight ${price === 0 ? "text-success" : "text-foreground"}`}>
+                <span
+                  className={`text-lg font-black tracking-tight ${price === 0 ? "text-success" : "text-foreground"}`}
+                >
                   {price === 0 ? "Free" : `₹${price}`}
                 </span>
                 {originalPrice && originalPrice > price && price > 0 && (
-                  <span className="text-[13px] font-semibold text-muted-foreground line-through">₹{originalPrice}</span>
+                  <span className="text-[13px] font-semibold text-muted-foreground line-through">
+                    ₹{originalPrice}
+                  </span>
                 )}
               </div>
             </div>

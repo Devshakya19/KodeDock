@@ -1,12 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import {
-  Package,
-  Download,
-  DollarSign,
-  Wallet,
-} from "lucide-react";
+import { Package, Download, DollarSign, Wallet } from "lucide-react";
 
 interface SellerStatsDeckProps {
   activeProducts: number;
@@ -90,7 +85,7 @@ export function SellerStatsDeck({
   } as any;
 
   return (
-    <motion.div 
+    <motion.div
       variants={containerVariants}
       initial="hidden"
       animate="show"
@@ -117,9 +112,7 @@ export function SellerStatsDeck({
               </div>
 
               <div className="space-y-2 relative z-10">
-                <div
-                  className={`text-3xl font-black tracking-tighter tabular-nums ${card.accent}`}
-                >
+                <div className={`text-3xl font-black tracking-tighter tabular-nums ${card.accent}`}>
                   {card.value}
                 </div>
 

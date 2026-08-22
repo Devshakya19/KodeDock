@@ -86,7 +86,9 @@ export function NotificationsSettings() {
           </div>
           <div>
             <h2 className="text-lg font-bold text-foreground">Notifications</h2>
-            <p className="text-[13px] text-muted-foreground font-medium mt-0.5">Configure email and push alerts</p>
+            <p className="text-[13px] text-muted-foreground font-medium mt-0.5">
+              Configure email and push alerts
+            </p>
           </div>
         </div>
 
@@ -97,23 +99,23 @@ export function NotificationsSettings() {
               <Mail className="w-4 h-4 text-muted-foreground" /> Email Notifications
             </h3>
             <div className="space-y-3">
-              <ToggleRow 
-                label="New Sales" 
+              <ToggleRow
+                label="New Sales"
                 description="Get notified when someone purchases your product"
                 checked={prefs.email_sales}
-                onChange={() => handleToggle('email_sales')}
+                onChange={() => handleToggle("email_sales")}
               />
-              <ToggleRow 
-                label="New Reviews" 
+              <ToggleRow
+                label="New Reviews"
                 description="Receive an email when a customer leaves a review"
                 checked={prefs.email_reviews}
-                onChange={() => handleToggle('email_reviews')}
+                onChange={() => handleToggle("email_reviews")}
               />
-              <ToggleRow 
-                label="Platform Updates" 
+              <ToggleRow
+                label="Platform Updates"
                 description="Important updates about KodeDock platform features"
                 checked={prefs.email_updates}
-                onChange={() => handleToggle('email_updates')}
+                onChange={() => handleToggle("email_updates")}
               />
             </div>
           </div>
@@ -126,29 +128,31 @@ export function NotificationsSettings() {
               <Smartphone className="w-4 h-4 text-muted-foreground" /> Push Notifications
             </h3>
             <div className="space-y-3">
-              <ToggleRow 
-                label="New Sales" 
+              <ToggleRow
+                label="New Sales"
                 description="Instant push alerts for every new sale"
                 checked={prefs.push_sales}
-                onChange={() => handleToggle('push_sales')}
+                onChange={() => handleToggle("push_sales")}
               />
-              <ToggleRow 
-                label="New Reviews" 
+              <ToggleRow
+                label="New Reviews"
                 description="Instant push alerts for new product reviews"
                 checked={prefs.push_reviews}
-                onChange={() => handleToggle('push_reviews')}
+                onChange={() => handleToggle("push_reviews")}
               />
-              <ToggleRow 
-                label="Platform Updates" 
+              <ToggleRow
+                label="Platform Updates"
                 description="Instant push alerts for critical platform changes"
                 checked={prefs.push_updates}
-                onChange={() => handleToggle('push_updates')}
+                onChange={() => handleToggle("push_updates")}
               />
             </div>
           </div>
 
           <div className="pt-4 border-t border-border flex items-center justify-between">
-            <span className={`text-[13px] font-medium ${message.includes('success') ? 'text-green-600' : 'text-destructive'}`}>
+            <span
+              className={`text-[13px] font-medium ${message.includes("success") ? "text-green-600" : "text-destructive"}`}
+            >
               {message}
             </span>
             <button
@@ -166,7 +170,17 @@ export function NotificationsSettings() {
   );
 }
 
-function ToggleRow({ label, description, checked, onChange }: { label: string, description: string, checked: boolean, onChange: () => void }) {
+function ToggleRow({
+  label,
+  description,
+  checked,
+  onChange,
+}: {
+  label: string;
+  description: string;
+  checked: boolean;
+  onChange: () => void;
+}) {
   return (
     <label className="flex items-center justify-between p-4 rounded-xl border border-border bg-secondary/30 cursor-pointer hover:border-border/80 transition-colors">
       <div>
@@ -174,12 +188,7 @@ function ToggleRow({ label, description, checked, onChange }: { label: string, d
         <div className="text-[13px] text-muted-foreground mt-0.5">{description}</div>
       </div>
       <div className="relative inline-flex items-center">
-        <input 
-          type="checkbox" 
-          className="sr-only peer" 
-          checked={checked} 
-          onChange={onChange} 
-        />
+        <input type="checkbox" className="sr-only peer" checked={checked} onChange={onChange} />
         <div className="w-11 h-6 bg-secondary dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary peer-checked:dark:bg-primary"></div>
       </div>
     </label>

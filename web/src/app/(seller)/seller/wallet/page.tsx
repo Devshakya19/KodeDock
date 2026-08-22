@@ -132,7 +132,9 @@ export default function SellerWalletPage() {
           payoutAccount?.account_type === "upi"
             ? `UPI ID (${payoutAccount.upi_id})`
             : `bank account ••••${payoutAccount?.masked_account_number?.slice(-4)}`;
-        setSuccess(`Withdrawal requested successfully! Funds will be disbursed to your ${destination}.`);
+        setSuccess(
+          `Withdrawal requested successfully! Funds will be disbursed to your ${destination}.`
+        );
         setWithdrawAmount("");
         fetchData(true);
       } else {
@@ -263,7 +265,8 @@ export default function SellerWalletPage() {
                     </span>
                   </div>
                   <p className="text-[10px] text-muted-foreground mt-3 leading-relaxed opacity-70">
-                    Official KodeDock verified creator balance token. Payout disbursements comply with Indian banking norms.
+                    Official KodeDock verified creator balance token. Payout disbursements comply
+                    with Indian banking norms.
                   </p>
                 </div>
                 <div className="p-6 pt-0 text-[9px] font-mono text-muted-foreground uppercase tracking-widest">
@@ -408,15 +411,11 @@ export default function SellerWalletPage() {
                   href="/seller/settings/payouts"
                   className="font-bold text-accent hover:text-primary flex items-center gap-1"
                 >
-                  {payoutAccount ? (
-                    payoutAccount.account_type === "upi" ? (
-                      `UPI: ${payoutAccount.upi_id}`
-                    ) : (
-                      `Bank: ••••${payoutAccount.masked_account_number?.slice(-4)}`
-                    )
-                  ) : (
-                    "Setup Bank / UPI Account"
-                  )}
+                  {payoutAccount
+                    ? payoutAccount.account_type === "upi"
+                      ? `UPI: ${payoutAccount.upi_id}`
+                      : `Bank: ••••${payoutAccount.masked_account_number?.slice(-4)}`
+                    : "Setup Bank / UPI Account"}
                   <Pencil className="w-3 h-3 ml-0.5" />
                 </Link>
               </div>
@@ -493,7 +492,8 @@ export default function SellerWalletPage() {
                       </div>
                       <div>
                         <p className="text-sm font-bold text-foreground">
-                          {tx.description || (isCredit ? "Product Sale Credit" : "Withdrawal Payout")}
+                          {tx.description ||
+                            (isCredit ? "Product Sale Credit" : "Withdrawal Payout")}
                         </p>
                         <p className="text-xs text-muted-foreground font-medium mt-0.5">
                           {new Date(tx.created_at).toLocaleDateString("en-IN", {

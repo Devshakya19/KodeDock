@@ -5,7 +5,6 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 
-
 export function DevCTA() {
   return (
     <section className="px-4 sm:px-6 lg:px-8 py-20">
@@ -15,10 +14,14 @@ export function DevCTA() {
             Ready to start earning?
           </h2>
           <p className="mt-4 text-muted-foreground max-w-lg mx-auto">
-            Join developers who are already earning passive income on KodeDock. It takes 5 minutes to list your first product.
+            Join developers who are already earning passive income on KodeDock. It takes 5 minutes
+            to list your first product.
           </p>
           <Link href="/developer-register">
-            <Button size="lg" className="mt-8 bg-background text-foreground hover:bg-secondary shadow-lg px-8 h-12 text-base font-semibold rounded-full">
+            <Button
+              size="lg"
+              className="mt-8 bg-background text-foreground hover:bg-secondary shadow-lg px-8 h-12 text-base font-semibold rounded-full"
+            >
               Create Seller Account
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
