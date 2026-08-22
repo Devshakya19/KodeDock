@@ -138,8 +138,8 @@ export function AddMoneyModal({ onClose, onSuccess }: AddMoneyModalProps) {
               onClick={() => setAmount(a.toString())}
               className={`py-2 rounded-lg border text-sm font-medium transition-colors ${
                 amount === a.toString()
-                  ? "bg-primary text-primary-foreground border-slate-950"
-                  : "bg-background text-foreground border-border hover:border-slate-400"
+                  ? "bg-primary text-primary-foreground border-foreground"
+                  : "bg-background text-foreground border-border hover:border-foreground/50"
               }`}
             >
               ₹{a.toLocaleString()}

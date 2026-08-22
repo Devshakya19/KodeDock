@@ -40,7 +40,7 @@ export function GithubShowcase() {
             <FadeIn key={step.title} delay={i * 0.1}>
               <div className="relative">
                 {i < GH_STEPS.length - 1 && (
-                  <div className="hidden lg:block absolute top-8 left-[60%] w-[80%] h-px bg-slate-200" />
+                  <div className="hidden lg:block absolute top-8 left-[60%] w-[80%] h-px bg-secondary" />
                 )}
                 <div className="relative z-10 text-center lg:text-left">
                   <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary text-primary-foreground mb-4 mx-auto lg:mx-0">

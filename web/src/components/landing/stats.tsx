@@ -18,7 +18,7 @@ export function Stats() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
           {STATS.map((stat, i) => (
             <FadeIn key={stat.label} delay={i * 0.1} className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-slate-900/10 mb-3 text-foreground">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-foreground/10 mb-3 text-foreground">
                 <stat.icon className="w-5.5 h-5.5" />
               </div>
               <div className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">{stat.value}</div>

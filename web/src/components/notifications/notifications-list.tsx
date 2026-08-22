@@ -20,13 +20,13 @@ function getNotificationConfig(type: string) {
       return { 
         icon: DollarSign, 
         colorClass: "bg-success/20 text-success",
-        borderClass: "border-emerald-200/60"
+        borderClass: "border-success/30"
       };
     case "product": 
       return { 
         icon: Package, 
         colorClass: "bg-accent/20 text-accent",
-        borderClass: "border-blue-200/60" 
+        borderClass: "border-primary/30" 
       };
     case "payout": 
       return { 
@@ -112,7 +112,7 @@ export function NotificationsList({ initialNotifications }: { initialNotificatio
         {unreadCount > 0 && (
           <button 
             onClick={handleMarkAllAsRead}
-            className="text-xs font-semibold text-accent hover:text-blue-700 transition-colors"
+            className="text-xs font-semibold text-accent hover:text-primary/90 transition-colors"
           >
             Mark all as read
           </button>
@@ -127,7 +127,7 @@ export function NotificationsList({ initialNotifications }: { initialNotificatio
             onClick={() => !notif.is_read && handleMarkAsRead(notif.id)}
             className={`group relative p-4 rounded-2xl transition-all flex items-start gap-4 ${
               !notif.is_read 
-                ? "bg-blue-50/40 hover:bg-blue-50/60 cursor-pointer" 
+                ? "bg-primary/5 hover:bg-primary/10 cursor-pointer" 
                 : "hover:bg-secondary"
             }`}
           >

@@ -99,7 +99,7 @@ export function ConnectionsSettings() {
         )}
 
         {success && (
-          <div className="mb-6 p-4 rounded-2xl bg-success/10 border border-emerald-100/50 text-[13px] font-medium text-success-foreground">
+          <div className="mb-6 p-4 rounded-2xl bg-success/10 border border-success/20 text-[13px] font-medium text-success-foreground">
             {success}
           </div>
         )}
@@ -107,7 +107,7 @@ export function ConnectionsSettings() {
         <div className="space-y-6">
           {/* GitHub Connection */}
           <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl border transition-colors ${
-            isGithubLinked ? "border-emerald-200/60 bg-emerald-50/30" : "border-border/60 bg-background"
+            isGithubLinked ? "border-success/30 bg-success/10" : "border-border/60 bg-background"
           }`}>
             <div className="flex items-center gap-4">
               <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 border ${

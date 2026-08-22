@@ -33,14 +33,14 @@ export function ProductCard({
 }: ProductCardProps) {
   return (
     <Link href={`/products/${id}`} className="group h-full flex flex-col relative">
-      <div className="bg-background rounded-[20px] p-2 sm:p-2.5 border border-border/80 hover:border-blue-200 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_-4px_rgba(59,130,246,0.1)] transition-all duration-300 h-full flex flex-col relative z-10 hover:-translate-y-1">
+      <div className="bg-background rounded-[20px] p-2 sm:p-2.5 border border-border/80 hover:border-accent/40 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_-4px_rgba(var(--accent),0.1)] transition-all duration-300 h-full flex flex-col relative z-10 hover:-translate-y-1">
         
         {/* Image Container */}
         <div className="relative aspect-[4/3] rounded-[14px] bg-secondary/50 overflow-hidden mb-4 border border-border">
           {image ? (
             <img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" />
           ) : (
-            <div className="w-full h-full bg-gradient-to-tr from-slate-100 to-slate-200 flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
+            <div className="w-full h-full bg-gradient-to-tr from-secondary/50 to-secondary flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
               <Code className="w-10 h-10 text-muted-foreground/80" />
             </div>
           )}
@@ -53,14 +53,14 @@ export function ProductCard({
           </Badge>
           
           {originalPrice && originalPrice > price && (
-            <Badge className="absolute top-2.5 right-2.5 text-[10px] font-bold px-2 py-1 bg-success text-primary-foreground border-0 shadow-md shadow-emerald-500/20">
+            <Badge className="absolute top-2.5 right-2.5 text-[10px] font-bold px-2 py-1 bg-success text-primary-foreground border-0 shadow-md shadow-success/20">
               -{Math.round(((originalPrice - price) / originalPrice) * 100)}%
             </Badge>
           )}
 
           {/* Hover Overlay */}
-          <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
-            <div className="translate-y-4 group-hover:translate-y-0 transition-all duration-300 bg-background text-foreground text-xs font-bold px-4 py-2 rounded-full shadow-lg flex items-center gap-1.5">
+          <div className="absolute inset-0 bg-background/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
+            <div className="translate-y-4 group-hover:translate-y-0 transition-all duration-300 bg-background text-foreground text-xs font-bold px-4 py-2 rounded-full shadow-lg flex items-center gap-1.5 border border-border/50">
               View Details <ArrowRight className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -68,7 +68,7 @@ export function ProductCard({
 
         {/* Content */}
         <div className="px-1.5 flex-1 flex flex-col">
-          <h3 className="font-bold text-foreground text-[15px] leading-snug group-hover:text-blue-600 transition-colors line-clamp-2 mb-1">
+          <h3 className="font-bold text-foreground text-[15px] leading-snug group-hover:text-accent transition-colors line-clamp-2 mb-1">
             {title}
           </h3>
           <p className="text-[13px] text-muted-foreground line-clamp-2 leading-relaxed flex-1">

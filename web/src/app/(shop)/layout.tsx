@@ -13,7 +13,7 @@ export default async function ShopLayout({ children }: { children: ReactNode }) 
   const fullName = claims?.full_name || undefined;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] font-sans selection:bg-blue-100 selection:text-blue-900">
+    <div className="min-h-screen bg-background font-sans selection:bg-accent/20 selection:text-foreground">
       <Navbar variant="browse" email={email} fullName={fullName} />
       
       {children}
@@ -37,25 +37,25 @@ export default async function ShopLayout({ children }: { children: ReactNode }) 
 
             <div className="flex flex-col gap-3">
               <span className="text-[13px] font-bold text-foreground uppercase tracking-wider mb-2">Marketplace</span>
-              <a href="/browse" className="text-[14px] font-medium text-muted-foreground hover:text-blue-600 transition-colors w-fit">All Products</a>
-              <a href="/browse?category=web-templates" className="text-[14px] font-medium text-muted-foreground hover:text-blue-600 transition-colors w-fit">Web Templates</a>
-              <a href="/browse?category=ui-kits" className="text-[14px] font-medium text-muted-foreground hover:text-blue-600 transition-colors w-fit">UI Kits</a>
-              <a href="/browse?category=mobile-apps" className="text-[14px] font-medium text-muted-foreground hover:text-blue-600 transition-colors w-fit">Mobile Apps</a>
+              <a href="/browse" className="text-[14px] font-medium text-muted-foreground hover:text-foreground transition-colors w-fit">All Products</a>
+              <a href="/browse?category=web-templates" className="text-[14px] font-medium text-muted-foreground hover:text-foreground transition-colors w-fit">Web Templates</a>
+              <a href="/browse?category=ui-kits" className="text-[14px] font-medium text-muted-foreground hover:text-foreground transition-colors w-fit">UI Kits</a>
+              <a href="/browse?category=mobile-apps" className="text-[14px] font-medium text-muted-foreground hover:text-foreground transition-colors w-fit">Mobile Apps</a>
             </div>
 
             <div className="flex flex-col gap-3">
               <span className="text-[13px] font-bold text-foreground uppercase tracking-wider mb-2">Resources</span>
-              <a href="/developer" className="text-[14px] font-medium text-muted-foreground hover:text-blue-600 transition-colors w-fit">Become a Seller</a>
-              <a href="/blog" className="text-[14px] font-medium text-muted-foreground hover:text-blue-600 transition-colors w-fit">Blog & News</a>
-              <a href="/contact" className="text-[14px] font-medium text-muted-foreground hover:text-blue-600 transition-colors w-fit">Help Center</a>
+              <a href="/developer" className="text-[14px] font-medium text-muted-foreground hover:text-foreground transition-colors w-fit">Become a Seller</a>
+              <a href="/blog" className="text-[14px] font-medium text-muted-foreground hover:text-foreground transition-colors w-fit">Blog & News</a>
+              <a href="/contact" className="text-[14px] font-medium text-muted-foreground hover:text-foreground transition-colors w-fit">Help Center</a>
             </div>
 
             <div className="flex flex-col gap-3">
               <span className="text-[13px] font-bold text-foreground uppercase tracking-wider mb-2">Legal</span>
-              <a href="/terms" className="text-[14px] font-medium text-muted-foreground hover:text-blue-600 transition-colors w-fit">Terms of Service</a>
-              <a href="/privacy" className="text-[14px] font-medium text-muted-foreground hover:text-blue-600 transition-colors w-fit">Privacy Policy</a>
-              <a href="/license" className="text-[14px] font-medium text-muted-foreground hover:text-blue-600 transition-colors w-fit">License Details</a>
-              <a href="/cookies" className="text-[14px] font-medium text-muted-foreground hover:text-blue-600 transition-colors w-fit">Cookie Policy</a>
+              <a href="/terms" className="text-[14px] font-medium text-muted-foreground hover:text-foreground transition-colors w-fit">Terms of Service</a>
+              <a href="/privacy" className="text-[14px] font-medium text-muted-foreground hover:text-foreground transition-colors w-fit">Privacy Policy</a>
+              <a href="/license" className="text-[14px] font-medium text-muted-foreground hover:text-foreground transition-colors w-fit">License Details</a>
+              <a href="/cookies" className="text-[14px] font-medium text-muted-foreground hover:text-foreground transition-colors w-fit">Cookie Policy</a>
             </div>
           </div>
           

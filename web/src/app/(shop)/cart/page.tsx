@@ -18,7 +18,7 @@ export default function CartPage() {
               The shopping cart is under development. In the meantime, you can purchase products directly from their page.
             </p>
             <Link href="/browse">
-              <Button className="bg-primary text-primary-foreground hover:bg-slate-800">
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
                 Browse Products
               </Button>
             </Link>

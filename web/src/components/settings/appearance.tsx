@@ -49,7 +49,7 @@ export function AppearanceSettings() {
                   previewBg="bg-slate-50"
                   mockupBody="bg-white"
                   mockupBorder="border-slate-200"
-                  mockupText="bg-slate-200"
+                  mockupText="bg-secondary"
                />
                
                {/* Dark Mode Option */}
@@ -110,7 +110,7 @@ function ThemeOption({ name, value, icon, currentTheme, onClick, previewBg, mock
       className={`relative cursor-pointer rounded-2xl border-2 p-1.5 transition-all ${
         isActive 
           ? "border-accent shadow-sm" 
-          : "border-transparent hover:border-slate-200 dark:hover:border-slate-800"
+          : "border-transparent hover:border-border"
       }`}
     >
       <div className={`w-full h-28 rounded-xl ${previewBg} flex flex-col justify-between p-3 border ${isActive ? "border-transparent" : "border-border"} shadow-sm overflow-hidden`}>

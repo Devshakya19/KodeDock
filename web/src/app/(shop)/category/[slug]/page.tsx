@@ -60,7 +60,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
             <Package className="w-12 h-12 text-muted-foreground/80 mx-auto mb-4" />
             <h2 className="text-lg font-semibold text-foreground mb-2">No products in this category</h2>
             <Link href="/browse">
-              <Button className="mt-4 bg-primary text-primary-foreground hover:bg-slate-800">
+              <Button className="mt-4 bg-primary text-primary-foreground hover:bg-primary/90">
                 Browse All Products
               </Button>
             </Link>
@@ -69,7 +69,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {products.map((product: any) => (
               <Link key={product.id} href={`/products/${product.id}`}>
-                <Card className="group border border-border hover:border-slate-950 hover:shadow-lg transition-all cursor-pointer h-full">
+                <Card className="group border border-border hover:border-foreground/50 hover:shadow-lg transition-all cursor-pointer h-full">
                   <div className="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
                     <Package className="w-8 h-8 text-muted-foreground" />
                   </div>

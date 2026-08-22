@@ -154,7 +154,7 @@ export function NotificationsSettings() {
             <button
               onClick={handleSave}
               disabled={saving}
-              className="h-11 px-6 rounded-xl bg-accent text-primary-foreground font-bold hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-600/20 transition-all hover:-translate-y-0.5 flex items-center gap-2 disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none"
+              className="h-11 px-6 rounded-xl bg-accent text-primary-foreground font-bold hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20 transition-all hover:-translate-y-0.5 flex items-center gap-2 disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none"
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               Save Preferences
@@ -168,7 +168,7 @@ export function NotificationsSettings() {
 
 function ToggleRow({ label, description, checked, onChange }: { label: string, description: string, checked: boolean, onChange: () => void }) {
   return (
-    <label className="flex items-center justify-between p-4 rounded-xl border border-border bg-secondary/30 cursor-pointer hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
+    <label className="flex items-center justify-between p-4 rounded-xl border border-border bg-secondary/30 cursor-pointer hover:border-border/80 transition-colors">
       <div>
         <div className="font-bold text-[14px] text-foreground">{label}</div>
         <div className="text-[13px] text-muted-foreground mt-0.5">{description}</div>
@@ -180,7 +180,7 @@ function ToggleRow({ label, description, checked, onChange }: { label: string, d
           checked={checked} 
           onChange={onChange} 
         />
-        <div className="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary peer-checked:dark:bg-primary"></div>
+        <div className="w-11 h-6 bg-secondary dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary peer-checked:dark:bg-primary"></div>
       </div>
     </label>
   );

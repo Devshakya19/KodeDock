@@ -113,7 +113,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
 
             <div className="space-y-3">
               <Link href={isBuyer ? "/browse" : "/seller/products"}>
-                <Button className="w-full bg-primary text-primary-foreground hover:bg-slate-800">
+                <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
                   {isBuyer ? "Browse More Products" : "Manage Products"}
                 </Button>
               </Link>

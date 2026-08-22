@@ -59,7 +59,7 @@ export function NotificationPopup({ onClose }: Props) {
             {notifications.slice(0, 8).map((n) => {
               const Icon = getIcon(n.type);
               return (
-                <div key={n.id} className={`px-4 py-3 border-b border-slate-50 last:border-0 ${!n.is_read ? "bg-blue-50/40" : ""}`}>
+                <div key={n.id} className={`px-4 py-3 border-b border-border/40 last:border-0 ${!n.is_read ? "bg-primary/5" : ""}`}>
                   <div className="flex items-start gap-2.5">
                     <div className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0 mt-0.5">
                       <Icon className="w-3.5 h-3.5 text-muted-foreground" />

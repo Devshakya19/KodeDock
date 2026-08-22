@@ -31,7 +31,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
         <div className="bg-background rounded-3xl p-8 md:p-14 mb-10 border border-border/60 shadow-sm relative overflow-hidden">
           
           {/* Subtle Grid Background */}
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#f1f5f9_1px,transparent_1px),linear-gradient(to_bottom,#f1f5f9_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-40 pointer-events-none" />
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-40 pointer-events-none" />
           
           <div className="relative z-10 grid md:grid-cols-5 gap-8 items-center">
             
@@ -60,7 +60,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                   </div>
                 </div>
                 
-                <div className="w-px h-8 bg-slate-200/80 hidden sm:block" />
+                <div className="w-px h-8 bg-border/80 hidden sm:block" />
                 
                 <div className="flex items-center gap-2.5">
                   <div className="w-10 h-10 rounded-full bg-secondary/50 flex items-center justify-center border border-border/60">
@@ -76,19 +76,19 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
 
             {/* Decorative Graphic Element (Hidden on small screens) */}
             <div className="hidden md:flex md:col-span-2 justify-end relative">
-              <div className="relative w-full max-w-[280px] aspect-square flex items-center justify-center bg-[#F8FAFC] rounded-3xl border border-border/50 shadow-inner group overflow-hidden">
+              <div className="relative w-full max-w-[280px] aspect-square flex items-center justify-center bg-secondary/20 rounded-3xl border border-border/50 shadow-inner group overflow-hidden">
                 <div className="absolute top-5 left-5 flex gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-slate-300" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-foreground/20" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-foreground/20" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-foreground/20" />
                 </div>
-                <Cpu className="w-24 h-24 text-muted-foreground/60 group-hover:scale-110 group-hover:text-blue-100 transition-all duration-500" />
+                <Cpu className="w-24 h-24 text-muted-foreground/60 group-hover:scale-110 group-hover:text-accent transition-all duration-500" />
                 
                 {/* Decorative Code Lines */}
                 <div className="absolute bottom-6 left-6 space-y-2 opacity-50">
-                  <div className="w-24 h-1.5 rounded-full bg-slate-200" />
-                  <div className="w-16 h-1.5 rounded-full bg-slate-200" />
-                  <div className="w-32 h-1.5 rounded-full bg-slate-200" />
+                  <div className="w-24 h-1.5 rounded-full bg-foreground/10" />
+                  <div className="w-16 h-1.5 rounded-full bg-foreground/10" />
+                  <div className="w-32 h-1.5 rounded-full bg-foreground/10" />
                 </div>
               </div>
             </div>
@@ -116,7 +116,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
           </div>
           
           {!searchQuery && !categoryFilter && (
-            <button className="hidden sm:flex items-center gap-1.5 text-[14px] font-bold text-accent hover:text-blue-700 transition-colors group">
+            <button className="hidden sm:flex items-center gap-1.5 text-[14px] font-bold text-accent hover:text-accent/80 transition-colors group">
               View All <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
           )}

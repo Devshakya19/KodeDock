@@ -126,7 +126,7 @@ export function PayoutSettings() {
 
       {success && (
         <div className="mb-6 p-4 rounded-2xl bg-success/10 border border-success/20 text-sm font-medium text-success-foreground flex items-center gap-3">
-          <CheckCircle className="w-5 h-5 text-emerald-500" />
+          <CheckCircle className="w-5 h-5 text-success" />
           {success}
         </div>
       )}
@@ -146,7 +146,7 @@ export function PayoutSettings() {
             className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
               accountType === "bank_account"
                 ? "border-primary bg-primary/10 shadow-sm"
-                : "border-border hover:border-slate-300 dark:hover:border-slate-700 bg-background"
+                : "border-border hover:border-border/80 bg-background"
             }`}
           >
             <Landmark className={`w-6 h-6 ${accountType === "bank_account" ? "text-accent" : "text-muted-foreground"}`} />
@@ -160,7 +160,7 @@ export function PayoutSettings() {
             className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
               accountType === "upi"
                 ? "border-primary bg-primary/10 shadow-sm"
-                : "border-border hover:border-slate-300 dark:hover:border-slate-700 bg-background"
+                : "border-border hover:border-border/80 bg-background"
             }`}
           >
             <Smartphone className={`w-6 h-6 ${accountType === "upi" ? "text-accent" : "text-muted-foreground"}`} />

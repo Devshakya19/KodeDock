@@ -51,7 +51,7 @@ export function Testimonials() {
         <div className="grid md:grid-cols-3 gap-6">
           {TESTIMONIALS.map((t, i) => (
             <FadeIn key={t.name} delay={i * 0.1}>
-              <Card className="h-full border border-border hover:border-slate-950 hover:shadow-lg transition-all duration-300">
+              <Card className="h-full border border-border hover:border-foreground hover:shadow-lg transition-all duration-300">
                 <CardContent className="p-6">
                   <div className="flex gap-1 mb-4">
                     {Array.from({ length: 5 }).map((_, j) => (
@@ -63,7 +63,7 @@ export function Testimonials() {
                   </div>
                   <p className="text-sm leading-relaxed text-foreground mb-6">&ldquo;{t.quote}&rdquo;</p>
                   <div className="flex items-center gap-3 pt-4 border-t border-border">
-                    <div className="w-10 h-10 rounded-full bg-slate-950/10 flex items-center justify-center text-sm font-bold text-foreground">
+                    <div className="w-10 h-10 rounded-full bg-foreground/10 flex items-center justify-center text-sm font-bold text-foreground">
                       {t.avatar}
                     </div>
                     <div>

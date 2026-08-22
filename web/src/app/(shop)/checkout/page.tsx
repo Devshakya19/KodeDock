@@ -179,7 +179,7 @@ function CheckoutContent() {
         <div className="bg-background p-10 md:p-14 rounded-[32px] text-center max-w-lg w-full shadow-xl shadow-slate-200/50 border border-border relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-2 bg-success" />
           <div className="w-24 h-24 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-8 border-[8px] border-white shadow-lg">
-            <CheckCircle className="w-12 h-12 text-emerald-500" />
+            <CheckCircle className="w-12 h-12 text-success" />
           </div>
           <h1 className="text-3xl font-black text-foreground tracking-tight mb-4">Payment Successful!</h1>
           <p className="text-muted-foreground text-base leading-relaxed mb-8 font-medium">
@@ -187,7 +187,7 @@ function CheckoutContent() {
           </p>
           <div className="flex flex-col gap-3">
             <Link href="/dashboard/purchases">
-              <Button className="w-full h-14 bg-primary text-primary-foreground hover:bg-slate-800 rounded-2xl font-bold shadow-lg shadow-slate-900/20 hover:-translate-y-0.5 transition-all">
+              <Button className="w-full h-14 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl font-bold shadow-lg shadow-foreground/10 hover:-translate-y-0.5 transition-all">
                 View My Purchases <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
@@ -305,7 +305,7 @@ function CheckoutContent() {
                   { icon: Zap, title: "Quality Assured", desc: "Verified source code" },
                 ].map(({ icon: Icon, title, desc }) => (
                   <div key={title} className="p-5 rounded-[24px] bg-background border border-border/60 flex flex-col items-center text-center">
-                    <Icon className="w-6 h-6 text-emerald-500 mb-3" />
+                    <Icon className="w-6 h-6 text-success mb-3" />
                     <h4 className="text-[13px] font-bold text-foreground mb-1">{title}</h4>
                     <p className="text-[11px] text-muted-foreground font-medium">{desc}</p>
                   </div>
@@ -340,8 +340,8 @@ function CheckoutContent() {
                           </div>
                         </div>
                         {hasEnoughWallet ? (
-                          <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                            <CheckCircle className="w-4 h-4 text-emerald-400" />
+                          <div className="w-6 h-6 rounded-full bg-success/20 flex items-center justify-center">
+                            <CheckCircle className="w-4 h-4 text-success" />
                           </div>
                         ) : null}
                       </div>
@@ -354,7 +354,7 @@ function CheckoutContent() {
                         <Button
                           onClick={handleWalletPayment}
                           disabled={loading || !product || !productId}
-                          className="w-full h-14 bg-emerald-600 text-primary-foreground hover:bg-emerald-700 rounded-2xl text-[15px] font-bold shadow-lg shadow-emerald-600/20 transition-all hover:-translate-y-0.5"
+                          className="w-full h-14 bg-success text-primary-foreground hover:bg-success/90 rounded-2xl text-[15px] font-bold shadow-lg shadow-success/20 transition-all hover:-translate-y-0.5"
                         >
                           {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : price === 0 ? "Get for Free" : `Pay ₹${price.toLocaleString()} from Wallet`}
                         </Button>
@@ -378,7 +378,7 @@ function CheckoutContent() {
                   </div>
 
                   <div className="mt-6 pt-5 border-t border-border">
-                    <div className="flex items-start gap-3 p-4 bg-secondary/50 rounded-2xl border border-slate-100/80">
+                    <div className="flex items-start gap-3 p-4 bg-secondary/50 rounded-2xl border border-border/40">
                       <Lock className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
                       <div>
                         <p className="text-[12px] font-bold text-foreground mb-1">

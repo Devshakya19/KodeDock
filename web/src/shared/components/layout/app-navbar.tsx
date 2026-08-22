@@ -203,11 +203,11 @@ export function AppNavbar({ variant, email = "", fullName, searchQuery = "" }: N
             <div className="hidden md:flex w-full max-w-[500px] lg:max-w-[600px] px-4">
               <form onSubmit={handleSearch} className="relative w-full group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Search className="w-4 h-4 text-muted-foreground group-focus-within:text-blue-600 transition-colors" />
+                  <Search className="w-4 h-4 text-muted-foreground group-focus-within:text-accent transition-colors" />
                 </div>
-                <Input placeholder="Search templates, UI kits, projects..." value={search} onChange={(e) => setSearch(e.target.value)} className="h-11 md:h-12 pl-11 pr-24 rounded-full border-border/60 bg-secondary/60 focus:bg-background shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)] focus-visible:ring-4 focus-visible:ring-blue-600/10 focus-visible:border-blue-600 transition-all text-[15px] font-medium" />
+                <Input placeholder="Search templates, UI kits, projects..." value={search} onChange={(e) => setSearch(e.target.value)} className="h-11 md:h-12 pl-11 pr-24 rounded-full border-border/60 bg-secondary/60 focus:bg-background shadow-[0_2px_10px_-3px_rgba(0,0,0,0.02)] focus-visible:ring-4 focus-visible:ring-accent/10 focus-visible:border-accent transition-all text-[15px] font-medium" />
                 <div className="absolute inset-y-0 right-1.5 flex items-center">
-                  <Button type="submit" size="sm" className="h-8 md:h-9 px-4 md:px-5 rounded-full bg-primary text-primary-foreground text-[13px] font-bold hover:bg-blue-600 shadow-sm hover:shadow-blue-600/20 transition-all">Search</Button>
+                  <Button type="submit" size="sm" className="h-8 md:h-9 px-4 md:px-5 rounded-full bg-primary text-primary-foreground text-[13px] font-bold hover:bg-primary/90 shadow-sm hover:shadow-primary/20 transition-all">Search</Button>
                 </div>
               </form>
             </div>
@@ -247,10 +247,10 @@ export function AppNavbar({ variant, email = "", fullName, searchQuery = "" }: N
           <div className="hidden md:flex items-center justify-end gap-3 lg:gap-4 flex-1 min-w-0">
             {(variant === "browse" || variant === "dashboard") && (
               <div className="flex items-center gap-3 bg-background px-2 py-1.5 rounded-full border border-border/60 shadow-sm">
-                <button onClick={() => setShowWallet(true)} className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50/80 border border-success/20 hover:bg-emerald-100 transition-colors cursor-pointer group">
+                <button onClick={() => setShowWallet(true)} className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-success/10 border border-success/20 hover:bg-success/20 transition-colors cursor-pointer group">
                   <div className="w-5 h-5 rounded-full bg-success/30 flex items-center justify-center"><Wallet className="w-3 h-3 text-success" /></div>
                   <div className="flex items-center">
-                    {walletBalance !== null ? <span className="text-[13px] font-bold text-success-foreground tracking-tight">₹{(walletBalance / 100).toLocaleString()}</span> : <span className="text-[13px] font-bold text-emerald-900/50 tracking-tight">...</span>}
+                    {walletBalance !== null ? <span className="text-[13px] font-bold text-success-foreground tracking-tight">₹{(walletBalance / 100).toLocaleString()}</span> : <span className="text-[13px] font-bold text-success-foreground/50 tracking-tight">...</span>}
                   </div>
                 </button>
                 <div className="w-px h-5 bg-border/80" />
@@ -265,7 +265,7 @@ export function AppNavbar({ variant, email = "", fullName, searchQuery = "" }: N
             )}
 
             {variant === "seller" && (
-              <Link href="/notifications" className="flex items-center justify-center w-10 h-10 rounded-full text-muted-foreground hover:text-foreground hover:bg-background border border-transparent hover:border-slate-200/60 transition-colors cursor-pointer relative shadow-sm">
+              <Link href="/notifications" className="flex items-center justify-center w-10 h-10 rounded-full text-muted-foreground hover:text-foreground hover:bg-background border border-transparent hover:border-border/60 transition-colors cursor-pointer relative shadow-sm">
                 <Bell className="w-4.5 h-4.5" />
                 {unreadCount > 0 && <span className="absolute -top-1 -right-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-primary-foreground ring-2 ring-background">{unreadCount > 99 ? '99+' : unreadCount}</span>}
               </Link>

@@ -103,7 +103,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             <h2 className="text-lg font-semibold text-foreground mb-2">No products found</h2>
             <p className="text-muted-foreground mb-4">Try different keywords or browse categories</p>
             <Link href="/browse">
-              <Button className="bg-primary text-primary-foreground hover:bg-slate-800">
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
                 Browse All Products
               </Button>
             </Link>
@@ -112,13 +112,13 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {products.map((product: any) => (
               <Link key={product.id} href={`/products/${product.id}`}>
-                <Card className="group border border-border hover:border-slate-950 hover:shadow-lg transition-all duration-300 cursor-pointer h-full">
+                <Card className="group border border-border hover:border-foreground/50 hover:shadow-lg transition-all duration-300 cursor-pointer h-full">
                   <div className="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center relative">
-                    <div className="w-10 h-10 rounded-lg bg-slate-200 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center">
                       <Package className="w-5 h-5 text-muted-foreground" />
                     </div>
                     {product.category && (
-                      <Badge variant="secondary" className="absolute top-3 left-3 text-[10px] bg-white/90 border border-border">
+                      <Badge variant="secondary" className="absolute top-3 left-3 text-[10px] bg-background/90 border border-border">
                         {product.category.name}
                       </Badge>
                     )}

@@ -139,7 +139,7 @@ export default async function SellerPublicPage({ params }: { params: Promise<{ i
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {products.map((product) => (
               <Link key={product.id} href={`/products/${product.id}`}>
-                <Card className="group border border-border hover:border-slate-950 hover:shadow-lg transition-all cursor-pointer h-full">
+                <Card className="group border border-border hover:border-foreground/50 hover:shadow-lg transition-all cursor-pointer h-full">
                   <div className="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center overflow-hidden">
                     {product.image_url ? (
                       <img src={product.image_url} alt={product.title} className="w-full h-full object-contain" />

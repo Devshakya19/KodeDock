@@ -77,7 +77,7 @@ export function SettingsLayout({ children, basePath, backLink }: SettingsLayoutP
                 href={item.href}
                 className={`flex items-start gap-4 p-4 rounded-2xl transition-all group relative overflow-hidden ${
                   isActive 
-                    ? "bg-primary text-primary-foreground shadow-xl shadow-slate-900/10" 
+                    ? "bg-primary text-primary-foreground shadow-xl shadow-primary/20" 
                     : "hover:bg-secondary text-muted-foreground hover:text-foreground border border-transparent"
                 }`}
               >

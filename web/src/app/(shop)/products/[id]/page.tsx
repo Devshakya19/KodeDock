@@ -194,7 +194,7 @@ export default function ProductDetailPage() {
         <h1 className="text-2xl font-black text-foreground mb-2">Product not found</h1>
         <p className="text-muted-foreground mb-8 font-medium">{error || "The product you're looking for doesn't exist or was removed."}</p>
         <Link href="/browse">
-          <Button className="w-full h-12 bg-primary text-primary-foreground hover:bg-slate-800 rounded-2xl font-bold">
+          <Button className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl font-bold">
             Browse Marketplace
           </Button>
         </Link>
@@ -217,7 +217,7 @@ export default function ProductDetailPage() {
           </Link>
           <div className="flex items-center gap-4 text-[13px] font-bold text-muted-foreground">
             <span className="flex items-center gap-1.5"><Eye className="w-4 h-4" /> {product.view_count} views</span>
-            <span className="w-1 h-1 rounded-full bg-slate-300" />
+            <span className="w-1 h-1 rounded-full bg-border/80" />
             <span className="flex items-center gap-1.5"><ShoppingCart className="w-4 h-4" /> {product.sales_count} sales</span>
           </div>
         </div>
@@ -232,7 +232,7 @@ export default function ProductDetailPage() {
             {/* Product Showcase Image */}
             <div className="relative rounded-[32px] overflow-hidden bg-background border border-border/60 shadow-sm group">
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/10 to-transparent pointer-events-none z-10" />
-              <div className="aspect-[16/10] sm:aspect-[21/9] lg:aspect-[16/10] relative flex items-center justify-center bg-slate-50/50 p-4 sm:p-8">
+              <div className="aspect-[16/10] sm:aspect-[21/9] lg:aspect-[16/10] relative flex items-center justify-center bg-secondary/30 p-4 sm:p-8">
                 {product.image_url ? (
                   <img 
                     src={product.image_url} 
@@ -356,7 +356,7 @@ export default function ProductDetailPage() {
                           value={reviewTitle}
                           onChange={(e) => setReviewTitle(e.target.value)}
                           placeholder="Summarize your review"
-                          className="w-full rounded-xl border border-border px-4 py-3 text-sm font-medium focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-shadow bg-secondary/50 focus:bg-white"
+                          className="w-full rounded-xl border border-border px-4 py-3 text-sm font-medium focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-shadow bg-secondary/50 focus:bg-background"
                         />
                       </div>
                       <div>
@@ -366,12 +366,12 @@ export default function ProductDetailPage() {
                           value={reviewComment}
                           onChange={(e) => setReviewComment(e.target.value)}
                           placeholder="What did you like or dislike? What is this product best used for?"
-                          className="w-full rounded-xl border border-border px-4 py-3 text-sm font-medium focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-shadow bg-secondary/50 focus:bg-white resize-none"
+                          className="w-full rounded-xl border border-border px-4 py-3 text-sm font-medium focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-shadow bg-secondary/50 focus:bg-background resize-none"
                         />
                       </div>
                       <div className="flex justify-end pt-2">
                         <Button type="submit" disabled={reviewSubmitting}
-                          className="bg-primary text-primary-foreground hover:bg-slate-800 font-bold rounded-xl h-11 px-8 shadow-lg shadow-slate-900/10">
+                          className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-xl h-11 px-8 shadow-lg shadow-foreground/5">
                           {reviewSubmitting ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
                           Submit Review
                         </Button>
@@ -430,7 +430,7 @@ export default function ProductDetailPage() {
                   </div>
                   {discount > 0 && (
                     <div className="inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 bg-success/10 text-success rounded-lg text-[13px] font-bold">
-                      <Zap className="w-4 h-4 fill-emerald-500 text-emerald-500" /> 
+                      <Zap className="w-4 h-4 fill-emerald-500 text-success" /> 
                       You save ₹{(origPrice! - price).toLocaleString()}
                     </div>
                   )}
@@ -438,7 +438,7 @@ export default function ProductDetailPage() {
 
                 <div className="space-y-3 mb-8">
                   <Button onClick={handleBuy} disabled={buying}
-                    className="w-full h-14 bg-primary text-primary-foreground hover:bg-slate-800 text-base font-bold rounded-2xl shadow-lg shadow-slate-900/20 transition-all hover:-translate-y-0.5">
+                    className="w-full h-14 bg-primary text-primary-foreground hover:bg-primary/90 text-base font-bold rounded-2xl shadow-lg shadow-foreground/10 transition-all hover:-translate-y-0.5">
                     {buying ? <Loader2 className="w-5 h-5 animate-spin" /> : <>{price === 0 ? "Download Free Code" : "Buy Now"}</>}
                   </Button>
 
@@ -490,10 +490,10 @@ export default function ProductDetailPage() {
                     <a href={product.demo_url} target="_blank" rel="noopener noreferrer"
                       className="flex items-center justify-between px-5 py-4 bg-secondary/50 hover:bg-secondary rounded-2xl transition-colors group">
                       <div className="flex items-center gap-3">
-                        <ExternalLink className="w-5 h-5 text-muted-foreground group-hover:text-blue-600 transition-colors" />
-                        <span className="text-[15px] font-bold text-foreground group-hover:text-slate-900">View Live Demo</span>
+                        <ExternalLink className="w-5 h-5 text-muted-foreground group-hover:text-accent transition-colors" />
+                        <span className="text-[15px] font-bold text-foreground group-hover:text-foreground">View Live Demo</span>
                       </div>
-                      <ChevronRight className="w-5 h-5 text-muted-foreground/80 group-hover:text-slate-500 group-hover:translate-x-0.5 transition-all" />
+                      <ChevronRight className="w-5 h-5 text-muted-foreground/80 group-hover:text-foreground group-hover:translate-x-0.5 transition-all" />
                     </a>
                   </div>
                 )}

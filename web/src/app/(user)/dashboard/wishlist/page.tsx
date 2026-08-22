@@ -34,7 +34,7 @@ export default async function WishlistPage() {
           <p className="text-muted-foreground text-base max-w-md mx-auto mb-8 font-medium">
             You haven't saved any products yet. Click the heart icon on any product to save it for later.
           </p>
-          <Link href="/browse" className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-8 text-base font-bold text-primary-foreground transition-colors hover:bg-slate-800 shadow-lg shadow-slate-900/20 hover:-translate-y-0.5">
+          <Link href="/browse" className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-8 text-base font-bold text-primary-foreground transition-colors hover:bg-primary/90 shadow-lg shadow-foreground/10 hover:-translate-y-0.5">
             Discover Products
           </Link>
         </div>

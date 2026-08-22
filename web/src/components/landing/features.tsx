@@ -67,7 +67,7 @@ export function Features() {
             <FadeIn key={feature.title} delay={i * 0.08}>
               <Card className="group h-full border border-border bg-background hover:shadow-lg transition-all duration-300">
                 <CardContent className="p-6">
-                  <div className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-slate-950/10 mb-4 text-foreground">
+                  <div className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-foreground/10 mb-4 text-foreground">
                     <feature.icon className="w-5 h-5" />
                   </div>
                   <h3 className="text-lg font-semibold mb-2 text-foreground">{feature.title}</h3>

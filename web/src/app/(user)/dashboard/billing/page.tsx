@@ -34,7 +34,7 @@ export default async function BillingPage() {
           <p className="text-muted-foreground text-base max-w-md mx-auto mb-8 font-medium">
             You don't have any billing history yet. Your invoices will automatically appear here once you make a purchase.
           </p>
-          <Link href="/dashboard/purchases" className="inline-flex h-12 items-center justify-center rounded-xl bg-secondary px-8 text-base font-bold text-foreground transition-colors hover:bg-slate-200 hover:-translate-y-0.5">
+          <Link href="/dashboard/purchases" className="inline-flex h-12 items-center justify-center rounded-xl bg-secondary px-8 text-base font-bold text-foreground transition-colors hover:bg-secondary hover:-translate-y-0.5">
             View Order History
           </Link>
         </div>

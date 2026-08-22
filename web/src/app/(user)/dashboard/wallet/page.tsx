@@ -160,7 +160,7 @@ export default function WalletPage() {
                     
                     <div className="text-right flex flex-col items-center mr-4">
                       <div className="text-[10px] text-muted-foreground font-medium tracking-widest uppercase mb-1">Status</div>
-                      <div className="text-sm sm:text-base font-bold tracking-widest text-emerald-400">ACTIVE</div>
+                      <div className="text-sm sm:text-base font-bold tracking-widest text-success">ACTIVE</div>
                     </div>
                     
                     {/* Mastercard style overlapping circles */}
@@ -182,7 +182,7 @@ export default function WalletPage() {
                 
                 <div className="px-6 sm:px-8 py-6 flex-1 flex flex-col">
                   {/* Signature Strip */}
-                  <div className="w-full h-10 sm:h-12 bg-slate-200/90 rounded flex items-center justify-end px-4 shadow-inner">
+                  <div className="w-full h-10 sm:h-12 bg-secondary/90 rounded flex items-center justify-end px-4 shadow-inner">
                     <span className="text-foreground font-bold text-sm sm:text-base italic font-serif tracking-widest">{userName}</span>
                   </div>
 
@@ -244,7 +244,7 @@ export default function WalletPage() {
               </div>
 
               <div className="flex items-center gap-4">
-                 <Button onClick={() => setShowAddMoney(true)} className="flex-1 h-14 bg-primary hover:bg-slate-800 text-primary-foreground rounded-2xl text-base font-bold shadow-lg shadow-slate-900/20 transition-all hover:-translate-y-0.5">
+                 <Button onClick={() => setShowAddMoney(true)} className="flex-1 h-14 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-base font-bold shadow-lg shadow-foreground/10 transition-all hover:-translate-y-0.5">
                     + Add Money
                  </Button>
                  <Button disabled={isRefreshing} onClick={() => fetchData(true)} variant="outline" className="w-14 h-14 rounded-2xl border-border text-muted-foreground hover:bg-secondary/50 hover:text-foreground transition-colors">
@@ -264,7 +264,7 @@ export default function WalletPage() {
               <input 
                  type="text" 
                  placeholder="Search history..." 
-                 className="pl-10 pr-4 py-2.5 bg-background border border-border rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-300 transition-all w-64 group-hover:border-slate-300"
+                 className="pl-10 pr-4 py-2.5 bg-background border border-border rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-accent/10 focus:border-accent transition-all w-64 group-hover:border-accent"
               />
            </div>
         </div>
@@ -283,10 +283,10 @@ export default function WalletPage() {
               {transactions.map((tx) => {
                 const isCredit = tx.type === "CREDIT";
                 return (
-                  <div key={tx.id} className="p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50/50 transition-colors">
+                  <div key={tx.id} className="p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-secondary/30 transition-colors">
                     <div className="flex items-start sm:items-center gap-4 sm:gap-5">
                       <div className={`w-12 h-12 rounded-[14px] flex items-center justify-center shrink-0 border ${
-                        isCredit ? "bg-success/10 text-success border-emerald-100/50" : "bg-secondary/50 text-muted-foreground border-border"
+                        isCredit ? "bg-success/10 text-success border-success/20" : "bg-secondary/50 text-muted-foreground border-border"
                       }`}>
                         {isCredit ? <ArrowDownLeft className="w-6 h-6" /> : <ArrowUpRight className="w-6 h-6" />}
                       </div>
@@ -294,7 +294,7 @@ export default function WalletPage() {
                         <p className="font-bold text-foreground text-base mb-1">{tx.description || "Wallet Transaction"}</p>
                         <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                           <span className="font-semibold text-muted-foreground">{new Date(tx.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                          <span className="w-1 h-1 rounded-full bg-slate-300" />
+                          <span className="w-1 h-1 rounded-full bg-border/80" />
                           <span className="uppercase text-[11px] tracking-wider font-bold">{tx.type}</span>
                         </p>
                       </div>
