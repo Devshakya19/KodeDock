@@ -419,12 +419,6 @@
     "ast_hash": "1fdb54277684f41969c8d0aad8f2329f",
     "semantic_hash": "1fdb54277684f41969c8d0aad8f2329f"
   },
-  "test-docker.sh": {
-    "mtime": 1787208282.2071395,
-    "seen": 1787404528.7217724,
-    "ast_hash": "28ffe9051ba9461479b554ef5fd345aa",
-    "semantic_hash": "28ffe9051ba9461479b554ef5fd345aa"
-  },
   "web/components.json": {
     "mtime": 1787209395.089936,
     "seen": 1787404528.721774,

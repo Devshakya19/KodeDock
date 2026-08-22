@@ -30,11 +30,12 @@ jobs:
         run: npm ci
 
       - name: Run ESLint
+        working-directory: web
+        run: npm run lint
+
       - name: Run Prettier check
         working-directory: web
         run: npm run format:check
-        working-directory: web
-        run: npm run lint
 
   type-check:
     name: type-check
