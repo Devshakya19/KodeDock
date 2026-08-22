@@ -524,7 +524,7 @@ async fn dispatch_order_events(order: &Order) -> Result<(), Box<dyn std::error::
     let email_job = serde_json::json!({
         "order_id": order.id,
         "buyer_id": order.buyer_id,
-        "amount": order.amount_usd,
+        "amount": order.amount_paise,
     })
     .to_string();
     let _: () = redis::cmd("LPUSH")
@@ -549,7 +549,7 @@ async fn dispatch_order_events(order: &Order) -> Result<(), Box<dyn std::error::
 
     let seller_ws_event = serde_json::json!({
         "userId": order.seller_id,
-        "message": format!("Cha-Ching! You just made a sale of ${}!", order.amount_usd),
+        "message": format!("Cha-Ching! You just made a sale of ₹{}!", order.amount_paise / 100),
         "orderId": order.id,
     })
     .to_string();
