@@ -235,8 +235,6 @@ All notable changes to the KodeDock backend project will be documented in this f
   - Applied the same deep semantic color refactoring to the Buyer Dashboard (`/dashboard`) and Marketplace Browse (`/browse`).
   - Replaced hardcoded legacy classes (`bg-[#F8FAFC]`, `bg-slate-200`, `text-blue-600`) with dynamic theme variables (`bg-background`, `bg-secondary`, `text-accent`) for flawless dark mode support.
   - Adjusted the global `ShopLayout` selection colors from blinding blue to theme-aware accent colors (`selection:bg-accent/20`).
-- **Contrast & Legibility Fixes:**
-  - Resolved an invisible text issue on the Navbar Wallet button and Settings pages in Light Mode. Replaced pure-white `text-success-foreground` with vibrant `text-success` on translucent green backgrounds (`bg-success/10`), ensuring perfect legibility across all themes.
 
 ### ⚙️ Settings & Performance
 - **Appearance Settings Tab:** 
@@ -246,9 +244,20 @@ All notable changes to the KodeDock backend project will be documented in this f
   - Updated `README.md` to perfectly center the KodeDock visual SVGs and appended the marketplace motto for an instantly recognizable branding experience.
 - **Bug Fixes:**
   - Fixed an `Uncaught TypeError: Failed to execute 'measure' on 'Performance'` on `GET /seller/settings` caused by a Next.js dev-mode quirk with synchronous redirects.
-  - **Cross-Account Cart Leak:** Fixed a bug where a buyer's shopping cart state persisted across sessions. Local storage (`kodedock_cart`) is now securely wiped upon logging out.
-  - **Seller Routing & Layout Isolation:** Fixed a critical UI bug where the seller's notification bell linked to the generic `/notifications` route, causing the buyer's layout (with wallet and cart) to leak into the seller's view. Created a strict `/seller/notifications` route to maintain correct layout boundaries.
-  - **Redundant UI Cleanup:** Added smart routing logic to dynamically hide the notification bell icon from the seller navbar when the user is actively viewing the notifications page, eliminating UX redundancy.
+
+## [v1.4.2] - 2026-08-22
+
+### 🎨 UI/UX Refinements
+- **Seller Header Badges:** 
+  - Removed decorative text badges (e.g., "Creator Studio", "Revenue Analytics") from the top of the `SellerHeader` component across all seller dashboard pages. This creates a cleaner, more focused typography hierarchy where the primary page title stands alone without distraction.
+- **Contrast & Legibility Fixes:**
+  - Resolved an invisible text issue on the Navbar Wallet button and Settings pages in Light Mode. Replaced pure-white `text-success-foreground` with vibrant `text-success` on translucent green backgrounds (`bg-success/10`), ensuring perfect legibility across all themes.
+- **Redundant UI Cleanup:** 
+  - Added smart routing logic to dynamically hide the notification bell icon from the seller navbar when the user is actively viewing the notifications page, eliminating UX redundancy.
+
+### 🐛 Bug Fixes
+- **Cross-Account Cart Leak:** Fixed a bug where a buyer's shopping cart state persisted across sessions. Local storage (`kodedock_cart`) is now securely wiped upon logging out.
+- **Seller Routing & Layout Isolation:** Fixed a critical UI bug where the seller's notification bell linked to the generic `/notifications` route, causing the buyer's layout (with wallet and cart) to leak into the seller's view. Created a strict `/seller/notifications` route to maintain correct layout boundaries.
 
 ---
 *End of Changelog.*
