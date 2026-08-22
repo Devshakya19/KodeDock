@@ -28,7 +28,7 @@ jobs:
           # Extract notes from CHANGE.md between current tag and the next tag/footer
           # We look for "## [$TAG_NAME]" and print until we hit the next "## [" or "---"
           awk -v tag="## [$TAG_NAME]" '
-            $0 ~ tag {flag=1; next}
+            index($0, tag) == 1 {flag=1; next}
             /^## \[/ && flag {flag=0; exit}
             /^---/ && flag {flag=0; exit}
             flag {print}
