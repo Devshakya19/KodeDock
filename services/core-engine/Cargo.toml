@@ -31,3 +31,4 @@ sha2 = "0.10"
 hex = "0.4"
 # Rate limiting (X-Forwarded-For aware via SmartIpKeyExtractor)
 actix-governor = "0.7"
+redis = { version = "1.6.0", features = ["tokio-comp"] }

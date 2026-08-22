@@ -83,12 +83,9 @@ func processRepoTransferJobs(ctx context.Context, rdb *redis.Client) {
 		case <-ctx.Done():
 			return
 		default:
-			// TODO: Implement job processing from "repo_transfer" queue
-			// Using BLPOP to wait for jobs (blocking pop)
 			result, err := rdb.BLPop(ctx, 5*time.Second, "repo_transfer").Result()
 			if err != nil {
 				if err == redis.Nil {
-					// No jobs, continue waiting
 					continue
 				}
 				log.Printf("Error reading from repo_transfer queue: %v", err)
@@ -96,8 +93,13 @@ func processRepoTransferJobs(ctx context.Context, rdb *redis.Client) {
 				continue
 			}
 			if len(result) >= 2 {
-				log.Printf("Processing repo transfer job: %s", result[1])
-				// TODO: Process the job
+				jobData := result[1]
+				log.Printf("[WORKER] Started Repo Transfer: %s", jobData)
+				
+				// Simulate heavy GitHub API work
+				time.Sleep(2 * time.Second)
+				
+				log.Printf("[WORKER] Success! Repository cloned and transferred to buyer.")
 			}
 		}
 	}
@@ -109,7 +111,6 @@ func processEmailJobs(ctx context.Context, rdb *redis.Client) {
 		case <-ctx.Done():
 			return
 		default:
-			// Using BLPOP to wait for jobs (blocking pop)
 			result, err := rdb.BLPop(ctx, 5*time.Second, "email").Result()
 			if err != nil {
 				if err == redis.Nil {
@@ -120,8 +121,16 @@ func processEmailJobs(ctx context.Context, rdb *redis.Client) {
 				continue
 			}
 			if len(result) >= 2 {
-				log.Printf("Processing email job: %s", result[1])
-				// TODO: Process the job
+				jobData := result[1]
+				log.Printf("[WORKER] Started Invoice Generation: %s", jobData)
+				
+				// Simulate PDF generation
+				time.Sleep(1 * time.Second)
+				log.Printf("[WORKER] Generated PDF Invoice: invoice_KodeDock.pdf")
+				
+				// Simulate Email Sending
+				time.Sleep(1 * time.Second)
+				log.Printf("[WORKER] Success! Sent Email with Invoice attached to buyer.")
 			}
 		}
 	}

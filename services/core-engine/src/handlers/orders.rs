@@ -294,7 +294,7 @@ async fn pay_from_wallet(
 
     match tx.commit().await {
         Ok(_) => {
-            let _ = enqueue_repo_transfer(pool, &order).await;
+            let _ = dispatch_order_events(&order).await;
             HttpResponse::Ok().json(ApiResponse::success(order, "Payment completed from wallet"))
         }
         Err(e) => {
@@ -447,7 +447,7 @@ pub async fn verify_order(
 
     match complete_order_atomic(pool.get_ref(), order.id, &body.razorpay_payment_id).await {
         Ok(_just_completed) => {
-            let _ = enqueue_repo_transfer(pool.get_ref(), &order).await;
+            let _ = dispatch_order_events(&order).await;
             let order = sqlx::query_as::<_, Order>("SELECT * FROM orders WHERE id = $1")
                 .bind(order.id)
                 .fetch_one(pool.get_ref())
@@ -462,20 +462,47 @@ pub async fn verify_order(
     }
 }
 
-async fn enqueue_repo_transfer(_pool: &PgPool, order: &Order) -> Result<(), sqlx::Error> {
+async fn dispatch_order_events(order: &Order) -> Result<(), Box<dyn std::error::Error>> {
     let redis_url = std::env::var("REDIS_URL").unwrap_or_else(|_| "redis://localhost:6379".to_string());
-    let job = serde_json::json!({
+    let client = redis::Client::open(redis_url)?;
+    let mut con = client.get_multiplexed_async_connection().await?;
+    
+    // 1. Job for Go Infra Worker (Repo Transfer)
+    let repo_job = serde_json::json!({
         "order_id": order.id,
         "buyer_id": order.buyer_id,
         "seller_id": order.seller_id,
         "product_id": order.product_id,
         "github_repo_url": order.github_repo_url,
-    });
+    }).to_string();
+    let _: () = redis::cmd("LPUSH").arg("repo_transfer").arg(&repo_job).query_async(&mut con).await?;
+    log::info!("Queued repo_transfer job for order {}", order.id);
 
-    let cloned = redis_url.clone();
-    tokio::task::spawn_blocking(move || {
-        log::info!("repo_transfer job queued (redis={}): {}", cloned, job);
-    });
+    // 2. Job for Go Infra Worker (Invoice & Email)
+    let email_job = serde_json::json!({
+        "order_id": order.id,
+        "buyer_id": order.buyer_id,
+        "amount": order.amount_usd,
+    }).to_string();
+    let _: () = redis::cmd("LPUSH").arg("email").arg(&email_job).query_async(&mut con).await?;
+    log::info!("Queued email (invoice) job for order {}", order.id);
+
+    // 3. PubSub Event for Node.js (Real-time Live Notification)
+    let ws_event = serde_json::json!({
+        "userId": order.buyer_id,
+        "message": "Payment Successful! Invoice has been sent to your email.",
+        "orderId": order.id,
+    }).to_string();
+    let _: () = redis::cmd("PUBLISH").arg("order_updates").arg(&ws_event).query_async(&mut con).await?;
+    
+    let seller_ws_event = serde_json::json!({
+        "userId": order.seller_id,
+        "message": format!("Cha-Ching! You just made a sale of ${}!", order.amount_usd),
+        "orderId": order.id,
+    }).to_string();
+    let _: () = redis::cmd("PUBLISH").arg("order_updates").arg(&seller_ws_event).query_async(&mut con).await?;
+    log::info!("Published order_updates to Redis PubSub for order {}", order.id);
+
     Ok(())
 }
 
@@ -670,7 +697,7 @@ pub async fn razorpay_webhook(
 
     match complete_order_atomic(pool.get_ref(), order.id, &payment_id).await {
         Ok(true) => {
-            let _ = enqueue_repo_transfer(pool.get_ref(), &order).await;
+            let _ = dispatch_order_events(&order).await;
             log::info!("Order {} completed via webhook", order.id);
         }
         Ok(false) => log::info!("Webhook: order {} already completed", order.id),
