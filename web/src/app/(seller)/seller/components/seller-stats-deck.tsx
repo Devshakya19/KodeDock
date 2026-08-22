@@ -66,7 +66,7 @@ export function SellerStatsDeck({
       subtitle: "Credited to wallet",
       icon: Wallet,
       accent: "text-success",
-      pillBg: "bg-success/10 text-success-foreground border border-success/30",
+      pillBg: "bg-success/10 text-success border border-success/30",
       tag: "Ready Payout",
       detail: "Direct to bank/UPI",
     },

@@ -125,7 +125,7 @@ export function PayoutSettings() {
       </div>
 
       {success && (
-        <div className="mb-6 p-4 rounded-2xl bg-success/10 border border-success/20 text-sm font-medium text-success-foreground flex items-center gap-3">
+        <div className="mb-6 p-4 rounded-2xl bg-success/10 border border-success/20 text-sm font-medium text-success flex items-center gap-3">
           <CheckCircle className="w-5 h-5 text-success" />
           {success}
         </div>

@@ -250,7 +250,7 @@ export function AppNavbar({ variant, email = "", fullName, searchQuery = "" }: N
                 <button onClick={() => setShowWallet(true)} className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-success/10 border border-success/20 hover:bg-success/20 transition-colors cursor-pointer group">
                   <div className="w-5 h-5 rounded-full bg-success/30 flex items-center justify-center"><Wallet className="w-3 h-3 text-success" /></div>
                   <div className="flex items-center">
-                    {walletBalance !== null ? <span className="text-[13px] font-bold text-success-foreground tracking-tight">₹{(walletBalance / 100).toLocaleString()}</span> : <span className="text-[13px] font-bold text-success-foreground/50 tracking-tight">...</span>}
+                    {walletBalance !== null ? <span className="text-[13px] font-bold text-success tracking-tight">₹{(walletBalance / 100).toLocaleString()}</span> : <span className="text-[13px] font-bold text-success/50 tracking-tight">...</span>}
                   </div>
                 </button>
                 <div className="w-px h-5 bg-border/80" />
@@ -311,7 +311,7 @@ export function AppNavbar({ variant, email = "", fullName, searchQuery = "" }: N
                       <button onClick={() => { setShowWallet(true); closeMobile(); }} className="mt-6 flex items-center justify-between w-full p-3.5 rounded-2xl bg-success/10 border border-success/20">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-success/30 flex items-center justify-center"><Wallet className="w-4 h-4 text-success" /></div>
-                          <span className="text-[14px] font-bold text-success-foreground">Wallet Balance</span>
+                          <span className="text-[14px] font-bold text-success">Wallet Balance</span>
                         </div>
                         <span className="text-[16px] font-black text-success tracking-tight">₹{((walletBalance ?? 0) / 100).toLocaleString()}</span>
                       </button>

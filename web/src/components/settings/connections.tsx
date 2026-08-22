@@ -99,7 +99,7 @@ export function ConnectionsSettings() {
         )}
 
         {success && (
-          <div className="mb-6 p-4 rounded-2xl bg-success/10 border border-success/20 text-[13px] font-medium text-success-foreground">
+          <div className="mb-6 p-4 rounded-2xl bg-success/10 border border-success/20 text-[13px] font-medium text-success">
             {success}
           </div>
         )}
