@@ -264,7 +264,7 @@ export function AppNavbar({ variant, email = "", fullName, searchQuery = "" }: N
               </div>
             )}
 
-            {variant === "seller" && (
+            {variant === "seller" && pathname !== "/seller/notifications" && (
               <Link href="/seller/notifications" className="flex items-center justify-center w-10 h-10 rounded-full text-muted-foreground hover:text-foreground hover:bg-background border border-transparent hover:border-border/60 transition-colors cursor-pointer relative shadow-sm">
                 <Bell className="w-4.5 h-4.5" />
                 {unreadCount > 0 && <span className="absolute -top-1 -right-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-primary-foreground ring-2 ring-background">{unreadCount > 99 ? '99+' : unreadCount}</span>}
