@@ -295,11 +295,13 @@ jobs:
   docker-build-test:
     name: docker-build-test
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_GITHUB_CLIENT_ID: dummy
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Build Web Image
-        run: docker compose build web
+        run: docker compose build frontend
       - name: Build Core Engine Image
         run: docker compose build core-engine
       - name: Build Infra Worker Image

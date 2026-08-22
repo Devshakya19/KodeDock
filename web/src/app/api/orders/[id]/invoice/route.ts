@@ -69,8 +69,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     // Generate Professional PDF
+    // --- Colors & Styling ---
+    const primaryColor = [132, 44, 249] as [number, number, number]; // #842CF9
     const doc = new jsPDF();
-    const primaryColor = [132, 44, 249]; // #842CF9
     const darkGray = [40, 40, 40];
     const lightGray = [120, 120, 120];
 
@@ -177,7 +178,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     });
 
     // --- Total Calculation Section ---
-    // @ts-ignore
+    // @ts-expect-error
     const finalY = doc.lastAutoTable?.finalY || 110;
 
     // Background for total
