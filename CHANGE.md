@@ -231,6 +231,12 @@ All notable changes to the KodeDock backend project will be documented in this f
   - Fixed a critical legibility bug where Double-Bezel cards and Recent Activity sections used literal `from-white` to `to-slate-50` gradients. Upgraded them to theme-aware `bg-gradient-to-b from-background to-secondary/20`, resolving bright white boxes blinding users in Dark Mode.
   - Optimized the **Sales Chart (Recharts)** by mapping axes, grids, and tooltips to Tailwind CSS variables (`hsl(var(--border))` and `hsl(var(--muted-foreground))`) instead of fixed hex codes.
   - Excluded the 3D Digital Creator Card from the theme switch, preserving its signature `from-slate-950 to-black` premium OLED look in both modes.
+- **Buyer Dashboard & Marketplace Dark Mode Refinement:**
+  - Applied the same deep semantic color refactoring to the Buyer Dashboard (`/dashboard`) and Marketplace Browse (`/browse`).
+  - Replaced hardcoded legacy classes (`bg-[#F8FAFC]`, `bg-slate-200`, `text-blue-600`) with dynamic theme variables (`bg-background`, `bg-secondary`, `text-accent`) for flawless dark mode support.
+  - Adjusted the global `ShopLayout` selection colors from blinding blue to theme-aware accent colors (`selection:bg-accent/20`).
+- **Contrast & Legibility Fixes:**
+  - Resolved an invisible text issue on the Navbar Wallet button and Settings pages in Light Mode. Replaced pure-white `text-success-foreground` with vibrant `text-success` on translucent green backgrounds (`bg-success/10`), ensuring perfect legibility across all themes.
 
 ### ⚙️ Settings & Performance
 - **Appearance Settings Tab:** 
