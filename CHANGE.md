@@ -259,5 +259,19 @@ All notable changes to the KodeDock backend project will be documented in this f
 - **Cross-Account Cart Leak:** Fixed a bug where a buyer's shopping cart state persisted across sessions. Local storage (`kodedock_cart`) is now securely wiped upon logging out.
 - **Seller Routing & Layout Isolation:** Fixed a critical UI bug where the seller's notification bell linked to the generic `/notifications` route, causing the buyer's layout (with wallet and cart) to leak into the seller's view. Created a strict `/seller/notifications` route to maintain correct layout boundaries.
 
+
+## [v1.5.0] - 2026-08-22
+
+### ✨ New Features
+- **Server-Side PDF Invoice Generation:**
+  - Designed and implemented a professional, enterprise-grade PDF invoice API (`/api/orders/[id]/invoice`) using `jsPDF` and `jspdf-autotable`.
+  - Used `sharp` to correctly parse and scale SVGs to PNGs on the server. The KodeDock official logo (`full-logo.svg`) and watermark (`icon.svg`) are now perfectly aspect-ratio locked and embedded seamlessly into the PDF without stretching.
+  - Added a "Download Invoice" action button directly into the buyer's "My Purchases" dashboard.
+
+### ⚙️ Architecture & Microservices
+- **End-to-End Async Order Pipeline:**
+  - **Rust (`core-engine`):** Integrated the `redis` crate. Replaced mocked placeholder logs with the actual `dispatch_order_events` function. Upon successful Razorpay payment, Rust now securely pushes structural JSON payloads into Redis Task Queues (`repo_transfer`, `email`) and broadcasts to Pub/Sub (`order_updates`).
+  - **Go (`infra-worker`):** Replaced skeleton TODO comments with active Redis `BLPOP` consumer loops for handling background email sending and GitHub repository transfers without blocking the main checkout thread.
+
 ---
 *End of Changelog.*
