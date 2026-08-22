@@ -99,27 +99,38 @@ export default async function PurchasesPage() {
 
                 {/* Right side: Price & Action */}
                 <div className="flex md:flex-col items-center md:items-end justify-between md:justify-center border-t md:border-t-0 border-border pt-4 md:pt-0">
-                  <div className="text-xl font-black text-foreground mb-2">
+                  <div className="text-xl font-black text-foreground mb-3">
                     ₹{(order.amount_paise / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </div>
                   
-                  {order.github_repo_url ? (
+                  <div className="flex items-center gap-2">
                     <a
-                      href={order.github_repo_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-bold hover:bg-primary/90 transition-colors shadow-sm"
+                      href={`/api/orders/${order.id}/invoice`}
+                      download
+                      className="inline-flex items-center justify-center gap-2 h-10 px-3 rounded-xl bg-secondary/80 text-foreground hover:bg-secondary text-sm font-bold transition-colors shadow-sm border border-border"
+                      title="Download Invoice"
                     >
-                      <GitBranch className="w-4 h-4" /> Access Repository
+                      <DownloadCloud className="w-4 h-4 text-muted-foreground" /> <span className="hidden sm:inline">Invoice</span>
                     </a>
-                  ) : (
-                    <Link 
-                      href={`/orders/${order.id}`}
-                      className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-xl bg-secondary text-foreground text-sm font-bold hover:bg-secondary transition-colors"
-                    >
-                      View Details <ArrowUpRight className="w-4 h-4" />
-                    </Link>
-                  )}
+                    
+                    {order.github_repo_url ? (
+                      <a
+                        href={order.github_repo_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-bold hover:bg-primary/90 transition-colors shadow-sm"
+                      >
+                        <GitBranch className="w-4 h-4" /> <span className="hidden sm:inline">Access Repo</span><span className="sm:hidden">Repo</span>
+                      </a>
+                    ) : (
+                      <Link 
+                        href={`/orders/${order.id}`}
+                        className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-xl bg-secondary text-foreground text-sm font-bold hover:bg-secondary transition-colors border border-border"
+                      >
+                        Details <ArrowUpRight className="w-4 h-4" />
+                      </Link>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
