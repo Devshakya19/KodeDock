@@ -72,7 +72,9 @@ export async function getServerToken(): Promise<string | null> {
  * Server-side API fetch. Reads token from cookies and calls the Rust backend directly.
  * Use this in server components instead of apiGet().
  */
-export async function serverApiGet<T>(path: string): Promise<{ success: boolean; data?: T; error?: string }> {
+export async function serverApiGet<T>(
+  path: string
+): Promise<{ success: boolean; data?: T; error?: string }> {
   try {
     const token = await getServerToken();
     if (!token) return { success: false, error: "Not authenticated" };
@@ -88,7 +90,10 @@ export async function serverApiGet<T>(path: string): Promise<{ success: boolean;
   }
 }
 
-export async function serverApiPost<T>(path: string, body: unknown): Promise<{ success: boolean; data?: T; error?: string }> {
+export async function serverApiPost<T>(
+  path: string,
+  body: unknown
+): Promise<{ success: boolean; data?: T; error?: string }> {
   try {
     const token = await getServerToken();
     if (!token) return { success: false, error: "Not authenticated" };
@@ -105,7 +110,10 @@ export async function serverApiPost<T>(path: string, body: unknown): Promise<{ s
   }
 }
 
-export async function serverApiPut<T>(path: string, body: unknown): Promise<{ success: boolean; data?: T; error?: string }> {
+export async function serverApiPut<T>(
+  path: string,
+  body: unknown
+): Promise<{ success: boolean; data?: T; error?: string }> {
   try {
     const token = await getServerToken();
     if (!token) return { success: false, error: "Not authenticated" };

@@ -45,8 +45,8 @@ export default function ForgotPasswordPage() {
             <h1 className="text-2xl font-bold text-foreground">Check your email</h1>
             <p className="text-sm text-muted-foreground mt-3 leading-relaxed">
               If an account exists with{" "}
-              <span className="font-semibold text-foreground">{email}</span>,
-              we&apos;ve sent a password reset link.
+              <span className="font-semibold text-foreground">{email}</span>, we&apos;ve sent a
+              password reset link.
             </p>
             <Link href="/login">
               <Button variant="outline" className="mt-6 border-border text-foreground">
@@ -97,11 +97,7 @@ export default function ForgotPasswordPage() {
               disabled={loading}
               className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              {loading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                "Send reset link"
-              )}
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Send reset link"}
             </Button>
           </form>
 

@@ -14,13 +14,21 @@ export default async function DownloadsPage() {
     <div className="w-full">
       {/* Header */}
       <div className="mb-10">
-        <Link href="/dashboard" className="inline-flex items-center gap-2 text-[13px] font-semibold text-muted-foreground hover:text-foreground mb-6 transition-colors group">
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back to Dashboard
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center gap-2 text-[13px] font-semibold text-muted-foreground hover:text-foreground mb-6 transition-colors group"
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back to
+          Dashboard
         </Link>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-black text-foreground tracking-tight">Downloads & Licenses</h1>
-            <p className="text-muted-foreground mt-2 text-base font-medium">Manage your digital product files and activation keys.</p>
+            <h1 className="text-3xl sm:text-4xl font-black text-foreground tracking-tight">
+              Downloads & Licenses
+            </h1>
+            <p className="text-muted-foreground mt-2 text-base font-medium">
+              Manage your digital product files and activation keys.
+            </p>
           </div>
         </div>
       </div>
@@ -32,16 +40,18 @@ export default async function DownloadsPage() {
           </div>
           <h3 className="text-2xl font-bold text-foreground mb-3">No downloads available</h3>
           <p className="text-muted-foreground text-base max-w-md mx-auto mb-8 font-medium">
-            Any products you purchase that include downloadable files or license keys will appear here.
+            Any products you purchase that include downloadable files or license keys will appear
+            here.
           </p>
-          <Link href="/browse" className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-8 text-base font-bold text-primary-foreground transition-colors hover:bg-primary/90 shadow-lg shadow-foreground/10 hover:-translate-y-0.5">
+          <Link
+            href="/browse"
+            className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-8 text-base font-bold text-primary-foreground transition-colors hover:bg-primary/90 shadow-lg shadow-foreground/10 hover:-translate-y-0.5"
+          >
             Explore Marketplace
           </Link>
         </div>
       ) : (
-        <div>
-           {/* Render downloads list here in the future */}
-        </div>
+        <div>{/* Render downloads list here in the future */}</div>
       )}
     </div>
   );

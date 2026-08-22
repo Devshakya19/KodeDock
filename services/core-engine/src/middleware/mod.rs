@@ -1,7 +1,7 @@
-use actix_web::{Error, HttpRequest, HttpResponse};
-use actix_web::error::ErrorUnauthorized;
-use jsonwebtoken::{decode, DecodingKey, Validation, Algorithm};
 use crate::services::ApiResponse;
+use actix_web::error::ErrorUnauthorized;
+use actix_web::{Error, HttpRequest, HttpResponse};
+use jsonwebtoken::{decode, Algorithm, DecodingKey, Validation};
 
 /// Verified JWT claims for the current request.
 #[derive(Debug, Clone)]
@@ -34,8 +34,7 @@ fn verify_bearer(req: &HttpRequest) -> Result<AuthClaims, Error> {
     validation.validate_aud = false; // JWTs may not have audience
 
     // Get JWT secret from environment — no fallback, must be set
-    let jwt_secret = std::env::var("JWT_SECRET")
-        .expect("JWT_SECRET must be set in environment");
+    let jwt_secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set in environment");
 
     match decode::<serde_json::Value>(
         token,
@@ -88,13 +87,13 @@ pub fn require_developer(req: &HttpRequest) -> Result<String, HttpResponse> {
                     claims.user_id,
                     claims.role
                 );
-                Err(HttpResponse::Forbidden()
-                    .json(ApiResponse::<()>::error("This action requires a seller account")))
+                Err(HttpResponse::Forbidden().json(ApiResponse::<()>::error(
+                    "This action requires a seller account",
+                )))
             } else {
                 Ok(claims.user_id)
             }
         }
-        Err(_) => Err(HttpResponse::Unauthorized()
-            .json(ApiResponse::<()>::error("Unauthorized"))),
+        Err(_) => Err(HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized"))),
     }
 }

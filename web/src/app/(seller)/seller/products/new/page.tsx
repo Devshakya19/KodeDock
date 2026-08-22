@@ -144,7 +144,12 @@ export default function NewProductPage() {
         category_id: category || undefined,
         github_repo_url: githubUrl || undefined,
         image_url: finalImageUrl || undefined,
-        tags: tags ? tags.split(",").map((t) => t.trim()).filter(Boolean) : [],
+        tags: tags
+          ? tags
+              .split(",")
+              .map((t) => t.trim())
+              .filter(Boolean)
+          : [],
         status,
         stock_limit: stockLimitValue,
       });
@@ -163,7 +168,8 @@ export default function NewProductPage() {
   }
 
   const parsedPrice = parseFloat(price);
-  const sellerEarnings = !isNaN(parsedPrice) && parsedPrice >= 49 ? (parsedPrice * 0.975).toFixed(2) : "0.00";
+  const sellerEarnings =
+    !isNaN(parsedPrice) && parsedPrice >= 49 ? (parsedPrice * 0.975).toFixed(2) : "0.00";
 
   if (success) {
     return (
@@ -235,7 +241,10 @@ export default function NewProductPage() {
 
                 {/* Description */}
                 <div>
-                  <label htmlFor="description" className="block text-xs font-bold text-foreground mb-1.5">
+                  <label
+                    htmlFor="description"
+                    className="block text-xs font-bold text-foreground mb-1.5"
+                  >
                     Short Description <span className="text-rose-500">*</span>
                   </label>
                   <textarea
@@ -253,7 +262,10 @@ export default function NewProductPage() {
                 {/* Category & Tags Grid */}
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="category" className="block text-xs font-bold text-foreground mb-1.5">
+                    <label
+                      htmlFor="category"
+                      className="block text-xs font-bold text-foreground mb-1.5"
+                    >
                       Category <span className="text-rose-500">*</span>
                     </label>
                     <div className="relative">
@@ -278,7 +290,10 @@ export default function NewProductPage() {
                   </div>
 
                   <div>
-                    <label htmlFor="tags" className="block text-xs font-bold text-foreground mb-1.5">
+                    <label
+                      htmlFor="tags"
+                      className="block text-xs font-bold text-foreground mb-1.5"
+                    >
                       Tags (Comma separated)
                     </label>
                     <div className="relative">
@@ -356,7 +371,10 @@ export default function NewProductPage() {
 
                 {/* GitHub Repo */}
                 <div>
-                  <label htmlFor="githubUrl" className="block text-xs font-bold text-foreground mb-1.5">
+                  <label
+                    htmlFor="githubUrl"
+                    className="block text-xs font-bold text-foreground mb-1.5"
+                  >
                     GitHub Private Repository (Optional)
                   </label>
                   <div className="relative">
@@ -370,7 +388,8 @@ export default function NewProductPage() {
                     />
                   </div>
                   <p className="text-[11px] text-muted-foreground mt-1.5 leading-relaxed">
-                    When linked, KodeDock automatically invites buyers to access your private repository upon verified checkout.
+                    When linked, KodeDock automatically invites buyers to access your private
+                    repository upon verified checkout.
                   </p>
                 </div>
               </div>
@@ -456,7 +475,10 @@ export default function NewProductPage() {
                 {/* Status selector */}
                 <div className="grid sm:grid-cols-2 gap-4 pt-2">
                   <div>
-                    <label htmlFor="status" className="block text-xs font-bold text-foreground mb-1.5">
+                    <label
+                      htmlFor="status"
+                      className="block text-xs font-bold text-foreground mb-1.5"
+                    >
                       Catalog Status
                     </label>
                     <select
@@ -474,7 +496,10 @@ export default function NewProductPage() {
 
                   {status === "limited" && (
                     <div>
-                      <label htmlFor="stockLimit" className="block text-xs font-bold text-foreground mb-1.5">
+                      <label
+                        htmlFor="stockLimit"
+                        className="block text-xs font-bold text-foreground mb-1.5"
+                      >
                         Stock Limit (Available Copies) <span className="text-rose-500">*</span>
                       </label>
                       <input
@@ -534,11 +559,7 @@ export default function NewProductPage() {
             <div className="rounded-[22px] bg-gradient-to-b from-background to-secondary/30 overflow-hidden flex flex-col">
               <div className="aspect-[16/10] w-full bg-secondary flex items-center justify-center relative overflow-hidden">
                 {imagePreview ? (
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                 ) : (
                   <ImageIcon className="w-12 h-12 text-muted-foreground/80" />
                 )}
@@ -571,7 +592,8 @@ export default function NewProductPage() {
                   {title || "Your Code Product Title"}
                 </h3>
                 <p className="text-xs text-muted-foreground line-clamp-2 mb-4 leading-relaxed font-normal">
-                  {description || "A concise summary of your boilerplate code, components, and design assets..."}
+                  {description ||
+                    "A concise summary of your boilerplate code, components, and design assets..."}
                 </p>
 
                 <div className="flex items-center justify-between pt-3 border-t border-border">

@@ -16,35 +16,35 @@ export interface Notification {
 function getNotificationConfig(type: string) {
   switch (type) {
     case "sale":
-    case "order": 
-      return { 
-        icon: DollarSign, 
+    case "order":
+      return {
+        icon: DollarSign,
         colorClass: "bg-success/20 text-success",
-        borderClass: "border-success/30"
+        borderClass: "border-success/30",
       };
-    case "product": 
-      return { 
-        icon: Package, 
+    case "product":
+      return {
+        icon: Package,
         colorClass: "bg-accent/20 text-accent",
-        borderClass: "border-primary/30" 
+        borderClass: "border-primary/30",
       };
-    case "payout": 
-      return { 
-        icon: ArrowUpRight, 
+    case "payout":
+      return {
+        icon: ArrowUpRight,
         colorClass: "bg-purple-100 text-purple-600",
-        borderClass: "border-purple-200/60" 
+        borderClass: "border-purple-200/60",
       };
-    case "system": 
-      return { 
-        icon: Sparkles, 
+    case "system":
+      return {
+        icon: Sparkles,
         colorClass: "bg-warning/20 text-warning",
-        borderClass: "border-amber-200/60" 
+        borderClass: "border-amber-200/60",
       };
-    default: 
-      return { 
-        icon: Bell, 
+    default:
+      return {
+        icon: Bell,
         colorClass: "bg-secondary text-muted-foreground",
-        borderClass: "border-border/60" 
+        borderClass: "border-border/60",
       };
   }
 }
@@ -53,24 +53,28 @@ function formatRelativeTime(dateString: string) {
   const date = new Date(dateString);
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-  
+
   if (diffInSeconds < 60) return "Just now";
   if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
   if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
   if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
-  
+
   return date.toLocaleDateString("en-IN", { month: "short", day: "numeric" });
 }
 
-export function NotificationsList({ initialNotifications }: { initialNotifications: Notification[] }) {
+export function NotificationsList({
+  initialNotifications,
+}: {
+  initialNotifications: Notification[];
+}) {
   const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   const handleMarkAllAsRead = async () => {
     // Optimistic UI update
-    setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
-    
+    setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+
     // API call
     try {
       await apiPut("/notifications/read-all", {});
@@ -81,8 +85,8 @@ export function NotificationsList({ initialNotifications }: { initialNotificatio
 
   const handleMarkAsRead = async (id: string) => {
     // Optimistic UI update
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
-    
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, is_read: true } : n)));
+
     // API call
     try {
       await apiPut(`/notifications/${id}/read`, {});
@@ -108,9 +112,11 @@ export function NotificationsList({ initialNotifications }: { initialNotificatio
   return (
     <div className="space-y-1">
       <div className="px-4 py-3 flex items-center justify-between border-b border-border mb-2">
-        <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Recent Activity</span>
+        <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+          Recent Activity
+        </span>
         {unreadCount > 0 && (
-          <button 
+          <button
             onClick={handleMarkAllAsRead}
             className="text-xs font-semibold text-accent hover:text-primary/90 transition-colors"
           >
@@ -118,27 +124,29 @@ export function NotificationsList({ initialNotifications }: { initialNotificatio
           </button>
         )}
       </div>
-      
+
       {notifications.map((notif) => {
         const { icon: Icon, colorClass, borderClass } = getNotificationConfig(notif.type);
         return (
-          <div 
-            key={notif.id} 
+          <div
+            key={notif.id}
             onClick={() => !notif.is_read && handleMarkAsRead(notif.id)}
             className={`group relative p-4 rounded-2xl transition-all flex items-start gap-4 ${
-              !notif.is_read 
-                ? "bg-primary/5 hover:bg-primary/10 cursor-pointer" 
+              !notif.is_read
+                ? "bg-primary/5 hover:bg-primary/10 cursor-pointer"
                 : "hover:bg-secondary"
             }`}
           >
             {!notif.is_read && (
               <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-accent rounded-r-full" />
             )}
-            
-            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 border ${colorClass} ${borderClass}`}>
+
+            <div
+              className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 border ${colorClass} ${borderClass}`}
+            >
               <Icon className="w-5 h-5" />
             </div>
-            
+
             <div className="flex-1 min-w-0 pt-0.5">
               <div className="flex items-start justify-between gap-2 mb-1">
                 <div className="text-[15px] font-bold text-foreground leading-tight">
@@ -148,9 +156,11 @@ export function NotificationsList({ initialNotifications }: { initialNotificatio
                   {formatRelativeTime(notif.created_at)}
                 </span>
               </div>
-              
+
               {notif.message && (
-                <p className={`text-[13px] leading-snug ${!notif.is_read ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>
+                <p
+                  className={`text-[13px] leading-snug ${!notif.is_read ? "text-foreground font-medium" : "text-muted-foreground"}`}
+                >
                   {notif.message}
                 </p>
               )}

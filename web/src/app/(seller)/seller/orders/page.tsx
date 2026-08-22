@@ -151,9 +151,7 @@ export default function SellerOrdersPage() {
             <div className="text-2xl font-black text-foreground tabular-nums">
               {orders.length} Orders
             </div>
-            <p className="text-[11px] text-muted-foreground font-medium mt-1">
-              All time purchases
-            </p>
+            <p className="text-[11px] text-muted-foreground font-medium mt-1">All time purchases</p>
           </div>
         </div>
 
@@ -187,7 +185,11 @@ export default function SellerOrdersPage() {
               </div>
             </div>
             <div className="text-2xl font-black text-foreground tabular-nums">
-              ₹{(totalRevenuePaise / 100).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+              ₹
+              {(totalRevenuePaise / 100).toLocaleString(undefined, {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2,
+              })}
             </div>
             <p className="text-[11px] text-muted-foreground font-medium mt-1">
               Direct to seller wallet
@@ -346,8 +348,8 @@ export default function SellerOrdersPage() {
                             order.status === "completed"
                               ? "bg-success/10 text-success border-emerald-200/60"
                               : order.status === "pending"
-                              ? "bg-warning/10 text-warning border-amber-200/60"
-                              : "bg-secondary text-muted-foreground border-border"
+                                ? "bg-warning/10 text-warning border-amber-200/60"
+                                : "bg-secondary text-muted-foreground border-border"
                           }`}
                         >
                           {order.status === "completed" ? (

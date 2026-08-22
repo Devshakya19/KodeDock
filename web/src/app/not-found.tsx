@@ -11,9 +11,7 @@ export default function NotFound() {
           The page you&apos;re looking for doesn&apos;t exist or has been moved.
         </p>
         <Link href="/">
-          <Button className="bg-primary text-primary-foreground hover:bg-slate-800">
-            Go Home
-          </Button>
+          <Button className="bg-primary text-primary-foreground hover:bg-slate-800">Go Home</Button>
         </Link>
       </div>
     </div>

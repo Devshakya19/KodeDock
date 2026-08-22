@@ -56,7 +56,6 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
 
   return (
     <div className="flex-1">
-
       <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Card className="border-border">
           <CardContent className="p-8">
@@ -81,11 +80,14 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             <div className="space-y-4 mb-6">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Status</span>
-                <Badge variant="secondary" className={
-                  order.status === "completed"
-                    ? "bg-success/20 text-success"
-                    : "bg-warning/20 text-warning"
-                }>
+                <Badge
+                  variant="secondary"
+                  className={
+                    order.status === "completed"
+                      ? "bg-success/20 text-success"
+                      : "bg-warning/20 text-warning"
+                  }
+                >
                   {order.status}
                 </Badge>
               </div>
@@ -95,18 +97,32 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Ordered</span>
-                <span className="text-foreground">{new Date(order.created_at).toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" })}</span>
+                <span className="text-foreground">
+                  {new Date(order.created_at).toLocaleDateString("en-IN", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </span>
               </div>
               {order.completed_at && (
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Completed</span>
-                  <span className="text-foreground">{new Date(order.completed_at).toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" })}</span>
+                  <span className="text-foreground">
+                    {new Date(order.completed_at).toLocaleDateString("en-IN", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </span>
                 </div>
               )}
               {order.razorpay_payment_id && (
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Payment ID</span>
-                  <span className="text-muted-foreground font-mono text-xs">{order.razorpay_payment_id}</span>
+                  <span className="text-muted-foreground font-mono text-xs">
+                    {order.razorpay_payment_id}
+                  </span>
                 </div>
               )}
             </div>

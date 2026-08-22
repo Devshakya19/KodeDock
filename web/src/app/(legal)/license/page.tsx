@@ -7,13 +7,15 @@ export default function LicensePage() {
       description="Terms governing the use of purchased code on KodeDock."
     >
       <div className="space-y-8 text-sm text-muted-foreground leading-relaxed">
-        <p><em>Last updated: July 2026</em></p>
+        <p>
+          <em>Last updated: July 2026</em>
+        </p>
 
         <section>
           <h2 className="text-xl font-semibold text-foreground mb-3">1. License Grant</h2>
           <p>
-            Upon purchase, you receive a non-exclusive, perpetual license to use the code
-            as specified by the seller. This license is tied to your KodeDock account.
+            Upon purchase, you receive a non-exclusive, perpetual license to use the code as
+            specified by the seller. This license is tied to your KodeDock account.
           </p>
         </section>
 
@@ -50,8 +52,8 @@ export default function LicensePage() {
         <section>
           <h2 className="text-xl font-semibold text-foreground mb-3">5. License Updates</h2>
           <p>
-            When a seller pushes updates to a repository, buyers receive notifications.
-            Updated code is delivered to the buyer&apos;s GitHub repository automatically.
+            When a seller pushes updates to a repository, buyers receive notifications. Updated code
+            is delivered to the buyer&apos;s GitHub repository automatically.
           </p>
         </section>
       </div>

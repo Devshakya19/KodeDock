@@ -63,9 +63,7 @@ export default function LoginPage() {
         <CardContent className="p-8">
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-foreground">Welcome back</h1>
-            <p className="text-sm text-muted-foreground mt-2">
-              Sign in to your KodeDock account
-            </p>
+            <p className="text-sm text-muted-foreground mt-2">Sign in to your KodeDock account</p>
           </div>
 
           {error && (
@@ -127,11 +125,7 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              {loading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                "Sign in"
-              )}
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Sign in"}
             </Button>
           </form>
 
@@ -156,16 +150,16 @@ export default function LoginPage() {
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}
-            <Link
-              href="/register"
-              className="font-semibold text-foreground hover:underline"
-            >
+            <Link href="/register" className="font-semibold text-foreground hover:underline">
               Create account
             </Link>
           </p>
           <p className="mt-2 text-center text-xs text-muted-foreground">
             Want to sell code?{" "}
-            <Link href="/developer-register" className="font-medium text-foreground hover:underline">
+            <Link
+              href="/developer-register"
+              className="font-medium text-foreground hover:underline"
+            >
               Create seller account
             </Link>
           </p>

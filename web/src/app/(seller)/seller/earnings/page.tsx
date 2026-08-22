@@ -218,18 +218,28 @@ export default function SellerEarningsPage() {
               You keep 97.5% of every sale.
             </h3>
             <p className="text-muted-foreground/80 text-xs sm:text-sm font-medium leading-relaxed">
-              KodeDock charges a minimal 2.5% platform fee to cover automated payment gateway processing, instant repository invitations, and fraud protection. No hidden subscription fees.
+              KodeDock charges a minimal 2.5% platform fee to cover automated payment gateway
+              processing, instant repository invitations, and fraud protection. No hidden
+              subscription fees.
             </p>
           </div>
 
           <div className="relative z-10 flex items-center gap-4 bg-white/5 border border-border/10 p-4 rounded-2xl backdrop-blur-xs">
             <div className="text-center px-4 border-r border-border/10">
-              <div className="text-2xl sm:text-3xl font-black text-emerald-400 tabular-nums">97.5%</div>
-              <div className="text-[10px] uppercase font-bold text-muted-foreground mt-0.5">Your Payout</div>
+              <div className="text-2xl sm:text-3xl font-black text-emerald-400 tabular-nums">
+                97.5%
+              </div>
+              <div className="text-[10px] uppercase font-bold text-muted-foreground mt-0.5">
+                Your Payout
+              </div>
             </div>
             <div className="text-center px-4">
-              <div className="text-2xl sm:text-3xl font-black text-muted-foreground/80 tabular-nums">2.5%</div>
-              <div className="text-[10px] uppercase font-bold text-muted-foreground mt-0.5">Platform Fee</div>
+              <div className="text-2xl sm:text-3xl font-black text-muted-foreground/80 tabular-nums">
+                2.5%
+              </div>
+              <div className="text-[10px] uppercase font-bold text-muted-foreground mt-0.5">
+                Platform Fee
+              </div>
             </div>
           </div>
         </div>
@@ -275,7 +285,8 @@ export default function SellerEarningsPage() {
                       </div>
                       <div>
                         <p className="text-sm font-bold text-foreground">
-                          {tx.description || (tx.type === "sale" ? "Product Sale Payout" : "Bank Payout Withdrawal")}
+                          {tx.description ||
+                            (tx.type === "sale" ? "Product Sale Payout" : "Bank Payout Withdrawal")}
                         </p>
                         <p className="text-xs text-muted-foreground font-medium mt-0.5">
                           {new Date(tx.created_at).toLocaleDateString("en-IN", {

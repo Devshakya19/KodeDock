@@ -40,7 +40,7 @@ export function AnimatedNumber({
         maximumFractionDigits: decimals,
       })}`;
     }
-    
+
     return `${prefix}${current.toLocaleString(undefined, {
       minimumFractionDigits: decimals,
       maximumFractionDigits: decimals,
@@ -49,7 +49,9 @@ export function AnimatedNumber({
 
   return (
     <motion.span className={className}>
-      {mounted ? displayValue : `${prefix}${(value).toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}`}
+      {mounted
+        ? displayValue
+        : `${prefix}${value.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}`}
     </motion.span>
   );
 }

@@ -1,2 +1,9 @@
 import { SecuritySettings } from "@/components/settings/security";
-export default function DashboardSecuritySettingsPage() { return <SecuritySettings deleteWarningText="Are you sure you want to delete your account?" hideHeader={true} />; }
+export default function DashboardSecuritySettingsPage() {
+  return (
+    <SecuritySettings
+      deleteWarningText="Are you sure you want to delete your account?"
+      hideHeader={true}
+    />
+  );
+}

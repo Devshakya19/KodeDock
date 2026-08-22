@@ -7,7 +7,6 @@ import { ArrowRight, Code2, TrendingUp } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Badge } from "@/shared/ui/badge";
 
-
 export function DevHero() {
   return (
     <section className="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
@@ -16,14 +15,16 @@ export function DevHero() {
 
       <div className="relative max-w-4xl mx-auto text-center">
         <FadeIn>
-          <Badge variant="secondary" className="mb-6 px-4 py-1.5 text-xs font-semibold tracking-wide uppercase bg-secondary border border-border text-foreground">
+          <Badge
+            variant="secondary"
+            className="mb-6 px-4 py-1.5 text-xs font-semibold tracking-wide uppercase bg-secondary border border-border text-foreground"
+          >
             For Developers
           </Badge>
         </FadeIn>
         <FadeIn delay={0.1}>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-foreground leading-[1.1]">
-            Sell your code.{" "}
-            <span className="gradient-text">Earn from your skills.</span>
+            Sell your code. <span className="gradient-text">Earn from your skills.</span>
           </h1>
         </FadeIn>
         <FadeIn delay={0.2}>
@@ -35,13 +36,20 @@ export function DevHero() {
         <FadeIn delay={0.3}>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/developer-register">
-              <Button size="lg" className="bg-primary text-primary-foreground hover:bg-slate-800 shadow-lg shadow-slate-950/25 px-8 h-12 text-base font-semibold rounded-full">
+              <Button
+                size="lg"
+                className="bg-primary text-primary-foreground hover:bg-slate-800 shadow-lg shadow-slate-950/25 px-8 h-12 text-base font-semibold rounded-full"
+              >
                 Start Selling
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
             <Link href="/#how-it-works">
-              <Button size="lg" variant="outline" className="border-border text-foreground h-12 text-base font-semibold rounded-full">
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-border text-foreground h-12 text-base font-semibold rounded-full"
+              >
                 Learn More
               </Button>
             </Link>

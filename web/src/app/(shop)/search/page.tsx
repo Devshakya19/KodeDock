@@ -39,13 +39,26 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       {/* Header */}
       <header className="border-b border-border bg-background">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center gap-6">
-          <Link href="/browse" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+          <Link
+            href="/browse"
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+          >
             <ArrowLeft className="w-4 h-4" />
             <span className="text-sm font-medium">Back</span>
           </Link>
-          <Link href="/browse" className="flex items-center gap-2.5 hover:opacity-90 transition-opacity">
-              <Image src="/icons/logo/full-logo.svg" alt="KodeDock" width={175} height={24} className="h-7 w-auto object-contain" priority />
-            </Link>
+          <Link
+            href="/browse"
+            className="flex items-center gap-2.5 hover:opacity-90 transition-opacity"
+          >
+            <Image
+              src="/icons/logo/full-logo.svg"
+              alt="KodeDock"
+              width={175}
+              height={24}
+              className="h-7 w-auto object-contain"
+              priority
+            />
+          </Link>
           <form className="hidden md:flex flex-1 max-w-xl" action="/search" method="get">
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -55,7 +68,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 placeholder="Search templates, UI kits, projects..."
                 className="h-10 pl-10 pr-20 border-border bg-secondary/50 text-sm"
               />
-              <Button type="submit" size="sm" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 px-3 text-xs font-semibold">
+              <Button
+                type="submit"
+                size="sm"
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 px-3 text-xs font-semibold"
+              >
                 Search
               </Button>
             </div>
@@ -80,12 +97,18 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             </Badge>
           </Link>
           <Link href={`/search?q=${query}&sort=price_low`}>
-            <Badge variant={sort === "price_low" ? "default" : "secondary"} className="cursor-pointer">
+            <Badge
+              variant={sort === "price_low" ? "default" : "secondary"}
+              className="cursor-pointer"
+            >
               Price: Low to High
             </Badge>
           </Link>
           <Link href={`/search?q=${query}&sort=price_high`}>
-            <Badge variant={sort === "price_high" ? "default" : "secondary"} className="cursor-pointer">
+            <Badge
+              variant={sort === "price_high" ? "default" : "secondary"}
+              className="cursor-pointer"
+            >
               Price: High to Low
             </Badge>
           </Link>
@@ -101,7 +124,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           <div className="text-center py-16">
             <Search className="w-12 h-12 text-muted-foreground/80 mx-auto mb-4" />
             <h2 className="text-lg font-semibold text-foreground mb-2">No products found</h2>
-            <p className="text-muted-foreground mb-4">Try different keywords or browse categories</p>
+            <p className="text-muted-foreground mb-4">
+              Try different keywords or browse categories
+            </p>
             <Link href="/browse">
               <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
                 Browse All Products
@@ -118,17 +143,28 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                       <Package className="w-5 h-5 text-muted-foreground" />
                     </div>
                     {product.category && (
-                      <Badge variant="secondary" className="absolute top-3 left-3 text-[10px] bg-background/90 border border-border">
+                      <Badge
+                        variant="secondary"
+                        className="absolute top-3 left-3 text-[10px] bg-background/90 border border-border"
+                      >
                         {product.category.name}
                       </Badge>
                     )}
                   </div>
                   <CardContent className="p-4">
-                    <h3 className="font-semibold text-foreground text-sm line-clamp-2">{product.title}</h3>
-                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{product.description}</p>
+                    <h3 className="font-semibold text-foreground text-sm line-clamp-2">
+                      {product.title}
+                    </h3>
+                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                      {product.description}
+                    </p>
                     <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
-                      <span className={`text-base font-bold ${product.price_paise === 0 ? "text-success font-extrabold" : "text-foreground"}`}>
-                        {product.price_paise === 0 ? "Free" : `₹${(product.price_paise / 100).toLocaleString()}`}
+                      <span
+                        className={`text-base font-bold ${product.price_paise === 0 ? "text-success font-extrabold" : "text-foreground"}`}
+                      >
+                        {product.price_paise === 0
+                          ? "Free"
+                          : `₹${(product.price_paise / 100).toLocaleString()}`}
                       </span>
                       <span className="text-[11px] text-muted-foreground">
                         {product.rating?.toFixed(1) || "0.0"} ★

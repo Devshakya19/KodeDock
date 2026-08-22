@@ -7,13 +7,15 @@ export default function RefundPage() {
       description="Our policies regarding refunds and returns."
     >
       <div className="space-y-8 text-sm text-muted-foreground leading-relaxed">
-        <p><em>Last updated: July 2026</em></p>
+        <p>
+          <em>Last updated: July 2026</em>
+        </p>
 
         <section>
           <h2 className="text-xl font-semibold text-foreground mb-3">1. General Policy</h2>
           <p>
-            All sales on KodeDock are final. However, we understand that sometimes things
-            don&apos;t work as expected. We offer a 48-hour dispute window for all purchases.
+            All sales on KodeDock are final. However, we understand that sometimes things don&apos;t
+            work as expected. We offer a 48-hour dispute window for all purchases.
           </p>
         </section>
 
@@ -51,8 +53,8 @@ export default function RefundPage() {
         <section>
           <h2 className="text-xl font-semibold text-foreground mb-3">5. Refund Processing</h2>
           <p>
-            Approved refunds are processed within 5-7 business days. The refund amount
-            is credited back to the original payment method.
+            Approved refunds are processed within 5-7 business days. The refund amount is credited
+            back to the original payment method.
           </p>
         </section>
       </div>

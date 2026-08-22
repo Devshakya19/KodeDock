@@ -5,12 +5,27 @@ import { FadeIn } from "@/shared/components/layout/fade-in";
 import { Layers, Lock, GitBranch, Star, Check, X } from "lucide-react";
 import { Card, CardContent } from "@/shared/ui/card";
 
-
 const GH_STEPS = [
-  { icon: Layers, title: "Seller links repo", desc: "Connect GitHub, choose a repo, and set your price." },
-  { icon: Lock, title: "Buyer pays", desc: "Payment is held in escrow until the buyer confirms satisfaction." },
-  { icon: GitBranch, title: "Repo created", desc: "A private repository is delivered to the buyer's GitHub account." },
-  { icon: Star, title: "Clone & build", desc: "Buyer clones the repo and begins building immediately." },
+  {
+    icon: Layers,
+    title: "Seller links repo",
+    desc: "Connect GitHub, choose a repo, and set your price.",
+  },
+  {
+    icon: Lock,
+    title: "Buyer pays",
+    desc: "Payment is held in escrow until the buyer confirms satisfaction.",
+  },
+  {
+    icon: GitBranch,
+    title: "Repo created",
+    desc: "A private repository is delivered to the buyer's GitHub account.",
+  },
+  {
+    icon: Star,
+    title: "Clone & build",
+    desc: "Buyer clones the repo and begins building immediately.",
+  },
 ];
 
 export function GithubShowcase() {

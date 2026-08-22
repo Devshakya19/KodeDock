@@ -5,17 +5,18 @@ import { FadeIn } from "@/shared/components/layout/fade-in";
 import { Eye, Shield, Wallet, GitBranch, Lock } from "lucide-react";
 import { Card, CardContent } from "@/shared/ui/card";
 
-
 const FEATURES = [
   {
     icon: GithubIcon,
     title: "GitHub Repo Delivery",
-    description: "Buyers get a private repo in GitHub with full commit history and collaboration tools.",
+    description:
+      "Buyers get a private repo in GitHub with full commit history and collaboration tools.",
   },
   {
     icon: Eye,
     title: "Live Preview System",
-    description: "Preview products in real time before purchase with a polished sandbox experience.",
+    description:
+      "Preview products in real time before purchase with a polished sandbox experience.",
   },
   {
     icon: Shield,
@@ -35,7 +36,8 @@ const FEATURES = [
   {
     icon: Lock,
     title: "Secure by Design",
-    description: "Strong validation, encryption, and secure payment handling keep every transaction safe.",
+    description:
+      "Strong validation, encryption, and secure payment handling keep every transaction safe.",
   },
 ];
 
@@ -56,8 +58,8 @@ export function Features() {
           </FadeIn>
           <FadeIn delay={0.2}>
             <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-              Build, buy, and sell with a simple marketplace that focuses on code delivery, security,
-              and clarity.
+              Build, buy, and sell with a simple marketplace that focuses on code delivery,
+              security, and clarity.
             </p>
           </FadeIn>
         </div>
@@ -71,7 +73,9 @@ export function Features() {
                     <feature.icon className="w-5 h-5" />
                   </div>
                   <h3 className="text-lg font-semibold mb-2 text-foreground">{feature.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {feature.description}
+                  </p>
                 </CardContent>
               </Card>
             </FadeIn>

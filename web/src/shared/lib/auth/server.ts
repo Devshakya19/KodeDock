@@ -8,8 +8,7 @@
 import { jwtVerify, SignJWT } from "jose";
 import type { NextRequest } from "next/server";
 
-const JWT_SECRET =
-  process.env.JWT_SECRET || "";
+const JWT_SECRET = process.env.JWT_SECRET || "";
 
 /** Cached key so we don't re-derive on every request. */
 let cachedKey: Uint8Array | undefined;
@@ -25,10 +24,10 @@ function getSigningKey(): Uint8Array {
 }
 
 export interface TokenClaims {
-  sub: string;    // user UUID
+  sub: string; // user UUID
   email: string;
   full_name: string | null;
-  role: string;   // "user" | "developer"
+  role: string; // "user" | "developer"
   exp: number;
   iat: number;
 }
@@ -44,9 +43,7 @@ export interface TokenClaims {
  * Returns `null` if the token is missing, expired, malformed, or has an
  * invalid signature.
  */
-export async function verifyToken(
-  token: string
-): Promise<TokenClaims | null> {
+export async function verifyToken(token: string): Promise<TokenClaims | null> {
   if (!token) return null;
   try {
     const { payload } = await jwtVerify(token, getSigningKey());
@@ -67,14 +64,10 @@ export async function verifyToken(
  * Extract the kodedock_token from a request (cookie first, then Authorization
  * header fallback) and verify it.
  */
-export async function verifyRequest(
-  request: NextRequest
-): Promise<TokenClaims | null> {
+export async function verifyRequest(request: NextRequest): Promise<TokenClaims | null> {
   const token =
     request.cookies.get("kodedock_token")?.value ||
-    (request.headers
-      .get("Authorization")
-      ?.replace(/^Bearer\s+/i, "")) ||
+    request.headers.get("Authorization")?.replace(/^Bearer\s+/i, "") ||
     "";
   return verifyToken(token);
 }

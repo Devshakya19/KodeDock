@@ -44,9 +44,9 @@ export default function CareersPage() {
         <section>
           <h2 className="text-2xl font-semibold text-foreground mb-4">Why Work at KodeDock?</h2>
           <p className="text-muted-foreground leading-relaxed">
-            We&apos;re building something meaningful — a platform that empowers Indian developers
-            to monetize their skills. Join a small, passionate team where your work directly
-            impacts thousands of creators.
+            We&apos;re building something meaningful — a platform that empowers Indian developers to
+            monetize their skills. Join a small, passionate team where your work directly impacts
+            thousands of creators.
           </p>
           <div className="grid sm:grid-cols-3 gap-4 mt-6">
             {[
@@ -73,13 +73,22 @@ export default function CareersPage() {
                       <h3 className="font-semibold text-foreground mb-1">{job.title}</h3>
                       <p className="text-sm text-muted-foreground mb-3">{job.description}</p>
                       <div className="flex flex-wrap gap-2">
-                        <Badge variant="secondary" className="text-[10px] bg-secondary border-border">
+                        <Badge
+                          variant="secondary"
+                          className="text-[10px] bg-secondary border-border"
+                        >
                           {job.department}
                         </Badge>
-                        <Badge variant="secondary" className="text-[10px] bg-secondary border-border">
+                        <Badge
+                          variant="secondary"
+                          className="text-[10px] bg-secondary border-border"
+                        >
                           {job.location}
                         </Badge>
-                        <Badge variant="secondary" className="text-[10px] bg-secondary border-border">
+                        <Badge
+                          variant="secondary"
+                          className="text-[10px] bg-secondary border-border"
+                        >
                           {job.type}
                         </Badge>
                       </div>

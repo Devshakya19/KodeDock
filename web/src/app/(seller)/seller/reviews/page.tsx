@@ -164,7 +164,9 @@ export default function SellerReviewsPage() {
                   </div>
                   <div
                     className={`w-6 text-right tabular-nums text-[11px] ${
-                      starFilter === dist.stars ? "text-primary-foreground font-black" : "text-muted-foreground font-bold"
+                      starFilter === dist.stars
+                        ? "text-primary-foreground font-black"
+                        : "text-muted-foreground font-bold"
                     }`}
                   >
                     {dist.count}
@@ -191,7 +193,9 @@ export default function SellerReviewsPage() {
                 High ratings drive 3.2x higher conversion.
               </h3>
               <p className="text-muted-foreground/80 text-xs sm:text-sm max-w-xl font-normal leading-relaxed">
-                Every review on KodeDock is linked directly to a verified customer purchase. Maintaining detailed documentation and responsive updates helps keep your average above 4.8 stars.
+                Every review on KodeDock is linked directly to a verified customer purchase.
+                Maintaining detailed documentation and responsive updates helps keep your average
+                above 4.8 stars.
               </p>
             </div>
 
@@ -282,7 +286,11 @@ export default function SellerReviewsPage() {
                       <div className="flex items-center gap-3.5">
                         <div className="w-10 h-10 rounded-xl bg-secondary border border-border/80 flex items-center justify-center font-black text-muted-foreground text-sm shrink-0 overflow-hidden">
                           {review.user_avatar ? (
-                            <img src={review.user_avatar} alt="" className="w-full h-full object-cover" />
+                            <img
+                              src={review.user_avatar}
+                              alt=""
+                              className="w-full h-full object-cover"
+                            />
                           ) : (
                             (review.user_name || "A")[0].toUpperCase()
                           )}
@@ -327,9 +335,7 @@ export default function SellerReviewsPage() {
                     {(review.title || review.comment) && (
                       <div className="pt-2 border-t border-border mt-1">
                         {review.title && (
-                          <h5 className="text-sm font-bold text-foreground mb-1">
-                            {review.title}
-                          </h5>
+                          <h5 className="text-sm font-bold text-foreground mb-1">{review.title}</h5>
                         )}
                         {review.comment && (
                           <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed font-normal">

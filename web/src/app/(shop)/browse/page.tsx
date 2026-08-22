@@ -26,29 +26,27 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
   return (
     <>
       <main className="w-full px-4 sm:px-6 lg:px-10 xl:px-14 py-8 md:py-10">
-        
         {/* Clean Minimal Hero Section */}
         <div className="bg-background rounded-3xl p-8 md:p-14 mb-10 border border-border/60 shadow-sm relative overflow-hidden">
-          
           {/* Subtle Grid Background */}
           <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-40 pointer-events-none" />
-          
+
           <div className="relative z-10 grid md:grid-cols-5 gap-8 items-center">
-            
             <div className="md:col-span-3">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-[11px] font-bold uppercase tracking-wider mb-6 text-accent">
                 <Sparkles className="w-3.5 h-3.5" />
                 Premium Marketplace
               </div>
-              
+
               <h1 className="text-3xl md:text-5xl font-black mb-4 leading-tight tracking-tight text-foreground">
                 Welcome back, {fullName ? fullName.split(" ")[0] : "Creator"}.
               </h1>
-              
+
               <p className="text-muted-foreground text-[15px] md:text-[17px] leading-relaxed max-w-xl mb-8 font-medium">
-                Discover production-ready templates, UI kits, and boilerplates from top developers. Delivered instantly to your GitHub.
+                Discover production-ready templates, UI kits, and boilerplates from top developers.
+                Delivered instantly to your GitHub.
               </p>
-              
+
               <div className="flex flex-wrap items-center gap-6">
                 <div className="flex items-center gap-2.5">
                   <div className="w-10 h-10 rounded-full bg-secondary/50 flex items-center justify-center border border-border/60">
@@ -56,19 +54,23 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                   </div>
                   <div className="flex flex-col">
                     <span className="text-[15px] font-bold text-foreground">2,400+</span>
-                    <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Premium Assets</span>
+                    <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                      Premium Assets
+                    </span>
                   </div>
                 </div>
-                
+
                 <div className="w-px h-8 bg-border/80 hidden sm:block" />
-                
+
                 <div className="flex items-center gap-2.5">
                   <div className="w-10 h-10 rounded-full bg-secondary/50 flex items-center justify-center border border-border/60">
                     <Zap className="w-4.5 h-4.5 text-amber-500" />
                   </div>
                   <div className="flex flex-col">
                     <span className="text-[15px] font-bold text-foreground">Instant</span>
-                    <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">GitHub Delivery</span>
+                    <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                      GitHub Delivery
+                    </span>
                   </div>
                 </div>
               </div>
@@ -83,7 +85,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                   <div className="w-2.5 h-2.5 rounded-full bg-foreground/20" />
                 </div>
                 <Cpu className="w-24 h-24 text-muted-foreground/60 group-hover:scale-110 group-hover:text-accent transition-all duration-500" />
-                
+
                 {/* Decorative Code Lines */}
                 <div className="absolute bottom-6 left-6 space-y-2 opacity-50">
                   <div className="w-24 h-1.5 rounded-full bg-foreground/10" />
@@ -92,7 +94,6 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                 </div>
               </div>
             </div>
-
           </div>
         </div>
 
@@ -103,21 +104,24 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
               {searchQuery
                 ? `Search results for "${searchQuery}"`
                 : categoryFilter
-                ? `${categoryFilter.replace(/-/g, " ").replace(/\b\w/g, (l: string) => l.toUpperCase())}`
-                : "Trending Products"}
-              
+                  ? `${categoryFilter.replace(/-/g, " ").replace(/\b\w/g, (l: string) => l.toUpperCase())}`
+                  : "Trending Products"}
+
               {!searchQuery && !categoryFilter && (
                 <span className="flex h-2.5 w-2.5 rounded-full bg-success" />
               )}
             </h2>
             <p className="text-[15px] text-muted-foreground font-medium mt-1">
-              {searchQuery || categoryFilter ? "Showing filtered assets from the marketplace" : "Most popular digital assets this week"}
+              {searchQuery || categoryFilter
+                ? "Showing filtered assets from the marketplace"
+                : "Most popular digital assets this week"}
             </p>
           </div>
-          
+
           {!searchQuery && !categoryFilter && (
             <button className="hidden sm:flex items-center gap-1.5 text-[14px] font-bold text-accent hover:text-accent/80 transition-colors group">
-              View All <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              View All{" "}
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
           )}
         </div>

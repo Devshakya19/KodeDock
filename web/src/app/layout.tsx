@@ -20,7 +20,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "KodeDock | Discover. Buy. Build.",
-  description: "India's first developer-focused digital goods marketplace that delivers code directly to buyers' GitHub accounts.",
+  description:
+    "India's first developer-focused digital goods marketplace that delivers code directly to buyers' GitHub accounts.",
 };
 
 export default function RootLayout({

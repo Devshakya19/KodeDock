@@ -1,9 +1,9 @@
+use crate::middleware::require_developer;
+use crate::models::{CreateProductRequest, Product, SellerStats, UpdateProductRequest};
+use crate::services::ApiResponse;
+use crate::storage::StorageClient;
 use actix_web::{web, HttpRequest, HttpResponse};
 use sqlx::PgPool;
-use crate::models::{Product, CreateProductRequest, UpdateProductRequest, SellerStats};
-use crate::services::ApiResponse;
-use crate::middleware::require_developer;
-use crate::storage::StorageClient;
 
 pub async fn create_product(
     pool: web::Data<PgPool>,
@@ -17,41 +17,54 @@ pub async fn create_product(
 
     let seller_uuid = match uuid::Uuid::parse_str(&seller_id) {
         Ok(uuid) => uuid,
-        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID")),
+        Err(_) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID"))
+        }
     };
 
     // Validate input lengths
     if body.title.len() > 200 {
-        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Title must be 200 characters or less"));
+        return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+            "Title must be 200 characters or less",
+        ));
     }
     if let Some(ref desc) = body.description {
         if desc.len() > 5000 {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Description must be 5000 characters or less"));
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+                "Description must be 5000 characters or less",
+            ));
         }
     }
     if let Some(ref long_desc) = body.long_description {
         if long_desc.len() > 5000 {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Long description must be 5000 characters or less"));
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+                "Long description must be 5000 characters or less",
+            ));
         }
     }
 
     // Validate numerical boundaries (Security Fix)
     if body.price_paise < 0 {
-        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Price cannot be negative"));
+        return HttpResponse::BadRequest()
+            .json(ApiResponse::<()>::error("Price cannot be negative"));
     }
     if let Some(orig_price) = body.original_price_paise {
         if orig_price < body.price_paise {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Original price must be greater than or equal to current price"));
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+                "Original price must be greater than or equal to current price",
+            ));
         }
     }
     if let Some(stock) = body.stock_limit {
         if stock < 1 {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Stock limit must be at least 1"));
+            return HttpResponse::BadRequest()
+                .json(ApiResponse::<()>::error("Stock limit must be at least 1"));
         }
     }
 
     // Generate unique slug: strip special chars, replace spaces, append UUID suffix
-    let base_slug: String = body.title
+    let base_slug: String = body
+        .title
         .to_lowercase()
         .chars()
         .filter(|c| c.is_alphanumeric() || *c == ' ')
@@ -78,10 +91,12 @@ pub async fn create_product(
                 Some(uuid)
             } else {
                 // Look up by name
-                match sqlx::query_scalar::<_, uuid::Uuid>("SELECT id FROM categories WHERE name = $1")
-                    .bind(val)
-                    .fetch_optional(pool.get_ref())
-                    .await
+                match sqlx::query_scalar::<_, uuid::Uuid>(
+                    "SELECT id FROM categories WHERE name = $1",
+                )
+                .bind(val)
+                .fetch_optional(pool.get_ref())
+                .await
                 {
                     Ok(Some(uuid)) => Some(uuid),
                     _ => None,
@@ -124,10 +139,7 @@ pub async fn create_product(
     }
 }
 
-pub async fn list_seller_products(
-    pool: web::Data<PgPool>,
-    req: HttpRequest,
-) -> HttpResponse {
+pub async fn list_seller_products(pool: web::Data<PgPool>, req: HttpRequest) -> HttpResponse {
     let seller_id = match require_developer(&req) {
         Ok(id) => id,
         Err(resp) => return resp,
@@ -135,7 +147,9 @@ pub async fn list_seller_products(
 
     let seller_uuid = match uuid::Uuid::parse_str(&seller_id) {
         Ok(uuid) => uuid,
-        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID")),
+        Err(_) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID"))
+        }
     };
 
     match sqlx::query_as::<_, Product>(
@@ -166,44 +180,59 @@ pub async fn update_product(
 
     let seller_uuid = match uuid::Uuid::parse_str(&seller_id) {
         Ok(uuid) => uuid,
-        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID")),
+        Err(_) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID"))
+        }
     };
 
     let id = match uuid::Uuid::parse_str(&path.into_inner()) {
         Ok(uuid) => uuid,
-        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid product ID")),
+        Err(_) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid product ID"))
+        }
     };
 
     // Verify ownership and fetch current price
-    let current_price = match sqlx::query_scalar::<_, i32>("SELECT price_paise FROM products WHERE id = $1 AND seller_id = $2")
-        .bind(id)
-        .bind(seller_uuid)
-        .fetch_optional(pool.get_ref())
-        .await
+    let current_price = match sqlx::query_scalar::<_, i32>(
+        "SELECT price_paise FROM products WHERE id = $1 AND seller_id = $2",
+    )
+    .bind(id)
+    .bind(seller_uuid)
+    .fetch_optional(pool.get_ref())
+    .await
     {
         Ok(Some(price)) => price,
-        Ok(None) => return HttpResponse::NotFound().json(ApiResponse::<()>::error("Product not found or not owned by you")),
+        Ok(None) => {
+            return HttpResponse::NotFound().json(ApiResponse::<()>::error(
+                "Product not found or not owned by you",
+            ))
+        }
         Err(e) => {
             log::error!("Failed to verify ownership: {}", e);
-            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Database error"));
+            return HttpResponse::InternalServerError()
+                .json(ApiResponse::<()>::error("Database error"));
         }
     };
 
     // Validate numerical boundaries (Security Fix)
     if let Some(price) = body.price_paise {
         if price < 0 {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Price cannot be negative"));
+            return HttpResponse::BadRequest()
+                .json(ApiResponse::<()>::error("Price cannot be negative"));
         }
     }
     if let Some(orig_price) = body.original_price_paise {
         let reference_price = body.price_paise.unwrap_or(current_price);
         if orig_price < reference_price {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Original price cannot be less than current price"));
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+                "Original price cannot be less than current price",
+            ));
         }
     }
     if let Some(stock) = body.stock_limit {
         if stock < 1 {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Stock limit must be at least 1"));
+            return HttpResponse::BadRequest()
+                .json(ApiResponse::<()>::error("Stock limit must be at least 1"));
         }
     }
 
@@ -280,7 +309,8 @@ pub async fn update_product(
         Ok(None) => HttpResponse::NotFound().json(ApiResponse::<()>::error("Product not found")),
         Err(e) => {
             log::error!("Failed to update product: {}", e);
-            HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to update product"))
+            HttpResponse::InternalServerError()
+                .json(ApiResponse::<()>::error("Failed to update product"))
         }
     }
 }
@@ -298,12 +328,16 @@ pub async fn delete_product(
 
     let seller_uuid = match uuid::Uuid::parse_str(&seller_id) {
         Ok(uuid) => uuid,
-        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID")),
+        Err(_) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID"))
+        }
     };
 
     let id = match uuid::Uuid::parse_str(&path.into_inner()) {
         Ok(uuid) => uuid,
-        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid product ID")),
+        Err(_) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid product ID"))
+        }
     };
 
     // Verify ownership before deletion
@@ -313,18 +347,22 @@ pub async fn delete_product(
         .await
     {
         Ok(Some(owner_id)) if owner_id == seller_uuid => {}
-        Ok(_) => return HttpResponse::NotFound().json(ApiResponse::<()>::error("Product not found")),
+        Ok(_) => {
+            return HttpResponse::NotFound().json(ApiResponse::<()>::error("Product not found"))
+        }
         Err(e) => {
             log::error!("Failed to verify ownership: {}", e);
-            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Database error"));
+            return HttpResponse::InternalServerError()
+                .json(ApiResponse::<()>::error("Database error"));
         }
     }
 
-    let order_count = sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM orders WHERE product_id = $1")
-        .bind(id)
-        .fetch_one(pool.get_ref())
-        .await
-        .unwrap_or(0);
+    let order_count =
+        sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM orders WHERE product_id = $1")
+            .bind(id)
+            .fetch_one(pool.get_ref())
+            .await
+            .unwrap_or(0);
 
     if order_count > 0 {
         // Soft delete (archive) because there are existing orders
@@ -341,13 +379,14 @@ pub async fn delete_product(
             }),
             Err(e) => {
                 log::error!("Failed to archive product: {}", e);
-                HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to archive product"))
+                HttpResponse::InternalServerError()
+                    .json(ApiResponse::<()>::error("Failed to archive product"))
             }
         }
     } else {
         // Hard delete and clean up image
         if let Ok(Some(image_url)) = sqlx::query_scalar::<_, String>(
-            "SELECT image_url FROM products WHERE id = $1 AND image_url IS NOT NULL"
+            "SELECT image_url FROM products WHERE id = $1 AND image_url IS NOT NULL",
         )
         .bind(id)
         .fetch_optional(pool.get_ref())
@@ -373,16 +412,14 @@ pub async fn delete_product(
             }),
             Err(e) => {
                 log::error!("Failed to delete product: {}", e);
-                HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to delete product"))
+                HttpResponse::InternalServerError()
+                    .json(ApiResponse::<()>::error("Failed to delete product"))
             }
         }
     }
 }
 
-pub async fn get_stats(
-    pool: web::Data<PgPool>,
-    req: HttpRequest,
-) -> HttpResponse {
+pub async fn get_stats(pool: web::Data<PgPool>, req: HttpRequest) -> HttpResponse {
     let seller_id = match require_developer(&req) {
         Ok(id) => id,
         Err(resp) => return resp,
@@ -390,7 +427,9 @@ pub async fn get_stats(
 
     let seller_uuid = match uuid::Uuid::parse_str(&seller_id) {
         Ok(uuid) => uuid,
-        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID")),
+        Err(_) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID"))
+        }
     };
 
     // Single query for all stats
@@ -407,7 +446,8 @@ pub async fn get_stats(
     .fetch_one(pool.get_ref())
     .await;
 
-    let (total_products, active_products, total_sales, total_revenue, total_views, total_reviews) = row.unwrap_or((0, 0, 0, Some(0), 0, 0));
+    let (total_products, active_products, total_sales, total_revenue, total_views, total_reviews) =
+        row.unwrap_or((0, 0, 0, Some(0), 0, 0));
     let total_revenue = total_revenue.unwrap_or(0);
 
     let stats = SellerStats {
@@ -423,10 +463,7 @@ pub async fn get_stats(
     HttpResponse::Ok().json(ApiResponse::success(stats, "Stats fetched"))
 }
 
-pub async fn get_seller_reviews(
-    pool: web::Data<PgPool>,
-    req: HttpRequest,
-) -> HttpResponse {
+pub async fn get_seller_reviews(pool: web::Data<PgPool>, req: HttpRequest) -> HttpResponse {
     let seller_id = match require_developer(&req) {
         Ok(id) => id,
         Err(resp) => return resp,
@@ -434,7 +471,9 @@ pub async fn get_seller_reviews(
 
     let seller_uuid = match uuid::Uuid::parse_str(&seller_id) {
         Ok(uuid) => uuid,
-        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID")),
+        Err(_) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID"))
+        }
     };
 
     match sqlx::query_as::<_, crate::models::SellerReviewItem>(
@@ -446,7 +485,7 @@ pub async fn get_seller_reviews(
            LEFT JOIN profiles u ON r.user_id = u.id
            WHERE p.seller_id = $1
            ORDER BY r.created_at DESC
-           LIMIT 100"#
+           LIMIT 100"#,
     )
     .bind(seller_uuid)
     .fetch_all(pool.get_ref())

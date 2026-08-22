@@ -1,13 +1,10 @@
+use crate::middleware::require_developer;
+use crate::models::{CreatePayoutAccountRequest, PayoutAccount, PayoutAccountResponse};
+use crate::services::ApiResponse;
 use actix_web::{web, HttpRequest, HttpResponse};
 use sqlx::PgPool;
-use crate::models::{PayoutAccount, PayoutAccountResponse, CreatePayoutAccountRequest};
-use crate::services::ApiResponse;
-use crate::middleware::require_developer;
 
-pub async fn get_payout_account(
-    pool: web::Data<PgPool>,
-    req: HttpRequest,
-) -> HttpResponse {
+pub async fn get_payout_account(pool: web::Data<PgPool>, req: HttpRequest) -> HttpResponse {
     let seller_id = match require_developer(&req) {
         Ok(id) => id,
         Err(resp) => return resp,
@@ -15,11 +12,13 @@ pub async fn get_payout_account(
 
     let seller_uuid = match uuid::Uuid::parse_str(&seller_id) {
         Ok(uuid) => uuid,
-        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID")),
+        Err(_) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID"))
+        }
     };
 
     match sqlx::query_as::<_, PayoutAccount>(
-        "SELECT * FROM seller_payout_accounts WHERE seller_id = $1"
+        "SELECT * FROM seller_payout_accounts WHERE seller_id = $1",
     )
     .bind(seller_uuid)
     .fetch_optional(pool.get_ref())
@@ -29,7 +28,9 @@ pub async fn get_payout_account(
             let response: PayoutAccountResponse = account.into();
             HttpResponse::Ok().json(ApiResponse::success(response, "Payout account fetched"))
         }
-        Ok(None) => HttpResponse::NotFound().json(ApiResponse::<()>::error("No payout account found")),
+        Ok(None) => {
+            HttpResponse::NotFound().json(ApiResponse::<()>::error("No payout account found"))
+        }
         Err(e) => {
             log::error!("Failed to fetch payout account: {}", e);
             HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Database error"))
@@ -49,12 +50,16 @@ pub async fn create_or_update_payout_account(
 
     let seller_uuid = match uuid::Uuid::parse_str(&seller_id) {
         Ok(uuid) => uuid,
-        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID")),
+        Err(_) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID"))
+        }
     };
 
     // Validate account_type
     if body.account_type != "bank_account" && body.account_type != "upi" {
-        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid account type. Must be 'bank_account' or 'upi'"));
+        return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+            "Invalid account type. Must be 'bank_account' or 'upi'",
+        ));
     }
 
     // Validate based on account_type
@@ -62,43 +67,61 @@ pub async fn create_or_update_payout_account(
         // Account holder name
         if let Some(ref name) = body.account_holder_name {
             if name.trim().is_empty() || name.len() > 100 {
-                return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Account holder name must be 1-100 characters"));
+                return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+                    "Account holder name must be 1-100 characters",
+                ));
             }
         } else {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Account holder name is required for bank account"));
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+                "Account holder name is required for bank account",
+            ));
         }
 
         // Account number (9-18 digits)
         if let Some(ref num) = body.account_number {
             if num.len() < 9 || num.len() > 18 || !num.chars().all(|c| c.is_ascii_digit()) {
-                return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Account number must be 9-18 digits"));
+                return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+                    "Account number must be 9-18 digits",
+                ));
             }
         } else {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Account number is required for bank account"));
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+                "Account number is required for bank account",
+            ));
         }
 
         // IFSC code (11 chars: 4 letters + 0 + 6 alphanumeric)
         if let Some(ref ifsc) = body.ifsc_code {
             if ifsc.len() != 11 {
-                return HttpResponse::BadRequest().json(ApiResponse::<()>::error("IFSC code must be 11 characters"));
+                return HttpResponse::BadRequest()
+                    .json(ApiResponse::<()>::error("IFSC code must be 11 characters"));
             }
             let chars: Vec<char> = ifsc.chars().collect();
-            if !chars[0..4].iter().all(|c| c.is_ascii_alphabetic()) ||
-               chars[4] != '0' ||
-               !chars[5..11].iter().all(|c| c.is_ascii_alphanumeric()) {
-                return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid IFSC code format. Example: SBIN0001234"));
+            if !chars[0..4].iter().all(|c| c.is_ascii_alphabetic())
+                || chars[4] != '0'
+                || !chars[5..11].iter().all(|c| c.is_ascii_alphanumeric())
+            {
+                return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+                    "Invalid IFSC code format. Example: SBIN0001234",
+                ));
             }
         } else {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("IFSC code is required for bank account"));
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+                "IFSC code is required for bank account",
+            ));
         }
 
         // Bank name
         if let Some(ref bank) = body.bank_name {
             if bank.trim().is_empty() || bank.len() > 100 {
-                return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Bank name must be 1-100 characters"));
+                return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+                    "Bank name must be 1-100 characters",
+                ));
             }
         } else {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Bank name is required for bank account"));
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+                "Bank name is required for bank account",
+            ));
         }
     }
 
@@ -107,13 +130,19 @@ pub async fn create_or_update_payout_account(
         if let Some(ref upi) = body.upi_id {
             let parts: Vec<&str> = upi.split('@').collect();
             if parts.len() != 2 || parts[0].is_empty() || parts[1].is_empty() {
-                return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid UPI ID format. Example: yourname@upi"));
+                return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+                    "Invalid UPI ID format. Example: yourname@upi",
+                ));
             }
             if upi.len() > 100 {
-                return HttpResponse::BadRequest().json(ApiResponse::<()>::error("UPI ID must be less than 100 characters"));
+                return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+                    "UPI ID must be less than 100 characters",
+                ));
             }
         } else {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("UPI ID is required for UPI payout"));
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error(
+                "UPI ID is required for UPI payout",
+            ));
         }
     }
 
@@ -151,15 +180,13 @@ pub async fn create_or_update_payout_account(
         }
         Err(e) => {
             log::error!("Failed to save payout account: {}", e);
-            HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to save payout account"))
+            HttpResponse::InternalServerError()
+                .json(ApiResponse::<()>::error("Failed to save payout account"))
         }
     }
 }
 
-pub async fn delete_payout_account(
-    pool: web::Data<PgPool>,
-    req: HttpRequest,
-) -> HttpResponse {
+pub async fn delete_payout_account(pool: web::Data<PgPool>, req: HttpRequest) -> HttpResponse {
     let seller_id = match require_developer(&req) {
         Ok(id) => id,
         Err(resp) => return resp,
@@ -167,7 +194,9 @@ pub async fn delete_payout_account(
 
     let seller_uuid = match uuid::Uuid::parse_str(&seller_id) {
         Ok(uuid) => uuid,
-        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID")),
+        Err(_) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID"))
+        }
     };
 
     match sqlx::query("DELETE FROM seller_payout_accounts WHERE seller_id = $1")
@@ -184,7 +213,8 @@ pub async fn delete_payout_account(
         }
         Err(e) => {
             log::error!("Failed to delete payout account: {}", e);
-            HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to delete payout account"))
+            HttpResponse::InternalServerError()
+                .json(ApiResponse::<()>::error("Failed to delete payout account"))
         }
     }
 }

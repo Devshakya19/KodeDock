@@ -89,9 +89,7 @@ export default function RegisterPage() {
         <CardContent className="p-8">
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-foreground">Create your account</h1>
-            <p className="text-sm text-muted-foreground mt-2">
-              Join 2,000+ developers on KodeDock
-            </p>
+            <p className="text-sm text-muted-foreground mt-2">Join 2,000+ developers on KodeDock</p>
           </div>
 
           {error && (
@@ -102,7 +100,10 @@ export default function RegisterPage() {
 
           <form onSubmit={handleRegister} className="space-y-4">
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-foreground mb-1.5">
+              <label
+                htmlFor="fullName"
+                className="block text-sm font-medium text-foreground mb-1.5"
+              >
                 Full name
               </label>
               <Input
@@ -132,7 +133,10 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-foreground mb-1.5">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-foreground mb-1.5"
+              >
                 Password
               </label>
               <div className="relative">
@@ -165,7 +169,9 @@ export default function RegisterPage() {
                     >
                       {req.test(password) && <Check className="w-2.5 h-2.5" />}
                     </div>
-                    <span className={req.test(password) ? "text-foreground" : "text-muted-foreground"}>
+                    <span
+                      className={req.test(password) ? "text-foreground" : "text-muted-foreground"}
+                    >
                       {req.label}
                     </span>
                   </div>
@@ -178,11 +184,7 @@ export default function RegisterPage() {
               disabled={loading}
               className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              {loading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                "Create account"
-              )}
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create account"}
             </Button>
           </form>
 
@@ -207,16 +209,16 @@ export default function RegisterPage() {
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link
-              href="/login"
-              className="font-semibold text-foreground hover:underline"
-            >
+            <Link href="/login" className="font-semibold text-foreground hover:underline">
               Sign in
             </Link>
           </p>
           <p className="mt-2 text-center text-xs text-muted-foreground">
             Want to sell code?{" "}
-            <Link href="/developer-register" className="font-medium text-foreground hover:underline">
+            <Link
+              href="/developer-register"
+              className="font-medium text-foreground hover:underline"
+            >
               Create seller account
             </Link>
           </p>

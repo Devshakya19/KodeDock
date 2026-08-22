@@ -15,7 +15,8 @@ export default function CartPage() {
             <ShoppingCart className="w-12 h-12 text-muted-foreground/80 mx-auto mb-4" />
             <h2 className="text-lg font-semibold text-foreground mb-2">Cart coming soon</h2>
             <p className="text-muted-foreground mb-6">
-              The shopping cart is under development. In the meantime, you can purchase products directly from their page.
+              The shopping cart is under development. In the meantime, you can purchase products
+              directly from their page.
             </p>
             <Link href="/browse">
               <Button className="bg-primary text-primary-foreground hover:bg-primary/90">

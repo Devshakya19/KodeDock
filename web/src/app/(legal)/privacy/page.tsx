@@ -7,22 +7,37 @@ export default function PrivacyPage() {
       description="How we collect, use, and protect your information."
     >
       <div className="space-y-8 text-sm text-muted-foreground leading-relaxed">
-        <p><em>Last updated: July 2026</em></p>
+        <p>
+          <em>Last updated: July 2026</em>
+        </p>
 
         <section>
           <h2 className="text-xl font-semibold text-foreground mb-3">1. Information We Collect</h2>
           <p>We collect information you provide directly:</p>
           <ul className="list-disc pl-6 mt-2 space-y-1">
-            <li><strong>Account Information:</strong> Name, email address, password (hashed)</li>
-            <li><strong>Profile Data:</strong> Bio, avatar, website, location</li>
-            <li><strong>GitHub Data:</strong> Username, repository URLs (for product linking)</li>
-            <li><strong>Payment Data:</strong> Payment method details (processed by Razorpay, not stored by us)</li>
-            <li><strong>Content:</strong> Products you list, reviews you write</li>
+            <li>
+              <strong>Account Information:</strong> Name, email address, password (hashed)
+            </li>
+            <li>
+              <strong>Profile Data:</strong> Bio, avatar, website, location
+            </li>
+            <li>
+              <strong>GitHub Data:</strong> Username, repository URLs (for product linking)
+            </li>
+            <li>
+              <strong>Payment Data:</strong> Payment method details (processed by Razorpay, not
+              stored by us)
+            </li>
+            <li>
+              <strong>Content:</strong> Products you list, reviews you write
+            </li>
           </ul>
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-foreground mb-3">2. How We Use Your Information</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-3">
+            2. How We Use Your Information
+          </h2>
           <ul className="list-disc pl-6 space-y-1">
             <li>To provide and maintain our marketplace services</li>
             <li>To process transactions and deliver purchased code</li>
@@ -36,8 +51,13 @@ export default function PrivacyPage() {
           <h2 className="text-xl font-semibold text-foreground mb-3">3. Data Sharing</h2>
           <p>We do not sell your personal information. We share data only with:</p>
           <ul className="list-disc pl-6 mt-2 space-y-1">
-            <li><strong>Service Providers:</strong> PostgreSQL (database), Razorpay (payments), GitHub (code delivery)</li>
-            <li><strong>Legal Requirements:</strong> When required by law or to protect our rights</li>
+            <li>
+              <strong>Service Providers:</strong> PostgreSQL (database), Razorpay (payments), GitHub
+              (code delivery)
+            </li>
+            <li>
+              <strong>Legal Requirements:</strong> When required by law or to protect our rights
+            </li>
           </ul>
         </section>
 
@@ -45,8 +65,8 @@ export default function PrivacyPage() {
           <h2 className="text-xl font-semibold text-foreground mb-3">4. Data Security</h2>
           <p>
             We implement industry-standard security measures including encryption, secure
-            authentication, and regular security audits. All payment data is processed by
-            Razorpay and never stored on our servers.
+            authentication, and regular security audits. All payment data is processed by Razorpay
+            and never stored on our servers.
           </p>
         </section>
 

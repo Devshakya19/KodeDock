@@ -3,7 +3,21 @@
 import { Suspense, useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Lock, Loader2, CheckCircle, Package, AlertCircle, Shield, Zap, Download, Wallet, CreditCard, ChevronRight, Receipt } from "lucide-react";
+import {
+  ArrowLeft,
+  Lock,
+  Loader2,
+  CheckCircle,
+  Package,
+  AlertCircle,
+  Shield,
+  Zap,
+  Download,
+  Wallet,
+  CreditCard,
+  ChevronRight,
+  Receipt,
+} from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { apiGet, apiPost } from "@/shared/lib/api/client";
 
@@ -49,7 +63,9 @@ interface RazorpayOptions {
   modal?: { ondismiss?: () => void };
 }
 
-interface RazorpayInstance { open: () => void; }
+interface RazorpayInstance {
+  open: () => void;
+}
 
 interface RazorpayCallbackResponse {
   razorpay_order_id: string;
@@ -59,9 +75,17 @@ interface RazorpayCallbackResponse {
 
 function loadRazorpayScript(): Promise<boolean> {
   return new Promise((resolve) => {
-    if (typeof window !== "undefined" && window.Razorpay) { resolve(true); return; }
-    const existing = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
-    if (existing) { existing.addEventListener("load", () => resolve(true)); return; }
+    if (typeof window !== "undefined" && window.Razorpay) {
+      resolve(true);
+      return;
+    }
+    const existing = document.querySelector(
+      'script[src="https://checkout.razorpay.com/v1/checkout.js"]'
+    );
+    if (existing) {
+      existing.addEventListener("load", () => resolve(true));
+      return;
+    }
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.onload = () => resolve(true);
@@ -83,7 +107,10 @@ function CheckoutContent() {
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
 
   const loadProduct = useCallback(async () => {
-    if (!productId) { setProductLoading(false); return; }
+    if (!productId) {
+      setProductLoading(false);
+      return;
+    }
     try {
       const [productRes, walletRes] = await Promise.all([
         apiGet<Product>(`/products/${productId}`),
@@ -92,18 +119,25 @@ function CheckoutContent() {
       if (productRes.success && productRes.data) setProduct(productRes.data);
       else setError(productRes.error || "Product not found");
       if (walletRes.success && walletRes.data) setWalletBalance(walletRes.data.balance_paise);
-    } catch { setError("Failed to load product"); }
-    finally { setProductLoading(false); }
+    } catch {
+      setError("Failed to load product");
+    } finally {
+      setProductLoading(false);
+    }
   }, [productId]);
 
-  useEffect(() => { loadProduct(); }, [loadProduct]);
+  useEffect(() => {
+    loadProduct();
+  }, [loadProduct]);
 
   async function handleWalletPayment() {
     if (!product || !productId) return;
     setLoading(true);
     setError("");
     try {
-      const orderResult = await apiPost<CheckoutOrderResponse>("/orders", { product_id: productId });
+      const orderResult = await apiPost<CheckoutOrderResponse>("/orders", {
+        product_id: productId,
+      });
       if (!orderResult.success || !orderResult.data) {
         setError(orderResult.error || "Failed to create order");
         setLoading(false);
@@ -122,17 +156,27 @@ function CheckoutContent() {
     setLoading(true);
     setError("");
     try {
-      const orderResult = await apiPost<CheckoutOrderResponse>("/orders", { product_id: productId });
+      const orderResult = await apiPost<CheckoutOrderResponse>("/orders", {
+        product_id: productId,
+      });
       if (!orderResult.success || !orderResult.data) {
         setError(orderResult.error || "Failed to create order");
         setLoading(false);
         return;
       }
       const orderData = orderResult.data;
-      if (!orderData.key_id) { setError("Payments are not configured. Please contact support."); setLoading(false); return; }
+      if (!orderData.key_id) {
+        setError("Payments are not configured. Please contact support.");
+        setLoading(false);
+        return;
+      }
 
       const scriptLoaded = await loadRazorpayScript();
-      if (!scriptLoaded) { setError("Failed to load payment gateway. Please try again."); setLoading(false); return; }
+      if (!scriptLoaded) {
+        setError("Failed to load payment gateway. Please try again.");
+        setLoading(false);
+        return;
+      }
 
       const options: RazorpayOptions = {
         key: orderData.key_id,
@@ -163,7 +207,12 @@ function CheckoutContent() {
         },
         prefill: {},
         theme: { color: "#0f172a" },
-        modal: { ondismiss: () => { setError("Payment was cancelled."); setLoading(false); } },
+        modal: {
+          ondismiss: () => {
+            setError("Payment was cancelled.");
+            setLoading(false);
+          },
+        },
       };
 
       new window.Razorpay(options).open();
@@ -181,9 +230,12 @@ function CheckoutContent() {
           <div className="w-24 h-24 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-8 border-[8px] border-white shadow-lg">
             <CheckCircle className="w-12 h-12 text-success" />
           </div>
-          <h1 className="text-3xl font-black text-foreground tracking-tight mb-4">Payment Successful!</h1>
+          <h1 className="text-3xl font-black text-foreground tracking-tight mb-4">
+            Payment Successful!
+          </h1>
           <p className="text-muted-foreground text-base leading-relaxed mb-8 font-medium">
-            Your purchase is confirmed. We are setting up your repository access and preparing your source code.
+            Your purchase is confirmed. We are setting up your repository access and preparing your
+            source code.
           </p>
           <div className="flex flex-col gap-3">
             <Link href="/dashboard/purchases">
@@ -205,7 +257,10 @@ function CheckoutContent() {
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/60">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link href={`/products/${productId || ''}`} className="flex items-center gap-2 text-[13px] font-bold text-muted-foreground hover:text-foreground transition-colors group">
+          <Link
+            href={`/products/${productId || ""}`}
+            className="flex items-center gap-2 text-[13px] font-bold text-muted-foreground hover:text-foreground transition-colors group"
+          >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back
           </Link>
           <div className="flex items-center gap-2 text-foreground font-bold">
@@ -215,7 +270,6 @@ function CheckoutContent() {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-10 lg:py-16">
-        
         {error && (
           <div className="max-w-3xl mx-auto mb-8 p-4 rounded-2xl bg-rose-50 border border-rose-100 text-sm font-bold text-rose-700 flex items-center gap-3 shadow-sm">
             <AlertCircle className="w-5 h-5 shrink-0" />
@@ -225,25 +279,32 @@ function CheckoutContent() {
 
         {!productId && !productLoading && (
           <div className="max-w-md mx-auto mt-20 text-center">
-             <div className="w-20 h-20 bg-warning/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Package className="w-10 h-10 text-amber-500" />
-             </div>
-             <h2 className="text-2xl font-black text-foreground mb-3">No product selected</h2>
-             <p className="text-muted-foreground font-medium mb-8">Please select a product from the marketplace to continue.</p>
-             <Link href="/browse">
-               <Button className="h-12 px-8 bg-primary text-primary-foreground rounded-2xl font-bold">Browse Marketplace</Button>
-             </Link>
+            <div className="w-20 h-20 bg-warning/10 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Package className="w-10 h-10 text-amber-500" />
+            </div>
+            <h2 className="text-2xl font-black text-foreground mb-3">No product selected</h2>
+            <p className="text-muted-foreground font-medium mb-8">
+              Please select a product from the marketplace to continue.
+            </p>
+            <Link href="/browse">
+              <Button className="h-12 px-8 bg-primary text-primary-foreground rounded-2xl font-bold">
+                Browse Marketplace
+              </Button>
+            </Link>
           </div>
         )}
 
         {productId && (
           <div className="grid lg:grid-cols-12 gap-10 lg:gap-14">
-            
             {/* Left Column: Order Summary */}
             <div className="lg:col-span-7 space-y-8">
               <div>
-                <h1 className="text-3xl lg:text-4xl font-black text-foreground tracking-tight mb-2">Review your order</h1>
-                <p className="text-muted-foreground font-medium">Verify the details below before completing your purchase.</p>
+                <h1 className="text-3xl lg:text-4xl font-black text-foreground tracking-tight mb-2">
+                  Review your order
+                </h1>
+                <p className="text-muted-foreground font-medium">
+                  Verify the details below before completing your purchase.
+                </p>
               </div>
 
               <div className="bg-background rounded-[32px] p-6 sm:p-8 border border-border/60 shadow-sm">
@@ -260,7 +321,11 @@ function CheckoutContent() {
                     <div className="flex flex-col sm:flex-row gap-5">
                       <div className="w-full sm:w-32 aspect-[16/10] sm:aspect-square rounded-2xl bg-secondary/50 flex items-center justify-center overflow-hidden shrink-0 border border-border">
                         {product.image_url ? (
-                          <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
+                          <img
+                            src={product.image_url}
+                            alt={product.title}
+                            className="w-full h-full object-cover"
+                          />
                         ) : (
                           <Package className="w-8 h-8 text-muted-foreground/80" />
                         )}
@@ -269,8 +334,12 @@ function CheckoutContent() {
                         <div className="inline-flex items-center px-2.5 py-1 rounded-md bg-secondary text-muted-foreground text-[10px] font-bold uppercase tracking-wider mb-2 self-start">
                           {product.category_name || "Uncategorized"}
                         </div>
-                        <h3 className="text-xl font-bold text-foreground leading-tight mb-2">{product.title}</h3>
-                        <p className="text-sm text-muted-foreground font-medium line-clamp-2">{product.description}</p>
+                        <h3 className="text-xl font-bold text-foreground leading-tight mb-2">
+                          {product.title}
+                        </h3>
+                        <p className="text-sm text-muted-foreground font-medium line-clamp-2">
+                          {product.description}
+                        </p>
                       </div>
                     </div>
 
@@ -287,14 +356,18 @@ function CheckoutContent() {
                       </div>
                       <div className="pt-4 border-t border-border flex justify-between items-end">
                         <span className="text-lg font-black text-foreground">Total Due</span>
-                        <span className={`text-3xl font-black tracking-tight ${price === 0 ? "text-success" : "text-foreground"}`}>
+                        <span
+                          className={`text-3xl font-black tracking-tight ${price === 0 ? "text-success" : "text-foreground"}`}
+                        >
                           {price === 0 ? "Free" : `₹${price.toLocaleString()}`}
                         </span>
                       </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="text-center py-12 text-muted-foreground font-medium">Product not found.</div>
+                  <div className="text-center py-12 text-muted-foreground font-medium">
+                    Product not found.
+                  </div>
                 )}
               </div>
 
@@ -304,7 +377,10 @@ function CheckoutContent() {
                   { icon: Download, title: "Instant Delivery", desc: "Get code immediately" },
                   { icon: Zap, title: "Quality Assured", desc: "Verified source code" },
                 ].map(({ icon: Icon, title, desc }) => (
-                  <div key={title} className="p-5 rounded-[24px] bg-background border border-border/60 flex flex-col items-center text-center">
+                  <div
+                    key={title}
+                    className="p-5 rounded-[24px] bg-background border border-border/60 flex flex-col items-center text-center"
+                  >
                     <Icon className="w-6 h-6 text-success mb-3" />
                     <h4 className="text-[13px] font-bold text-foreground mb-1">{title}</h4>
                     <p className="text-[11px] text-muted-foreground font-medium">{desc}</p>
@@ -317,7 +393,6 @@ function CheckoutContent() {
             <div className="lg:col-span-5">
               <div className="lg:sticky lg:top-24">
                 <div className="bg-background rounded-[32px] p-6 sm:p-8 border border-border/60 shadow-lg relative overflow-hidden">
-                  
                   {/* Decorative corner */}
                   <div className="absolute -top-10 -right-10 w-32 h-32 bg-secondary/50 rounded-full blur-2xl pointer-events-none" />
 
@@ -328,15 +403,21 @@ function CheckoutContent() {
                   {/* Wallet Balance Display */}
                   {walletBalance !== null && price > 0 && (
                     <div className="mb-6">
-                      <label className="block text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Available Balance</label>
+                      <label className="block text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-2">
+                        Available Balance
+                      </label>
                       <div className="flex items-center justify-between p-4 rounded-[20px] bg-primary text-primary-foreground shadow-inner">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
                             <Wallet className="w-5 h-5 text-white/90" />
                           </div>
                           <div>
-                            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Digital Wallet</p>
-                            <p className="text-xl font-black tracking-tight">₹{(walletBalance / 100).toLocaleString()}</p>
+                            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+                              Digital Wallet
+                            </p>
+                            <p className="text-xl font-black tracking-tight">
+                              ₹{(walletBalance / 100).toLocaleString()}
+                            </p>
                           </div>
                         </div>
                         {hasEnoughWallet ? (
@@ -356,14 +437,21 @@ function CheckoutContent() {
                           disabled={loading || !product || !productId}
                           className="w-full h-14 bg-success text-primary-foreground hover:bg-success/90 rounded-2xl text-[15px] font-bold shadow-lg shadow-success/20 transition-all hover:-translate-y-0.5"
                         >
-                          {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : price === 0 ? "Get for Free" : `Pay ₹${price.toLocaleString()} from Wallet`}
+                          {loading ? (
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                          ) : price === 0 ? (
+                            "Get for Free"
+                          ) : (
+                            `Pay ₹${price.toLocaleString()} from Wallet`
+                          )}
                         </Button>
                       </div>
                     ) : (
                       <div className="space-y-4">
                         {walletBalance !== null && (
                           <div className="p-3 rounded-xl bg-warning/10 border border-amber-100 text-[12px] font-bold text-warning text-center flex items-center justify-center gap-2">
-                            <AlertCircle className="w-4 h-4" /> Insufficient wallet balance. Pay via Razorpay.
+                            <AlertCircle className="w-4 h-4" /> Insufficient wallet balance. Pay via
+                            Razorpay.
                           </div>
                         )}
                         <Button
@@ -371,7 +459,13 @@ function CheckoutContent() {
                           disabled={loading || !product || !productId}
                           className="w-full h-14 bg-[#3399cc] text-primary-foreground hover:bg-[#2b83b0] rounded-2xl text-[15px] font-bold shadow-lg shadow-[#3399cc]/20 transition-all hover:-translate-y-0.5"
                         >
-                          {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : price === 0 ? "Get for Free" : `Pay ₹${price.toLocaleString()} securely`}
+                          {loading ? (
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                          ) : price === 0 ? (
+                            "Get for Free"
+                          ) : (
+                            `Pay ₹${price.toLocaleString()} securely`
+                          )}
                         </Button>
                       </div>
                     )}
@@ -385,7 +479,21 @@ function CheckoutContent() {
                           Payments processed securely
                         </p>
                         <p className="text-[11px] text-muted-foreground font-medium leading-relaxed">
-                          By proceeding, you agree to KodeDock&apos;s <Link href="/terms" className="text-foreground hover:text-foreground underline underline-offset-2 decoration-slate-300">Terms of Service</Link> and <Link href="/privacy" className="text-foreground hover:text-foreground underline underline-offset-2 decoration-slate-300">Privacy Policy</Link>.
+                          By proceeding, you agree to KodeDock&apos;s{" "}
+                          <Link
+                            href="/terms"
+                            className="text-foreground hover:text-foreground underline underline-offset-2 decoration-slate-300"
+                          >
+                            Terms of Service
+                          </Link>{" "}
+                          and{" "}
+                          <Link
+                            href="/privacy"
+                            className="text-foreground hover:text-foreground underline underline-offset-2 decoration-slate-300"
+                          >
+                            Privacy Policy
+                          </Link>
+                          .
                         </p>
                       </div>
                     </div>
@@ -393,7 +501,6 @@ function CheckoutContent() {
                 </div>
               </div>
             </div>
-
           </div>
         )}
       </main>
@@ -403,11 +510,13 @@ function CheckoutContent() {
 
 export default function CheckoutPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-secondary/50 flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-border border-t-slate-900 rounded-full animate-spin" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-secondary/50 flex items-center justify-center">
+          <div className="w-10 h-10 border-4 border-border border-t-slate-900 rounded-full animate-spin" />
+        </div>
+      }
+    >
       <CheckoutContent />
     </Suspense>
   );

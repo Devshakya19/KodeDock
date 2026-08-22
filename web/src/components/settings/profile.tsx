@@ -3,7 +3,18 @@ import { GithubIcon } from "@/shared/components/icons/github";
 
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, CheckCircle, ExternalLink, Camera, User, Link as LinkIcon, MapPin, AlignLeft, Info, LocateFixed } from "lucide-react";
+import {
+  Loader2,
+  CheckCircle,
+  ExternalLink,
+  Camera,
+  User,
+  Link as LinkIcon,
+  MapPin,
+  AlignLeft,
+  Info,
+  LocateFixed,
+} from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { useProfile } from "@/shared/hooks/profile";
@@ -12,7 +23,7 @@ import { theme } from "@/shared/lib/theme";
 export function ProfileSettings() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const {
     loading,
     saving,
@@ -24,7 +35,7 @@ export function ProfileSettings() {
     updateField,
     handleAvatarUpload,
     handleAutoFetchLocation,
-    handleSubmit
+    handleSubmit,
   } = useProfile();
 
   if (loading) {
@@ -82,18 +93,21 @@ export function ProfileSettings() {
               ) : (
                 <>
                   <Camera className="w-6 h-6 text-primary-foreground mb-1" />
-                  <span className="text-[10px] font-bold text-primary-foreground uppercase tracking-wider">Change</span>
+                  <span className="text-[10px] font-bold text-primary-foreground uppercase tracking-wider">
+                    Change
+                  </span>
                 </>
               )}
             </button>
           </div>
           <div>
-            <h3 className="text-xl font-bold text-foreground mb-1">{formData.full_name || "User Profile"}</h3>
+            <h3 className="text-xl font-bold text-foreground mb-1">
+              {formData.full_name || "User Profile"}
+            </h3>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          
           <div className="grid sm:grid-cols-2 gap-8">
             <div className="space-y-2">
               <label htmlFor="fullName" className={theme.typography.label}>
@@ -123,7 +137,9 @@ export function ProfileSettings() {
                 )}
               </div>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-[15px] font-medium">@</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-[15px] font-medium">
+                  @
+                </span>
                 <Input
                   id="githubUsername"
                   value={formData.github_username}
@@ -136,7 +152,7 @@ export function ProfileSettings() {
               {formData.github_username && (
                 <div className="flex items-center justify-between mt-2">
                   <a
-                   href={`https://github.com/${formData.github_username}`}
+                    href={`https://github.com/${formData.github_username}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 text-[12px] font-medium text-accent hover:text-primary/90 transition-colors"
@@ -144,7 +160,9 @@ export function ProfileSettings() {
                     Verify Profile <ExternalLink className="w-3 h-3" />
                   </a>
                   {formData.is_github_connected && (
-                    <span className="text-[11px] text-muted-foreground font-medium">Auto-synced from connected account</span>
+                    <span className="text-[11px] text-muted-foreground font-medium">
+                      Auto-synced from connected account
+                    </span>
                   )}
                 </div>
               )}
@@ -193,7 +211,11 @@ export function ProfileSettings() {
                   disabled={fetchingLocation}
                   className="flex items-center gap-1.5 text-[12px] font-semibold text-accent hover:text-primary/90 transition-colors disabled:opacity-50"
                 >
-                  {fetchingLocation ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <LocateFixed className="w-3.5 h-3.5" />}
+                  {fetchingLocation ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <LocateFixed className="w-3.5 h-3.5" />
+                  )}
                   Auto Detect
                 </button>
               </div>

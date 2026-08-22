@@ -1,6 +1,6 @@
-use aws_sdk_s3::Client;
-use aws_sdk_s3::config::{Builder, Credentials, Region, BehaviorVersion};
+use aws_sdk_s3::config::{BehaviorVersion, Builder, Credentials, Region};
 use aws_sdk_s3::presigning::PresigningConfig;
+use aws_sdk_s3::Client;
 use std::env;
 use std::time::Duration;
 
@@ -31,13 +31,8 @@ impl StorageClient {
         let bucket = env::var("S3_BUCKET").unwrap_or_else(|_| "kodedock-media".to_string());
         let region = env::var("S3_REGION").unwrap_or_else(|_| "us-east-1".to_string());
 
-        let credentials = Credentials::new(
-            access_key,
-            secret_key,
-            None,
-            None,
-            "kodedock-seaweedfs",
-        );
+        let credentials =
+            Credentials::new(access_key, secret_key, None, None, "kodedock-seaweedfs");
 
         let config = Builder::new()
             .behavior_version(BehaviorVersion::latest())
@@ -49,10 +44,14 @@ impl StorageClient {
 
         let client = Client::from_conf(config);
 
-        let public_url_base = env::var("S3_PUBLIC_URL")
-            .expect("S3_PUBLIC_URL must be set");
+        let public_url_base = env::var("S3_PUBLIC_URL").expect("S3_PUBLIC_URL must be set");
 
-        Self { client, bucket, public_url_base, s3_endpoint: endpoint }
+        Self {
+            client,
+            bucket,
+            public_url_base,
+            s3_endpoint: endpoint,
+        }
     }
 
     pub async fn presign_put(
@@ -61,11 +60,11 @@ impl StorageClient {
         content_type: &str,
         expires_in_secs: u64,
     ) -> Result<String, String> {
-        let presign_config = PresigningConfig::expires_in(
-            Duration::from_secs(expires_in_secs),
-        ).map_err(|e| format!("Presign config error: {}", e))?;
+        let presign_config = PresigningConfig::expires_in(Duration::from_secs(expires_in_secs))
+            .map_err(|e| format!("Presign config error: {}", e))?;
 
-        let request = self.client
+        let request = self
+            .client
             .put_object()
             .bucket(&self.bucket)
             .key(key)

@@ -30,6 +30,9 @@ jobs:
         run: npm ci
 
       - name: Run ESLint
+      - name: Run Prettier check
+        working-directory: web
+        run: npm run format:check
         working-directory: web
         run: npm run lint
 
@@ -92,6 +95,10 @@ jobs:
         with:
           toolchain: stable
 
+      - name: Check Rust Formatting
+        working-directory: services/core-engine
+        run: cargo fmt --check
+
       - name: Check Rust code
         working-directory: services/core-engine
         run: cargo check
@@ -134,6 +141,16 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: "1.25.13"
+
+      - name: Check Go Formatting
+        working-directory: services/infra-worker
+        run: |
+          UNFORMATTED=$(gofmt -l .)
+          if [ -n "$UNFORMATTED" ]; then
+            echo "The following Go files are not formatted:"
+            echo "$UNFORMATTED"
+            exit 1
+          fi
 
       - name: Build Go code
         working-directory: services/infra-worker
@@ -273,3 +290,16 @@ jobs:
         with:
           path: ./
           extra_args: --debug --only-verified
+
+  docker-build-test:
+    name: docker-build-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build Web Image
+        run: docker compose build web
+      - name: Build Core Engine Image
+        run: docker compose build core-engine
+      - name: Build Infra Worker Image
+        run: docker compose build infra-worker

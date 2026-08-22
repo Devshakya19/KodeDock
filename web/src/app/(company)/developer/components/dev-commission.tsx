@@ -4,7 +4,6 @@ import { FadeIn } from "@/shared/components/layout/fade-in";
 import { Check, X } from "lucide-react";
 import { Badge } from "@/shared/ui/badge";
 
-
 const COMPARISON = [
   { feature: "Commission Rate", kodedock: "2.5%", codecanyon: "50%", gumroad: "10%" },
   { feature: "GitHub Repo Delivery", kodedock: true, codecanyon: false, gumroad: false },
@@ -20,7 +19,10 @@ export function DevCommission() {
       <div className="max-w-4xl mx-auto">
         <FadeIn>
           <div className="text-center mb-12">
-            <Badge variant="secondary" className="mb-4 px-4 py-1.5 text-xs font-semibold tracking-wide uppercase bg-secondary border border-border text-foreground">
+            <Badge
+              variant="secondary"
+              className="mb-4 px-4 py-1.5 text-xs font-semibold tracking-wide uppercase bg-secondary border border-border text-foreground"
+            >
               Pricing
             </Badge>
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
@@ -43,22 +45,43 @@ export function DevCommission() {
               </thead>
               <tbody>
                 {COMPARISON.map((row, i) => (
-                  <tr key={row.feature} className={i < COMPARISON.length - 1 ? "border-b border-border" : ""}>
+                  <tr
+                    key={row.feature}
+                    className={i < COMPARISON.length - 1 ? "border-b border-border" : ""}
+                  >
                     <td className="p-4 text-foreground font-medium">{row.feature}</td>
                     <td className="p-4 text-center font-semibold text-foreground">
                       {typeof row.kodedock === "boolean" ? (
-                        row.kodedock ? <Check className="w-5 h-5 text-success mx-auto" /> : <X className="w-5 h-5 text-red-400 mx-auto" />
-                      ) : row.kodedock}
+                        row.kodedock ? (
+                          <Check className="w-5 h-5 text-success mx-auto" />
+                        ) : (
+                          <X className="w-5 h-5 text-red-400 mx-auto" />
+                        )
+                      ) : (
+                        row.kodedock
+                      )}
                     </td>
                     <td className="p-4 text-center text-muted-foreground">
                       {typeof row.codecanyon === "boolean" ? (
-                        row.codecanyon ? <Check className="w-5 h-5 text-success mx-auto" /> : <X className="w-5 h-5 text-red-400 mx-auto" />
-                      ) : row.codecanyon}
+                        row.codecanyon ? (
+                          <Check className="w-5 h-5 text-success mx-auto" />
+                        ) : (
+                          <X className="w-5 h-5 text-red-400 mx-auto" />
+                        )
+                      ) : (
+                        row.codecanyon
+                      )}
                     </td>
                     <td className="p-4 text-center text-muted-foreground">
                       {typeof row.gumroad === "boolean" ? (
-                        row.gumroad ? <Check className="w-5 h-5 text-success mx-auto" /> : <X className="w-5 h-5 text-red-400 mx-auto" />
-                      ) : row.gumroad}
+                        row.gumroad ? (
+                          <Check className="w-5 h-5 text-success mx-auto" />
+                        ) : (
+                          <X className="w-5 h-5 text-red-400 mx-auto" />
+                        )
+                      ) : (
+                        row.gumroad
+                      )}
                     </td>
                   </tr>
                 ))}

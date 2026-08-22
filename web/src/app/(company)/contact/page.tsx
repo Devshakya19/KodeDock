@@ -5,24 +5,31 @@ import { Mail, MapPin, Phone } from "lucide-react";
 
 export default function ContactPage() {
   return (
-    <StaticPageLayout
-      title="Contact Us"
-      description="Get in touch with the KodeDock team."
-    >
+    <StaticPageLayout title="Contact Us" description="Get in touch with the KodeDock team.">
       <div className="space-y-8">
         <section>
           <h2 className="text-2xl font-semibold text-foreground mb-4">Get in Touch</h2>
           <p className="text-muted-foreground leading-relaxed">
-            Have a question, suggestion, or want to partner with us? We&apos;d love to hear from you.
-            Reach out through any of the channels below.
+            Have a question, suggestion, or want to partner with us? We&apos;d love to hear from
+            you. Reach out through any of the channels below.
           </p>
         </section>
 
         <section>
           <div className="grid sm:grid-cols-3 gap-6">
             {[
-              { icon: Mail, title: "Email", value: "hello@kodedock.com", desc: "For general inquiries" },
-              { icon: Mail, title: "Support", value: "support@kodedock.com", desc: "For technical support" },
+              {
+                icon: Mail,
+                title: "Email",
+                value: "hello@kodedock.com",
+                desc: "For general inquiries",
+              },
+              {
+                icon: Mail,
+                title: "Support",
+                value: "support@kodedock.com",
+                desc: "For technical support",
+              },
               { icon: MapPin, title: "Location", value: "India", desc: "Remote-first company" },
             ].map((contact) => (
               <Card key={contact.title} className="border-border">
@@ -52,7 +59,9 @@ export default function ContactPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-1.5">Email</label>
+                    <label className="block text-sm font-medium text-foreground mb-1.5">
+                      Email
+                    </label>
                     <input
                       type="email"
                       placeholder="your@email.com"
@@ -61,7 +70,9 @@ export default function ContactPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1.5">Message</label>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">
+                    Message
+                  </label>
                   <textarea
                     rows={4}
                     placeholder="How can we help you?"

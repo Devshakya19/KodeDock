@@ -34,12 +34,19 @@ export function LandingNavbar() {
     >
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-8">
-          <Link href="/" className="font-marketing font-bold text-xl tracking-tight flex items-center gap-2">
+          <Link
+            href="/"
+            className="font-marketing font-bold text-xl tracking-tight flex items-center gap-2"
+          >
             Kode<span className="text-primary">Dock</span>
           </Link>
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
             {navLinks.map((link) => (
-              <Link key={link.label} href={link.href} className="hover:text-foreground transition-colors">
+              <Link
+                key={link.label}
+                href={link.href}
+                className="hover:text-foreground transition-colors"
+              >
                 {link.label}
               </Link>
             ))}
@@ -48,7 +55,10 @@ export function LandingNavbar() {
 
         <div className="flex items-center gap-4">
           <div className="hidden md:flex items-center gap-4">
-            <Link href="/login" className="text-sm font-medium hover:text-foreground transition-colors">
+            <Link
+              href="/login"
+              className="text-sm font-medium hover:text-foreground transition-colors"
+            >
               Log in
             </Link>
             <Button asChild variant="outline" className="hidden lg:flex">

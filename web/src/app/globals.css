@@ -14,7 +14,7 @@
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
-  
+
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
 
@@ -79,30 +79,30 @@
 @layer base {
   :root {
     /* --- 60% White --- */
-    --background: 0 0% 100%;       /* #FFFFFF */
-    --card: 0 0% 100%;             /* #FFFFFF */
-    --popover: 0 0% 100%;          /* #FFFFFF */
+    --background: 0 0% 100%; /* #FFFFFF */
+    --card: 0 0% 100%; /* #FFFFFF */
+    --popover: 0 0% 100%; /* #FFFFFF */
 
     /* --- 30% Neutrals & Surfaces --- */
-    --secondary: 240 10% 96%;      /* #F1F1F3 */
-    --muted: 240 14% 97%;          /* #F8F8FA */
-    --border: 240 6% 90%;          /* #E5E5E7 */
-    --input: 240 6% 90%;           /* #E5E5E7 */
+    --secondary: 240 10% 96%; /* #F1F1F3 */
+    --muted: 240 14% 97%; /* #F8F8FA */
+    --border: 240 6% 90%; /* #E5E5E7 */
+    --input: 240 6% 90%; /* #E5E5E7 */
 
     /* --- Typography (Not directly in 60-30-10 calculation) --- */
-    --foreground: 0 0% 4%;         /* #0A0A0A */
+    --foreground: 0 0% 4%; /* #0A0A0A */
     --card-foreground: 0 0% 4%;
     --popover-foreground: 0 0% 4%;
     --secondary-foreground: 0 0% 4%;
     --muted-foreground: 240 5% 65%; /* #A1A1AA */
 
     /* --- 10% Electric Purple --- */
-    --primary: 262 81% 58%;        /* #7C3AED */
+    --primary: 262 81% 58%; /* #7C3AED */
     --primary-foreground: 0 0% 100%;
-    --accent: 262 81% 58%;         /* #7C3AED */
+    --accent: 262 81% 58%; /* #7C3AED */
     --accent-foreground: 0 0% 100%;
-    --ring: 262 81% 58%;           /* #7C3AED */
-    
+    --ring: 262 81% 58%; /* #7C3AED */
+
     /* Semantic Actions */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
@@ -116,30 +116,30 @@
 
   .dark {
     /* --- 60% Black --- */
-    --background: 0 0% 4%;         /* #0A0A0A */
+    --background: 0 0% 4%; /* #0A0A0A */
 
     /* --- 30% Dark Surfaces --- */
-    --card: 240 6% 10%;            /* #18181B */
-    --popover: 240 6% 10%;         /* #18181B */
-    --secondary: 240 4% 16%;       /* #27272A */
-    --muted: 240 4% 16%;           /* #27272A */
-    --border: 240 5% 26%;          /* #3F3F46 */
-    --input: 240 5% 26%;           /* #3F3F46 */
+    --card: 240 6% 10%; /* #18181B */
+    --popover: 240 6% 10%; /* #18181B */
+    --secondary: 240 4% 16%; /* #27272A */
+    --muted: 240 4% 16%; /* #27272A */
+    --border: 240 5% 26%; /* #3F3F46 */
+    --input: 240 5% 26%; /* #3F3F46 */
 
     /* --- Typography (Not directly in 60-30-10 calculation) --- */
-    --foreground: 0 0% 98%;        /* #FAFAFA */
+    --foreground: 0 0% 98%; /* #FAFAFA */
     --card-foreground: 0 0% 98%;
     --popover-foreground: 0 0% 98%;
     --secondary-foreground: 0 0% 98%;
     --muted-foreground: 240 5% 65%; /* #A1A1AA */
 
     /* --- 10% Electric Purple --- */
-    --primary: 262 81% 58%;        /* #7C3AED */
+    --primary: 262 81% 58%; /* #7C3AED */
     --primary-foreground: 0 0% 100%;
-    --accent: 262 81% 58%;         /* #7C3AED */
+    --accent: 262 81% 58%; /* #7C3AED */
     --accent-foreground: 0 0% 100%;
-    --ring: 262 81% 58%;           /* #7C3AED */
-    
+    --ring: 262 81% 58%; /* #7C3AED */
+
     /* Semantic Actions */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;

@@ -12,10 +12,10 @@ export function Navbar(props: NavbarProps) {
   if (!props.variant || props.variant === "landing") {
     return <LandingNavbar />;
   }
-  
+
   return (
-    <AppNavbar 
-      variant={props.variant} 
+    <AppNavbar
+      variant={props.variant}
       email={props.email}
       fullName={props.fullName}
       searchQuery={props.searchQuery}

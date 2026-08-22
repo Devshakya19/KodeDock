@@ -19,9 +19,12 @@ interface Props {
 
 function getIcon(type: string) {
   switch (type) {
-    case "order": return ShoppingCart;
-    case "product": return Package;
-    default: return Bell;
+    case "order":
+      return ShoppingCart;
+    case "product":
+      return Package;
+    default:
+      return Bell;
   }
 }
 
@@ -39,45 +42,50 @@ export function NotificationPopup({ onClose }: Props) {
   }, []);
 
   return (
-    <PopupWrapper 
-      title="Notifications" 
-      icon={Bell} 
-      onClose={onClose}
-    >
-
-        {loading ? (
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="w-5 h-5 text-muted-foreground animate-spin" />
-          </div>
-        ) : notifications.length === 0 ? (
-          <div className="py-10 text-center">
-            <Bell className="w-8 h-8 text-muted-foreground/80 mx-auto mb-2" />
-            <p className="text-sm text-muted-foreground">No notifications</p>
-          </div>
-        ) : (
-          <div className="max-h-80 overflow-y-auto">
-            {notifications.slice(0, 8).map((n) => {
-              const Icon = getIcon(n.type);
-              return (
-                <div key={n.id} className={`px-4 py-3 border-b border-border/40 last:border-0 ${!n.is_read ? "bg-primary/5" : ""}`}>
-                  <div className="flex items-start gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Icon className="w-3.5 h-3.5 text-muted-foreground" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-foreground">{n.title}</p>
-                      {n.message && <p className="text-xs text-muted-foreground mt-0.5 truncate">{n.message}</p>}
-                      <p className="text-[11px] text-muted-foreground mt-1">
-                        {new Date(n.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
-                      </p>
-                    </div>
-                    {!n.is_read && <div className="w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0 mt-2" />}
+    <PopupWrapper title="Notifications" icon={Bell} onClose={onClose}>
+      {loading ? (
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="w-5 h-5 text-muted-foreground animate-spin" />
+        </div>
+      ) : notifications.length === 0 ? (
+        <div className="py-10 text-center">
+          <Bell className="w-8 h-8 text-muted-foreground/80 mx-auto mb-2" />
+          <p className="text-sm text-muted-foreground">No notifications</p>
+        </div>
+      ) : (
+        <div className="max-h-80 overflow-y-auto">
+          {notifications.slice(0, 8).map((n) => {
+            const Icon = getIcon(n.type);
+            return (
+              <div
+                key={n.id}
+                className={`px-4 py-3 border-b border-border/40 last:border-0 ${!n.is_read ? "bg-primary/5" : ""}`}
+              >
+                <div className="flex items-start gap-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Icon className="w-3.5 h-3.5 text-muted-foreground" />
                   </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-foreground">{n.title}</p>
+                    {n.message && (
+                      <p className="text-xs text-muted-foreground mt-0.5 truncate">{n.message}</p>
+                    )}
+                    <p className="text-[11px] text-muted-foreground mt-1">
+                      {new Date(n.created_at).toLocaleDateString("en-IN", {
+                        day: "numeric",
+                        month: "short",
+                      })}
+                    </p>
+                  </div>
+                  {!n.is_read && (
+                    <div className="w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0 mt-2" />
+                  )}
                 </div>
-              );
-            })}
-          </div>
-        )}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </PopupWrapper>
   );
 }

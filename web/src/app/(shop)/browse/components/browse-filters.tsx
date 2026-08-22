@@ -33,7 +33,6 @@ export function BrowseFilters({ activeCategory }: BrowseFiltersProps) {
 
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 bg-background p-2 rounded-[20px] border border-border/80 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.03)]">
-      
       {/* Categories Scrollable Bar */}
       <div className="flex items-center gap-1.5 overflow-x-auto w-full scrollbar-none px-2 py-1">
         <div className="flex items-center gap-2 pr-4 border-r border-border mr-2 shrink-0">
@@ -42,7 +41,7 @@ export function BrowseFilters({ activeCategory }: BrowseFiltersProps) {
           </div>
           <span className="text-[13px] font-bold text-foreground">Filters</span>
         </div>
-        
+
         {CATEGORIES.map((cat) => {
           const isActive = activeCategory === cat.value;
           return (
@@ -68,7 +67,6 @@ export function BrowseFilters({ activeCategory }: BrowseFiltersProps) {
           Sort by: Popular
         </button>
       </div>
-
     </div>
   );
 }

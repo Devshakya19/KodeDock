@@ -16,9 +16,9 @@ export default function AboutPage() {
             the experience our community deserves.
           </p>
           <p className="text-muted-foreground leading-relaxed mt-4">
-            We built KodeDock to change that. A marketplace where developers can monetize their
-            code with just 2.5% commission, where buyers get production-ready code delivered
-            directly to their GitHub accounts, and where the Indian developer community can thrive.
+            We built KodeDock to change that. A marketplace where developers can monetize their code
+            with just 2.5% commission, where buyers get production-ready code delivered directly to
+            their GitHub accounts, and where the Indian developer community can thrive.
           </p>
         </section>
 
@@ -35,11 +35,23 @@ export default function AboutPage() {
           <h2 className="text-2xl font-semibold text-foreground mb-4">Our Values</h2>
           <div className="grid sm:grid-cols-2 gap-4 mt-4">
             {[
-              { title: "Fair Commerce", desc: "2.5% commission ensures creators keep what they earn" },
-              { title: "Developer First", desc: "Built by developers, for developers — GitHub integration, not .zip files" },
-              { title: "Quality First", desc: "Curated listings, verified sellers, quality assurance" },
+              {
+                title: "Fair Commerce",
+                desc: "2.5% commission ensures creators keep what they earn",
+              },
+              {
+                title: "Developer First",
+                desc: "Built by developers, for developers — GitHub integration, not .zip files",
+              },
+              {
+                title: "Quality First",
+                desc: "Curated listings, verified sellers, quality assurance",
+              },
               { title: "Community Driven", desc: "Built-in forums, reviews, seller profiles" },
-              { title: "Affordable Access", desc: "Making production-grade code accessible to students" },
+              {
+                title: "Affordable Access",
+                desc: "Making production-grade code accessible to students",
+              },
               { title: "Transparency", desc: "Clear pricing, instant payouts, no hidden fees" },
             ].map((value) => (
               <div key={value.title} className="p-4 rounded-lg border border-border">
@@ -55,10 +67,10 @@ export default function AboutPage() {
           <p className="text-muted-foreground leading-relaxed">
             The Indian developer ecosystem has over <strong>8 million developers</strong> and
             <strong>500,000+ CS students</strong> graduating annually. These creators build
-            thousands of projects, templates, and tools every year but have no affordable,
-            localized platform to monetize them. KodeDock fills this gap with a 2.5% commission
-            rate (lowest in the market), automatic GitHub repo delivery, and a focus on
-            affordability for both buyers and sellers.
+            thousands of projects, templates, and tools every year but have no affordable, localized
+            platform to monetize them. KodeDock fills this gap with a 2.5% commission rate (lowest
+            in the market), automatic GitHub repo delivery, and a focus on affordability for both
+            buyers and sellers.
           </p>
         </section>
       </div>

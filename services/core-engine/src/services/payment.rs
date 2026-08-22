@@ -84,7 +84,10 @@ pub async fn create_razorpay_order(
         .map_err(|e| Error::Network(e.to_string()))?;
 
     let status = resp.status();
-    let body = resp.text().await.map_err(|e| Error::Network(e.to_string()))?;
+    let body = resp
+        .text()
+        .await
+        .map_err(|e| Error::Network(e.to_string()))?;
 
     if !status.is_success() {
         log::error!(
@@ -124,8 +127,7 @@ pub fn verify_payment_signature(
     // `verify_slice` performs a constant-time comparison to resist timing
     // attacks. Razorpay sends the signature as a hex-encoded string, so we
     // must decode it to raw bytes before comparison.
-    let sig_bytes = hex::decode(razorpay_signature)
-        .map_err(|_| Error::InvalidSignature)?;
+    let sig_bytes = hex::decode(razorpay_signature).map_err(|_| Error::InvalidSignature)?;
     mac.verify_slice(&sig_bytes)
         .map_err(|_| Error::InvalidSignature)
 }
@@ -145,8 +147,7 @@ pub fn verify_webhook_signature(raw_body: &[u8], signature_header: &str) -> Resu
     let mut mac = Hmac::<Sha256>::new_from_slice(webhook_secret.as_bytes())
         .map_err(|_| Error::InvalidSignature)?;
     mac.update(raw_body);
-    let sig_bytes = hex::decode(signature_header)
-        .map_err(|_| Error::InvalidSignature)?;
+    let sig_bytes = hex::decode(signature_header).map_err(|_| Error::InvalidSignature)?;
     mac.verify_slice(&sig_bytes)
         .map_err(|_| Error::InvalidSignature)
 }
@@ -154,5 +155,7 @@ pub fn verify_webhook_signature(raw_body: &[u8], signature_header: &str) -> Resu
 /// Public client key id (used to initialize Razorpay Checkout.js). This is
 /// safe to expose to the browser — it only identifies the account.
 pub fn public_key_id() -> Option<String> {
-    std::env::var("RAZORPAY_KEY_ID").ok().filter(|s| !s.is_empty())
+    std::env::var("RAZORPAY_KEY_ID")
+        .ok()
+        .filter(|s| !s.is_empty())
 }

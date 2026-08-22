@@ -28,7 +28,10 @@ export default function PressPage() {
               { label: "Target Market", value: "Indian developers, students, designers" },
               { label: "Key Feature", value: "GitHub repo delivery (no .zip files)" },
             ].map((fact) => (
-              <div key={fact.label} className="flex items-center justify-between p-3 rounded-lg border border-border">
+              <div
+                key={fact.label}
+                className="flex items-center justify-between p-3 rounded-lg border border-border"
+              >
                 <span className="text-sm font-medium text-foreground">{fact.label}</span>
                 <span className="text-sm font-semibold text-foreground">{fact.value}</span>
               </div>
@@ -39,7 +42,8 @@ export default function PressPage() {
         <section>
           <h2 className="text-2xl font-semibold text-foreground mb-4">Brand Assets</h2>
           <p className="text-muted-foreground leading-relaxed mb-4">
-            Download official KodeDock brand assets for use in articles, presentations, and media coverage.
+            Download official KodeDock brand assets for use in articles, presentations, and media
+            coverage.
           </p>
           <Card className="border-border">
             <CardContent className="p-6">
@@ -50,7 +54,10 @@ export default function PressPage() {
                   { name: "Social Media Banner", size: "200 KB" },
                   { name: "Brand Guidelines PDF", size: "1.2 MB" },
                 ].map((asset) => (
-                  <div key={asset.name} className="flex items-center justify-between p-3 rounded-lg border border-border">
+                  <div
+                    key={asset.name}
+                    className="flex items-center justify-between p-3 rounded-lg border border-border"
+                  >
                     <span className="text-sm font-medium text-foreground">{asset.name}</span>
                     <span className="text-xs text-muted-foreground">{asset.size}</span>
                   </div>

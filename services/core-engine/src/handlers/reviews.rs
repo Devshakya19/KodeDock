@@ -1,8 +1,8 @@
+use crate::middleware::extract_user_id;
+use crate::models::{CreateReviewRequest, Review};
+use crate::services::ApiResponse;
 use actix_web::{web, HttpRequest, HttpResponse};
 use sqlx::PgPool;
-use crate::models::{Review, CreateReviewRequest};
-use crate::services::ApiResponse;
-use crate::middleware::extract_user_id;
 
 /// Review with joined user profile data
 #[derive(Debug, serde::Serialize, serde::Deserialize, sqlx::FromRow)]
@@ -22,13 +22,12 @@ pub struct ReviewWithUser {
     pub user_avatar: Option<String>,
 }
 
-pub async fn list_reviews(
-    pool: web::Data<PgPool>,
-    path: web::Path<String>,
-) -> HttpResponse {
+pub async fn list_reviews(pool: web::Data<PgPool>, path: web::Path<String>) -> HttpResponse {
     let product_id = match uuid::Uuid::parse_str(&path.into_inner()) {
         Ok(uuid) => uuid,
-        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid product ID")),
+        Err(_) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid product ID"))
+        }
     };
 
     match sqlx::query_as::<_, ReviewWithUser>(
@@ -39,7 +38,7 @@ pub async fn list_reviews(
            LEFT JOIN profiles p ON r.user_id = p.id
            WHERE r.product_id = $1
            ORDER BY r.created_at DESC
-           LIMIT 50"#
+           LIMIT 50"#,
     )
     .bind(product_id)
     .fetch_all(pool.get_ref())
@@ -48,28 +47,36 @@ pub async fn list_reviews(
         Ok(reviews) => HttpResponse::Ok().json(ApiResponse::success(reviews, "Reviews fetched")),
         Err(e) => {
             log::error!("Failed to fetch reviews: {}", e);
-            HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Failed to fetch reviews"))
+            HttpResponse::InternalServerError()
+                .json(ApiResponse::<()>::error("Failed to fetch reviews"))
         }
     }
 }
 
 /// Notify seller when a review is posted
-async fn notify_seller_on_review(pool: &PgPool, product_id: uuid::Uuid, buyer_id: uuid::Uuid, rating: i32) {
+async fn notify_seller_on_review(
+    pool: &PgPool,
+    product_id: uuid::Uuid,
+    buyer_id: uuid::Uuid,
+    rating: i32,
+) {
     // Get seller_id and product title
     let product_info = sqlx::query_as::<_, (uuid::Uuid, String)>(
-        "SELECT seller_id, title FROM products WHERE id = $1"
+        "SELECT seller_id, title FROM products WHERE id = $1",
     )
     .bind(product_id)
     .fetch_optional(pool)
     .await;
 
     if let Ok(Some((seller_id, title))) = product_info {
-        let message = format!("{} left a {}-star review on \"{}\"", 
-            "A buyer", rating, title);
-        
+        let message = format!(
+            "{} left a {}-star review on \"{}\"",
+            "A buyer", rating, title
+        );
+
         let _ = sqlx::query(
             r#"INSERT INTO notifications (user_id, type, title, message, data)
-               VALUES ($1, 'review', 'New Review', $2, $3)"#
+               VALUES ($1, 'review', 'New Review', $2, $3)"#,
         )
         .bind(seller_id)
         .bind(&message)
@@ -90,22 +97,27 @@ pub async fn create_review(
 ) -> HttpResponse {
     let user_id = match extract_user_id(&req) {
         Ok(id) => id,
-        Err(_) => return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized")),
+        Err(_) => {
+            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized"))
+        }
     };
 
     let user_uuid = match uuid::Uuid::parse_str(&user_id) {
         Ok(uuid) => uuid,
-        Err(_) => return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID")),
+        Err(_) => {
+            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID"))
+        }
     };
 
     // Validate rating range
     if body.rating < 1 || body.rating > 5 {
-        return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Rating must be between 1 and 5"));
+        return HttpResponse::BadRequest()
+            .json(ApiResponse::<()>::error("Rating must be between 1 and 5"));
     }
 
     // Check for duplicate review (same user + same order)
     let existing = sqlx::query_scalar::<_, uuid::Uuid>(
-        "SELECT id FROM reviews WHERE order_id = $1 AND user_id = $2"
+        "SELECT id FROM reviews WHERE order_id = $1 AND user_id = $2",
     )
     .bind(body.order_id)
     .bind(user_uuid)
@@ -114,12 +126,15 @@ pub async fn create_review(
 
     match existing {
         Ok(Some(_)) => {
-            return HttpResponse::Conflict().json(ApiResponse::<()>::error("You have already reviewed this product"));
+            return HttpResponse::Conflict().json(ApiResponse::<()>::error(
+                "You have already reviewed this product",
+            ));
         }
         Ok(None) => {}
         Err(e) => {
             log::error!("Failed to check existing review: {}", e);
-            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Database error"));
+            return HttpResponse::InternalServerError()
+                .json(ApiResponse::<()>::error("Database error"));
         }
     }
 

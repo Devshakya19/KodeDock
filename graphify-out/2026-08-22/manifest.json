@@ -444,10 +444,10 @@
     "semantic_hash": "d8f9a09a4cedc2fc6b6c667fe2f77dee"
   },
   "web/package.json": {
-    "mtime": 1787403838.0410047,
-    "seen": 1787404528.7217789,
-    "ast_hash": "a93a352a5e014bf39cdc3f65c11be50a",
-    "semantic_hash": "a93a352a5e014bf39cdc3f65c11be50a"
+    "mtime": 1787420734.8005197,
+    "seen": 1787422032.808521,
+    "ast_hash": "5267476ecdc701a68ce98394e645d2a1",
+    "semantic_hash": ""
   },
   "web/postcss.config.mjs": {
     "mtime": 1787209327.2793498,
@@ -846,10 +846,10 @@
     "semantic_hash": "20931a6a60f01d1a2f78d08450b7e7b2"
   },
   "web/src/app/(user)/dashboard/purchases/page.tsx": {
-    "mtime": 1787384625.0182848,
-    "seen": 1787404528.7219079,
-    "ast_hash": "d84527e56705d8a42fba9575869f1687",
-    "semantic_hash": "d84527e56705d8a42fba9575869f1687"
+    "mtime": 1787419130.3870769,
+    "seen": 1787422032.808628,
+    "ast_hash": "62813a2b4987183ae93c9f8435a218aa",
+    "semantic_hash": ""
   },
   "web/src/app/(user)/dashboard/settings/appearance/page.tsx": {
     "mtime": 1787384625.0203354,
@@ -2064,8 +2064,8 @@
     "semantic_hash": ""
   },
   "duplicate.md": {
-    "mtime": 1787208282.0856028,
-    "seen": 1787418964.9973109,
+    "mtime": 1787421983.1409578,
+    "seen": 1787422032.8089364,
     "ast_hash": "25c198c3169d1c6332acc6be7a584b50",
     "semantic_hash": ""
   },
@@ -2277,6 +2277,12 @@
     "mtime": 1787304654.3384345,
     "seen": 1787418964.997385,
     "ast_hash": "e5241d6797a640f0b8b3857137ab503c",
+    "semantic_hash": ""
+  },
+  "web/src/app/api/orders/[id]/invoice/route.ts": {
+    "mtime": 1787421118.8830152,
+    "seen": 1787422032.8086607,
+    "ast_hash": "2b4e37a0710d1947da93c6df3eaa6988",
     "semantic_hash": ""
   }
 }
