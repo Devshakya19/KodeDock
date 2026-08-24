@@ -121,6 +121,23 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(storage.clone()))
             // Health check
             .route("/health", web::get().to(handlers::health::health_check))
+            // HQ (Admin Control Plane)
+            .route("/api/hq/health", web::get().to(handlers::hq::health_check))
+            .route("/api/hq/setup", web::post().to(handlers::hq::setup))
+            .route("/api/hq/login", web::post().to(handlers::hq::login))
+            .route("/api/hq/me", web::get().to(handlers::hq::me))
+            .route("/api/hq/stats", web::get().to(handlers::hq::stats))
+            .route("/api/hq/products", web::get().to(handlers::hq::get_products))
+            .route("/api/hq/products/{id}/status", web::put().to(handlers::hq::set_product_status))
+            .route("/api/hq/users", web::get().to(handlers::hq::get_users))
+            .route("/api/hq/users/{id}/status", web::put().to(handlers::hq::set_user_status))
+            .route("/api/hq/finance/stats", web::get().to(handlers::hq::finance_stats))
+            .route("/api/hq/finance/withdrawals", web::get().to(handlers::hq::get_withdrawals))
+            .route("/api/hq/safety/disputes", web::get().to(handlers::hq::get_disputes))
+            .route("/api/hq/safety/disputes/{id}", web::put().to(handlers::hq::set_dispute_status))
+            .route("/api/hq/settings", web::put().to(handlers::hq::set_settings))
+            .route("/api/hq/support/tickets", web::get().to(handlers::hq::get_support_tickets))
+            .route("/api/hq/support/tickets/{id}/status", web::put().to(handlers::hq::set_ticket_status))
             // Auth (rate-limited)
             .route(
                 "/api/auth/register",

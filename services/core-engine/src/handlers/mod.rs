@@ -9,3 +9,4 @@ pub mod reviews;
 pub mod seller;
 pub mod upload;
 pub mod wallet;
+pub mod hq;
