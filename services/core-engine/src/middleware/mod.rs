@@ -97,3 +97,72 @@ pub fn require_developer(req: &HttpRequest) -> Result<String, HttpResponse> {
         Err(_) => Err(HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized"))),
     }
 }
+
+/// Verified JWT claims for KodeDock HQ
+#[derive(Debug, Clone)]
+pub struct HqAuthClaims {
+    pub staff_id: String,
+    pub role_id: String,
+    pub is_hq: bool,
+}
+
+/// Require the authenticated user to be a valid KodeDock HQ Staff member.
+/// It strictly checks for `is_hq: true` in the token claims to prevent
+/// normal users from accessing HQ endpoints.
+pub fn require_hq_access(req: &HttpRequest) -> Result<HqAuthClaims, HttpResponse> {
+    let auth_header = req
+        .headers()
+        .get("Authorization")
+        .and_then(|v| v.to_str().ok())
+        .ok_or_else(|| HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Missing Authorization header")))?;
+
+    let token = auth_header
+        .strip_prefix("Bearer ")
+        .ok_or_else(|| HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid Authorization header format")))?;
+
+    if token.is_empty() {
+        return Err(HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Empty token")));
+    }
+
+    let mut validation = Validation::new(Algorithm::HS256);
+    validation.validate_aud = false;
+
+    let jwt_secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+
+    match decode::<serde_json::Value>(
+        token,
+        &DecodingKey::from_secret(jwt_secret.as_bytes()),
+        &validation,
+    ) {
+        Ok(token_data) => {
+            let claims = token_data.claims;
+            
+            // Explicit HQ validation
+            let is_hq = claims.get("is_hq").and_then(|v| v.as_bool()).unwrap_or(false);
+            if !is_hq {
+                log::warn!("SECURITY ALERT: Non-HQ token attempted to access an HQ endpoint!");
+                return Err(HttpResponse::Forbidden().json(ApiResponse::<()>::error("Forbidden: This action requires an HQ Staff Token")));
+            }
+
+            let staff_id = claims
+                .get("sub")
+                .and_then(|v| v.as_str())
+                .ok_or_else(|| HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid token: missing sub")))?;
+            
+            let role_id = claims
+                .get("role_id")
+                .and_then(|v| v.as_str())
+                .ok_or_else(|| HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid token: missing role_id")))?;
+
+            Ok(HqAuthClaims {
+                staff_id: staff_id.to_string(),
+                role_id: role_id.to_string(),
+                is_hq,
+            })
+        }
+        Err(e) => {
+            log::error!("HQ JWT decode error: {}", e);
+            Err(HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid or expired HQ token")))
+        }
+    }
+}
