@@ -276,9 +276,9 @@
     "semantic_hash": "fed3ca56093ede7d681d90346cf02647"
   },
   "services/core-engine/src/handlers/mod.rs": {
-    "mtime": 1787510619.5565813,
-    "seen": 1787567718.4568198,
-    "ast_hash": "7ed82e56c41be25c908463d1e2e84150",
+    "mtime": 1787589335.3071854,
+    "seen": 1787589619.426437,
+    "ast_hash": "b41fc11e4c9fd392bee51391ab3b13c7",
     "semantic_hash": ""
   },
   "services/core-engine/src/handlers/notifications.rs": {
@@ -336,15 +336,15 @@
     "semantic_hash": ""
   },
   "services/core-engine/src/main.rs": {
-    "mtime": 1787587091.5451407,
-    "seen": 1787588477.7830162,
-    "ast_hash": "e05532822f2fccff9e8900f56b17bb14",
+    "mtime": 1787589335.381186,
+    "seen": 1787589619.426464,
+    "ast_hash": "b86301bed65c2afb2291832d92e42a42",
     "semantic_hash": ""
   },
   "services/core-engine/src/middleware/mod.rs": {
-    "mtime": 1787511563.1271658,
-    "seen": 1787567718.457591,
-    "ast_hash": "39544ecaf52663320a7a864e89634b8e",
+    "mtime": 1787589347.677299,
+    "seen": 1787589619.4264667,
+    "ast_hash": "4b4bf0ae1359e009a4224d43e0c3d4ce",
     "semantic_hash": ""
   },
   "services/core-engine/src/models/mod.rs": {
@@ -2394,21 +2394,21 @@
     "semantic_hash": ""
   },
   "services/core-engine/src/handlers/hq.rs": {
-    "mtime": 1787587091.5438585,
-    "seen": 1787588477.78242,
-    "ast_hash": "814b4668d3e8d409c79eb90afd938e7c",
+    "mtime": 1787589335.3041854,
+    "seen": 1787589619.426433,
+    "ast_hash": "f47494988bccfcc2468ffc7576663018",
     "semantic_hash": ""
   },
   "services/core-engine/src/models/hq.rs": {
-    "mtime": 1787584549.3529506,
-    "seen": 1787588477.7830834,
-    "ast_hash": "ef71543e761e923ca2cb5a3bcc1c65df",
+    "mtime": 1787589347.6777377,
+    "seen": 1787589619.4264696,
+    "ast_hash": "88fd44ec5c0d694f518a81687a9db30f",
     "semantic_hash": ""
   },
   "services/core-engine/src/services/hq.rs": {
-    "mtime": 1787587801.2249918,
-    "seen": 1787588477.7832115,
-    "ast_hash": "43b5331cfa9d92889249ef14153a373a",
+    "mtime": 1787589347.676579,
+    "seen": 1787589619.426477,
+    "ast_hash": "7127f26c1713d18cd5f374c269806ae3",
     "semantic_hash": ""
   },
   "kodedock-hq/README.md": {

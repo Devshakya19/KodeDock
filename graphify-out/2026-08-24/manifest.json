@@ -1327,8 +1327,8 @@
   },
   "sql/01-schema.sql": {
     "mtime": 1787586764.1542041,
-    "seen": 1787588803.1642957,
-    "ast_hash": "",
+    "seen": 1787588839.381994,
+    "ast_hash": "75496d5154e4df1b4aee786e9401f5c8",
     "semantic_hash": ""
   },
   ".agents/rules/graphify.md": {
@@ -2617,8 +2617,8 @@
   },
   "sql/03-platform-settings.sql": {
     "mtime": 1787583264.7521935,
-    "seen": 1787588803.1643045,
-    "ast_hash": "",
+    "seen": 1787588839.3820004,
+    "ast_hash": "9c0774ddabc6de0219a3c9fac3d82e88",
     "semantic_hash": ""
   }
 }
