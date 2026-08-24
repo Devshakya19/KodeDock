@@ -402,3 +402,4 @@ pub struct SellerReviewItem {
     pub comment: Option<String>,
     pub created_at: Option<chrono::DateTime<chrono::Utc>>,
 }
+pub mod hq;
