@@ -14,6 +14,7 @@ const ALLOWED_PREFIXES = [
   "upload/",
   "profile",
   "auth/",
+  "public/",
   "search",
 ];
 

@@ -49,6 +49,19 @@ export default function NewProductPage() {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("");
+
+  const [categoriesList, setCategoriesList] = useState<{id: string, name: string, slug: string}[]>([]);
+  useEffect(() => {
+    fetch('/api/proxy/public/categories')
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "success") {
+          setCategoriesList(data.data);
+        }
+      })
+      .catch(err => console.error("Failed to load categories", err));
+  }, []);
+
   const [githubUrl, setGithubUrl] = useState("");
   const [tags, setTags] = useState("");
   const [imageUrl, setImageUrl] = useState("");
@@ -279,9 +292,9 @@ export default function NewProductPage() {
                         <option value="" disabled>
                           Select category
                         </option>
-                        {CATEGORIES.map((cat) => (
-                          <option key={cat} value={cat}>
-                            {cat}
+                        {categoriesList.map((cat) => (
+                          <option key={cat.id} value={cat.id}>
+                            {cat.name}
                           </option>
                         ))}
                       </select>
