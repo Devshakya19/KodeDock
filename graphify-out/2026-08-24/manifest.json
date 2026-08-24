@@ -336,9 +336,9 @@
     "semantic_hash": ""
   },
   "services/core-engine/src/main.rs": {
-    "mtime": 1787566912.621571,
-    "seen": 1787567718.457589,
-    "ast_hash": "fdfeda9f2cb61bb260a1825b7233c9c7",
+    "mtime": 1787587091.5451407,
+    "seen": 1787588477.7830162,
+    "ast_hash": "e05532822f2fccff9e8900f56b17bb14",
     "semantic_hash": ""
   },
   "services/core-engine/src/middleware/mod.rs": {
@@ -448,24 +448,6 @@
     "seen": 1787404528.7217808,
     "ast_hash": "239f3ebf717465dc636818a1a619398d",
     "semantic_hash": "239f3ebf717465dc636818a1a619398d"
-  },
-  "web/scripts/fix-new-components-theme.js": {
-    "mtime": 1787282157.9338927,
-    "seen": 1787404528.7217824,
-    "ast_hash": "fe9390bfa0fd495eb14baeef9ea0368f",
-    "semantic_hash": "fe9390bfa0fd495eb14baeef9ea0368f"
-  },
-  "web/scripts/fix-seller-theme.js": {
-    "mtime": 1787282157.9348927,
-    "seen": 1787404528.7217846,
-    "ast_hash": "3b66d51f758eae355265b8a9bf36f6d8",
-    "semantic_hash": "3b66d51f758eae355265b8a9bf36f6d8"
-  },
-  "web/scripts/fix-ultimate-theme.js": {
-    "mtime": 1787282157.9348927,
-    "seen": 1787404528.721787,
-    "ast_hash": "798aa3bd5b12ebc5f7b916d8e2657de1",
-    "semantic_hash": "798aa3bd5b12ebc5f7b916d8e2657de1"
   },
   "web/src/app/(auth)/developer-register/page.tsx": {
     "mtime": 1787424144.9522727,
@@ -666,15 +648,15 @@
     "semantic_hash": ""
   },
   "web/src/app/(seller)/seller/products/[id]/edit/page.tsx": {
-    "mtime": 1787424146.1093657,
-    "seen": 1787424348.419595,
-    "ast_hash": "597bad13cdf7cbe58f45569a6db6df2b",
+    "mtime": 1787588168.5875585,
+    "seen": 1787588477.786114,
+    "ast_hash": "205813c7ecbbc00733261bfa086377ce",
     "semantic_hash": ""
   },
   "web/src/app/(seller)/seller/products/new/page.tsx": {
-    "mtime": 1787424146.215521,
-    "seen": 1787424348.4195974,
-    "ast_hash": "6abdfaeb6586fe246e1124677e3d4ba9",
+    "mtime": 1787588168.5890574,
+    "seen": 1787588477.786116,
+    "ast_hash": "43066ca97f0b59958d76fbb88ab839f8",
     "semantic_hash": ""
   },
   "web/src/app/(seller)/seller/products/page.tsx": {
@@ -744,9 +726,9 @@
     "semantic_hash": ""
   },
   "web/src/app/(shop)/browse/components/browse-filters.tsx": {
-    "mtime": 1787424146.559257,
-    "seen": 1787424348.4196298,
-    "ast_hash": "f6773d3c2b44a2692db67508f3a343b8",
+    "mtime": 1787588168.5928762,
+    "seen": 1787588477.786869,
+    "ast_hash": "896c463eabcd0465f4350618a550fb49",
     "semantic_hash": ""
   },
   "web/src/app/(shop)/browse/components/product-card.tsx": {
@@ -966,9 +948,9 @@
     "semantic_hash": "d4238437494819b7d9cede29f55a0d68"
   },
   "web/src/app/api/proxy/[...path]/route.ts": {
-    "mtime": 1787424147.7435524,
-    "seen": 1787424348.4197164,
-    "ast_hash": "75504da733fc9bd6a11718bca2f27e76",
+    "mtime": 1787588137.5859058,
+    "seen": 1787588477.7892723,
+    "ast_hash": "46023ec3a71b14be309c071f51c6357e",
     "semantic_hash": ""
   },
   "web/src/app/api/upload/file/route.ts": {
@@ -1002,9 +984,9 @@
     "semantic_hash": ""
   },
   "web/src/components/landing/categories.tsx": {
-    "mtime": 1787424147.9482439,
-    "seen": 1787424348.4197307,
-    "ast_hash": "fe7ccabb5a0191c1753dbd8c2fe5154a",
+    "mtime": 1787588168.6021585,
+    "seen": 1787588477.7895548,
+    "ast_hash": "7a83a9fd27bd365966a4e35d60d1bb47",
     "semantic_hash": ""
   },
   "web/src/components/landing/features.tsx": {
@@ -1344,9 +1326,9 @@
     "semantic_hash": "ee17fd1c97c735e9f3564e3f5251f125"
   },
   "sql/01-schema.sql": {
-    "mtime": 1787566854.8612804,
-    "seen": 1787567729.310265,
-    "ast_hash": "2c874469ee0ab4c45a3e783494fa457b",
+    "mtime": 1787586764.1542041,
+    "seen": 1787588803.1642957,
+    "ast_hash": "",
     "semantic_hash": ""
   },
   ".agents/rules/graphify.md": {
@@ -1944,9 +1926,9 @@
     "semantic_hash": ""
   },
   "CHANGE.md": {
-    "mtime": 1787567591.5831318,
-    "seen": 1787567718.4771013,
-    "ast_hash": "a43a18b9c32d8e05d03f195f8cc639b2",
+    "mtime": 1787588676.261431,
+    "seen": 1787588803.1649983,
+    "ast_hash": "c182829b4cdd893d2cd061e7bb336143",
     "semantic_hash": ""
   },
   "CODE_OF_CONDUCT.md": {
@@ -1980,9 +1962,9 @@
     "semantic_hash": ""
   },
   "docker-compose.yml": {
-    "mtime": 1787567355.5214722,
-    "seen": 1787567718.4773264,
-    "ast_hash": "bfef1cc990f7a8e63031917b696fc3f0",
+    "mtime": 1787585999.2624092,
+    "seen": 1787588477.7984645,
+    "ast_hash": "1d9808b4713c722acf971f3f4fbeb52a",
     "semantic_hash": ""
   },
   "docs/APP-FLOW.md": {
@@ -2055,12 +2037,6 @@
     "mtime": 1787282157.9175112,
     "seen": 1787418964.9973087,
     "ast_hash": "4c53e9207384858d523f3e5181d5dfca",
-    "semantic_hash": ""
-  },
-  "duplicate.md": {
-    "mtime": 1787421983.1409578,
-    "seen": 1787422032.8089364,
-    "ast_hash": "25c198c3169d1c6332acc6be7a584b50",
     "semantic_hash": ""
   },
   "services/ai-service/requirements.txt": {
@@ -2310,27 +2286,27 @@
     "semantic_hash": ""
   },
   "kodedock-hq/src/App.tsx": {
-    "mtime": 1787566956.8442,
-    "seen": 1787567718.4556925,
-    "ast_hash": "3772ebbc74239ca24a167c180b790757",
+    "mtime": 1787587485.0005052,
+    "seen": 1787588477.781448,
+    "ast_hash": "22e60642f8a6ac0a28148d9083fc096a",
     "semantic_hash": ""
   },
   "kodedock-hq/src/context/AuthContext.tsx": {
-    "mtime": 1787511839.5828228,
-    "seen": 1787567718.4556947,
+    "mtime": 1787587484.9999056,
+    "seen": 1787588477.7814512,
     "ast_hash": "7ed75a3b5859653ff89c870f116346e7",
     "semantic_hash": ""
   },
   "kodedock-hq/src/layouts/AuthLayout.tsx": {
-    "mtime": 1787512124.6130161,
-    "seen": 1787567718.4556966,
+    "mtime": 1787587484.9916813,
+    "seen": 1787588477.781454,
     "ast_hash": "292a56355d0a7afce9b6916c73fabb0c",
     "semantic_hash": ""
   },
   "kodedock-hq/src/layouts/HqLayout.tsx": {
-    "mtime": 1787548748.6827822,
-    "seen": 1787567718.4556994,
-    "ast_hash": "e5f84ef35eeffc00a999969982269275",
+    "mtime": 1787587484.9921174,
+    "seen": 1787588477.7814565,
+    "ast_hash": "7a3ff223329b383e60b89b04991e94f2",
     "semantic_hash": ""
   },
   "kodedock-hq/src/lib/utils.ts": {
@@ -2340,57 +2316,57 @@
     "semantic_hash": ""
   },
   "kodedock-hq/src/main.tsx": {
-    "mtime": 1787509121.2184615,
-    "seen": 1787567718.4557037,
+    "mtime": 1787587485.0002866,
+    "seen": 1787588477.7815228,
     "ast_hash": "787e5a07efeb2bf6209d5937195f2f68",
     "semantic_hash": ""
   },
   "kodedock-hq/src/pages/(auth)/Login.tsx": {
-    "mtime": 1787512151.0039506,
-    "seen": 1787567718.455706,
-    "ast_hash": "5f8f9d2841be626273bd0a62e71927f4",
+    "mtime": 1787587484.9930148,
+    "seen": 1787588477.7815247,
+    "ast_hash": "40ca005be5fc35525204878b0a76a2d1",
     "semantic_hash": ""
   },
   "kodedock-hq/src/pages/(auth)/Setup.tsx": {
-    "mtime": 1787548128.4202569,
-    "seen": 1787567718.4557087,
-    "ast_hash": "d240715d47d22ec039a0db05c83505d9",
+    "mtime": 1787587484.9936664,
+    "seen": 1787588477.7815268,
+    "ast_hash": "53159fcafc5ca2ed126d54767dda67f2",
     "semantic_hash": ""
   },
   "kodedock-hq/src/pages/(owner)/finance/Finance.tsx": {
-    "mtime": 1787566219.0188944,
-    "seen": 1787567718.455711,
-    "ast_hash": "8b1992c2f94ea40a9f973af8243a3ceb",
+    "mtime": 1787587484.99556,
+    "seen": 1787588477.781536,
+    "ast_hash": "3fa5de842f9b9262aad4ea5bf6d9bf50",
     "semantic_hash": ""
   },
   "kodedock-hq/src/pages/(owner)/marketplace/Marketplace.tsx": {
-    "mtime": 1787564662.1515017,
-    "seen": 1787567718.4557128,
-    "ast_hash": "19c7a16983f7441355bfc999dcfe72a1",
+    "mtime": 1787587484.9943962,
+    "seen": 1787588477.7815404,
+    "ast_hash": "3423d30294c3d8fa48c56aa1be7db1c1",
     "semantic_hash": ""
   },
   "kodedock-hq/src/pages/(owner)/safety/Safety.tsx": {
-    "mtime": 1787566467.8461852,
-    "seen": 1787567718.4557147,
-    "ast_hash": "855f6b2141b9dc8fbc5f5ca36ae086c8",
+    "mtime": 1787587484.9966388,
+    "seen": 1787588477.781544,
+    "ast_hash": "607246cb9610f36364cffb78f0c559b5",
     "semantic_hash": ""
   },
   "kodedock-hq/src/pages/(owner)/settings/Settings.tsx": {
-    "mtime": 1787567314.6608963,
-    "seen": 1787567718.4557166,
-    "ast_hash": "6ee50544f761d526d5766ab043bc744c",
+    "mtime": 1787587484.9970317,
+    "seen": 1787588477.7815459,
+    "ast_hash": "6e866c6b504a87430dde3c07c4892079",
     "semantic_hash": ""
   },
   "kodedock-hq/src/pages/(owner)/support/Support.tsx": {
-    "mtime": 1787566946.05072,
-    "seen": 1787567718.4557188,
-    "ast_hash": "30ebeade8b140be098d4501fbd762c91",
+    "mtime": 1787587484.9960985,
+    "seen": 1787588477.7815495,
+    "ast_hash": "9f351bdbfa6d4130a4534aeebb49adef",
     "semantic_hash": ""
   },
   "kodedock-hq/src/pages/(owner)/users/Users.tsx": {
-    "mtime": 1787565460.6134818,
-    "seen": 1787567718.4557216,
-    "ast_hash": "ef1c31fc0e57d612071c4576b696c266",
+    "mtime": 1787587484.9948502,
+    "seen": 1787588477.7815511,
+    "ast_hash": "1f4e88f3763217dcc3271550a8697e1a",
     "semantic_hash": ""
   },
   "kodedock-hq/tsconfig.app.json": {
@@ -2412,27 +2388,27 @@
     "semantic_hash": ""
   },
   "kodedock-hq/vite.config.ts": {
-    "mtime": 1787509801.030325,
-    "seen": 1787567718.4557316,
-    "ast_hash": "5c8e49ef37d67ef5aadea1520984feef",
+    "mtime": 1787587879.7636223,
+    "seen": 1787588477.7816968,
+    "ast_hash": "db458bf8fe3fcc1962e9eb5e9353adaf",
     "semantic_hash": ""
   },
   "services/core-engine/src/handlers/hq.rs": {
-    "mtime": 1787566904.2461097,
-    "seen": 1787567718.456816,
-    "ast_hash": "cf56b1339a3febbf8010dcbc79c5d2f4",
+    "mtime": 1787587091.5438585,
+    "seen": 1787588477.78242,
+    "ast_hash": "814b4668d3e8d409c79eb90afd938e7c",
     "semantic_hash": ""
   },
   "services/core-engine/src/models/hq.rs": {
-    "mtime": 1787566875.8982537,
-    "seen": 1787567718.457594,
-    "ast_hash": "7f4dd359aff8ae105d77563177665e39",
+    "mtime": 1787584549.3529506,
+    "seen": 1787588477.7830834,
+    "ast_hash": "ef71543e761e923ca2cb5a3bcc1c65df",
     "semantic_hash": ""
   },
   "services/core-engine/src/services/hq.rs": {
-    "mtime": 1787566895.815691,
-    "seen": 1787567718.457696,
-    "ast_hash": "48fce61c1bf4b57e0482d1ab55f94a3b",
+    "mtime": 1787587801.2249918,
+    "seen": 1787588477.7832115,
+    "ast_hash": "43b5331cfa9d92889249ef14153a373a",
     "semantic_hash": ""
   },
   "kodedock-hq/README.md": {
@@ -2605,8 +2581,44 @@
   },
   "sql/02-hq-schema.sql": {
     "mtime": 1787510559.066263,
-    "seen": 1787567729.310269,
+    "seen": 1787588803.1643,
     "ast_hash": "b07ebaef46cccf6e3fbd2fedcccf5bb2",
+    "semantic_hash": ""
+  },
+  "kodedock-hq/src/pages/(owner)/audit/AuditLogs.tsx": {
+    "mtime": 1787587484.9988668,
+    "seen": 1787588477.7815306,
+    "ast_hash": "fd1c193a14009c2fbd1d2bf62d70e1b9",
+    "semantic_hash": ""
+  },
+  "kodedock-hq/src/pages/(owner)/catalog/Catalog.tsx": {
+    "mtime": 1787587484.9992344,
+    "seen": 1787588477.7815332,
+    "ast_hash": "bc26d9efb2391e8012c44477a056fd6c",
+    "semantic_hash": ""
+  },
+  "kodedock-hq/src/pages/(owner)/integrations/Integrations.tsx": {
+    "mtime": 1787587484.9978087,
+    "seen": 1787588477.7815378,
+    "ast_hash": "307b8cbb69d494469c09f6d112b75ba1",
+    "semantic_hash": ""
+  },
+  "kodedock-hq/src/pages/(owner)/platform/PlatformSettings.tsx": {
+    "mtime": 1787587484.9974136,
+    "seen": 1787588477.7815423,
+    "ast_hash": "6085a1923f74277a865a7c5fd6d46767",
+    "semantic_hash": ""
+  },
+  "kodedock-hq/src/pages/(owner)/staff/StaffManagement.tsx": {
+    "mtime": 1787587484.9982264,
+    "seen": 1787588477.7815475,
+    "ast_hash": "31358043b4f519908dcc486ed91736b0",
+    "semantic_hash": ""
+  },
+  "sql/03-platform-settings.sql": {
+    "mtime": 1787583264.7521935,
+    "seen": 1787588803.1643045,
+    "ast_hash": "",
     "semantic_hash": ""
   }
 }
