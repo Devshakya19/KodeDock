@@ -2,6 +2,30 @@
 
 All notable changes to the KodeDock backend project will be documented in this file.
 
+## [v1.3.0] - 2026-08-24 (Owner Controls & Integration Sync)
+
+### 👑 Owner Dashboard (HQ) Features
+- **Dynamic Categories (Catalog):** Created a live, fully functional `Catalog` UI for the Owner to add and delete taxonomy/categories.
+- **Backend API for Categories:** Added `DELETE /api/hq/catalog/categories/:id` in `core-engine` with strict role-based access to allow the owner to safely wipe out categories.
+- **Integration 2-Way Sync:** Built a specialized `.env` synchronization system. Platform integration keys modified from the HQ dashboard now write directly to the `.env` file via `core-engine` (binding `/app/.env` volume), ensuring environment secrets are always aligned without requiring redeployments.
+- **HQ UI Refinements:**
+  - Added an Eye/EyeOff password toggle in the `Integrations` settings.
+  - Eliminated hardcoded `http://localhost:4001` occurrences, switching entirely to dynamically resolved `import.meta.env.VITE_API_URL` to support production builds.
+  - Fixed Vite plugin failures by transitioning away from `date-fns` to native `Date.toLocaleString()`.
+
+### 🌐 Next.js Public Web Application Updates
+- **Live Database Driven Website:** Migrated all hardcoded dummy categories out of the Next.js `web` app.
+  - **Landing Page, Browse Filters, and Seller Product Form** now fetch dynamic data from the live database.
+- **New Public API Endpoint:** Shipped a highly optimized `GET /api/public/categories` in the Rust backend that casts product counts (`INT`) appropriately for JSON serialization without Type conflicts.
+- **Next.js Proxy Securty:** Whitelisted the `"public/"` path suffix in the SSRF proxy protection layer (`web/src/app/api/proxy/[...path]/route.ts`) to allow safe, CORS-free fetching of categories across domains.
+
+### 🧹 Database & Codebase Optimization
+- **Cleanup:** Purged completely all mock/dummy SQL inserts for categories from `01-schema.sql` and dropped them directly from the active live database.
+- **File Hygiene:** Deleted numerous legacy UI automation scripts, temporary extraction `.py` tools, duplicate MD reports, and test binaries that were cluttering the repository.
+- **Fixes:** Replaced `__dirname` with ES Module safe `import.meta.dirname` in the Vite build configuration.
+
+
+
 ## [v1.2.0] - 2026-08-11
 
 ### 🎨 UI/UX Redesigns & Enhancements
