@@ -40,3 +40,4 @@ impl<T> ApiResponse<T> {
         }
     }
 }
+pub mod hq;
