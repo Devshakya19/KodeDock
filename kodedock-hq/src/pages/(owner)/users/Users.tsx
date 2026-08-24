@@ -32,7 +32,7 @@ export default function Users() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch("http://localhost:4001/api/hq/users?limit=20", {
+      const res = await fetch(import.meta.env.VITE_API_URL + "/api/hq/users?limit=20", {
         headers: { "Authorization": `Bearer ${token}` }
       });
       const data = await res.json();
@@ -52,7 +52,7 @@ export default function Users() {
 
   const updateUserStatus = async (id: string, is_active: boolean) => {
     try {
-      const res = await fetch(`http://localhost:4001/api/hq/users/${id}/status`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/hq/users/${id}/status`, {
         method: "PUT",
         headers: { 
           "Authorization": `Bearer ${token}`,

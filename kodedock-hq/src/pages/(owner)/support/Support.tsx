@@ -34,7 +34,7 @@ export default function Support() {
 
   const fetchTickets = async () => {
     try {
-      const res = await fetch("http://localhost:4001/api/hq/support/tickets?limit=20", {
+      const res = await fetch(import.meta.env.VITE_API_URL + "/api/hq/support/tickets?limit=20", {
         headers: { "Authorization": `Bearer ${token}` }
       });
       const data = await res.json();
@@ -54,7 +54,7 @@ export default function Support() {
 
   const updateTicketStatus = async (id: string, status: string) => {
     try {
-      const res = await fetch(`http://localhost:4001/api/hq/support/tickets/${id}/status`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/hq/support/tickets/${id}/status`, {
         method: "PUT",
         headers: { 
           "Authorization": `Bearer ${token}`,
