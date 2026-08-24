@@ -34,7 +34,7 @@ export default function Marketplace() {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch("http://localhost:4001/api/hq/products?limit=20", {
+      const res = await fetch(import.meta.env.VITE_API_URL + "/api/hq/products?limit=20", {
         headers: { "Authorization": `Bearer ${token}` }
       });
       const data = await res.json();
@@ -54,7 +54,7 @@ export default function Marketplace() {
 
   const updateStatus = async (id: string, newStatus: string) => {
     try {
-      const res = await fetch(`http://localhost:4001/api/hq/products/${id}/status`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/hq/products/${id}/status`, {
         method: "PUT",
         headers: { 
           "Authorization": `Bearer ${token}`,

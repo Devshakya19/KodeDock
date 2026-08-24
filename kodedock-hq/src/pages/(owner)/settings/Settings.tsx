@@ -33,7 +33,7 @@ export default function Settings() {
         payload.password = formData.password;
       }
 
-      const res = await fetch("http://localhost:4001/api/hq/settings", {
+      const res = await fetch(import.meta.env.VITE_API_URL + "/api/hq/settings", {
         method: "PUT",
         headers: { 
           "Authorization": `Bearer ${token}`,

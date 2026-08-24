@@ -14,6 +14,11 @@ import Finance from "@/pages/(owner)/finance/Finance";
 import Safety from "@/pages/(owner)/safety/Safety";
 import Settings from "@/pages/(owner)/settings/Settings";
 import Support from "@/pages/(owner)/support/Support";
+import PlatformSettings from "@/pages/(owner)/platform/PlatformSettings";
+import Integrations from "@/pages/(owner)/integrations/Integrations";
+import StaffManagement from "@/pages/(owner)/staff/StaffManagement";
+import AuditLogs from "@/pages/(owner)/audit/AuditLogs";
+import Catalog from "@/pages/(owner)/catalog/Catalog";
 
 export default function App() {
   return (
@@ -32,11 +37,16 @@ export default function App() {
             <Route index element={<Navigate to="marketplace" replace />} />
             
             <Route path="marketplace" element={<Marketplace />} />
+            <Route path="catalog" element={<Catalog />} />
             <Route path="users" element={<Users />} />
             <Route path="finance" element={<Finance />} />
             <Route path="safety" element={<Safety />} />
-            <Route path="settings" element={<Settings />} />
             <Route path="support" element={<Support />} />
+            <Route path="platform" element={<PlatformSettings />} />
+            <Route path="integrations" element={<Integrations />} />
+            <Route path="staff" element={<StaffManagement />} />
+            <Route path="audit" element={<AuditLogs />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
 
           {/* Fallback */}

@@ -33,7 +33,7 @@ export default function Safety() {
 
   const fetchDisputes = async () => {
     try {
-      const res = await fetch("http://localhost:4001/api/hq/safety/disputes?limit=20", {
+      const res = await fetch(import.meta.env.VITE_API_URL + "/api/hq/safety/disputes?limit=20", {
         headers: { "Authorization": `Bearer ${token}` }
       });
       const data = await res.json();
@@ -56,7 +56,7 @@ export default function Safety() {
       const resolution = status === 'resolved' ? 'Resolved by HQ Admin' : 
                          status === 'closed' ? 'Closed without action' : null;
 
-      const res = await fetch(`http://localhost:4001/api/hq/safety/disputes/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/hq/safety/disputes/${id}`, {
         method: "PUT",
         headers: { 
           "Authorization": `Bearer ${token}`,
