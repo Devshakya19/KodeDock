@@ -50,16 +50,18 @@ export default function NewProductPage() {
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("");
 
-  const [categoriesList, setCategoriesList] = useState<{id: string, name: string, slug: string}[]>([]);
+  const [categoriesList, setCategoriesList] = useState<
+    { id: string; name: string; slug: string }[]
+  >([]);
   useEffect(() => {
-    fetch('/api/proxy/public/categories')
-      .then(res => res.json())
-      .then(data => {
+    fetch("/api/proxy/public/categories")
+      .then((res) => res.json())
+      .then((data) => {
         if (data.status === "success") {
           setCategoriesList(data.data);
         }
       })
-      .catch(err => console.error("Failed to load categories", err));
+      .catch((err) => console.error("Failed to load categories", err));
   }, []);
 
   const [githubUrl, setGithubUrl] = useState("");

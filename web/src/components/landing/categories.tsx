@@ -9,14 +9,14 @@ export function Categories() {
   const [categories, setCategories] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch('/api/proxy/public/categories')
-      .then(res => res.json())
-      .then(data => {
+    fetch("/api/proxy/public/categories")
+      .then((res) => res.json())
+      .then((data) => {
         if (data.status === "success") {
           setCategories(data.data.slice(0, 8)); // Show max 8
         }
       })
-      .catch(err => console.error("Failed to load categories", err));
+      .catch((err) => console.error("Failed to load categories", err));
   }, []);
 
   return (
@@ -35,7 +35,9 @@ export function Categories() {
         </div>
 
         {categories.length === 0 ? (
-          <p className="text-muted-foreground text-center py-10">No categories found. Wait for owner to create some.</p>
+          <p className="text-muted-foreground text-center py-10">
+            No categories found. Wait for owner to create some.
+          </p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {categories.map((category) => (
@@ -47,7 +49,9 @@ export function Categories() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-lg">{category.name}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">{category.product_count} items</p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {category.product_count} items
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
