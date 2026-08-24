@@ -113,3 +113,66 @@ pub struct HqSupportTicket {
     pub priority: String,
     pub created_at: Option<DateTime<Utc>>,
 }
+
+#[derive(Serialize, Deserialize)]
+#[derive(FromRow)]
+pub struct PlatformSetting {
+    pub key: String,
+    pub value: serde_json::Value,
+    pub description: Option<String>,
+}
+
+#[derive(Serialize, Deserialize)]
+#[derive(FromRow)]
+pub struct PlatformIntegration {
+    pub provider: String,
+    pub is_active: bool,
+    pub config: serde_json::Value,
+}
+
+#[derive(Serialize, Deserialize, FromRow)]
+pub struct HqCategory {
+    pub id: Uuid,
+    pub name: String,
+    pub slug: String,
+    pub description: Option<String>,
+    pub product_count: Option<i32>,
+    pub is_active: Option<bool>,
+}
+
+#[derive(Serialize, Deserialize, FromRow)]
+pub struct HqAuditLogView {
+    pub id: Uuid,
+    pub staff_name: Option<String>,
+    pub action: String,
+    pub target_resource_id: Option<String>,
+    pub reason: Option<String>,
+    pub old_data: Option<serde_json::Value>,
+    pub new_data: Option<serde_json::Value>,
+    pub created_at: Option<DateTime<Utc>>,
+}
+
+#[derive(Serialize, Deserialize, FromRow)]
+pub struct HqPayoutRequest {
+    pub id: Uuid,
+    pub seller_id: Uuid,
+    pub seller_name: Option<String>,
+    pub amount_paise: i32,
+    pub status: String,
+    pub payout_method_id: Option<Uuid>,
+    pub payout_details: Option<serde_json::Value>,
+    pub processed_by: Option<Uuid>,
+    pub notes: Option<String>,
+    pub created_at: Option<DateTime<Utc>>,
+}
+
+#[derive(Serialize, Deserialize, FromRow)]
+pub struct HqStaffView {
+    pub id: Uuid,
+    pub name: String,
+    pub email: String,
+    pub role_id: Option<Uuid>,
+    pub role_name: Option<String>,
+    pub is_active: Option<bool>,
+    pub last_login_at: Option<DateTime<Utc>>,
+}
