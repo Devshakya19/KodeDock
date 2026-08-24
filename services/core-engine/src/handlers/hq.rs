@@ -19,10 +19,7 @@ pub struct SetupRequest {
     pub name: String,
 }
 
-pub async fn setup(
-    pool: web::Data<PgPool>,
-    req: web::Json<SetupRequest>,
-) -> impl Responder {
+pub async fn setup(pool: web::Data<PgPool>, req: web::Json<SetupRequest>) -> impl Responder {
     match setup_owner(pool.get_ref(), &req.email, &req.password, &req.name).await {
         Ok(_) => HttpResponse::Ok().json(json!({
             "status": "success",
@@ -41,10 +38,7 @@ pub struct LoginRequest {
     pub password: String,
 }
 
-pub async fn login(
-    pool: web::Data<PgPool>,
-    req: web::Json<LoginRequest>,
-) -> impl Responder {
+pub async fn login(pool: web::Data<PgPool>, req: web::Json<LoginRequest>) -> impl Responder {
     match authenticate_staff(pool.get_ref(), &req.email, &req.password).await {
         Ok((staff, token)) => HttpResponse::Ok().json(json!({
             "status": "success",
@@ -67,14 +61,11 @@ pub async fn login(
 }
 
 use crate::middleware::require_hq_access;
+use crate::models::hq::HqStaff;
 use actix_web::HttpRequest;
 use uuid::Uuid;
-use crate::models::hq::HqStaff;
 
-pub async fn me(
-    pool: web::Data<PgPool>,
-    req: HttpRequest,
-) -> impl Responder {
+pub async fn me(pool: web::Data<PgPool>, req: HttpRequest) -> impl Responder {
     let hq_claims = match require_hq_access(&req) {
         Ok(c) => c,
         Err(response) => return response,
@@ -82,7 +73,10 @@ pub async fn me(
 
     let staff_id = match Uuid::parse_str(&hq_claims.staff_id) {
         Ok(id) => id,
-        Err(_) => return HttpResponse::BadRequest().json(json!({"status": "error", "message": "Invalid staff ID format"})),
+        Err(_) => {
+            return HttpResponse::BadRequest()
+                .json(json!({"status": "error", "message": "Invalid staff ID format"}))
+        }
     };
 
     // Fetch the latest staff info from the database
@@ -98,7 +92,8 @@ pub async fn me(
     };
 
     if !staff.is_active {
-        return HttpResponse::Forbidden().json(json!({"status": "error", "message": "This staff account has been disabled"}));
+        return HttpResponse::Forbidden()
+            .json(json!({"status": "error", "message": "This staff account has been disabled"}));
     }
 
     HttpResponse::Ok().json(json!({
@@ -118,10 +113,7 @@ pub async fn me(
 
 use crate::services::hq::get_dashboard_stats;
 
-pub async fn stats(
-    pool: web::Data<PgPool>,
-    req: HttpRequest,
-) -> impl Responder {
+pub async fn stats(pool: web::Data<PgPool>, req: HttpRequest) -> impl Responder {
     // 1. Authenticate Request
     if let Err(response) = require_hq_access(&req) {
         return response;
@@ -343,16 +335,27 @@ pub async fn set_dispute_status(
         Ok(claims) => claims,
         Err(response) => return response,
     };
-    
+
     // We need the admin's UUID to record who resolved it
     let admin_id = match Uuid::parse_str(&auth_claims.staff_id) {
         Ok(id) => id,
-        Err(_) => return HttpResponse::BadRequest().json(json!({"status":"error", "message": "Invalid staff ID"})),
+        Err(_) => {
+            return HttpResponse::BadRequest()
+                .json(json!({"status":"error", "message": "Invalid staff ID"}))
+        }
     };
 
     let dispute_id = path.into_inner();
 
-    match update_hq_dispute(pool.get_ref(), dispute_id, admin_id, &body.status, body.resolution.clone()).await {
+    match update_hq_dispute(
+        pool.get_ref(),
+        dispute_id,
+        admin_id,
+        &body.status,
+        body.resolution.clone(),
+    )
+    .await
+    {
         Ok(_) => HttpResponse::Ok().json(json!({
             "status": "success",
             "message": "Dispute updated successfully"
@@ -364,8 +367,8 @@ pub async fn set_dispute_status(
     }
 }
 
-use crate::services::hq::update_hq_profile;
 use crate::services::auth::hash_password;
+use crate::services::hq::update_hq_profile;
 
 #[derive(serde::Deserialize)]
 pub struct UpdateProfileRequest {
@@ -382,23 +385,34 @@ pub async fn set_settings(
         Ok(claims) => claims,
         Err(response) => return response,
     };
-    
+
     let admin_id = match Uuid::parse_str(&auth_claims.staff_id) {
         Ok(id) => id,
-        Err(_) => return HttpResponse::BadRequest().json(json!({"status":"error", "message": "Invalid staff ID"})),
+        Err(_) => {
+            return HttpResponse::BadRequest()
+                .json(json!({"status":"error", "message": "Invalid staff ID"}))
+        }
     };
 
     let password_hash = match &body.password {
-        Some(p) if !p.trim().is_empty() => {
-            match hash_password(p) {
-                Ok(h) => Some(h),
-                Err(_) => return HttpResponse::InternalServerError().json(json!({"status":"error", "message": "Failed to hash password"})),
+        Some(p) if !p.trim().is_empty() => match hash_password(p) {
+            Ok(h) => Some(h),
+            Err(_) => {
+                return HttpResponse::InternalServerError()
+                    .json(json!({"status":"error", "message": "Failed to hash password"}))
             }
-        }
+        },
         _ => None,
     };
 
-    match update_hq_profile(pool.get_ref(), admin_id, body.full_name.clone(), password_hash).await {
+    match update_hq_profile(
+        pool.get_ref(),
+        admin_id,
+        body.full_name.clone(),
+        password_hash,
+    )
+    .await
+    {
         Ok(_) => HttpResponse::Ok().json(json!({
             "status": "success",
             "message": "HQ settings updated successfully"
@@ -465,10 +479,7 @@ pub async fn set_ticket_status(
     }
 }
 
-pub async fn get_settings(
-    pool: web::Data<PgPool>,
-    req: HttpRequest,
-) -> impl Responder {
+pub async fn get_settings(pool: web::Data<PgPool>, req: HttpRequest) -> impl Responder {
     if let Err(response) = require_hq_access(&req) {
         return response;
     }
@@ -477,7 +488,8 @@ pub async fn get_settings(
         Ok(settings) => HttpResponse::Ok().json(json!({ "status": "success", "data": settings })),
         Err(e) => {
             log::error!("Failed to get platform settings: {}", e);
-            HttpResponse::InternalServerError().json(json!({ "status": "error", "message": "Internal server error" }))
+            HttpResponse::InternalServerError()
+                .json(json!({ "status": "error", "message": "Internal server error" }))
         }
     }
 }
@@ -499,28 +511,37 @@ pub async fn update_setting(
     };
 
     let key = path.into_inner();
-    match crate::services::hq::update_platform_setting(pool.get_ref(), &key, body.value.clone(), &auth.staff_id).await {
-        Ok(_) => HttpResponse::Ok().json(json!({ "status": "success", "message": "Setting updated successfully" })),
+    match crate::services::hq::update_platform_setting(
+        pool.get_ref(),
+        &key,
+        body.value.clone(),
+        &auth.staff_id,
+    )
+    .await
+    {
+        Ok(_) => HttpResponse::Ok()
+            .json(json!({ "status": "success", "message": "Setting updated successfully" })),
         Err(e) => {
             log::error!("Failed to update setting: {}", e);
-            HttpResponse::InternalServerError().json(json!({ "status": "error", "message": "Failed to update setting" }))
+            HttpResponse::InternalServerError()
+                .json(json!({ "status": "error", "message": "Failed to update setting" }))
         }
     }
 }
 
-pub async fn get_integrations(
-    pool: web::Data<PgPool>,
-    req: HttpRequest,
-) -> impl Responder {
+pub async fn get_integrations(pool: web::Data<PgPool>, req: HttpRequest) -> impl Responder {
     if let Err(response) = require_hq_access(&req) {
         return response;
     }
 
     match crate::services::hq::get_platform_integrations(pool.get_ref()).await {
-        Ok(integrations) => HttpResponse::Ok().json(json!({ "status": "success", "data": integrations })),
+        Ok(integrations) => {
+            HttpResponse::Ok().json(json!({ "status": "success", "data": integrations }))
+        }
         Err(e) => {
             log::error!("Failed to get integrations: {}", e);
-            HttpResponse::InternalServerError().json(json!({ "status": "error", "message": "Internal server error" }))
+            HttpResponse::InternalServerError()
+                .json(json!({ "status": "error", "message": "Internal server error" }))
         }
     }
 }
@@ -543,23 +564,33 @@ pub async fn update_integration(
     };
 
     let provider = path.into_inner();
-    match crate::services::hq::update_platform_integration(pool.get_ref(), &provider, body.is_active, body.config.clone(), &auth.staff_id).await {
-        Ok(_) => HttpResponse::Ok().json(json!({ "status": "success", "message": "Integration updated successfully" })),
+    match crate::services::hq::update_platform_integration(
+        pool.get_ref(),
+        &provider,
+        body.is_active,
+        body.config.clone(),
+        &auth.staff_id,
+    )
+    .await
+    {
+        Ok(_) => HttpResponse::Ok()
+            .json(json!({ "status": "success", "message": "Integration updated successfully" })),
         Err(e) => {
             log::error!("Failed to update integration: {}", e);
-            HttpResponse::InternalServerError().json(json!({ "status": "error", "message": "Failed to update integration" }))
+            HttpResponse::InternalServerError()
+                .json(json!({ "status": "error", "message": "Failed to update integration" }))
         }
     }
 }
 
-pub async fn get_categories(
-    pool: web::Data<PgPool>,
-    req: HttpRequest,
-) -> impl Responder {
-    if let Err(response) = require_hq_access(&req) { return response; }
+pub async fn get_categories(pool: web::Data<PgPool>, req: HttpRequest) -> impl Responder {
+    if let Err(response) = require_hq_access(&req) {
+        return response;
+    }
     match crate::services::hq::get_categories(pool.get_ref()).await {
         Ok(cats) => HttpResponse::Ok().json(json!({ "status": "success", "data": cats })),
-        Err(e) => HttpResponse::InternalServerError().json(json!({ "status": "error", "message": e.to_string() }))
+        Err(e) => HttpResponse::InternalServerError()
+            .json(json!({ "status": "error", "message": e.to_string() })),
     }
 }
 
@@ -575,21 +606,31 @@ pub async fn create_category(
     req: HttpRequest,
     body: web::Json<CreateCatReq>,
 ) -> impl Responder {
-    if let Err(response) = require_hq_access(&req) { return response; }
-    match crate::services::hq::create_category(pool.get_ref(), &body.name, &body.slug, body.description.as_deref()).await {
+    if let Err(response) = require_hq_access(&req) {
+        return response;
+    }
+    match crate::services::hq::create_category(
+        pool.get_ref(),
+        &body.name,
+        &body.slug,
+        body.description.as_deref(),
+    )
+    .await
+    {
         Ok(id) => HttpResponse::Ok().json(json!({ "status": "success", "data": { "id": id } })),
-        Err(e) => HttpResponse::InternalServerError().json(json!({ "status": "error", "message": e.to_string() }))
+        Err(e) => HttpResponse::InternalServerError()
+            .json(json!({ "status": "error", "message": e.to_string() })),
     }
 }
 
-pub async fn get_audit_logs(
-    pool: web::Data<PgPool>,
-    req: HttpRequest,
-) -> impl Responder {
-    if let Err(response) = require_hq_access(&req) { return response; }
+pub async fn get_audit_logs(pool: web::Data<PgPool>, req: HttpRequest) -> impl Responder {
+    if let Err(response) = require_hq_access(&req) {
+        return response;
+    }
     match crate::services::hq::get_audit_logs(pool.get_ref()).await {
         Ok(logs) => HttpResponse::Ok().json(json!({ "status": "success", "data": logs })),
-        Err(e) => HttpResponse::InternalServerError().json(json!({ "status": "error", "message": e.to_string() }))
+        Err(e) => HttpResponse::InternalServerError()
+            .json(json!({ "status": "error", "message": e.to_string() })),
     }
 }
 
@@ -604,12 +645,15 @@ pub async fn get_payout_requests(
     req: HttpRequest,
     query: web::Query<std::collections::HashMap<String, String>>,
 ) -> impl Responder {
-    if let Err(response) = require_hq_access(&req) { return response; }
-    
+    if let Err(response) = require_hq_access(&req) {
+        return response;
+    }
+
     let status = query.get("status").map(|s| s.as_str());
     match crate::services::hq::list_payout_requests(pool.get_ref(), status).await {
         Ok(reqs) => HttpResponse::Ok().json(json!({ "status": "success", "data": reqs })),
-        Err(e) => HttpResponse::InternalServerError().json(json!({ "status": "error", "message": e.to_string() }))
+        Err(e) => HttpResponse::InternalServerError()
+            .json(json!({ "status": "error", "message": e.to_string() })),
     }
 }
 
@@ -623,22 +667,32 @@ pub async fn process_payout(
         Ok(a) => a,
         Err(response) => return response,
     };
-    
+
     let payout_id = path.into_inner();
-    match crate::services::hq::process_payout_request(pool.get_ref(), &payout_id, &body.status, body.notes.as_deref(), &auth.staff_id).await {
-        Ok(_) => HttpResponse::Ok().json(json!({ "status": "success", "message": "Payout request processed" })),
-        Err(e) => HttpResponse::InternalServerError().json(json!({ "status": "error", "message": e.to_string() }))
+    match crate::services::hq::process_payout_request(
+        pool.get_ref(),
+        &payout_id,
+        &body.status,
+        body.notes.as_deref(),
+        &auth.staff_id,
+    )
+    .await
+    {
+        Ok(_) => HttpResponse::Ok()
+            .json(json!({ "status": "success", "message": "Payout request processed" })),
+        Err(e) => HttpResponse::InternalServerError()
+            .json(json!({ "status": "error", "message": e.to_string() })),
     }
 }
 
-pub async fn get_staff(
-    pool: web::Data<PgPool>,
-    req: HttpRequest,
-) -> impl Responder {
-    if let Err(response) = require_hq_access(&req) { return response; }
+pub async fn get_staff(pool: web::Data<PgPool>, req: HttpRequest) -> impl Responder {
+    if let Err(response) = require_hq_access(&req) {
+        return response;
+    }
     match crate::services::hq::list_staff(pool.get_ref()).await {
         Ok(staff) => HttpResponse::Ok().json(json!({ "status": "success", "data": staff })),
-        Err(e) => HttpResponse::InternalServerError().json(json!({ "status": "error", "message": e.to_string() }))
+        Err(e) => HttpResponse::InternalServerError()
+            .json(json!({ "status": "error", "message": e.to_string() })),
     }
 }
 
@@ -654,22 +708,34 @@ pub async fn invite_staff(
     req: HttpRequest,
     body: web::Json<InviteStaffReq>,
 ) -> impl Responder {
-    if let Err(response) = require_hq_access(&req) { return response; }
-    
-    let temp_password = uuid::Uuid::new_v4().to_string().chars().take(12).collect::<String>();
+    if let Err(response) = require_hq_access(&req) {
+        return response;
+    }
+
+    let temp_password = uuid::Uuid::new_v4()
+        .to_string()
+        .chars()
+        .take(12)
+        .collect::<String>();
     let hashed = crate::services::auth::hash_password(&temp_password).unwrap_or_default();
-    
-    match crate::services::hq::invite_staff(pool.get_ref(), &body.name, &body.email, body.role_id.as_deref(), &hashed).await {
-        Ok(id) => {
-            HttpResponse::Ok().json(json!({ 
-                "status": "success", 
-                "data": { "id": id, "temporary_password": temp_password } 
-            }))
-        },
-        Err(e) => HttpResponse::InternalServerError().json(json!({ "status": "error", "message": e.to_string() }))
+
+    match crate::services::hq::invite_staff(
+        pool.get_ref(),
+        &body.name,
+        &body.email,
+        body.role_id.as_deref(),
+        &hashed,
+    )
+    .await
+    {
+        Ok(id) => HttpResponse::Ok().json(json!({
+            "status": "success",
+            "data": { "id": id, "temporary_password": temp_password }
+        })),
+        Err(e) => HttpResponse::InternalServerError()
+            .json(json!({ "status": "error", "message": e.to_string() })),
     }
 }
-
 
 pub async fn delete_category_handler(
     pool: web::Data<PgPool>,
@@ -680,26 +746,33 @@ pub async fn delete_category_handler(
         Ok(a) => a,
         Err(response) => return response,
     };
-    
+
     let cat_id = path.into_inner();
     match crate::services::hq::delete_category(pool.get_ref(), &cat_id).await {
         Ok(_) => {
-            crate::services::hq::log_audit(pool.get_ref(), &auth.staff_id, "DELETE_CATEGORY", Some(&cat_id), None, None, None).await;
+            crate::services::hq::log_audit(
+                pool.get_ref(),
+                &auth.staff_id,
+                "DELETE_CATEGORY",
+                Some(&cat_id),
+                None,
+                None,
+                None,
+            )
+            .await;
             HttpResponse::Ok().json(serde_json::json!({"status": "success"}))
-        },
-        Err(e) => {
-            HttpResponse::InternalServerError().json(serde_json::json!({"status": "error", "message": e.to_string()}))
         }
+        Err(e) => HttpResponse::InternalServerError()
+            .json(serde_json::json!({"status": "error", "message": e.to_string()})),
     }
 }
 
-
-
-pub async fn get_public_categories_handler(
-    pool: web::Data<sqlx::PgPool>,
-) -> impl Responder {
+pub async fn get_public_categories_handler(pool: web::Data<sqlx::PgPool>) -> impl Responder {
     match crate::services::hq::get_public_categories(pool.get_ref()).await {
-        Ok(cats) => HttpResponse::Ok().json(serde_json::json!({ "status": "success", "data": cats })),
-        Err(e) => HttpResponse::InternalServerError().json(serde_json::json!({ "status": "error", "message": e.to_string() }))
+        Ok(cats) => {
+            HttpResponse::Ok().json(serde_json::json!({ "status": "success", "data": cats }))
+        }
+        Err(e) => HttpResponse::InternalServerError()
+            .json(serde_json::json!({ "status": "error", "message": e.to_string() })),
     }
 }

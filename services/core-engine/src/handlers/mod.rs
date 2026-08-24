@@ -1,5 +1,6 @@
 pub mod auth;
 pub mod health;
+pub mod hq;
 pub mod notifications;
 pub mod orders;
 pub mod payout;
@@ -9,4 +10,3 @@ pub mod reviews;
 pub mod seller;
 pub mod upload;
 pub mod wallet;
-pub mod hq;
