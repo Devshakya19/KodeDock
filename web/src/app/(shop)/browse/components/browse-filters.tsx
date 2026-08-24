@@ -11,20 +11,20 @@ interface BrowseFiltersProps {
 export function BrowseFilters({ activeCategory }: BrowseFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [categories, setCategories] = useState<{label: string, value: string}[]>([
-    { label: "All Assets", value: "" }
+  const [categories, setCategories] = useState<{ label: string; value: string }[]>([
+    { label: "All Assets", value: "" },
   ]);
 
   useEffect(() => {
-    fetch('/api/proxy/public/categories')
-      .then(res => res.json())
-      .then(data => {
+    fetch("/api/proxy/public/categories")
+      .then((res) => res.json())
+      .then((data) => {
         if (data.status === "success") {
           const fetchedCats = data.data.map((c: any) => ({ label: c.name, value: c.slug }));
           setCategories([{ label: "All Assets", value: "" }, ...fetchedCats]);
         }
       })
-      .catch(err => console.error("Failed to load categories for filters", err));
+      .catch((err) => console.error("Failed to load categories for filters", err));
   }, []);
 
   function handleCategoryChange(categoryValue: string) {
