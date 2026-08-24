@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-kodedock_secret}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./sql/01-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./sql:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U kodedock -d kodedock"]
       interval: 10s
@@ -86,7 +86,7 @@ services:
       - DATABASE_URL=postgres://kodedock:${POSTGRES_PASSWORD:-kodedock_secret}@postgres:5432/kodedock
       - REDIS_URL=redis://:${REDIS_PASSWORD:-kodedock_redis_secret}@redis:6379
       - JWT_SECRET=${JWT_SECRET:-kodedock-super-secret-jwt-key-change-in-production-2024}
-      - CORS_ORIGINS=http://localhost:3000,http://localhost:3001
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:3001,http://localhost:5173,http://localhost:5174,http://localhost:5175
       - S3_ENDPOINT=http://seaweedfs:8333
       - S3_ACCESS_KEY=kodedock_seaweed
       - S3_SECRET_KEY=kodedock_seaweed_secret
