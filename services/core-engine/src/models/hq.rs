@@ -4,6 +4,7 @@ use sqlx::FromRow;
 use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
+#[allow(dead_code)]
 pub struct HqRole {
     pub id: Uuid,
     pub name: String,
@@ -12,6 +13,7 @@ pub struct HqRole {
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
+#[allow(dead_code)]
 pub struct HqStaff {
     pub id: Uuid,
     pub email: String,
@@ -28,6 +30,7 @@ pub struct HqStaff {
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
+#[allow(dead_code)]
 pub struct HqAuditLog {
     pub id: Uuid,
     pub staff_id: Option<Uuid>,
@@ -114,16 +117,14 @@ pub struct HqSupportTicket {
     pub created_at: Option<DateTime<Utc>>,
 }
 
-#[derive(Serialize, Deserialize)]
-#[derive(FromRow)]
+#[derive(Serialize, Deserialize, FromRow)]
 pub struct PlatformSetting {
     pub key: String,
     pub value: serde_json::Value,
     pub description: Option<String>,
 }
 
-#[derive(Serialize, Deserialize)]
-#[derive(FromRow)]
+#[derive(Serialize, Deserialize, FromRow)]
 pub struct PlatformIntegration {
     pub provider: String,
     pub is_active: bool,
