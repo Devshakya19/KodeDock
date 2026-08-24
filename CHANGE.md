@@ -294,5 +294,41 @@ All notable changes to the KodeDock backend project will be documented in this f
 - **Docker Build Error:** Renamed the web service pointer from `web` to `frontend` in `ci.yml` and injected a dummy `NEXT_PUBLIC_GITHUB_CLIENT_ID` to unblock Docker Compose verification.
 - **Rust Compilation:** Updated legacy `amount_usd` references to `amount_paise` in `orders.rs` ensuring seamless PubSub and Redis integration.
 
+
+## [v1.6.0] - 2026-08-24
+
+### 🏢 KodeDock HQ (Admin Control Plane)
+- **Frontend Architecture (`kodedock-hq`):**
+  - Completely reorganized the React application using Next.js style route groups: `src/pages/(auth)` and `src/pages/(owner)`.
+  - Built a secure layout wrapper (`HqLayout.tsx`) utilizing `AuthContext` to protect all owner routes. Unauthenticated users are instantly redirected to `/login`.
+- **Marketplace Hub (`/owner/marketplace`):**
+  - Built a comprehensive data table to view and search all platform products. 
+  - Added new Rust endpoints `GET /api/hq/products` and `PUT /api/hq/products/:id/status` allowing admins to instantly Approve, Pause, or Archive products globally.
+- **User Management (`/owner/users`):**
+  - Modified the PostgreSQL `users` table to include an `is_active` boolean column. 
+  - Created a global suspend/restore toggle with `GET /api/hq/users` and `PUT /api/hq/users/:id/status` APIs to manage platform bans securely.
+- **Finance & Payouts (`/owner/finance`):**
+  - Created a financial ledger dashboard highlighting Total Platform Revenue, Held Escrow, and Total Payouts.
+  - Implemented `GET /api/hq/finance/stats` and `GET /api/hq/finance/withdrawals` to fetch real-time wallet transactions and seller bank/UPI payout details.
+- **Trust & Safety (`/owner/safety`):**
+  - Developed a robust dispute resolution dashboard for handling buyer/seller conflicts.
+  - Built `HqDispute` models in Rust and mapped endpoints `GET /api/hq/safety/disputes` and `PUT /api/hq/safety/disputes/:id` to manage claim reviews and resolutions.
+- **Support Inbox (`/owner/support`):**
+  - Created a brand new PostgreSQL `support_tickets` table to handle direct user queries.
+  - Designed a high-contrast inbox UI with priority badges (Urgent, High, Low) and action menus.
+  - Added full backend CRUD support via `GET /api/hq/support/tickets` and `PUT /api/hq/support/tickets/:id/status`.
+- **HQ Settings (`/owner/settings`):**
+  - Added a secure admin profile configuration page.
+  - Implemented `PUT /api/hq/settings` in Rust utilizing **Argon2** password hashing to safely update admin credentials.
+
+### 🛡️ Core Engine Security & Database
+- **HQ Middleware (`middleware/mod.rs`):**
+  - Implemented a strict `require_hq_access` middleware for all `/api/hq/*` routes.
+  - Explicitly decodes the JWT using the server's `JWT_SECRET` and validates the `is_hq: true` claim. If missing, it immediately rejects the request with a `403 Forbidden`, preventing standard users from accessing admin routes.
+- **CORS Configuration:**
+  - Expanded `CORS_ORIGINS` in `docker-compose.yml` to explicitly include `http://localhost:5174` and `http://localhost:5175`, ensuring the Vite development server never encounters cross-origin network errors.
+- **Database Persistence:**
+  - Hardcoded all live database schema updates (e.g., `is_active` column in `users`, new `support_tickets` table) directly into `sql/01-schema.sql` ensuring seamless environment reproducibility for new deployments.
+
 ---
 *End of Changelog.*
