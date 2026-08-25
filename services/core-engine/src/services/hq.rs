@@ -219,7 +219,7 @@ pub async fn get_dashboard_stats(pool: &PgPool) -> Result<HqDashboardStats, Stri
             .await
             .map_err(|e| format!("Database error fetching disputes: {}", e))?;
     let active_disputes = disputes_row.0;
-    
+
     // 5. Revenue Chart (Last 7 Days)
     let chart_records = sqlx::query_as::<_, (String, i64)>(
         r#"
@@ -234,7 +234,7 @@ pub async fn get_dashboard_stats(pool: &PgPool) -> Result<HqDashboardStats, Stri
         LEFT JOIN orders o ON o.created_at::date = date_series::date AND o.status = 'completed'
         GROUP BY date_series
         ORDER BY date_series;
-        "#
+        "#,
     )
     .fetch_all(pool)
     .await
@@ -752,7 +752,11 @@ pub async fn invite_staff(
     Ok(row.0)
 }
 
-pub async fn update_staff_status(pool: &PgPool, staff_id: Uuid, is_active: bool) -> Result<(), sqlx::Error> {
+pub async fn update_staff_status(
+    pool: &PgPool,
+    staff_id: Uuid,
+    is_active: bool,
+) -> Result<(), sqlx::Error> {
     sqlx::query("UPDATE hq_staff SET is_active = $1 WHERE id = $2")
         .bind(is_active)
         .bind(staff_id)
@@ -761,7 +765,11 @@ pub async fn update_staff_status(pool: &PgPool, staff_id: Uuid, is_active: bool)
     Ok(())
 }
 
-pub async fn update_staff_role(pool: &PgPool, staff_id: Uuid, role_id: Option<Uuid>) -> Result<(), sqlx::Error> {
+pub async fn update_staff_role(
+    pool: &PgPool,
+    staff_id: Uuid,
+    role_id: Option<Uuid>,
+) -> Result<(), sqlx::Error> {
     sqlx::query("UPDATE hq_staff SET role_id = $1 WHERE id = $2")
         .bind(role_id)
         .bind(staff_id)

@@ -1920,9 +1920,9 @@
     "semantic_hash": ""
   },
   "CHANGE.md": {
-    "mtime": 1787654481.5717854,
-    "seen": 1787654501.314015,
-    "ast_hash": "6e26c2c226aecbf6f0929a28018ef234",
+    "mtime": 1787656367.6619432,
+    "seen": 1787656388.6367254,
+    "ast_hash": "3977d1ed8d80a159a183e8939c8f6a77",
     "semantic_hash": ""
   },
   "CODE_OF_CONDUCT.md": {
@@ -2629,8 +2629,8 @@
   },
   "sql/01-init.sql": {
     "mtime": 1787639093.0998592,
-    "seen": 1787654501.3135858,
-    "ast_hash": "",
+    "seen": 1787656388.6362996,
+    "ast_hash": "da763008b9c00c8a2251709dfe327c81",
     "semantic_hash": ""
   },
   "kodedock-hq/public/favicon.svg": {

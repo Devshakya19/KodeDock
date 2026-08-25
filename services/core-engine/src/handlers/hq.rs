@@ -753,13 +753,15 @@ pub async fn set_staff_status(
         Err(response) => return response,
     };
     let target_id = path.into_inner();
-    
+
     // Prevent self-suspension
     if auth.staff_id == target_id.to_string() && !body.is_active {
-        return HttpResponse::BadRequest().json(json!({ "status": "error", "message": "You cannot suspend yourself" }));
+        return HttpResponse::BadRequest()
+            .json(json!({ "status": "error", "message": "You cannot suspend yourself" }));
     }
 
-    match crate::services::hq::update_staff_status(pool.get_ref(), target_id, body.is_active).await {
+    match crate::services::hq::update_staff_status(pool.get_ref(), target_id, body.is_active).await
+    {
         Ok(_) => {
             crate::services::hq::log_audit(
                 pool.get_ref(),
@@ -769,10 +771,13 @@ pub async fn set_staff_status(
                 None,
                 Some(serde_json::json!({"is_active": body.is_active})),
                 None,
-            ).await;
-            HttpResponse::Ok().json(json!({ "status": "success", "message": "Staff status updated" }))
-        },
-        Err(e) => HttpResponse::InternalServerError().json(json!({ "status": "error", "message": e.to_string() }))
+            )
+            .await;
+            HttpResponse::Ok()
+                .json(json!({ "status": "success", "message": "Staff status updated" }))
+        }
+        Err(e) => HttpResponse::InternalServerError()
+            .json(json!({ "status": "error", "message": e.to_string() })),
     }
 }
 
@@ -792,10 +797,11 @@ pub async fn set_staff_role(
         Err(response) => return response,
     };
     let target_id = path.into_inner();
-    
+
     // Prevent removing own role
     if auth.staff_id == target_id.to_string() {
-        return HttpResponse::BadRequest().json(json!({ "status": "error", "message": "You cannot change your own role" }));
+        return HttpResponse::BadRequest()
+            .json(json!({ "status": "error", "message": "You cannot change your own role" }));
     }
 
     match crate::services::hq::update_staff_role(pool.get_ref(), target_id, body.role_id).await {
@@ -808,10 +814,12 @@ pub async fn set_staff_role(
                 None,
                 Some(serde_json::json!({"role_id": body.role_id})),
                 None,
-            ).await;
+            )
+            .await;
             HttpResponse::Ok().json(json!({ "status": "success", "message": "Staff role updated" }))
-        },
-        Err(e) => HttpResponse::InternalServerError().json(json!({ "status": "error", "message": e.to_string() }))
+        }
+        Err(e) => HttpResponse::InternalServerError()
+            .json(json!({ "status": "error", "message": e.to_string() })),
     }
 }
 
