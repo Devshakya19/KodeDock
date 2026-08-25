@@ -1,7 +1,7 @@
 # Graph Report - KodeDock  (2026-08-24)
 
 ## Corpus Check
-- 362 files · ~887,734 words
+- 362 files · ~887,748 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a7d3f738`
+- Built from commit: `689192d5`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -363,16 +363,16 @@
 10. `TestShadcnInstaller` - 26 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `setup()` --calls--> `setup_owner()`  [INFERRED]
-  services/core-engine/src/handlers/hq.rs → services/core-engine/src/services/hq.rs
-- `login()` --calls--> `authenticate_staff()`  [INFERRED]
-  services/core-engine/src/handlers/hq.rs → services/core-engine/src/services/hq.rs
-- `stats()` --calls--> `get_dashboard_stats()`  [INFERRED]
-  services/core-engine/src/handlers/hq.rs → services/core-engine/src/services/hq.rs
-- `get_products()` --calls--> `list_hq_products()`  [INFERRED]
-  services/core-engine/src/handlers/hq.rs → services/core-engine/src/services/hq.rs
-- `set_product_status()` --calls--> `update_product_status()`  [INFERRED]
-  services/core-engine/src/handlers/hq.rs → services/core-engine/src/services/hq.rs
+- `TestTailwindConfigGenerator` --uses--> `TailwindConfigGenerator`  [INFERRED]
+  .agents/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py → .agents/skills/ui-styling/scripts/tailwind_config_gen.py
+- `TestGeneratedConfigIsValidJs` --uses--> `TailwindConfigGenerator`  [INFERRED]
+  .agents/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py → .agents/skills/ui-styling/scripts/tailwind_config_gen.py
+- `TestShadcnInstaller` --uses--> `ShadcnInstaller`  [INFERRED]
+  .agents/skills/ui-styling/scripts/tests/test_shadcn_add.py → .agents/skills/ui-styling/scripts/shadcn_add.py
+- `handleWithdraw()` --calls--> `apiPost()`  [EXTRACTED]
+  web/src/app/(seller)/seller/wallet/page.tsx → web/src/shared/lib/api/client.ts
+- `handlePasswordChange()` --calls--> `apiPost()`  [EXTRACTED]
+  web/src/components/settings/security.tsx → web/src/shared/lib/api/client.ts
 
 ## Import Cycles
 - None detected.
@@ -1440,7 +1440,7 @@ Cohesion: 0.42
 Nodes (8): AuthClaims, extract_user_id(), HqAuthClaims, Error, HttpRequest, Result, String, verify_bearer()
 
 ## Knowledge Gaps
-- **2093 isolated node(s):** `BrowseFiltersProps`, `ProductCardProps`, `Product`, `ProductGridProps`, `BrowsePageProps` (+2088 more)
+- **2093 isolated node(s):** `CATEGORIES`, `CATEGORIES`, `BrowseFiltersProps`, `ProductCardProps`, `Product` (+2088 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **69 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -1448,14 +1448,14 @@ Nodes (8): AuthClaims, extract_user_id(), HqAuthClaims, Error, HttpRequest, Resu
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `react` connect `react` to `apiPost`, `plugins`, `verifyToken`, `cn`, `Finance.tsx`, `seller/page.tsx`, `app/layout.tsx`, `button.tsx`, `AuthContext.tsx`, `Marketplace.tsx`, `Safety.tsx`, `Support.tsx`, `Users.tsx`, `profile.tsx`, `auth/client.ts`, `security.tsx`, `(main)/page.tsx`?**
-  _High betweenness centrality (0.007) - this node is a cross-community bridge._
+  _High betweenness centrality (0.008) - this node is a cross-community bridge._
 - **Why does `extract_user_id()` connect `extract_user_id` to `presign_upload`, `models/mod.rs`, `wallet.rs`, `get_product`, `orders.rs`, `mark_read`, `update_profile`?**
-  _High betweenness centrality (0.003) - this node is a cross-community bridge._
+  _High betweenness centrality (0.004) - this node is a cross-community bridge._
 - **Why does `jsonwebtoken` connect `services/auth.rs` to `services/hq.rs`, `extract_user_id`?**
   _High betweenness centrality (0.003) - this node is a cross-community bridge._
 - **Are the 2 inferred relationships involving `TailwindConfigGenerator` (e.g. with `TestGeneratedConfigIsValidJs` and `TestTailwindConfigGenerator`) actually correct?**
   _`TailwindConfigGenerator` has 2 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `BrowseFiltersProps`, `ProductCardProps`, `Product` to the rest of the system?**
+- **What connects `CATEGORIES`, `CATEGORIES`, `BrowseFiltersProps` to the rest of the system?**
   _2093 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Changelog` be split into smaller, more focused modules?**
   _Cohesion score 0.1 - nodes in this community are weakly interconnected._

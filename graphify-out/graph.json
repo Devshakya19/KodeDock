@@ -2437,7 +2437,7 @@
       "file_type": "code",
       "norm_label": "handledelete()",
       "source_file": "web/src/app/(seller)/seller/products/[id]/edit/page.tsx",
-      "source_location": "L159"
+      "source_location": "L161"
     },
     {
       "id": "web_src_app_seller_seller_products_id_edit_page_editproductpage_handleimageselect",
@@ -2449,7 +2449,7 @@
       "file_type": "code",
       "norm_label": "handleimageselect()",
       "source_file": "web/src/app/(seller)/seller/products/[id]/edit/page.tsx",
-      "source_location": "L117"
+      "source_location": "L119"
     },
     {
       "id": "web_src_app_seller_seller_products_id_edit_page_editproductpage_handleremoveimage",
@@ -2461,7 +2461,7 @@
       "file_type": "code",
       "norm_label": "handleremoveimage()",
       "source_file": "web/src/app/(seller)/seller/products/[id]/edit/page.tsx",
-      "source_location": "L150"
+      "source_location": "L152"
     },
     {
       "id": "web_src_app_seller_seller_products_id_edit_page_editproductpage_handlesubmit",
@@ -2473,7 +2473,7 @@
       "file_type": "code",
       "norm_label": "handlesubmit()",
       "source_file": "web/src/app/(seller)/seller/products/[id]/edit/page.tsx",
-      "source_location": "L182"
+      "source_location": "L184"
     },
     {
       "id": "web_src_app_seller_seller_products_id_edit_page_editproductpage_loadproduct",
@@ -2485,7 +2485,7 @@
       "file_type": "code",
       "norm_label": "loadproduct()",
       "source_file": "web/src/app/(seller)/seller/products/[id]/edit/page.tsx",
-      "source_location": "L78"
+      "source_location": "L80"
     },
     {
       "id": "web_src_app_seller_seller_settings_profile_page_sellerprofilesettingspage",
@@ -4021,7 +4021,7 @@
       "file_type": "code",
       "norm_label": "handleimageselect()",
       "source_file": "web/src/app/(seller)/seller/products/new/page.tsx",
-      "source_location": "L80"
+      "source_location": "L82"
     },
     {
       "id": "web_src_app_seller_seller_products_new_page_newproductpage_handleremoveimage",
@@ -4033,7 +4033,7 @@
       "file_type": "code",
       "norm_label": "handleremoveimage()",
       "source_file": "web/src/app/(seller)/seller/products/new/page.tsx",
-      "source_location": "L100"
+      "source_location": "L102"
     },
     {
       "id": "web_src_app_seller_seller_products_new_page_newproductpage_handlesubmit",
@@ -4045,7 +4045,7 @@
       "file_type": "code",
       "norm_label": "handlesubmit()",
       "source_file": "web/src/app/(seller)/seller/products/new/page.tsx",
-      "source_location": "L108"
+      "source_location": "L110"
     },
     {
       "id": "web_src_app_shop_checkout_page_checkoutcontent",
@@ -54769,7 +54769,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "web/src/app/(seller)/seller/products/[id]/edit/page.tsx",
-      "source_location": "L169",
+      "source_location": "L171",
       "weight": 1.0
     },
     {
@@ -54781,7 +54781,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "web/src/app/(seller)/seller/products/[id]/edit/page.tsx",
-      "source_location": "L139",
+      "source_location": "L141",
       "weight": 1.0
     },
     {
@@ -54793,7 +54793,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "web/src/app/(seller)/seller/products/[id]/edit/page.tsx",
-      "source_location": "L210",
+      "source_location": "L212",
       "weight": 1.0
     },
     {
@@ -54805,7 +54805,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "web/src/app/(seller)/seller/products/new/page.tsx",
-      "source_location": "L142",
+      "source_location": "L144",
       "weight": 1.0
     },
     {
@@ -54817,7 +54817,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "web/src/app/(seller)/seller/products/new/page.tsx",
-      "source_location": "L153",
+      "source_location": "L155",
       "weight": 1.0
     },
     {
@@ -55801,7 +55801,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "web/src/app/(seller)/seller/products/[id]/edit/page.tsx",
-      "source_location": "L78",
+      "source_location": "L80",
       "weight": 1.0
     },
     {
@@ -110999,7 +110999,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "web/src/app/(seller)/seller/products/[id]/edit/page.tsx",
-      "source_location": "L117",
+      "source_location": "L119",
       "weight": 1.0
     },
     {
@@ -111010,7 +111010,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "web/src/app/(seller)/seller/products/[id]/edit/page.tsx",
-      "source_location": "L150",
+      "source_location": "L152",
       "weight": 1.0
     },
     {
@@ -111021,7 +111021,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "web/src/app/(seller)/seller/products/[id]/edit/page.tsx",
-      "source_location": "L159",
+      "source_location": "L161",
       "weight": 1.0
     },
     {
@@ -111032,7 +111032,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "web/src/app/(seller)/seller/products/[id]/edit/page.tsx",
-      "source_location": "L182",
+      "source_location": "L184",
       "weight": 1.0
     },
     {
@@ -111065,7 +111065,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "web/src/app/(seller)/seller/products/new/page.tsx",
-      "source_location": "L100",
+      "source_location": "L102",
       "weight": 1.0
     },
     {
@@ -111076,7 +111076,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "web/src/app/(seller)/seller/products/new/page.tsx",
-      "source_location": "L108",
+      "source_location": "L110",
       "weight": 1.0
     },
     {
@@ -111087,7 +111087,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "web/src/app/(seller)/seller/products/new/page.tsx",
-      "source_location": "L80",
+      "source_location": "L82",
       "weight": 1.0
     },
     {
@@ -118892,5 +118892,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "a7d3f7380e3aa6e94cfa2feeaefe6644c18a8145"
+  "built_at_commit": "689192d5705553314a330125f1148aebbbc5c9ef"
 }
