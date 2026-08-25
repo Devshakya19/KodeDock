@@ -21,12 +21,15 @@ export default function HqLayout() {
     return () => clearInterval(timer);
   }, []);
 
-  // Toggle the command palette on Command+K or Ctrl+K
+  // Toggle the command palette on Command+K or Ctrl+K, close on Escape
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         setOpen((open) => !open);
+      }
+      if (e.key === "Escape") {
+        setOpen(false);
       }
     };
     document.addEventListener("keydown", down);
@@ -98,6 +101,13 @@ export default function HqLayout() {
                   autoFocus 
                   placeholder="Search headquarters..." 
                   className="w-full h-14 bg-transparent border-none outline-none text-white placeholder:text-muted-foreground font-medium" 
+                  autoComplete="off"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  name="hq-search"
+                  type="search"
+                  data-lpignore="true"
+                  data-1p-ignore="true"
                 />
                 <div className="flex items-center gap-1">
                   <kbd className="bg-white/10 text-muted-foreground text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">ESC</kbd>

@@ -1920,9 +1920,9 @@
     "semantic_hash": ""
   },
   "CHANGE.md": {
-    "mtime": 1787648290.5821621,
-    "seen": 1787648339.8392787,
-    "ast_hash": "b916994d21fd0af1b8c5b0382eb97415",
+    "mtime": 1787651767.5337915,
+    "seen": 1787651796.4340472,
+    "ast_hash": "236ef0aef9640f5c1b3fbe861d8eca29",
     "semantic_hash": ""
   },
   "CODE_OF_CONDUCT.md": {
@@ -2586,9 +2586,9 @@
     "semantic_hash": ""
   },
   "kodedock-hq/src/pages/(owner)/integrations/Integrations.tsx": {
-    "mtime": 1787651251.9663076,
-    "seen": 1787651527.7460947,
-    "ast_hash": "19c599470be58a4c8abcd4bd799e2d54",
+    "mtime": 1787651605.6565778,
+    "seen": 1787651635.0795462,
+    "ast_hash": "cd1889a672bf5c901a5817ff3514194b",
     "semantic_hash": ""
   },
   "kodedock-hq/src/pages/(owner)/platform/PlatformSettings.tsx": {
@@ -2643,24 +2643,6 @@
     "mtime": 1787651251.9680102,
     "seen": 1787651527.746089,
     "ast_hash": "b746d367de21226a321da08deec1bbe6",
-    "semantic_hash": ""
-  },
-  "query_test.sql": {
-    "mtime": 1787649722.5827377,
-    "seen": 1787650108.181904,
-    "ast_hash": "08af9e69bce55c0c210803125992fed5",
-    "semantic_hash": ""
-  },
-  "kodedock-hq/replace_animations.py": {
-    "mtime": 1787651186.1363976,
-    "seen": 1787651527.7460427,
-    "ast_hash": "d0593f8cb8c50eb3a00360fa8ddb9b7f",
-    "semantic_hash": ""
-  },
-  "kodedock-hq/upgrade_headers.py": {
-    "mtime": 1787651251.8916786,
-    "seen": 1787651527.746126,
-    "ast_hash": "0c9ff0556f850c612974c0943e0e6f9b",
     "semantic_hash": ""
   }
 }
