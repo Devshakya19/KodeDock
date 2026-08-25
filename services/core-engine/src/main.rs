@@ -249,7 +249,10 @@ async fn main() -> std::io::Result<()> {
             )
             .route("/api/auth/logout", web::post().to(handlers::auth::logout))
             .route("/api/auth/me", web::get().to(handlers::auth::me))
-            .route("/api/auth/config", web::get().to(handlers::auth::get_auth_config))
+            .route(
+                "/api/auth/config",
+                web::get().to(handlers::auth::get_auth_config),
+            )
             .route(
                 "/api/auth/change-password",
                 web::post().to(handlers::auth::change_password),

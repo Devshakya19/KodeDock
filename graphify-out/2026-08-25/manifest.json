@@ -264,9 +264,9 @@
     "semantic_hash": ""
   },
   "services/core-engine/src/handlers/auth.rs": {
-    "mtime": 1787423507.1749444,
-    "seen": 1787424348.4194276,
-    "ast_hash": "746fb1e3c0166b75af89a20ca5b41234",
+    "mtime": 1787655949.3438911,
+    "seen": 1787656363.4254918,
+    "ast_hash": "510be18bebd254ccd7113b890dad1e40",
     "semantic_hash": ""
   },
   "services/core-engine/src/handlers/health.rs": {
@@ -336,9 +336,9 @@
     "semantic_hash": ""
   },
   "services/core-engine/src/main.rs": {
-    "mtime": 1787642818.3079987,
-    "seen": 1787648339.8387613,
-    "ast_hash": "a26419ecdec4415632a0ebd4ec4d4067",
+    "mtime": 1787655754.428156,
+    "seen": 1787656363.4267328,
+    "ast_hash": "989233cba7317df202e6685cb6ab8de7",
     "semantic_hash": ""
   },
   "services/core-engine/src/middleware/mod.rs": {
@@ -450,9 +450,9 @@
     "semantic_hash": "239f3ebf717465dc636818a1a619398d"
   },
   "web/src/app/(auth)/developer-register/page.tsx": {
-    "mtime": 1787424144.9522727,
-    "seen": 1787424348.4195206,
-    "ast_hash": "f7a577fe012adca644308ad69bac6829",
+    "mtime": 1787656167.643395,
+    "seen": 1787656363.4285076,
+    "ast_hash": "b3bc161a81662d55a18774f7f2c2f728",
     "semantic_hash": ""
   },
   "web/src/app/(auth)/forgot-password/page.tsx": {
@@ -468,15 +468,15 @@
     "semantic_hash": ""
   },
   "web/src/app/(auth)/login/page.tsx": {
-    "mtime": 1787424145.0871031,
-    "seen": 1787424348.4195282,
-    "ast_hash": "3864806afde93d2682d2d3e5e1e14085",
+    "mtime": 1787656109.3518574,
+    "seen": 1787656363.428721,
+    "ast_hash": "1eee98f61a6b291950679ae45f7f0d96",
     "semantic_hash": ""
   },
   "web/src/app/(auth)/register/page.tsx": {
-    "mtime": 1787424145.1392708,
-    "seen": 1787424348.4195304,
-    "ast_hash": "9c1f80fdba2ac6b64293b1d68a9d2eb3",
+    "mtime": 1787656167.643395,
+    "seen": 1787656363.4287243,
+    "ast_hash": "25783e1a81d49eb56aa12c5892c4d2d1",
     "semantic_hash": ""
   },
   "web/src/app/(auth)/reset-password/page.tsx": {
@@ -1092,9 +1092,9 @@
     "semantic_hash": ""
   },
   "web/src/components/settings/connections.tsx": {
-    "mtime": 1787424148.4543934,
-    "seen": 1787424348.4197698,
-    "ast_hash": "2014e36cd899508c76cd86ee0a8e3fdc",
+    "mtime": 1787656167.643395,
+    "seen": 1787656363.43863,
+    "ast_hash": "4d35d240f0ef63594c494bf8a12f0de6",
     "semantic_hash": ""
   },
   "web/src/components/settings/layout.tsx": {
@@ -2400,9 +2400,9 @@
     "semantic_hash": ""
   },
   "services/core-engine/src/services/hq.rs": {
-    "mtime": 1787649944.0002913,
-    "seen": 1787650108.1819856,
-    "ast_hash": "c78df9b0b2cec0bb940561eb8b4e92d6",
+    "mtime": 1787655681.2975912,
+    "seen": 1787656363.4271498,
+    "ast_hash": "9e65e22e202cf708bc702d881dcca8e1",
     "semantic_hash": ""
   },
   "kodedock-hq/README.md": {
@@ -2586,9 +2586,9 @@
     "semantic_hash": ""
   },
   "kodedock-hq/src/pages/(owner)/integrations/Integrations.tsx": {
-    "mtime": 1787651605.6565778,
-    "seen": 1787651635.0795462,
-    "ast_hash": "cd1889a672bf5c901a5817ff3514194b",
+    "mtime": 1787655244.8299773,
+    "seen": 1787656363.4233568,
+    "ast_hash": "43465ac632cb6599df58d4f9f5f848e4",
     "semantic_hash": ""
   },
   "kodedock-hq/src/pages/(owner)/platform/PlatformSettings.tsx": {
@@ -2630,7 +2630,7 @@
   "sql/01-init.sql": {
     "mtime": 1787639093.0998592,
     "seen": 1787654501.3135858,
-    "ast_hash": "da763008b9c00c8a2251709dfe327c81",
+    "ast_hash": "",
     "semantic_hash": ""
   },
   "kodedock-hq/public/favicon.svg": {
@@ -2643,6 +2643,12 @@
     "mtime": 1787651251.9680102,
     "seen": 1787651527.746089,
     "ast_hash": "b746d367de21226a321da08deec1bbe6",
+    "semantic_hash": ""
+  },
+  "web/src/app/api/auth/config/route.ts": {
+    "mtime": 1787655784.252971,
+    "seen": 1787656363.4364595,
+    "ast_hash": "be2f37a91580b26fbf86a277953b79c6",
     "semantic_hash": ""
   }
 }
