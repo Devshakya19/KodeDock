@@ -725,6 +725,24 @@ pub async fn invite_staff(
     Ok(row.0)
 }
 
+pub async fn update_staff_status(pool: &PgPool, staff_id: Uuid, is_active: bool) -> Result<(), sqlx::Error> {
+    sqlx::query("UPDATE hq_staff SET is_active = $1 WHERE id = $2")
+        .bind(is_active)
+        .bind(staff_id)
+        .execute(pool)
+        .await?;
+    Ok(())
+}
+
+pub async fn update_staff_role(pool: &PgPool, staff_id: Uuid, role_id: Option<Uuid>) -> Result<(), sqlx::Error> {
+    sqlx::query("UPDATE hq_staff SET role_id = $1 WHERE id = $2")
+        .bind(role_id)
+        .bind(staff_id)
+        .execute(pool)
+        .await?;
+    Ok(())
+}
+
 // --- Platform Settings ---
 pub async fn get_platform_settings(
     pool: &sqlx::PgPool,
