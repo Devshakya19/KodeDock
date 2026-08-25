@@ -1,20 +1,49 @@
-import { Outlet, Navigate, Link, useLocation } from "react-router-dom";
+import { Outlet, Navigate, Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { 
   Users, ShoppingBag, CreditCard, Shield, LifeBuoy, Settings, LogOut, 
-  Layers, Link2, Sliders, Activity, UserCog 
+  Layers, Link2, Sliders, Activity, UserCog, Search, LayoutDashboard,
+  Bell, Globe, TerminalSquare, Command
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import { Command as CommandPalette } from "cmdk";
 
 export default function HqLayout() {
   const { isAuthenticated, logout, staff } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
+  const [time, setTime] = useState(new Date());
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Toggle the command palette on Command+K or Ctrl+K
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setOpen((open) => !open);
+      }
+    };
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
   const sections = [
+    {
+      title: "Overview",
+      links: [
+        { name: "Dashboard", path: "/owner/dashboard", icon: LayoutDashboard },
+      ]
+    },
     {
       title: "Operations",
       links: [
@@ -42,22 +71,84 @@ export default function HqLayout() {
     }
   ];
 
+  // Helper to find the current active link name for the breadcrumb
+  let activeLinkName = "Dashboard";
+  let activeSectionName = "Overview";
+  
+  sections.forEach(sec => {
+    sec.links.forEach(link => {
+      if (location.pathname.startsWith(link.path)) {
+        activeLinkName = link.name;
+        activeSectionName = sec.title;
+      }
+    });
+  });
+
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-background">
-      <aside className="w-full md:w-64 bg-card border-r border-border p-4 flex flex-col justify-between overflow-y-auto">
+    <div className="min-h-screen flex flex-col md:flex-row bg-[#0A0A0B] text-foreground font-sans">
+      
+      {/* Command Palette Overlay */}
+      {open && (
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-start justify-center pt-[15vh]">
+          <div className="bg-[#18181B] border border-white/10 rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <CommandPalette label="Global Command Menu" className="w-full">
+              <div className="flex items-center px-4 border-b border-white/10" cmdk-input-wrapper="">
+                <Search className="w-5 h-5 text-muted-foreground mr-3" />
+                <CommandPalette.Input 
+                  autoFocus 
+                  placeholder="Search headquarters..." 
+                  className="w-full h-14 bg-transparent border-none outline-none text-white placeholder:text-muted-foreground font-medium" 
+                />
+                <div className="flex items-center gap-1">
+                  <kbd className="bg-white/10 text-muted-foreground text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">ESC</kbd>
+                </div>
+              </div>
+              <CommandPalette.List className="max-h-[300px] overflow-y-auto p-2">
+                <CommandPalette.Empty className="py-6 text-center text-sm text-muted-foreground">
+                  No results found.
+                </CommandPalette.Empty>
+
+                <CommandPalette.Group heading="Navigation" className="text-xs font-semibold text-muted-foreground px-2 py-2">
+                  {sections.flatMap(s => s.links).map((link) => (
+                    <CommandPalette.Item 
+                      key={link.path}
+                      onSelect={() => {
+                        navigate(link.path);
+                        setOpen(false);
+                      }}
+                      className="flex items-center gap-3 px-3 py-2.5 mt-1 rounded-md text-sm font-medium text-muted-foreground hover:text-white hover:bg-white/10 cursor-pointer data-[selected=true]:bg-white/10 data-[selected=true]:text-white"
+                    >
+                      <link.icon className="h-4 w-4" />
+                      {link.name}
+                    </CommandPalette.Item>
+                  ))}
+                </CommandPalette.Group>
+              </CommandPalette.List>
+            </CommandPalette>
+          </div>
+        </div>
+      )}
+
+      {/* Premium Sidebar */}
+      <aside className="w-full md:w-64 bg-[#0A0A0B] border-r border-white/10 p-4 flex flex-col justify-between overflow-y-auto relative z-20">
         <div>
-          <div className="flex items-center gap-3 mb-6 px-2 mt-2">
-            <img src="/icons/logo/kd.svg" alt="Logo" className="h-8 w-8" />
-            <h1 className="font-bold text-xl tracking-tight text-foreground">KodeDock HQ</h1>
+          <div className="flex items-center gap-3 mb-8 px-2 mt-2 group cursor-pointer">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 transition-shadow">
+              <TerminalSquare className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <h1 className="font-black text-lg tracking-tight text-white leading-tight">KodeDock</h1>
+              <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Headquarters</p>
+            </div>
           </div>
           
           <div className="space-y-6">
             {sections.map((section) => (
               <div key={section.title}>
-                <h3 className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                <h3 className="px-3 text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">
                   {section.title}
                 </h3>
-                <nav className="space-y-1">
+                <nav className="space-y-0.5">
                   {section.links.map((link) => {
                     const Icon = link.icon;
                     const isActive = location.pathname.startsWith(link.path);
@@ -66,13 +157,16 @@ export default function HqLayout() {
                         key={link.path}
                         to={link.path}
                         className={cn(
-                          "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                          "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all group relative",
                           isActive 
-                            ? "bg-primary/10 text-primary" 
-                            : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                            ? "bg-white/10 text-white" 
+                            : "text-muted-foreground hover:bg-white/5 hover:text-white"
                         )}
                       >
-                        <Icon className="h-4 w-4" />
+                        {isActive && (
+                          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4 bg-indigo-500 rounded-r-full" />
+                        )}
+                        <Icon className={cn("h-4 w-4 transition-colors", isActive ? "text-indigo-400" : "group-hover:text-indigo-400/70")} />
                         {link.name}
                       </Link>
                     );
@@ -83,42 +177,84 @@ export default function HqLayout() {
           </div>
         </div>
 
-        <div className="pt-4 border-t border-border mt-8">
+        <div className="pt-4 mt-8">
           <Link 
             to="/owner/settings"
             className={cn(
-              "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors mb-2",
+              "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all mb-4 group",
               location.pathname === "/owner/settings" 
-                ? "bg-primary/10 text-primary" 
-                : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                ? "bg-white/10 text-white" 
+                : "text-muted-foreground hover:bg-white/5 hover:text-white"
             )}
           >
-            <Settings className="h-4 w-4" />
-            Personal Settings
+            <Settings className="h-4 w-4 group-hover:text-white" />
+            Admin Settings
           </Link>
           
-          <div className="flex items-center gap-3 px-2 mb-4">
-            <div className="h-8 w-8 rounded-full bg-secondary flex items-center justify-center text-xs font-bold text-foreground">
+          <div className="flex items-center gap-3 px-3 py-3 bg-[#18181B] border border-white/5 rounded-xl">
+            <div className="h-9 w-9 rounded-full bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center text-xs font-bold text-white shadow-inner">
               {staff?.name?.charAt(0)}
             </div>
             <div className="flex-1 overflow-hidden">
-              <p className="text-sm font-medium text-foreground truncate">{staff?.name}</p>
+              <p className="text-sm font-bold text-white truncate leading-tight">{staff?.name}</p>
               <p className="text-xs text-muted-foreground truncate">{staff?.email}</p>
             </div>
+            <button 
+              onClick={logout}
+              className="p-2 text-muted-foreground hover:text-rose-400 hover:bg-rose-400/10 rounded-lg transition-colors"
+              title="Sign Out"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
           </div>
-          <button 
-            onClick={logout}
-            className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
-          >
-            <LogOut className="h-4 w-4" />
-            Sign out
-          </button>
         </div>
       </aside>
 
-      <main className="flex-1 overflow-auto p-6 md:p-10">
-        <Outlet />
-      </main>
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col h-screen overflow-hidden bg-background rounded-l-[2rem] shadow-[-10px_0_30px_rgba(0,0,0,0.5)] border-l border-white/10 relative z-30">
+        
+        {/* Top Header */}
+        <header className="h-16 border-b border-border bg-background/80 backdrop-blur-md flex items-center justify-between px-6 shrink-0 sticky top-0 z-40">
+          <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+            <span>KodeDock</span>
+            <span className="text-border">/</span>
+            <span>{activeSectionName}</span>
+            <span className="text-border">/</span>
+            <span className="text-foreground">{activeLinkName}</span>
+          </div>
+
+          <div className="flex items-center gap-5">
+            <button 
+              onClick={() => setOpen(true)}
+              className="hidden md:flex items-center gap-2 text-xs font-medium text-muted-foreground bg-secondary hover:bg-secondary/80 border border-border px-3 py-1.5 rounded-lg transition-colors"
+            >
+              <Search className="w-3.5 h-3.5" />
+              <span>Search HQ</span>
+              <div className="flex items-center gap-1 ml-2">
+                <kbd className="bg-background text-[10px] px-1.5 py-0.5 rounded border border-border shadow-sm">⌘</kbd>
+                <kbd className="bg-background text-[10px] px-1.5 py-0.5 rounded border border-border shadow-sm">K</kbd>
+              </div>
+            </button>
+
+            <div className="h-5 w-[1px] bg-border hidden md:block"></div>
+
+            <div className="hidden md:flex items-center gap-2 text-xs font-bold text-muted-foreground bg-secondary/50 px-3 py-1.5 rounded-full border border-border">
+              <Globe className="w-3.5 h-3.5 text-indigo-400" />
+              {time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true, timeZoneName: 'short' })}
+            </div>
+
+            <button className="relative p-2 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-full transition-colors">
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-background"></span>
+            </button>
+          </div>
+        </header>
+
+        {/* Scrollable Page Content */}
+        <main className="flex-1 overflow-y-auto p-6 md:p-10 relative">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }

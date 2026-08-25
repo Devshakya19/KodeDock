@@ -8,6 +8,7 @@ import Login from "@/pages/(auth)/Login";
 import Setup from "@/pages/(auth)/Setup";
 
 // Owner Pages
+import Dashboard from "@/pages/(owner)/dashboard/Dashboard";
 import Marketplace from "@/pages/(owner)/marketplace/Marketplace";
 import Users from "@/pages/(owner)/users/Users";
 import Finance from "@/pages/(owner)/finance/Finance";
@@ -33,9 +34,10 @@ export default function App() {
 
           {/* Protected HQ Routes */}
           <Route path="/owner" element={<HqLayout />}>
-            {/* Redirect /owner to the first actionable module */}
-            <Route index element={<Navigate to="marketplace" replace />} />
+            {/* Redirect /owner to dashboard */}
+            <Route index element={<Navigate to="dashboard" replace />} />
             
+            <Route path="dashboard" element={<Dashboard />} />
             <Route path="marketplace" element={<Marketplace />} />
             <Route path="catalog" element={<Catalog />} />
             <Route path="users" element={<Users />} />
@@ -50,7 +52,7 @@ export default function App() {
           </Route>
 
           {/* Fallback */}
-          <Route path="*" element={<Navigate to="/owner/marketplace" replace />} />
+          <Route path="*" element={<Navigate to="/owner/dashboard" replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

@@ -109,21 +109,26 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <button
-          className="rounded-md border border-input px-3 py-1 text-sm disabled:opacity-50"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </button>
-        <button
-          className="rounded-md border border-input px-3 py-1 text-sm disabled:opacity-50"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </button>
+      <div className="flex items-center justify-between space-x-2 py-4 px-2">
+        <div className="text-sm text-muted-foreground font-medium">
+          Showing {table.getRowModel().rows.length} rows
+        </div>
+        <div className="flex gap-2">
+          <button
+            className="rounded-lg bg-secondary hover:bg-secondary/80 text-foreground font-semibold px-4 py-2 text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </button>
+          <button
+            className="rounded-lg bg-secondary hover:bg-secondary/80 text-foreground font-semibold px-4 py-2 text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   )
