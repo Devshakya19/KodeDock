@@ -2,6 +2,13 @@
 
 All notable changes to the KodeDock backend project will be documented in this file.
 
+## [Unreleased]
+
+### 🐛 Bug Fixes
+- **HQ Search (Command Palette):** 
+  - Added `Escape` key handler to close the global command menu.
+  - Disabled browser autocomplete, auto-correct, and password manager autofill on the search input to prevent queries from being saved as passwords.
+
 ## [v1.3.0] - 2026-08-24 (Owner Controls & Integration Sync)
 
 ### 👑 Owner Dashboard (HQ) Features
