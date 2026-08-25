@@ -737,6 +737,84 @@ pub async fn invite_staff(
     }
 }
 
+#[derive(Deserialize)]
+pub struct UpdateStaffStatusReq {
+    pub is_active: bool,
+}
+
+pub async fn set_staff_status(
+    pool: web::Data<PgPool>,
+    req: HttpRequest,
+    path: web::Path<Uuid>,
+    body: web::Json<UpdateStaffStatusReq>,
+) -> impl Responder {
+    let auth = match require_hq_access(&req) {
+        Ok(a) => a,
+        Err(response) => return response,
+    };
+    let target_id = path.into_inner();
+    
+    // Prevent self-suspension
+    if auth.staff_id == target_id.to_string() && !body.is_active {
+        return HttpResponse::BadRequest().json(json!({ "status": "error", "message": "You cannot suspend yourself" }));
+    }
+
+    match crate::services::hq::update_staff_status(pool.get_ref(), target_id, body.is_active).await {
+        Ok(_) => {
+            crate::services::hq::log_audit(
+                pool.get_ref(),
+                &auth.staff_id,
+                "UPDATE_STAFF_STATUS",
+                Some(&target_id.to_string()),
+                None,
+                Some(serde_json::json!({"is_active": body.is_active})),
+                None,
+            ).await;
+            HttpResponse::Ok().json(json!({ "status": "success", "message": "Staff status updated" }))
+        },
+        Err(e) => HttpResponse::InternalServerError().json(json!({ "status": "error", "message": e.to_string() }))
+    }
+}
+
+#[derive(Deserialize)]
+pub struct UpdateStaffRoleReq {
+    pub role_id: Option<Uuid>,
+}
+
+pub async fn set_staff_role(
+    pool: web::Data<PgPool>,
+    req: HttpRequest,
+    path: web::Path<Uuid>,
+    body: web::Json<UpdateStaffRoleReq>,
+) -> impl Responder {
+    let auth = match require_hq_access(&req) {
+        Ok(a) => a,
+        Err(response) => return response,
+    };
+    let target_id = path.into_inner();
+    
+    // Prevent removing own role
+    if auth.staff_id == target_id.to_string() {
+        return HttpResponse::BadRequest().json(json!({ "status": "error", "message": "You cannot change your own role" }));
+    }
+
+    match crate::services::hq::update_staff_role(pool.get_ref(), target_id, body.role_id).await {
+        Ok(_) => {
+            crate::services::hq::log_audit(
+                pool.get_ref(),
+                &auth.staff_id,
+                "UPDATE_STAFF_ROLE",
+                Some(&target_id.to_string()),
+                None,
+                Some(serde_json::json!({"role_id": body.role_id})),
+                None,
+            ).await;
+            HttpResponse::Ok().json(json!({ "status": "success", "message": "Staff role updated" }))
+        },
+        Err(e) => HttpResponse::InternalServerError().json(json!({ "status": "error", "message": e.to_string() }))
+    }
+}
+
 pub async fn delete_category_handler(
     pool: web::Data<PgPool>,
     path: web::Path<String>,
