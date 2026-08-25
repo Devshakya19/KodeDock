@@ -1,6 +1,9 @@
-import { useEffect, useState } from "react";
-import { useAuth } from "@/context/AuthContext";
-import { Wallet, IndianRupee, Building2, History, Banknote, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Wallet, IndianRupee, Building2, History, AlertCircle, CheckCircle2 } from "lucide-react";
+import { api } from "@/lib/api";
+import { DataTable } from "@/components/ui/data-table";
+import type { ColumnDef } from "@tanstack/react-table";
 
 interface FinanceStats {
   total_platform_fee_paise: number;
@@ -28,64 +31,116 @@ interface PayoutRequest {
   created_at: string | null;
 }
 
+const formatCurrency = (paise: number) => {
+  return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(paise / 100);
+};
+
+// --- PAYOUT ACTION CELL ---
+const PayoutActionCell = ({ request }: { request: PayoutRequest }) => {
+  const queryClient = useQueryClient();
+  const [processing, setProcessing] = useState(false);
+
+  const mutation = useMutation({
+    mutationFn: async (status: string) => {
+      setProcessing(true);
+      await api.put(`/api/hq/finance/payouts/${request.id}/process`, { status, notes: `Processed manually via HQ` });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['hq-finance-payouts'] });
+      queryClient.invalidateQueries({ queryKey: ['hq-finance-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['hq-finance-withdrawals'] });
+    },
+    onSettled: () => setProcessing(false)
+  });
+
+  return (
+    <div className="flex justify-end gap-2">
+      <button 
+        onClick={() => { if(confirm('Reject this payout?')) mutation.mutate("REJECTED") }}
+        disabled={processing}
+        className="px-3 py-1.5 border border-red-500/30 text-red-500 rounded hover:bg-red-500/10 text-xs font-medium transition-colors disabled:opacity-50"
+      >
+        Reject
+      </button>
+      <button 
+        onClick={() => { if(confirm('Mark as Paid?')) mutation.mutate("PAID") }}
+        disabled={processing}
+        className="px-3 py-1.5 bg-green-500 text-white rounded hover:bg-green-600 text-xs font-medium transition-colors flex items-center gap-1 disabled:opacity-50"
+      >
+        <CheckCircle2 className="w-3.5 h-3.5" /> Mark Paid
+      </button>
+    </div>
+  );
+};
+
+// --- COLUMNS ---
+const payoutColumns: ColumnDef<PayoutRequest>[] = [
+  {
+    accessorKey: "seller_name",
+    header: "Seller",
+    cell: ({ row }) => <span className="font-medium text-foreground">{row.original.seller_name || "Unknown Seller"}</span>,
+  },
+  {
+    accessorKey: "amount_paise",
+    header: "Amount",
+    cell: ({ row }) => <span className="font-bold text-foreground">{formatCurrency(row.original.amount_paise)}</span>,
+  },
+  {
+    id: "payout_info",
+    header: "Payout Info",
+    cell: ({ row }) => {
+      const details = row.original.payout_details;
+      return (
+        <span className="text-muted-foreground">
+          {details?.upi_id ? `UPI: ${details.upi_id}` : details?.account_number ? `A/C: ${details.account_number}` : 'No details'}
+        </span>
+      );
+    }
+  },
+  {
+    id: "actions",
+    header: () => <div className="text-right">Actions</div>,
+    cell: ({ row }) => <PayoutActionCell request={row.original} />,
+  }
+];
+
+const withdrawalColumns: ColumnDef<Withdrawal>[] = [
+  {
+    accessorKey: "created_at",
+    header: "Date",
+    cell: ({ row }) => <span className="text-muted-foreground">{row.original.created_at ? new Date(row.original.created_at).toLocaleDateString() : 'N/A'}</span>,
+  },
+  {
+    accessorKey: "seller_name",
+    header: "Seller",
+    cell: ({ row }) => <span className="font-medium text-foreground">{row.original.seller_name || "Unknown Seller"}</span>,
+  },
+  {
+    accessorKey: "amount_paise",
+    header: "Amount",
+    cell: ({ row }) => <span className="font-bold text-foreground">{formatCurrency(row.original.amount_paise)}</span>,
+  }
+];
+
 export default function Finance() {
-  const { token } = useAuth();
-  const [stats, setStats] = useState<FinanceStats | null>(null);
-  const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
-  const [payoutRequests, setPayoutRequests] = useState<PayoutRequest[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [processing, setProcessing] = useState<string | null>(null);
+  const { data: statsRes } = useQuery({
+    queryKey: ['hq-finance-stats'],
+    queryFn: async () => await api.get('/api/hq/finance/stats')
+  });
 
-  useEffect(() => {
-    fetchFinanceData();
-  }, [token]);
+  const { data: payoutsRes, isLoading: loadingPayouts } = useQuery({
+    queryKey: ['hq-finance-payouts'],
+    queryFn: async () => await api.get('/api/hq/finance/payouts?status=PENDING')
+  });
 
-  const fetchFinanceData = async () => {
-    if (!token) return;
-    try {
-      const [statsRes, withRes, payRes] = await Promise.all([
-        fetch(import.meta.env.VITE_API_URL + "/api/hq/finance/stats", { headers: { "Authorization": `Bearer ${token}` } }),
-        fetch(import.meta.env.VITE_API_URL + "/api/hq/finance/withdrawals?limit=20", { headers: { "Authorization": `Bearer ${token}` } }),
-        fetch(import.meta.env.VITE_API_URL + "/api/hq/finance/payouts?status=PENDING", { headers: { "Authorization": `Bearer ${token}` } })
-      ]);
-      
-      const statsData = await statsRes.json();
-      const withData = await withRes.json();
-      const payData = await payRes.json();
+  const { data: withdrawalsRes, isLoading: loadingWithdrawals } = useQuery({
+    queryKey: ['hq-finance-withdrawals'],
+    queryFn: async () => await api.get('/api/hq/finance/withdrawals?limit=100')
+  });
 
-      if (statsData.status === "success") setStats(statsData.data);
-      if (withData.status === "success") setWithdrawals(withData.data);
-      if (payData.status === "success") setPayoutRequests(payData.data);
-    } catch (err) {
-      console.error("Failed to fetch finance data", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const processPayout = async (id: string, status: string) => {
-    if (!confirm(`Are you sure you want to mark this payout as ${status}?`)) return;
-    setProcessing(id);
-    try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/hq/finance/payouts/${id}/process`, {
-        method: "PUT",
-        headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}` 
-        },
-        body: JSON.stringify({ status, notes: `Processed manually via HQ` })
-      });
-      if (res.ok) fetchFinanceData();
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setProcessing(null);
-    }
-  };
-
-  const formatCurrency = (paise: number) => {
-    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(paise / 100);
-  };
+  const stats: FinanceStats | null = statsRes?.data || null;
+  const payouts = payoutsRes?.data || [];
+  const withdrawals = withdrawalsRes?.data || [];
 
   return (
     <div className="space-y-8 pb-20 max-w-6xl mx-auto">
@@ -95,7 +150,7 @@ export default function Finance() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-card border border-border p-6 rounded-xl flex items-start gap-4">
+        <div className="bg-card border border-border p-6 rounded-xl flex items-start gap-4 shadow-sm">
           <div className="p-3 bg-emerald-500/10 rounded-lg"><Building2 className="h-6 w-6 text-emerald-500" /></div>
           <div>
             <p className="text-sm font-medium text-muted-foreground">Platform Revenue</p>
@@ -103,7 +158,7 @@ export default function Finance() {
           </div>
         </div>
         
-        <div className="bg-card border border-border p-6 rounded-xl flex items-start gap-4">
+        <div className="bg-card border border-border p-6 rounded-xl flex items-start gap-4 shadow-sm">
           <div className="p-3 bg-blue-500/10 rounded-lg"><Wallet className="h-6 w-6 text-blue-500" /></div>
           <div>
             <p className="text-sm font-medium text-muted-foreground">Funds in Escrow</p>
@@ -111,7 +166,7 @@ export default function Finance() {
           </div>
         </div>
 
-        <div className="bg-card border border-border p-6 rounded-xl flex items-start gap-4">
+        <div className="bg-card border border-border p-6 rounded-xl flex items-start gap-4 shadow-sm">
           <div className="p-3 bg-purple-500/10 rounded-lg"><IndianRupee className="h-6 w-6 text-purple-500" /></div>
           <div>
             <p className="text-sm font-medium text-muted-foreground">Total Payouts Done</p>
@@ -121,86 +176,29 @@ export default function Finance() {
       </div>
 
       {/* Payout Requests */}
-      <div className="bg-card border border-border rounded-xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-border flex items-center gap-2">
+      <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
+        <div className="px-6 py-4 border-b border-border flex items-center gap-2 bg-secondary/20">
           <AlertCircle className="h-5 w-5 text-orange-500" />
           <h2 className="text-lg font-semibold text-foreground">Pending Payout Requests</h2>
         </div>
-        <table className="w-full text-sm text-left">
-          <thead className="bg-secondary/50 text-muted-foreground text-xs uppercase font-semibold">
-            <tr>
-              <th className="px-6 py-4">Seller</th>
-              <th className="px-6 py-4">Amount</th>
-              <th className="px-6 py-4">Payout Info</th>
-              <th className="px-6 py-4 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {loading ? (
-              <tr><td colSpan={4} className="px-6 py-8 text-center text-muted-foreground">Loading...</td></tr>
-            ) : payoutRequests.length === 0 ? (
-              <tr><td colSpan={4} className="px-6 py-8 text-center text-muted-foreground">No pending requests.</td></tr>
-            ) : (
-              payoutRequests.map(p => (
-                <tr key={p.id} className="hover:bg-secondary/30">
-                  <td className="px-6 py-4 font-medium">{p.seller_name}</td>
-                  <td className="px-6 py-4 font-bold text-foreground">{formatCurrency(p.amount_paise)}</td>
-                  <td className="px-6 py-4 text-muted-foreground">
-                    {p.payout_details?.upi_id ? `UPI: ${p.payout_details.upi_id}` : `A/C: ${p.payout_details?.account_number}`}
-                  </td>
-                  <td className="px-6 py-4 flex justify-end gap-2">
-                    <button 
-                      onClick={() => processPayout(p.id, "REJECTED")}
-                      disabled={processing === p.id}
-                      className="px-3 py-1.5 border border-red-500/30 text-red-500 rounded hover:bg-red-500/10 text-xs font-medium transition-colors"
-                    >
-                      Reject
-                    </button>
-                    <button 
-                      onClick={() => processPayout(p.id, "PAID")}
-                      disabled={processing === p.id}
-                      className="px-3 py-1.5 bg-green-500 text-white rounded hover:bg-green-600 text-xs font-medium transition-colors flex items-center gap-1"
-                    >
-                      <CheckCircle2 className="w-3.5 h-3.5" /> Mark Paid
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+        {loadingPayouts ? (
+          <div className="p-8 text-center text-muted-foreground">Loading pending requests...</div>
+        ) : (
+          <DataTable columns={payoutColumns} data={payouts} />
+        )}
       </div>
 
       {/* Withdrawals Ledger */}
-      <div className="bg-card border border-border rounded-xl overflow-hidden mt-8">
-        <div className="px-6 py-4 border-b border-border flex items-center gap-2">
+      <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm mt-8">
+        <div className="px-6 py-4 border-b border-border flex items-center gap-2 bg-secondary/20">
           <History className="h-5 w-5 text-foreground" />
           <h2 className="text-lg font-semibold text-foreground">Withdrawals Ledger</h2>
         </div>
-        <table className="w-full text-sm text-left">
-          <thead className="bg-secondary/50 text-muted-foreground text-xs uppercase font-semibold">
-            <tr>
-              <th className="px-6 py-4">Date</th>
-              <th className="px-6 py-4">Seller</th>
-              <th className="px-6 py-4">Amount</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {loading ? (
-              <tr><td colSpan={3} className="px-6 py-8 text-center text-muted-foreground">Loading...</td></tr>
-            ) : withdrawals.length === 0 ? (
-              <tr><td colSpan={3} className="px-6 py-8 text-center text-muted-foreground">No records.</td></tr>
-            ) : (
-              withdrawals.map(w => (
-                <tr key={w.transaction_id} className="hover:bg-secondary/30">
-                  <td className="px-6 py-4 text-muted-foreground">{w.created_at ? new Date(w.created_at).toLocaleDateString() : 'N/A'}</td>
-                  <td className="px-6 py-4 font-medium">{w.seller_name}</td>
-                  <td className="px-6 py-4 font-bold">{formatCurrency(w.amount_paise)}</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+        {loadingWithdrawals ? (
+          <div className="p-8 text-center text-muted-foreground">Loading withdrawals...</div>
+        ) : (
+          <DataTable columns={withdrawalColumns} data={withdrawals} />
+        )}
       </div>
     </div>
   );
