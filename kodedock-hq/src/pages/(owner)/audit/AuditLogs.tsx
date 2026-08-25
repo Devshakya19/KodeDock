@@ -102,10 +102,10 @@ export default function AuditLogs() {
   const logs: AuditLog[] = response?.data || [];
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto pb-20">
+    <div className="space-y-8 max-w-6xl mx-auto pb-20 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">Audit Logs</h2>
-        <p className="text-muted-foreground mt-1">
+        <h2 className="text-3xl font-bold tracking-tight text-foreground">Audit Logs</h2>
+        <p className="text-muted-foreground mt-1 font-medium">
           Track and review all administrative actions taken on the platform.
         </p>
       </div>

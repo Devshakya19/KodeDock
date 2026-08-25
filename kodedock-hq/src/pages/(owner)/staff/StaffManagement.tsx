@@ -194,11 +194,11 @@ export default function StaffManagement() {
   };
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto relative pb-20">
+    <div className="space-y-8 max-w-6xl mx-auto relative pb-20 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex justify-between items-end">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Staff Management</h2>
-          <p className="text-muted-foreground mt-1">
+          <h2 className="text-3xl font-bold tracking-tight text-foreground">Staff Management</h2>
+          <p className="text-muted-foreground mt-1 font-medium">
             Manage admin accounts, roles, and access permissions.
           </p>
         </div>

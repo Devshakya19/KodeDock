@@ -144,16 +144,51 @@ export default function Support() {
   });
 
   const tickets: SupportTicket[] = response?.data || [];
+  
+  const total = tickets.length;
+  const open = tickets.filter(t => t.status === 'open').length;
+  const inProgress = tickets.filter(t => t.status === 'in_progress').length;
 
   return (
-    <div className="space-y-6 pb-20 max-w-6xl mx-auto">
+    <div className="space-y-8 pb-20 max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
             <LifeBuoy className="h-8 w-8 text-sky-500" />
             Support Inbox
           </h1>
-          <p className="text-muted-foreground mt-1">Manage and resolve user queries and issues.</p>
+          <p className="text-muted-foreground mt-1 font-medium">Manage and resolve user queries and issues.</p>
+        </div>
+      </div>
+
+      {/* Mini Stats Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-card border border-border rounded-xl p-5 shadow-sm flex items-center gap-4">
+          <div className="h-12 w-12 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-500">
+            <CheckCircle className="h-6 w-6" />
+          </div>
+          <div>
+            <p className="text-sm font-bold text-muted-foreground">Open Tickets</p>
+            <h3 className="text-2xl font-black text-foreground">{open}</h3>
+          </div>
+        </div>
+        <div className="bg-card border border-border rounded-xl p-5 shadow-sm flex items-center gap-4">
+          <div className="h-12 w-12 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500">
+            <Clock className="h-6 w-6" />
+          </div>
+          <div>
+            <p className="text-sm font-bold text-muted-foreground">In Progress</p>
+            <h3 className="text-2xl font-black text-foreground">{inProgress}</h3>
+          </div>
+        </div>
+        <div className="bg-card border border-border rounded-xl p-5 shadow-sm flex items-center gap-4">
+          <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+            <LifeBuoy className="h-6 w-6" />
+          </div>
+          <div>
+            <p className="text-sm font-bold text-muted-foreground">Total Tickets</p>
+            <h3 className="text-2xl font-black text-foreground">{total}</h3>
+          </div>
         </div>
       </div>
 

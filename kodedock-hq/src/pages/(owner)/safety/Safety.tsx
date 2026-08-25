@@ -130,16 +130,51 @@ export default function Safety() {
   });
 
   const disputes: Dispute[] = response?.data || [];
+  
+  const total = disputes.length;
+  const open = disputes.filter(d => d.status === 'open').length;
+  const resolved = disputes.filter(d => d.status === 'resolved').length;
 
   return (
-    <div className="space-y-6 pb-20 max-w-6xl mx-auto">
+    <div className="space-y-8 pb-20 max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
             <Shield className="h-8 w-8 text-rose-500" />
             Trust & Safety
           </h1>
-          <p className="text-muted-foreground mt-1">Manage order disputes, reports, and platform integrity.</p>
+          <p className="text-muted-foreground mt-1 font-medium">Manage order disputes, reports, and platform integrity.</p>
+        </div>
+      </div>
+
+      {/* Mini Stats Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-card border border-border rounded-xl p-5 shadow-sm flex items-center gap-4">
+          <div className="h-12 w-12 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-500">
+            <AlertTriangle className="h-6 w-6" />
+          </div>
+          <div>
+            <p className="text-sm font-bold text-muted-foreground">Action Required</p>
+            <h3 className="text-2xl font-black text-foreground">{open}</h3>
+          </div>
+        </div>
+        <div className="bg-card border border-border rounded-xl p-5 shadow-sm flex items-center gap-4">
+          <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+            <Shield className="h-6 w-6" />
+          </div>
+          <div>
+            <p className="text-sm font-bold text-muted-foreground">Total Disputes</p>
+            <h3 className="text-2xl font-black text-foreground">{total}</h3>
+          </div>
+        </div>
+        <div className="bg-card border border-border rounded-xl p-5 shadow-sm flex items-center gap-4">
+          <div className="h-12 w-12 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+            <CheckCircle className="h-6 w-6" />
+          </div>
+          <div>
+            <p className="text-sm font-bold text-muted-foreground">Resolved</p>
+            <h3 className="text-2xl font-black text-foreground">{resolved}</h3>
+          </div>
         </div>
       </div>
 

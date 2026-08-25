@@ -63,14 +63,14 @@ export default function Settings() {
   };
 
   return (
-    <div className="space-y-6 pb-20 max-w-4xl">
+    <div className="space-y-8 pb-20 max-w-4xl animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
             <SettingsIcon className="h-8 w-8 text-indigo-500" />
             HQ Settings
           </h1>
-          <p className="text-muted-foreground mt-1">Manage your admin profile and platform configurations.</p>
+          <p className="text-muted-foreground mt-1 font-medium">Manage your admin profile and platform configurations.</p>
         </div>
       </div>
 
