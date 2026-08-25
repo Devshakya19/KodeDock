@@ -868,3 +868,10 @@ pub async fn github_unlink(pool: web::Data<PgPool>, req: HttpRequest) -> HttpRes
         error: None,
     })
 }
+
+pub async fn get_auth_config() -> impl actix_web::Responder {
+    let github_client_id = std::env::var("NEXT_PUBLIC_GITHUB_CLIENT_ID").or_else(|_| std::env::var("GITHUB_CLIENT_ID")).unwrap_or_default();
+    actix_web::HttpResponse::Ok().json(serde_json::json!({
+        "github_client_id": github_client_id
+    }))
+}

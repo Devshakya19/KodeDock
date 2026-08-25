@@ -4,6 +4,16 @@ All notable changes to the KodeDock backend project will be documented in this f
 
 ## [Unreleased]
 
+### ✨ Features
+- **HQ Integrations UI Overhaul:**
+  - Redesigned the `Integrations` page in HQ to use an aesthetic grid of cards.
+  - Implemented dynamic logo loading from `/icons/tech` for each integration card with a graceful fallback.
+  - Moved configuration secrets and enable/disable toggles into a polished modal to improve focus and prevent accidental edits.
+- **Real-Time Integrations Dynamic Sync:**
+  - Next.js frontend now fetches the GitHub Client ID dynamically at runtime via `/api/auth/config` instead of hardcoding `NEXT_PUBLIC_GITHUB_CLIENT_ID` at build time.
+  - Rust `core-engine` instantly sets `std::env::set_var` when the HQ dashboard updates configurations, avoiding the need for backend process restarts.
+
+
 ### 🐛 Bug Fixes
 - **HQ Search (Command Palette):** 
   - Added `Escape` key handler to close the global command menu.

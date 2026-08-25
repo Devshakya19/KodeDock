@@ -57,6 +57,7 @@ pub fn update_env_file(
         if !found {
             lines.push(format!("{}={}", k, v));
         }
+        std::env::set_var(k, v);
     }
 
     let new_content = lines.join("\n") + "\n";

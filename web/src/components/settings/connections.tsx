@@ -34,18 +34,22 @@ export function ConnectionsSettings() {
     });
   }, []);
 
-  function handleConnectGithub() {
-    setError("");
+  async function handleConnectGithub() {
+        setError("");
     setSuccess("");
-    const clientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID;
-    if (!clientId || clientId === "your_github_client_id") {
-      setError("GitHub Client ID is not configured in environment variables.");
-      return;
+    try {
+      const res = await fetch("/api/auth/config", { cache: "no-store" });
+      const data = await res.json();
+      const clientId = data.github_client_id;
+      if (!clientId || clientId === "your_github_client_id") {
+        setError("GitHub Client ID is not configured.");
+        return;
+      }
+      const state = btoa("link|/seller/settings/connections");
+      window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${window.location.origin}/api/auth/callback&scope=repo&state=${state}`;
+    } catch(e) {
+      setError("Failed to fetch configuration.");
     }
-
-    // Pass 'link' in state so the callback knows this is a linking action, not a login action
-    const state = btoa("link|/seller/settings/connections");
-    window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${window.location.origin}/api/auth/callback&scope=repo&state=${state}`;
   }
 
   async function handleUnlinkGithub() {
