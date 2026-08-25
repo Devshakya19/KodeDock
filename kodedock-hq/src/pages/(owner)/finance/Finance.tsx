@@ -143,10 +143,10 @@ export default function Finance() {
   const withdrawals = withdrawalsRes?.data || [];
 
   return (
-    <div className="space-y-8 pb-20 max-w-6xl mx-auto">
+    <div className="space-y-8 pb-20 max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-foreground">Finance & Payouts</h1>
-        <p className="text-muted-foreground mt-1">Manage seller withdrawals and platform revenue.</p>
+        <p className="text-muted-foreground mt-1 font-medium">Manage seller withdrawals and platform revenue.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
