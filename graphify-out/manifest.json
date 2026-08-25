@@ -648,15 +648,15 @@
     "semantic_hash": ""
   },
   "web/src/app/(seller)/seller/products/[id]/edit/page.tsx": {
-    "mtime": 1787588168.5875585,
-    "seen": 1787588477.786114,
-    "ast_hash": "205813c7ecbbc00733261bfa086377ce",
+    "mtime": 1787589758.8291566,
+    "seen": 1787589850.3194854,
+    "ast_hash": "e26b770fe5ae4bc355b50aed5d4c49da",
     "semantic_hash": ""
   },
   "web/src/app/(seller)/seller/products/new/page.tsx": {
-    "mtime": 1787588168.5890574,
-    "seen": 1787588477.786116,
-    "ast_hash": "43066ca97f0b59958d76fbb88ab839f8",
+    "mtime": 1787589758.9882495,
+    "seen": 1787589850.3194892,
+    "ast_hash": "d1f3f80c6b0e149cfa0a198b14a726f7",
     "semantic_hash": ""
   },
   "web/src/app/(seller)/seller/products/page.tsx": {
@@ -726,9 +726,9 @@
     "semantic_hash": ""
   },
   "web/src/app/(shop)/browse/components/browse-filters.tsx": {
-    "mtime": 1787588168.5928762,
-    "seen": 1787588477.786869,
-    "ast_hash": "896c463eabcd0465f4350618a550fb49",
+    "mtime": 1787589759.2802508,
+    "seen": 1787589850.319519,
+    "ast_hash": "2e2aa399f8b0322c38355e9d3883d11d",
     "semantic_hash": ""
   },
   "web/src/app/(shop)/browse/components/product-card.tsx": {
@@ -984,9 +984,9 @@
     "semantic_hash": ""
   },
   "web/src/components/landing/categories.tsx": {
-    "mtime": 1787588168.6021585,
-    "seen": 1787588477.7895548,
-    "ast_hash": "7a83a9fd27bd365966a4e35d60d1bb47",
+    "mtime": 1787589760.3682554,
+    "seen": 1787589850.3196287,
+    "ast_hash": "b77d72427bdb580039ee1b20b47545ea",
     "semantic_hash": ""
   },
   "web/src/components/landing/features.tsx": {

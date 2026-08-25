@@ -1,16 +1,16 @@
 # Graph Report - KodeDock  (2026-08-24)
 
 ## Corpus Check
-- 362 files · ~887,598 words
+- 362 files · ~887,734 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 4345 nodes · 5975 edges · 345 communities (278 shown, 67 thin omitted)
+- 4348 nodes · 5976 edges · 353 communities (284 shown, 69 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 96 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `95a07ce5`
+- Built from commit: `a7d3f738`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -22,7 +22,7 @@
 - cn
 - fontSize
 - slide_search_core.py
-- extract_user_id
+- require_developer
 - Finance.tsx
 - seller/page.tsx
 - models/mod.rs
@@ -89,7 +89,7 @@
 - main.go
 - app/layout.tsx
 - Data
-- HttpRequest
+- wallet.rs
 - Json
 - Prerequisites
 - devDependencies
@@ -171,7 +171,7 @@
 - KodeDock HQ - System Architecture Blueprint
 - Security, Audit Logs, and Workflows
 - services/hq.rs
-- create_review
+- StorageClient
 - button.tsx
 - React + TypeScript + Vite
 - Path
@@ -313,10 +313,13 @@
 - Performance Issues
 - 16
 - Vec
+- mark_read
 - 8
+- update_profile
 - graphify reference: GitHub clone and cross-repo merge
 - graphify reference: transcribe video and audio
 - [2026-08-11 / 2026-08-12] - Core Engine Initial Fixes & Rate Limiting
+- presign_upload
 - md
 - 1. THE THREE DIALS (Core Configuration)
 - [v1.5.1] - 2026-08-23
@@ -341,6 +344,11 @@
 - 6
 - primary
 - [2026-08-15] - Deferred Uploads, Schema Synchronization & UI Fixes
+- create_or_update_payout_account
+- extract_user_id
+- Error
+- HttpRequest
+- HttpResponse
 
 ## God Nodes (most connected - your core abstractions)
 1. `react` - 70 edges
@@ -369,7 +377,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (345 total, 67 thin omitted)
+## Communities (353 total, 69 thin omitted)
 
 ### Community 0 - "Changelog"
 Cohesion: 0.10
@@ -399,9 +407,9 @@ Nodes (16): $type, $value, $type, $value, $type, $value, $type, $value (+8 more)
 Cohesion: 0.08
 Nodes (36): format_context(), format_result(), main(), Format a single search result for display, Format contextual recommendations for display., BM25, calculate_pattern_break(), detect_domain() (+28 more)
 
-### Community 7 - "extract_user_id"
-Cohesion: 0.05
-Nodes (69): Client, Clone, get_preferences(), list_notifications(), mark_all_read(), mark_read(), Data, HttpRequest (+61 more)
+### Community 7 - "require_developer"
+Cohesion: 0.37
+Nodes (15): HttpResponse, create_product(), delete_product(), get_seller_reviews(), get_stats(), list_seller_products(), Data, HttpRequest (+7 more)
 
 ### Community 8 - "Finance.tsx"
 Cohesion: 0.40
@@ -412,8 +420,8 @@ Cohesion: 0.11
 Nodes (16): Order, SalesChart(), SalesChartProps, SellerStatsDeck(), SellerStatsDeckProps, dynamic, Order, revalidate (+8 more)
 
 ### Community 10 - "models/mod.rs"
-Cohesion: 0.09
-Nodes (59): Decimal, From, complete_topup_atomic(), create_topup(), get_balance(), list_transactions(), release_escrow(), Bytes (+51 more)
+Cohesion: 0.10
+Nodes (49): Decimal, From, create_review(), list_reviews(), notify_seller_on_review(), ReviewWithUser, Data, DateTime (+41 more)
 
 ### Community 11 - "spacing"
 Cohesion: 0.09
@@ -433,7 +441,7 @@ Nodes (16): Test adding colors multiple times., Test adding full color palette.,
 
 ### Community 15 - "handlers/hq.rs"
 Cohesion: 0.16
-Nodes (55): Data, HttpRequest, Json, Path, Query, Responder, create_category(), CreateCatReq (+47 more)
+Nodes (55): Data, Json, Path, Query, Responder, create_category(), CreateCatReq, delete_category_handler() (+47 more)
 
 ### Community 16 - "Tailwind CSS Utility Reference"
 Cohesion: 0.05
@@ -663,6 +671,10 @@ Nodes (7): context.Context, redis.Client, redis.Options, main(), parseRedisURL()
 Cohesion: 0.29
 Nodes (5): geistMono, geistSans, metadata, sora, ThemeProvider()
 
+### Community 74 - "wallet.rs"
+Cohesion: 0.18
+Nodes (25): complete_topup_atomic(), create_topup(), get_balance(), list_transactions(), release_escrow(), Bytes, Data, HttpRequest (+17 more)
+
 ### Community 76 - "Prerequisites"
 Cohesion: 0.06
 Nodes (33): Accessibility, Available Domains, Available Stacks, Common Rules for Professional UI, Common Sticking Points, Example Workflow, How to Use This Skill, Icons & Visual Elements (+25 more)
@@ -837,11 +849,11 @@ Nodes (4): 1. Immutable Audit Logging, 2. Sensitive Action Approvals (Maker-Chec
 
 ### Community 170 - "services/hq.rs"
 Cohesion: 0.12
-Nodes (65): Box, DateTime, Error, HqAuditLog, HqAuditLogView, HqCategory, HqDashboardStats, HqDispute (+57 more)
+Nodes (65): Box, DateTime, HqAuditLog, HqAuditLogView, HqCategory, HqDashboardStats, HqDispute, HqFinanceStats (+57 more)
 
-### Community 171 - "create_review"
-Cohesion: 0.19
-Nodes (15): create_review(), list_reviews(), notify_seller_on_review(), ReviewWithUser, Data, DateTime, HttpRequest, HttpResponse (+7 more)
+### Community 171 - "StorageClient"
+Cohesion: 0.22
+Nodes (7): Client, Clone, Option, Result, Self, String, StorageClient
 
 ### Community 172 - "button.tsx"
 Cohesion: 0.10
@@ -1363,13 +1375,25 @@ Nodes (4): High Memory Usage, Performance Issues, Slow API Response Times, Slow 
 Cohesion: 0.67
 Nodes (3): $type, $value, 16
 
+### Community 317 - "mark_read"
+Cohesion: 0.33
+Nodes (13): get_preferences(), list_notifications(), mark_all_read(), mark_read(), Data, HttpRequest, HttpResponse, Json (+5 more)
+
 ### Community 318 - "8"
 Cohesion: 0.67
 Nodes (3): $type, $value, 8
 
+### Community 319 - "update_profile"
+Cohesion: 0.27
+Nodes (10): get_profile(), Data, HttpRequest, HttpResponse, Json, Path, PgPool, String (+2 more)
+
 ### Community 322 - "[2026-08-11 / 2026-08-12] - Core Engine Initial Fixes & Rate Limiting"
 Cohesion: 0.67
 Nodes (3): [2026-08-11 / 2026-08-12] - Core Engine Initial Fixes & Rate Limiting, Fixed, Security
+
+### Community 323 - "presign_upload"
+Cohesion: 0.27
+Nodes (9): extension_from_content_type(), presign_upload(), PresignRequest, PresignResponse, Data, HttpRequest, HttpResponse, Json (+1 more)
 
 ### Community 324 - "md"
 Cohesion: 0.67
@@ -1407,20 +1431,28 @@ Nodes (3): primary, $type, $value
 Cohesion: 0.67
 Nodes (3): [2026-08-15] - Deferred Uploads, Schema Synchronization & UI Fixes, 🐛 Bug Fixes, ✨ Features
 
+### Community 348 - "create_or_update_payout_account"
+Cohesion: 0.47
+Nodes (8): create_or_update_payout_account(), delete_payout_account(), get_payout_account(), Data, HttpRequest, HttpResponse, Json, PgPool
+
+### Community 349 - "extract_user_id"
+Cohesion: 0.42
+Nodes (8): AuthClaims, extract_user_id(), HqAuthClaims, Error, HttpRequest, Result, String, verify_bearer()
+
 ## Knowledge Gaps
 - **2093 isolated node(s):** `BrowseFiltersProps`, `ProductCardProps`, `Product`, `ProductGridProps`, `BrowsePageProps` (+2088 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **67 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **69 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `react` connect `react` to `apiPost`, `plugins`, `verifyToken`, `cn`, `Finance.tsx`, `seller/page.tsx`, `app/layout.tsx`, `button.tsx`, `AuthContext.tsx`, `Marketplace.tsx`, `Safety.tsx`, `Support.tsx`, `Users.tsx`, `profile.tsx`, `auth/client.ts`, `security.tsx`, `(main)/page.tsx`?**
-  _High betweenness centrality (0.009) - this node is a cross-community bridge._
-- **Why does `extract_user_id()` connect `extract_user_id` to `models/mod.rs`, `create_review`, `orders.rs`, `get_product`?**
+  _High betweenness centrality (0.007) - this node is a cross-community bridge._
+- **Why does `extract_user_id()` connect `extract_user_id` to `presign_upload`, `models/mod.rs`, `wallet.rs`, `get_product`, `orders.rs`, `mark_read`, `update_profile`?**
   _High betweenness centrality (0.003) - this node is a cross-community bridge._
-- **Why does `apiGet()` connect `react` to `apiPost`, `verifyToken`, `cn`, `profile.tsx`, `security.tsx`, `(main)/page.tsx`?**
-  _High betweenness centrality (0.002) - this node is a cross-community bridge._
+- **Why does `jsonwebtoken` connect `services/auth.rs` to `services/hq.rs`, `extract_user_id`?**
+  _High betweenness centrality (0.003) - this node is a cross-community bridge._
 - **Are the 2 inferred relationships involving `TailwindConfigGenerator` (e.g. with `TestGeneratedConfigIsValidJs` and `TestTailwindConfigGenerator`) actually correct?**
   _`TailwindConfigGenerator` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `BrowseFiltersProps`, `ProductCardProps`, `Product` to the rest of the system?**
