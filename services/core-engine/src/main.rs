@@ -183,6 +183,14 @@ async fn main() -> std::io::Result<()> {
             .route("/api/hq/staff", web::get().to(handlers::hq::get_staff))
             .route("/api/hq/staff", web::post().to(handlers::hq::invite_staff))
             .route(
+                "/api/hq/staff/{id}/status",
+                web::put().to(handlers::hq::set_staff_status),
+            )
+            .route(
+                "/api/hq/staff/{id}/role",
+                web::put().to(handlers::hq::set_staff_role),
+            )
+            .route(
                 "/api/hq/catalog/categories",
                 web::get().to(handlers::hq::get_categories),
             )
