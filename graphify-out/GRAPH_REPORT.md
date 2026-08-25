@@ -1,16 +1,16 @@
 # Graph Report - KodeDock  (2026-08-25)
 
 ## Corpus Check
-- 365 files · ~720,234 words
+- 366 files · ~720,780 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 4417 nodes · 6088 edges · 360 communities (289 shown, 71 thin omitted)
+- 4424 nodes · 6095 edges · 369 communities (298 shown, 71 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 96 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `56611f3f`
+- Built from commit: `5874fbb8`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -90,7 +90,7 @@
 - app/layout.tsx
 - web/package.json
 - apiPost
-- none
+- mark_read
 - Prerequisites
 - devDependencies
 - components/settings/layout.tsx
@@ -121,7 +121,7 @@
 - register/route.ts
 - .test_add_components_no_config
 - Component Specifications
-- 2
+- update_product
 - shadcn/ui Accessibility Patterns
 - KodeDock — Terms of Service
 - .test_get_installed_components_empty
@@ -171,13 +171,13 @@
 - KodeDock HQ - System Architecture Blueprint
 - Security, Audit Logs, and Workflows
 - services/hq.rs
-- extract_user_id
+- StorageClient
 - react
 - React + TypeScript + Vite
-- 4
+- 1. THE THREE DIALS (Core Configuration)
 - KodeDock — Project Requirement Document
-- appearance.tsx
-- .test_add_components_already_installed
+- update_profile
+- presign_upload
 - KodeDock — Refund & Cancellation Policy
 - Routing by Task Type
 - kodedock-hq/tsconfig.json
@@ -193,7 +193,7 @@
 - CIP Mockup Prompt Engineering
 - Color Semantics
 - Agent Skill: Principal UI/UX Architect & Motion Choreographer (Awwwards-Tier)
-- axios
+- extract_user_id
 - jspdf
 - CORE DIRECTIVE: AWWWARDS-LEVEL IMAGE ART DIRECTION
 - SKILL: Industrial Brutalism & Tactical Telemetry UI
@@ -241,7 +241,7 @@
 - 18. EXTRA CREATIVITY & IMPLEMENTATION EDGE
 - Dark mode
 - 11. Page Designs
-- 2.2 Light Theme
+- create_or_update_payout_account
 - 3.1 Font roles
 - 9. AI TELLS (Forbidden Patterns)
 - 12. THE COMBINATORIAL VARIATION ENGINE
@@ -280,7 +280,7 @@
 - [v1.3.0] - 2026-08-12
 - 13. Motion & Interaction
 - 1. Design Philosophy
-- 2.3 Dark Theme
+- 2.2 Light Theme
 - profile.tsx
 - Environment Setup
 - Backend Issues
@@ -336,17 +336,19 @@
 - workflows/graphify.md
 - footer.tsx
 - dependencies
-- class-variance-authority
+- [v1.4.1] - 2026-08-21
 - kodedock-hq/package.json
 - table.tsx
 - clsx
-- notifications.tsx
+- [v1.4.2] - 2026-08-22
 - lucide-react
-- primary
-- [v1.5.0] - 2026-08-22
+- notifications.tsx
+- appearance.tsx
 - react-dom
 - tailwindcss-animate
 - StaffManagement.tsx
+- padding-y
+- .test_init_default_project_root
 - Contributors — KodeDock
 - main.tsx
 - AuditLogs.tsx
@@ -354,6 +356,12 @@
 - PlatformSettings.tsx
 - Login.tsx
 - Setup.tsx
+- react
+- none
+- 1
+- 3
+- destructive
+- class-variance-authority
 - api.ts
 - PayoutSettings
 
@@ -384,11 +392,11 @@
 ## Import Cycles
 - None detected.
 
-## Communities (360 total, 71 thin omitted)
+## Communities (369 total, 71 thin omitted)
 
 ### Community 0 - "Changelog"
-Cohesion: 0.10
-Nodes (19): [2026-08-13] - Core Engine Security & Deep Audit Fixes, [2026-08-14] - Core Engine Final Deep Scan & Refinements, [2026-08-15] - Deferred Uploads, Schema Synchronization & UI Fixes, 🌓 Advanced Theming & Dark Mode Perfection, 🐛 Bug Fixes, 🐛 Bug Fixes, Changelog, 🛡️ Core Engine Security & Database (+11 more)
+Cohesion: 0.11
+Nodes (18): [2026-08-13] - Core Engine Security & Deep Audit Fixes, [2026-08-14] - Core Engine Final Deep Scan & Refinements, [2026-08-15] - Deferred Uploads, Schema Synchronization & UI Fixes, ⚙️ Architecture & Microservices, 🐛 Bug Fixes, 🐛 Bug Fixes, Changelog, 🛡️ Core Engine Security & Database (+10 more)
 
 ### Community 1 - "verifyToken"
 Cohesion: 0.10
@@ -448,7 +456,7 @@ Nodes (16): Test adding colors multiple times., Test adding full color palette.,
 
 ### Community 15 - "handlers/hq.rs"
 Cohesion: 0.16
-Nodes (59): Responder, create_category(), CreateCatReq, delete_category_handler(), finance_stats(), get_audit_logs(), get_categories(), get_disputes() (+51 more)
+Nodes (59): create_category(), CreateCatReq, delete_category_handler(), finance_stats(), get_audit_logs(), get_categories(), get_disputes(), get_integrations() (+51 more)
 
 ### Community 16 - "Tailwind CSS Utility Reference"
 Cohesion: 0.05
@@ -463,8 +471,8 @@ Cohesion: 0.13
 Nodes (24): get_context(), is_allowed_exception(), is_allowed_rgba(), is_inside_block(), load_css_variables(), main(), print_result(), print_summary() (+16 more)
 
 ### Community 19 - "handlers/auth.rs"
-Cohesion: 0.21
-Nodes (27): AuthResponse, change_password(), ChangePasswordRequest, delete_account(), forgot_password(), ForgotPasswordRequest, github_link(), github_oauth() (+19 more)
+Cohesion: 0.19
+Nodes (29): AuthResponse, change_password(), ChangePasswordRequest, delete_account(), forgot_password(), ForgotPasswordRequest, get_auth_config(), github_link() (+21 more)
 
 ### Community 20 - "Brand Guidelines v1.0"
 Cohesion: 0.05
@@ -500,7 +508,7 @@ Nodes (18): ansi_ljust(), format_ascii_box(), format_markdown(), format_master_m
 
 ### Community 28 - "color"
 Cohesion: 0.11
-Nodes (19): $type, $value, background, destructive, foreground, muted-foreground, primary-hover, secondary (+11 more)
+Nodes (19): $type, $value, background, foreground, muted-foreground, primary, primary-hover, secondary (+11 more)
 
 ### Community 29 - "DesignSystemGenerator"
 Cohesion: 0.14
@@ -543,12 +551,12 @@ Cohesion: 0.05
 Nodes (53): $type, $value, $type, $value, $type, $value, $type, $value (+45 more)
 
 ### Community 39 - "input"
-Cohesion: 0.20
-Nodes (12): padding-x, padding-y, input, $type, $value, focus-ring, padding-x, padding-y (+4 more)
+Cohesion: 0.29
+Nodes (8): padding-x, input, $type, $value, focus-ring, padding-x, $type, $value
 
 ### Community 40 - "TestShadcnInstaller"
 Cohesion: 0.12
-Nodes (9): Test adding components in dry run mode., Test ShadcnInstaller class., Test adding all components without config., Test adding all components in dry run mode., Test listing installed components without config., Test listing installed components when none exist., Test listing installed components when they exist., Test initialization with custom project root. (+1 more)
+Nodes (9): Test adding components in dry run mode., Test ShadcnInstaller class., Test adding all components without config., Test adding all components in dry run mode., Test listing installed components without config., Test listing installed components when none exist., Test initialization with custom project root., Test checking for non-existent shadcn config. (+1 more)
 
 ### Community 41 - "extract-colors.cjs"
 Cohesion: 0.22
@@ -580,7 +588,7 @@ Nodes (10): fg, font-size, hover-bg, button, $type, $value, $type, $value (+2 mo
 
 ### Community 48 - "ShadcnInstaller"
 Cohesion: 0.20
-Nodes (7): main(), Handle shadcn/ui component installation., ShadcnInstaller, Tests for shadcn_add.py, Test initialization with default project root., Test checking for non-existent shadcn config., Test getting installed components without config.
+Nodes (7): main(), Handle shadcn/ui component installation., ShadcnInstaller, Tests for shadcn_add.py, Test adding components that are already installed., Test listing installed components when they exist., Test getting installed components without config.
 
 ### Community 49 - ".check_shadcn_config"
 Cohesion: 0.21
@@ -686,9 +694,9 @@ Nodes (9): name, private, scripts, build, dev, format:check, lint, start (+1 mor
 Cohesion: 0.08
 Nodes (26): ForgotPasswordPage(), handleSubmit(), ResetPasswordForm(), handleSubmit(), NewProductPage(), handleSubmit(), CheckoutContent(), handleRazorpayPayment() (+18 more)
 
-### Community 75 - "none"
-Cohesion: 0.67
-Nodes (4): $type, $value, none, none
+### Community 75 - "mark_read"
+Cohesion: 0.33
+Nodes (13): get_preferences(), list_notifications(), mark_all_read(), mark_read(), Data, HttpRequest, HttpResponse, Json (+5 more)
 
 ### Community 76 - "Prerequisites"
 Cohesion: 0.06
@@ -751,8 +759,8 @@ Cohesion: 0.19
 Nodes (15): create_review(), list_reviews(), notify_seller_on_review(), ReviewWithUser, Data, DateTime, HttpRequest, HttpResponse (+7 more)
 
 ### Community 96 - "Integrations.tsx"
-Cohesion: 0.50
-Nodes (3): getProviderDetails(), Integration, Integrations()
+Cohesion: 0.47
+Nodes (4): getProviderDetails(), Integration, IntegrationLogo(), Integrations()
 
 ### Community 97 - "plugins"
 Cohesion: 0.22
@@ -762,9 +770,9 @@ Nodes (8): plugins, rules, react/only-export-components, react/rules-of-hooks, $
 Cohesion: 0.07
 Nodes (28): Alert, Anatomy, Anatomy, Anatomy, Anatomy, Anatomy, Badge, Button (+20 more)
 
-### Community 106 - "2"
-Cohesion: 0.67
-Nodes (3): $type, $value, 2
+### Community 106 - "update_product"
+Cohesion: 0.41
+Nodes (13): create_product(), delete_product(), get_seller_reviews(), get_stats(), list_seller_products(), Data, HttpRequest, HttpResponse (+5 more)
 
 ### Community 107 - "shadcn/ui Accessibility Patterns"
 Cohesion: 0.07
@@ -874,9 +882,9 @@ Nodes (4): 1. Immutable Audit Logging, 2. Sensitive Action Approvals (Maker-Chec
 Cohesion: 0.09
 Nodes (80): Display, Formatter, HqAuditLog, HqAuditLogView, HqCategory, HqDashboardStats, HqDispute, HqFinanceStats (+72 more)
 
-### Community 171 - "extract_user_id"
-Cohesion: 0.05
-Nodes (69): Client, Clone, get_preferences(), list_notifications(), mark_all_read(), mark_read(), Data, HttpRequest (+61 more)
+### Community 171 - "StorageClient"
+Cohesion: 0.22
+Nodes (7): Client, Clone, Option, Result, Self, String, StorageClient
 
 ### Community 172 - "react"
 Cohesion: 0.05
@@ -886,13 +894,21 @@ Nodes (41): DataTableProps, settingsSchema, SettingsValues, react, DeveloperRegi
 Cohesion: 0.50
 Nodes (3): Expanding the Oxlint configuration, React Compiler, React + TypeScript + Vite
 
-### Community 174 - "4"
-Cohesion: 0.67
-Nodes (3): $type, $value, 4
+### Community 174 - "1. THE THREE DIALS (Core Configuration)"
+Cohesion: 0.50
+Nodes (4): 1.A Dial Inference (design read → dial values), 1.B Use-Case Presets, 1.C How the Dials Drive Output, 1. THE THREE DIALS (Core Configuration)
 
 ### Community 175 - "KodeDock — Project Requirement Document"
 Cohesion: 0.09
 Nodes (22): 1. Executive Summary, 2. Problem Statement, 3. Solution Overview, 4. Target Audience, 5. Business Model, 6. MVP Scope (Phase 1) & Current Status, 7. Product Roadmap, 8. Success Metrics (+14 more)
+
+### Community 176 - "update_profile"
+Cohesion: 0.27
+Nodes (10): get_profile(), Data, HttpRequest, HttpResponse, Json, Path, PgPool, String (+2 more)
+
+### Community 177 - "presign_upload"
+Cohesion: 0.27
+Nodes (9): extension_from_content_type(), presign_upload(), PresignRequest, PresignResponse, Data, HttpRequest, HttpResponse, Json (+1 more)
 
 ### Community 178 - "KodeDock — Refund & Cancellation Policy"
 Cohesion: 0.10
@@ -950,6 +966,10 @@ Nodes (17): Accent, Applying Semantic Tokens, Background & Foreground, Border & 
 Cohesion: 0.11
 Nodes (17): 1. Meta Information & Core Directive, 2. THE "ABSOLUTE ZERO" DIRECTIVE (STRICT ANTI-PATTERNS), 3. THE CREATIVE VARIANCE ENGINE, 4. HAPTIC MICRO-AESTHETICS (COMPONENT MASTERY), 5. MOTION CHOREOGRAPHY (FLUID DYNAMICS), 6. PERFORMANCE GUARDRAILS, 7. EXECUTION PROTOCOL, 8. PRE-OUTPUT CHECKLIST (+9 more)
 
+### Community 195 - "extract_user_id"
+Cohesion: 0.42
+Nodes (9): AuthClaims, extract_user_id(), HqAuthClaims, require_developer(), HttpRequest, HttpResponse, Result, String (+1 more)
+
 ### Community 198 - "CORE DIRECTIVE: AWWWARDS-LEVEL IMAGE ART DIRECTION"
 Cohesion: 0.12
 Nodes (16): 10. SECTION RHYTHM RULE, 12. DENSITY & SPACING DISCIPLINE, 14. IMAGE / MEDIA DIRECTION, 16. MULTI-IMAGE CONSISTENCY RULE, 17. CLARITY CHECK, 19. RESPONSE BEHAVIOR, 1. ACTIVE BASELINE CONFIGURATION, 21. FINAL GOAL (+8 more)
@@ -983,8 +1003,8 @@ Cohesion: 0.13
 Nodes (14): AIDA (Attention-Interest-Desire-Action), Before-After-Bridge, Contrast Patterns, Copywriting Formulas, Core Formulas, Cost of Inaction, FAB (Features-Advantages-Benefits), Formula-to-Slide Mapping (+6 more)
 
 ### Community 206 - "tasteskill: Anti-Slop Frontend Skill"
-Cohesion: 0.13
-Nodes (15): 0.A Read these signals first, 0.B Output a one-line "Design Read" before generating, 0. BRIEF INFERENCE (Read the Room Before Anything Else), 0.C If the brief is ambiguous, ask one question, do not guess, 0.D Anti-Default Discipline, 13. OUT OF SCOPE, 14. FINAL PRE-FLIGHT CHECK, 1.A Dial Inference (design read → dial values) (+7 more)
+Cohesion: 0.18
+Nodes (11): 0.A Read these signals first, 0.B Output a one-line "Design Read" before generating, 0. BRIEF INFERENCE (Read the Room Before Anything Else), 0.C If the brief is ambiguous, ask one question, do not guess, 0.D Anti-Default Discipline, 13. OUT OF SCOPE, 14. FINAL PRE-FLIGHT CHECK, 2.A When to reach for a real design system (use official packages) (+3 more)
 
 ### Community 207 - "Appendix B - Canonical Sources (read these before reinventing)"
 Cohesion: 0.13
@@ -1134,9 +1154,9 @@ Nodes (9): 10% — Electric Purple, 10% — Electric Purple, 30% — Black / neu
 Cohesion: 0.22
 Nodes (9): 11.1 Landing / Marketing Page, 11.2 Browse Page, 11.3 Seller Dashboard, 11.4 Checkout, 11. Page Designs, Marketing visual rules, Product card, Structure (+1 more)
 
-### Community 244 - "2.2 Light Theme"
-Cohesion: 0.40
-Nodes (5): 2.2 Light Theme, Accent, Borders, Core, Secondary surfaces
+### Community 244 - "create_or_update_payout_account"
+Cohesion: 0.47
+Nodes (8): create_or_update_payout_account(), delete_payout_account(), get_payout_account(), Data, HttpRequest, HttpResponse, Json, PgPool
 
 ### Community 245 - "3.1 Font roles"
 Cohesion: 0.22
@@ -1286,9 +1306,9 @@ Nodes (5): 13. Motion & Interaction, Allowed, Avoid, Easing, Timing
 Cohesion: 0.40
 Nodes (5): 1. Design Philosophy, Core principles, KodeDock — UI/UX Design System, Table of Contents, Visual character
 
-### Community 283 - "2.3 Dark Theme"
-Cohesion: 0.22
-Nodes (9): 2.1 Brand colors, 2.3 Dark Theme, 2.4 Semantic colors, 2. Brand Color System, Accent, Borders, Brand rule, Core (+1 more)
+### Community 283 - "2.2 Light Theme"
+Cohesion: 0.14
+Nodes (14): 2.1 Brand colors, 2.2 Light Theme, 2.3 Dark Theme, 2.4 Semantic colors, 2. Brand Color System, Accent, Accent, Borders (+6 more)
 
 ### Community 284 - "profile.tsx"
 Cohesion: 0.26
@@ -1428,7 +1448,11 @@ Nodes (3): LinkedinIcon(), TwitterIcon(), Footer()
 
 ### Community 338 - "dependencies"
 Cohesion: 0.11
-Nodes (19): cmdk, @hookform/resolvers, dependencies, clsx, cmdk, @hookform/resolvers, lucide-react, react (+11 more)
+Nodes (19): axios, cmdk, @hookform/resolvers, dependencies, axios, clsx, cmdk, @hookform/resolvers (+11 more)
+
+### Community 339 - "[v1.4.1] - 2026-08-21"
+Cohesion: 0.67
+Nodes (3): 🌓 Advanced Theming & Dark Mode Perfection, ⚙️ Settings & Performance, [v1.4.1] - 2026-08-21
 
 ### Community 340 - "kodedock-hq/package.json"
 Cohesion: 0.20
@@ -1438,17 +1462,17 @@ Nodes (9): name, private, scripts, build, dev, lint, preview, type (+1 more)
 Cohesion: 0.22
 Nodes (8): Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow
 
-### Community 346 - "primary"
+### Community 343 - "[v1.4.2] - 2026-08-22"
 Cohesion: 0.67
-Nodes (3): primary, $type, $value
-
-### Community 347 - "[v1.5.0] - 2026-08-22"
-Cohesion: 0.67
-Nodes (3): ⚙️ Architecture & Microservices, ✨ New Features, [v1.5.0] - 2026-08-22
+Nodes (3): 🐛 Bug Fixes, 🎨 UI/UX Refinements, [v1.4.2] - 2026-08-22
 
 ### Community 350 - "StaffManagement.tsx"
 Cohesion: 0.29
 Nodes (4): columns, inviteSchema, InviteValues, Staff
+
+### Community 351 - "padding-y"
+Cohesion: 0.67
+Nodes (4): padding-y, padding-y, $type, $value
 
 ### Community 353 - "Contributors — KodeDock"
 Cohesion: 0.50
@@ -1462,29 +1486,45 @@ Nodes (3): Category, categorySchema, CategoryValues
 Cohesion: 0.40
 Nodes (3): platformSchema, PlatformValues, Setting
 
+### Community 361 - "none"
+Cohesion: 0.67
+Nodes (4): $type, $value, none, none
+
+### Community 362 - "1"
+Cohesion: 0.67
+Nodes (3): $type, $value, 1
+
+### Community 363 - "3"
+Cohesion: 0.67
+Nodes (3): $type, $value, 3
+
+### Community 364 - "destructive"
+Cohesion: 0.67
+Nodes (3): destructive, $type, $value
+
 ### Community 374 - "PayoutSettings"
 Cohesion: 0.29
 Nodes (3): PayoutSettings(), handleSave(), validate()
 
 ## Knowledge Gaps
-- **2137 isolated node(s):** `fs`, `path`, `fs`, `path`, `fs` (+2132 more)
+- **2138 isolated node(s):** `fs`, `path`, `fs`, `path`, `fs` (+2133 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **71 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `react` connect `react` to `verifyToken`, `app-navbar.tsx`, `wallet-popup.tsx`, `Finance.tsx`, `seller/page.tsx`, `AuthContext.tsx`, `profile.tsx`, `Marketplace.tsx`, `Safety.tsx`, `Support.tsx`, `Users.tsx`, `card.tsx`, `appearance.tsx`, `button.tsx`, `auth/client.ts`, `(main)/page.tsx`, `app/layout.tsx`, `apiPost`, `footer.tsx`, `table.tsx`, `notifications.tsx`, `StaffManagement.tsx`, `Integrations.tsx`, `plugins`, `main.tsx`, `AuditLogs.tsx`, `Catalog.tsx`, `PlatformSettings.tsx`?**
+- **Why does `react` connect `react` to `verifyToken`, `app-navbar.tsx`, `wallet-popup.tsx`, `Finance.tsx`, `seller/page.tsx`, `AuthContext.tsx`, `profile.tsx`, `Marketplace.tsx`, `Safety.tsx`, `Support.tsx`, `Users.tsx`, `card.tsx`, `button.tsx`, `auth/client.ts`, `(main)/page.tsx`, `app/layout.tsx`, `apiPost`, `footer.tsx`, `table.tsx`, `notifications.tsx`, `appearance.tsx`, `StaffManagement.tsx`, `Integrations.tsx`, `plugins`, `main.tsx`, `AuditLogs.tsx`, `Catalog.tsx`, `PlatformSettings.tsx`?**
   _High betweenness centrality (0.010) - this node is a cross-community bridge._
+- **Why does `extract_user_id()` connect `extract_user_id` to `models/mod.rs`, `mark_read`, `services/hq.rs`, `get_product`, `update_profile`, `presign_upload`, `orders.rs`, `create_review`?**
+  _High betweenness centrality (0.004) - this node is a cross-community bridge._
 - **Why does `primitive` connect `radius` to `fontSize`, `gray`, `spacing`, `design-tokens-starter.json`, `duration`?**
-  _High betweenness centrality (0.003) - this node is a cross-community bridge._
-- **Why does `extract_user_id()` connect `extract_user_id` to `services/hq.rs`, `models/mod.rs`, `get_product`, `orders.rs`, `create_review`?**
   _High betweenness centrality (0.003) - this node is a cross-community bridge._
 - **Are the 2 inferred relationships involving `TailwindConfigGenerator` (e.g. with `TestGeneratedConfigIsValidJs` and `TestTailwindConfigGenerator`) actually correct?**
   _`TailwindConfigGenerator` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `fs`, `path`, `fs` to the rest of the system?**
-  _2137 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _2138 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Changelog` be split into smaller, more focused modules?**
-  _Cohesion score 0.1 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.10526315789473684 - nodes in this community are weakly interconnected._
 - **Should `verifyToken` be split into smaller, more focused modules?**
   _Cohesion score 0.10338680926916222 - nodes in this community are weakly interconnected._

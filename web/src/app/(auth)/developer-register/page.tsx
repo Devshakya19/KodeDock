@@ -59,16 +59,26 @@ export default function DeveloperRegisterPage() {
     }
   }
 
-  async function handleGithubLogin() {
+    async function handleGithubLogin() {
     setError("");
-    const clientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID;
-    if (!clientId || clientId === "your_github_client_id") {
-      setError("GitHub login is not configured");
-      return;
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/config", { cache: "no-store" });
+      const data = await res.json();
+      const clientId = data.github_client_id;
+      
+      if (!clientId || clientId === "your_github_client_id") {
+        setError("GitHub login is not configured");
+        setLoading(false);
+        return;
+      }
+      // State encodes role + next URL so the callback knows where to redirect.
+      const state = btoa("developer|/seller");
+      window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${window.location.origin}/api/auth/callback&state=${state}`;
+    } catch (e) {
+      setError("Failed to connect to authentication server.");
+      setLoading(false);
     }
-    // Developer register → role is "developer", redirect to /seller after auth.
-    const state = btoa("developer|/seller");
-    window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${window.location.origin}/api/auth/callback&state=${state}`;
   }
 
   if (success) {

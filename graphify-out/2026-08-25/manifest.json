@@ -1920,9 +1920,9 @@
     "semantic_hash": ""
   },
   "CHANGE.md": {
-    "mtime": 1787651767.5337915,
-    "seen": 1787651796.4340472,
-    "ast_hash": "236ef0aef9640f5c1b3fbe861d8eca29",
+    "mtime": 1787654481.5717854,
+    "seen": 1787654501.314015,
+    "ast_hash": "6e26c2c226aecbf6f0929a28018ef234",
     "semantic_hash": ""
   },
   "CODE_OF_CONDUCT.md": {
@@ -2298,9 +2298,9 @@
     "semantic_hash": ""
   },
   "kodedock-hq/src/layouts/HqLayout.tsx": {
-    "mtime": 1787649569.0963945,
-    "seen": 1787650108.1818233,
-    "ast_hash": "dcd5f175de803d5feebac777dd591122",
+    "mtime": 1787654377.574194,
+    "seen": 1787654466.23329,
+    "ast_hash": "cbf2e5b3d85d55903dc5b2245062bfef",
     "semantic_hash": ""
   },
   "kodedock-hq/src/lib/utils.ts": {
@@ -2629,7 +2629,7 @@
   },
   "sql/01-init.sql": {
     "mtime": 1787639093.0998592,
-    "seen": 1787648404.4507394,
+    "seen": 1787654501.3135858,
     "ast_hash": "da763008b9c00c8a2251709dfe327c81",
     "semantic_hash": ""
   },
