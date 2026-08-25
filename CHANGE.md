@@ -20,7 +20,7 @@ All notable changes to the KodeDock backend project will be documented in this f
 - **Next.js Proxy Securty:** Whitelisted the `"public/"` path suffix in the SSRF proxy protection layer (`web/src/app/api/proxy/[...path]/route.ts`) to allow safe, CORS-free fetching of categories across domains.
 
 ### 🧹 Database & Codebase Optimization
-- **Cleanup:** Purged completely all mock/dummy SQL inserts for categories from `01-schema.sql` and dropped them directly from the active live database.
+- **Cleanup:** Purged completely all mock/dummy SQL inserts for categories from `01-init.sql` and dropped them directly from the active live database.
 - **File Hygiene:** Deleted numerous legacy UI automation scripts, temporary extraction `.py` tools, duplicate MD reports, and test binaries that were cluttering the repository.
 - **Fixes:** Replaced `__dirname` with ES Module safe `import.meta.dirname` in the Vite build configuration.
 
@@ -150,7 +150,7 @@ All notable changes to the KodeDock backend project will be documented in this f
 - **Deferred Image Uploads (Plan A)**: Completely refactored the product creation flow (`new-product.tsx`) to prevent storage leaks. Product images are now temporarily held in React state and are only securely uploaded to SeaweedFS (via pre-signed URLs) at the exact moment the seller clicks "Publish". This ensures no orphaned images exist in the storage system if a seller abandons a draft.
 
 ### 🐛 Bug Fixes
-- **Critical (Database Synchronization)**: Resolved a persistent `Failed to create product` internal server error caused by missing `updated_at` columns in the database. Performed a clean volume rebuild to properly synchronize the Docker Postgres instance with the definitive `01-schema.sql` (which correctly triggers `set_updated_at` on rows).
+- **Critical (Database Synchronization)**: Resolved a persistent `Failed to create product` internal server error caused by missing `updated_at` columns in the database. Performed a clean volume rebuild to properly synchronize the Docker Postgres instance with the definitive `01-init.sql` (which correctly triggers `set_updated_at` on rows).
 - **High (Blank Screen in Settings)**: Fixed a bug in the Seller Notification Settings (`notifications/page.tsx`) where an uninitialized preferences row resulted in a completely blank page due to a strict null check. The UI now gracefully falls back to default values (Email/Push notifications ON) when no explicit configuration exists.
 - **Medium (Geolocation Error Handling)**: Added robust error handling in `profile.tsx` to display proper feedback messages to the seller if they deny the browser's location permission request (`GeolocationPositionError`).
 
@@ -352,7 +352,25 @@ All notable changes to the KodeDock backend project will be documented in this f
 - **CORS Configuration:**
   - Expanded `CORS_ORIGINS` in `docker-compose.yml` to explicitly include `http://localhost:5174` and `http://localhost:5175`, ensuring the Vite development server never encounters cross-origin network errors.
 - **Database Persistence:**
-  - Hardcoded all live database schema updates (e.g., `is_active` column in `users`, new `support_tickets` table) directly into `sql/01-schema.sql` ensuring seamless environment reproducibility for new deployments.
+  - Hardcoded all live database schema updates (e.g., `is_active` column in `users`, new `support_tickets` table) directly into `sql/01-init.sql` ensuring seamless environment reproducibility for new deployments.
+
+## [v1.7.0] - 2026-08-25
+
+### 🏢 HQ Frontend Refactoring & React Query Migration
+- **Global Table Standardization**: Completely overhauled `AuditLogs.tsx`, `Safety.tsx`, and `Support.tsx` to utilize the unified `<DataTable />` component, ensuring a consistent, accessible, and responsive tabular data experience across the admin panel.
+- **Data Fetching Architecture**: Successfully migrated all legacy `useEffect`/`fetch` patterns to **Tanstack React Query**. This provides automatic caching, background refetching, and seamless loading state management out-of-the-box.
+- **Form Integrity**: Rewrote the `Integrations.tsx` configuration panel using `react-hook-form` and `useMutation`. This eliminates manual state management bugs and introduces robust `sonner` toasts for success/error handling.
+- **Zero Errors**: Ensured absolute type safety. The entire `kodedock-hq` codebase now passes `tsc --noEmit` with zero errors, fully conforming to strict `verbatimModuleSyntax`.
+
+### ⚙️ Core Engine - Staff Management API
+- **Staff Control Endpoints**: Discovered missing actions in the Staff Management UI and proactively implemented the corresponding backend logic in Rust.
+  - Added `PUT /api/hq/staff/:id/status` to allow Admins to suspend or activate HQ staff accounts securely.
+  - Added `PUT /api/hq/staff/:id/role` to enable role assignments (e.g. promoting a user to Super Admin).
+- **Audit Logging**: Integrated internal `log_audit` hooks into the new staff endpoints so that all role modifications and account suspensions are permanently recorded in the HQ Audit Logs.
+- **Self-Suspension Protection**: Implemented strict validation rules preventing admins from suspending their own accounts or demoting their own roles.
+
+### 🧹 Database Initialization Cleanup
+- **SQL Consolidation**: Successfully merged isolated schema fragments (`02-hq-schema.sql`, `03-platform-settings.sql`) into a singular, unified `01-init.sql`. This ensures a flawless, atomic database instantiation process for new Docker environments without race conditions.
 
 ---
 *End of Changelog.*
