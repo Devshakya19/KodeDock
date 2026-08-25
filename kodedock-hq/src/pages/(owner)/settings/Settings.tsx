@@ -1,63 +1,65 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Settings as SettingsIcon, Save, User, Lock, Mail } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useMutation } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+
+const settingsSchema = z.object({
+  full_name: z.string().min(2, "Name must be at least 2 characters"),
+  password: z.string().optional().or(z.literal('')),
+  confirm_password: z.string().optional().or(z.literal('')),
+}).refine((data) => {
+  if (data.password && data.password !== data.confirm_password) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Passwords do not match",
+  path: ["confirm_password"],
+});
+
+type SettingsValues = z.infer<typeof settingsSchema>;
 
 export default function Settings() {
   const { staff, token, login } = useAuth();
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
   
-  const [formData, setFormData] = useState({
-    full_name: staff?.name || "",
-    password: "",
-    confirm_password: ""
+  const form = useForm<SettingsValues>({
+    resolver: zodResolver(settingsSchema),
+    defaultValues: {
+      full_name: staff?.name || "",
+      password: "",
+      confirm_password: "",
+    }
   });
 
-  const [error, setError] = useState<string | null>(null);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setSuccess(false);
-
-    if (formData.password && formData.password !== formData.confirm_password) {
-      setError("Passwords do not match.");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const payload: any = { full_name: formData.full_name };
-      if (formData.password) {
-        payload.password = formData.password;
+  const mutation = useMutation({
+    mutationFn: async (values: SettingsValues) => {
+      const payload: any = { full_name: values.full_name };
+      if (values.password) {
+        payload.password = values.password;
       }
-
-      const res = await fetch(import.meta.env.VITE_API_URL + "/api/hq/settings", {
-        method: "PUT",
-        headers: { 
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-      
-      if (res.ok) {
-        setSuccess(true);
-        // Refresh local staff context with new name
-        if (staff) {
-          login(token!, { ...staff, name: formData.full_name });
-        }
-        setFormData(prev => ({ ...prev, password: "", confirm_password: "" }));
-      } else {
-        setError(data.message || "Failed to update settings.");
+      const res = await api.put("/api/hq/settings", payload);
+      return { res, newName: values.full_name };
+    },
+    onSuccess: (data) => {
+      toast.success("Settings updated successfully!");
+      if (staff && token) {
+        login(token, { ...staff, name: data.newName });
       }
-    } catch (err) {
-      setError("An unexpected error occurred.");
-    } finally {
-      setLoading(false);
+      form.reset({ full_name: data.newName, password: "", confirm_password: "" });
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message || "Failed to update settings.");
     }
+  });
+
+  const onSubmit = (data: SettingsValues) => {
+    mutation.mutate(data);
   };
 
   return (
@@ -77,18 +79,7 @@ export default function Settings() {
           <h2 className="text-lg font-semibold text-foreground">Admin Profile Settings</h2>
         </div>
         
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {error && (
-            <div className="p-3 rounded-md bg-rose-500/10 text-rose-500 text-sm font-medium border border-rose-500/20">
-              {error}
-            </div>
-          )}
-          {success && (
-            <div className="p-3 rounded-md bg-emerald-500/10 text-emerald-500 text-sm font-medium border border-emerald-500/20">
-              Settings updated successfully!
-            </div>
-          )}
-
+        <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 space-y-6">
           <div className="space-y-4 max-w-xl">
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground flex items-center gap-2">
@@ -109,11 +100,15 @@ export default function Settings() {
               </label>
               <input 
                 type="text" 
-                value={formData.full_name}
-                onChange={(e) => setFormData({...formData, full_name: e.target.value})}
-                required
-                className="w-full bg-background border border-input rounded-md px-4 py-2.5 text-sm text-foreground focus:outline-none focus:border-primary"
+                {...form.register("full_name")}
+                className={cn(
+                  "w-full bg-background border rounded-md px-4 py-2.5 text-sm text-foreground focus:outline-none focus:border-primary",
+                  form.formState.errors.full_name ? "border-rose-500" : "border-input"
+                )}
               />
+              {form.formState.errors.full_name && (
+                <p className="text-sm text-rose-500 font-medium">{form.formState.errors.full_name.message}</p>
+              )}
             </div>
 
             <div className="pt-4 border-t border-border">
@@ -125,25 +120,26 @@ export default function Settings() {
                   <label className="text-sm font-medium text-muted-foreground">New Password (Optional)</label>
                   <input 
                     type="password" 
-                    value={formData.password}
-                    onChange={(e) => setFormData({...formData, password: e.target.value})}
+                    {...form.register("password")}
                     placeholder="Leave blank to keep current"
                     className="w-full bg-background border border-input rounded-md px-4 py-2.5 text-sm text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>
                 
-                {formData.password && (
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-muted-foreground">Confirm New Password</label>
-                    <input 
-                      type="password" 
-                      value={formData.confirm_password}
-                      onChange={(e) => setFormData({...formData, confirm_password: e.target.value})}
-                      required={!!formData.password}
-                      className="w-full bg-background border border-input rounded-md px-4 py-2.5 text-sm text-foreground focus:outline-none focus:border-primary"
-                    />
-                  </div>
-                )}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-muted-foreground">Confirm New Password</label>
+                  <input 
+                    type="password" 
+                    {...form.register("confirm_password")}
+                    className={cn(
+                      "w-full bg-background border rounded-md px-4 py-2.5 text-sm text-foreground focus:outline-none focus:border-primary",
+                      form.formState.errors.confirm_password ? "border-rose-500" : "border-input"
+                    )}
+                  />
+                  {form.formState.errors.confirm_password && (
+                    <p className="text-sm text-rose-500 font-medium">{form.formState.errors.confirm_password.message}</p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -151,10 +147,10 @@ export default function Settings() {
           <div className="flex items-center justify-end pt-4 border-t border-border">
             <button 
               type="submit" 
-              disabled={loading}
+              disabled={mutation.isPending}
               className="flex items-center gap-2 bg-primary text-primary-foreground px-6 py-2.5 rounded-md text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors"
             >
-              {loading ? "Saving..." : (
+              {mutation.isPending ? "Saving..." : (
                 <>
                   <Save className="h-4 w-4" /> Save Settings
                 </>
