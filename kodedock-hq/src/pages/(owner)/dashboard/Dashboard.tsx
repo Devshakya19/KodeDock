@@ -79,7 +79,6 @@ export default function Dashboard() {
           title="Total Revenue (Platform)" 
           value={`₹${(Number(stats.total_revenue_paise) / 100).toLocaleString()}`} 
           icon={Wallet}
-          trend="+12.5%"
           subtitle="All time marketplace GMV"
         />
         <MetricCard 
@@ -109,10 +108,6 @@ export default function Dashboard() {
               <h3 className="font-bold text-lg text-foreground">Revenue Velocity</h3>
               <p className="text-sm text-muted-foreground font-medium">Gross merchandise volume over last 7 days</p>
             </div>
-            <select className="bg-secondary text-foreground text-xs font-bold px-3 py-1.5 rounded-md border-none outline-none cursor-pointer">
-              <option>Last 7 Days</option>
-              <option>Last 30 Days</option>
-            </select>
           </div>
           
           <div className="h-[300px] w-full">
