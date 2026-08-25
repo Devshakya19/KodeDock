@@ -151,29 +151,68 @@ export default function Users() {
   });
 
   const users = response?.data || [];
+  const total = users.length;
+  const sellers = users.filter((u: User) => u.role === 'developer').length;
+  const suspended = users.filter((u: User) => !u.is_active).length;
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-8 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">User Management</h1>
-          <p className="text-muted-foreground mt-1">Monitor, suspend, and manage buyers and sellers.</p>
+          <p className="text-muted-foreground mt-1 font-medium">Monitor, suspend, and manage platform participants.</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 bg-secondary text-secondary-foreground border border-border px-3 py-2 rounded-md text-sm font-medium hover:bg-secondary/80">
+          <button className="flex items-center gap-2 bg-secondary text-foreground font-bold px-4 py-2 rounded-lg hover:bg-secondary/80 transition-colors shadow-sm">
             <Filter className="h-4 w-4" />
-            Role Filter
+            Filter Users
           </button>
         </div>
       </div>
 
-      <div className="bg-card shadow-sm overflow-visible">
+      {/* Mini Stats Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-card border border-border rounded-xl p-5 shadow-sm flex items-center gap-4">
+          <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+            <UserCheck className="h-6 w-6" />
+          </div>
+          <div>
+            <p className="text-sm font-bold text-muted-foreground">Total Users</p>
+            <h3 className="text-2xl font-black text-foreground">{total}</h3>
+          </div>
+        </div>
+        <div className="bg-card border border-border rounded-xl p-5 shadow-sm flex items-center gap-4">
+          <div className="h-12 w-12 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-500">
+            <CheckCircle className="h-6 w-6" />
+          </div>
+          <div>
+            <p className="text-sm font-bold text-muted-foreground">Active Sellers</p>
+            <h3 className="text-2xl font-black text-foreground">{sellers}</h3>
+          </div>
+        </div>
+        <div className="bg-card border border-border rounded-xl p-5 shadow-sm flex items-center gap-4">
+          <div className="h-12 w-12 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500">
+            <ShieldAlert className="h-6 w-6" />
+          </div>
+          <div>
+            <p className="text-sm font-bold text-muted-foreground">Suspended</p>
+            <h3 className="text-2xl font-black text-foreground">{suspended}</h3>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
         {isLoading ? (
-          <div className="p-10 text-center text-muted-foreground">Loading users...</div>
+          <div className="p-16 flex flex-col items-center justify-center text-muted-foreground">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+            <p className="font-medium">Loading users...</p>
+          </div>
         ) : isError ? (
-          <div className="p-10 text-center text-red-500">Error loading users.</div>
+          <div className="p-16 text-center text-red-500 font-bold bg-red-500/5">Failed to load users.</div>
         ) : (
-          <DataTable columns={columns} data={users} searchKey="email" />
+          <div className="p-2">
+            <DataTable columns={columns} data={users} searchKey="email" />
+          </div>
         )}
       </div>
     </div>
