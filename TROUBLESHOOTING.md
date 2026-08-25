@@ -129,7 +129,7 @@ docker compose exec postgres ls -la /docker-entrypoint-initdb.d/
 ```
 3. Manually apply schema if needed:
 ```bash
-docker compose exec -T postgres psql -U kodedock -d kodedock < sql/01-schema.sql
+docker compose exec -T postgres psql -U kodedock -d kodedock < sql/01-init.sql
 ```
 
 ## Service Connection Issues
