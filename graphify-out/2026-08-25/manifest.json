@@ -2630,7 +2630,7 @@
   "sql/01-init.sql": {
     "mtime": 1787639093.0998592,
     "seen": 1787648339.8387926,
-    "ast_hash": "",
+    "ast_hash": "da763008b9c00c8a2251709dfe327c81",
     "semantic_hash": ""
   },
   "kodedock-hq/public/favicon.svg": {
