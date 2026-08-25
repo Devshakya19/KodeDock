@@ -1,28 +1,28 @@
 # Graph Report - KodeDock  (2026-08-25)
 
 ## Corpus Check
-- 364 files · ~717,721 words
+- 366 files · ~719,494 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 4352 nodes · 5980 edges · 354 communities (285 shown, 69 thin omitted)
+- 4441 nodes · 6084 edges · 377 communities (291 shown, 86 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 96 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `b66624e0`
+- Built from commit: `5a393bb3`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - Changelog
-- verifyToken
+- theme.ts
 - services/auth.rs
 - search
 - cn
 - fontSize
 - slide_search_core.py
-- update_product
+- wallet.rs
 - Finance.tsx
 - seller/page.tsx
 - models/mod.rs
@@ -45,7 +45,7 @@
 - design_system.py
 - color
 - DesignSystemGenerator
-- (main)/page.tsx
+- card.tsx
 - fetch-background.py
 - components.json
 - dependencies
@@ -76,20 +76,20 @@
 - compilerOptions
 - logo/generate.py
 - generate-tokens.cjs
-- security.tsx
+- appearance.tsx
 - ._base_config
 - ApiResponse
 - sync-brand-to-tokens.cjs
 - _run
 - KodeDock — Rules & Conventions
 - BM25
-- web/package.json
+- (main)/page.tsx
 - proxy/[...path]/route.ts
 - 6. Database Schema
 - main.go
 - app/layout.tsx
 - Data
-- create_review
+- mark_read
 - Json
 - Prerequisites
 - devDependencies
@@ -110,8 +110,8 @@
 - orders.rs
 - Logo Usage Rules
 - lg
-- clsx
-- static-layout.tsx
+- create_review
+- Integrations.tsx
 - plugins
 - .__init__
 - .temp_project
@@ -172,7 +172,7 @@
 - Security, Audit Logs, and Workflows
 - services/hq.rs
 - StorageClient
-- button.tsx
+- react
 - React + TypeScript + Vite
 - Path
 - KodeDock — Project Requirement Document
@@ -194,6 +194,7 @@
 - Color Semantics
 - Agent Skill: Principal UI/UX Architect & Motion Choreographer (Awwwards-Tier)
 - DateTime
+- Settings.tsx
 - CORE DIRECTIVE: AWWWARDS-LEVEL IMAGE ART DIRECTION
 - SKILL: Industrial Brutalism & Tactical Telemetry UI
 - Design Principles
@@ -280,11 +281,11 @@
 - 13. Motion & Interaction
 - 1. Design Philosophy
 - 2.3 Dark Theme
-- react
+- apiGet
 - Environment Setup
 - Backend Issues
 - Docker & Container Issues
-- apiPost
+- ProductDetailPage
 - 7. DIAL DEFINITIONS (Technical Reference)
 - graphify reference: add a URL and watch a folder
 - graphify reference: commit hook and native CLAUDE.md integration
@@ -312,14 +313,14 @@
 - Frontend Issues
 - Performance Issues
 - 16
-- Vec
-- mark_read
+- HqAuditLogView
+- HqCategory
 - 8
-- update_profile
+- HqDashboardStats
 - graphify reference: GitHub clone and cross-repo merge
 - graphify reference: transcribe video and audio
 - [2026-08-11 / 2026-08-12] - Core Engine Initial Fixes & Rate Limiting
-- presign_upload
+- HqDispute
 - md
 - 1. THE THREE DIALS (Core Configuration)
 - [v1.5.1] - 2026-08-23
@@ -333,33 +334,55 @@
 - .test_check_shadcn_config_exists
 - .test_get_installed_components_with_files
 - workflows/graphify.md
-- jose
-- jspdf-autotable
-- next
-- radix-ui
-- recharts
-- sharp
-- sonner
-- lucide-react
+- update_product
+- dependencies
+- HqFinanceStats
+- kodedock-hq/package.json
+- table.tsx
+- HqPayoutRequest
+- notifications.tsx
 - 6
 - primary
 - [v1.5.0] - 2026-08-22
-- create_or_update_payout_account
-- extract_user_id
-- Error
-- HttpRequest
+- zod
+- HqProduct
+- StaffManagement.tsx
+- HqStaffView
 - HttpResponse
 - [v1.6.0] - 2026-08-24
+- main.tsx
+- AuditLogs.tsx
+- Catalog.tsx
+- PlatformSettings.tsx
+- Login.tsx
+- Setup.tsx
+- HqSupportTicket
+- HqUser
+- HqWithdrawal
+- PlatformIntegration
+- PlatformSetting
+- HashMap
+- PgPool
+- Result
+- api.ts
+- Vec
+- extract_user_id
+- create_or_update_payout_account
+- HttpRequest
+- Error
+- PayoutSettings
+- ConnectionsSettings
+- RegisterPage
 
 ## God Nodes (most connected - your core abstractions)
-1. `react` - 70 edges
+1. `react` - 71 edges
 2. `TailwindConfigGenerator` - 58 edges
 3. `CORE DIRECTIVE: IMAGE-FIRST WEBSITE DESIGN TO CODE` - 39 edges
 4. `CORE DIRECTIVE: PREMIUM MOBILE APP IMAGE DIRECTION` - 39 edges
 5. `Button()` - 38 edges
 6. `TestTailwindConfigGenerator` - 35 edges
 7. `ShadcnInstaller` - 34 edges
-8. `require_hq_access()` - 30 edges
+8. `require_hq_access()` - 32 edges
 9. `cn()` - 28 edges
 10. `TestShadcnInstaller` - 26 edges
 
@@ -370,23 +393,23 @@
   .agents/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py → .agents/skills/ui-styling/scripts/tailwind_config_gen.py
 - `TestShadcnInstaller` --uses--> `ShadcnInstaller`  [INFERRED]
   .agents/skills/ui-styling/scripts/tests/test_shadcn_add.py → .agents/skills/ui-styling/scripts/shadcn_add.py
+- `handleDelete()` --calls--> `apiDelete()`  [EXTRACTED]
+  web/src/app/(seller)/seller/products/[id]/edit/page.tsx → web/src/shared/lib/api/client.ts
 - `handleWithdraw()` --calls--> `apiPost()`  [EXTRACTED]
   web/src/app/(seller)/seller/wallet/page.tsx → web/src/shared/lib/api/client.ts
-- `handlePasswordChange()` --calls--> `apiPost()`  [EXTRACTED]
-  web/src/components/settings/security.tsx → web/src/shared/lib/api/client.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (354 total, 69 thin omitted)
+## Communities (377 total, 86 thin omitted)
 
 ### Community 0 - "Changelog"
 Cohesion: 0.12
 Nodes (16): [2026-08-13] - Core Engine Security & Deep Audit Fixes, [2026-08-14] - Core Engine Final Deep Scan & Refinements, [2026-08-15] - Deferred Uploads, Schema Synchronization & UI Fixes, 🌓 Advanced Theming & Dark Mode Perfection, 🐛 Bug Fixes, 🐛 Bug Fixes, Changelog, ✨ Features (+8 more)
 
-### Community 1 - "verifyToken"
+### Community 1 - "theme.ts"
 Cohesion: 0.08
-Nodes (26): SellerLayout(), BrowseFilters(), BrowseFiltersProps, ProductCard(), ProductCardProps, Product, ProductGrid(), ProductGridProps (+18 more)
+Nodes (28): SellerLayout(), fetchNotifications(), NotificationsPage(), BrowseFilters(), BrowseFiltersProps, ProductCard(), ProductCardProps, Product (+20 more)
 
 ### Community 2 - "services/auth.rs"
 Cohesion: 0.09
@@ -398,7 +421,7 @@ Nodes (42): BM25, detect_domain(), get_cip_brief(), _load_csv(), Load CSV and re
 
 ### Community 4 - "cn"
 Cohesion: 0.07
-Nodes (34): CartItem, CartPopup(), getCart(), Props, saveCart(), getIcon(), Notification, NotificationPopup() (+26 more)
+Nodes (36): CartItem, CartPopup(), getCart(), Props, saveCart(), getIcon(), Notification, NotificationPopup() (+28 more)
 
 ### Community 5 - "fontSize"
 Cohesion: 0.12
@@ -408,21 +431,21 @@ Nodes (16): $type, $value, $type, $value, $type, $value, $type, $value (+8 more)
 Cohesion: 0.08
 Nodes (36): format_context(), format_result(), main(), Format a single search result for display, Format contextual recommendations for display., BM25, calculate_pattern_break(), detect_domain() (+28 more)
 
-### Community 7 - "update_product"
-Cohesion: 0.41
-Nodes (13): create_product(), delete_product(), get_seller_reviews(), get_stats(), list_seller_products(), Data, HttpRequest, HttpResponse (+5 more)
+### Community 7 - "wallet.rs"
+Cohesion: 0.18
+Nodes (25): complete_topup_atomic(), create_topup(), get_balance(), list_transactions(), release_escrow(), Bytes, Data, HttpRequest (+17 more)
 
 ### Community 8 - "Finance.tsx"
-Cohesion: 0.40
-Nodes (3): FinanceStats, PayoutRequest, Withdrawal
+Cohesion: 0.22
+Nodes (7): Finance(), FinanceStats, formatCurrency(), payoutColumns, PayoutRequest, Withdrawal, withdrawalColumns
 
 ### Community 9 - "seller/page.tsx"
 Cohesion: 0.11
 Nodes (16): Order, SalesChart(), SalesChartProps, SellerStatsDeck(), SellerStatsDeckProps, dynamic, Order, revalidate (+8 more)
 
 ### Community 10 - "models/mod.rs"
-Cohesion: 0.09
-Nodes (59): Decimal, From, complete_topup_atomic(), create_topup(), get_balance(), list_transactions(), release_escrow(), Bytes (+51 more)
+Cohesion: 0.18
+Nodes (34): Decimal, From, CheckoutOrderResponse, CreateOrderRequest, CreatePayoutAccountRequest, CreateProductRequest, CreateReviewRequest, ListTransactionsQuery (+26 more)
 
 ### Community 11 - "spacing"
 Cohesion: 0.09
@@ -441,8 +464,8 @@ Cohesion: 0.06
 Nodes (16): Test adding colors multiple times., Test adding full color palette., Test adding custom spacing., Test adding custom breakpoints., Test TailwindConfigGenerator class., Test generating TypeScript configuration., Test validating config with empty theme extensions., Test writing configuration to file. (+8 more)
 
 ### Community 15 - "handlers/hq.rs"
-Cohesion: 0.16
-Nodes (55): Data, Json, Path, Query, Responder, create_category(), CreateCatReq, delete_category_handler() (+47 more)
+Cohesion: 0.15
+Nodes (60): Data, HqStaff, HttpRequest, Json, Path, Query, Responder, create_category() (+52 more)
 
 ### Community 16 - "Tailwind CSS Utility Reference"
 Cohesion: 0.05
@@ -500,9 +523,9 @@ Nodes (19): $type, $value, background, destructive, foreground, muted-foreground
 Cohesion: 0.14
 Nodes (11): DesignSystemGenerator, Find matching reasoning rule for a category., Apply reasoning rules to search results., Select best matching result based on priority keywords., Extract results list from search result dict., Generate complete design system recommendation. variance/motion/density are…, Bucket a 1-10 dial value into its tier config. Returns None if value is None., Generates design system recommendations from aggregated searches. (+3 more)
 
-### Community 30 - "(main)/page.tsx"
-Cohesion: 0.06
-Nodes (33): BENEFITS, DevBenefits(), COMPARISON, DevCommission(), DevCTA(), DevHero(), CATEGORIES, Categories() (+25 more)
+### Community 30 - "card.tsx"
+Cohesion: 0.07
+Nodes (21): TODO: Implement email verification via backend, BLOG_POSTS, OPENINGS, CategoryPage(), formatSlug(), getCategoryProducts(), Product, SearchPage() (+13 more)
 
 ### Community 31 - "fetch-background.py"
 Cohesion: 0.17
@@ -513,12 +536,12 @@ Cohesion: 0.11
 Nodes (17): aliases, components, hooks, lib, ui, utils, iconLibrary, rsc (+9 more)
 
 ### Community 33 - "dependencies"
-Cohesion: 0.11
-Nodes (19): framer-motion, jspdf, next-themes, react-use, dependencies, class-variance-authority, framer-motion, jspdf (+11 more)
+Cohesion: 0.06
+Nodes (34): jose, jspdf, jspdf-autotable, recharts, next, next-themes, radix-ui, react-use (+26 more)
 
 ### Community 34 - "devDependencies"
-Cohesion: 0.09
-Nodes (23): eslint, eslint-config-next, eslint-config-prettier, eslint-plugin-prettier, prettier, @tailwindcss/postcss, devDependencies, eslint (+15 more)
+Cohesion: 0.06
+Nodes (32): eslint, eslint-config-next, eslint-config-prettier, eslint-plugin-prettier, prettier, @tailwindcss/postcss, devDependencies, eslint (+24 more)
 
 ### Community 35 - "index.js"
 Cohesion: 0.12
@@ -624,10 +647,6 @@ Nodes (9): enhance_prompt(), generate_batch(), generate_logo(), load_env(), main
 Cohesion: 0.36
 Nodes (9): flattenTokens(), fs, generateCSS(), generateTailwind(), main(), parseArgs(), path, resolveReference() (+1 more)
 
-### Community 61 - "security.tsx"
-Cohesion: 0.06
-Nodes (17): getSellerProducts(), getSellerProfile(), Product, SellerProfile, SellerPublicPage(), AppearanceSettings(), ThemeOptionProps, NotificationPrefs (+9 more)
-
 ### Community 62 - "._base_config"
 Cohesion: 0.22
 Nodes (6): Path, Initialize generator. Args: typescript: If True, generate .ts config, else .js…, Determine default output path., Create base configuration structure., Get default content paths for framework., Any
@@ -652,9 +671,9 @@ Nodes (34): 10. Documentation Rules, 11. Environment Variables, 1. Folder Struct
 Cohesion: 0.28
 Nodes (5): BM25, BM25 ranking algorithm for text search, Lowercase, split, remove punctuation, filter short words, Build BM25 index from documents, Score all documents against query
 
-### Community 68 - "web/package.json"
-Cohesion: 0.20
-Nodes (9): name, private, scripts, build, dev, format:check, lint, start (+1 more)
+### Community 68 - "(main)/page.tsx"
+Cohesion: 0.06
+Nodes (27): BENEFITS, DevBenefits(), COMPARISON, DevCommission(), DevCTA(), DevHero(), Categories(), Features (+19 more)
 
 ### Community 69 - "proxy/[...path]/route.ts"
 Cohesion: 0.39
@@ -672,17 +691,17 @@ Nodes (7): context.Context, redis.Client, redis.Options, main(), parseRedisURL()
 Cohesion: 0.29
 Nodes (5): geistMono, geistSans, metadata, sora, ThemeProvider()
 
-### Community 74 - "create_review"
-Cohesion: 0.19
-Nodes (15): create_review(), list_reviews(), notify_seller_on_review(), ReviewWithUser, Data, DateTime, HttpRequest, HttpResponse (+7 more)
+### Community 74 - "mark_read"
+Cohesion: 0.33
+Nodes (13): get_preferences(), list_notifications(), mark_all_read(), mark_read(), Data, HttpRequest, HttpResponse, Json (+5 more)
 
 ### Community 76 - "Prerequisites"
 Cohesion: 0.06
 Nodes (33): Accessibility, Available Domains, Available Stacks, Common Rules for Professional UI, Common Sticking Points, Example Workflow, How to Use This Skill, Icons & Visual Elements (+25 more)
 
 ### Community 77 - "devDependencies"
-Cohesion: 0.04
-Nodes (45): dependencies, class-variance-authority, clsx, lucide-react, react, react-dom, react-router-dom, tailwind-merge (+37 more)
+Cohesion: 0.10
+Nodes (21): devDependencies, oxlint, tailwindcss, tailwindcss-animate, @tailwindcss/vite, @types/node, @types/react, @types/react-dom (+13 more)
 
 ### Community 79 - "sm"
 Cohesion: 0.60
@@ -732,9 +751,9 @@ Nodes (28): Absolute Don'ts, Approved Backgrounds, Before Using Logo, Clear Spac
 Cohesion: 0.60
 Nodes (5): lg, $type, $value, lg, lg
 
-### Community 96 - "static-layout.tsx"
-Cohesion: 0.14
-Nodes (3): BLOG_POSTS, StaticPageLayout(), StaticPageLayoutProps
+### Community 95 - "create_review"
+Cohesion: 0.19
+Nodes (15): create_review(), list_reviews(), notify_seller_on_review(), ReviewWithUser, Data, DateTime, HttpRequest, HttpResponse (+7 more)
 
 ### Community 97 - "plugins"
 Cohesion: 0.22
@@ -849,16 +868,16 @@ Cohesion: 0.40
 Nodes (4): 1. Immutable Audit Logging, 2. Sensitive Action Approvals (Maker-Checker Workflow), 3. Recommended Security Upgrades (For Future), Security, Audit Logs, and Workflows
 
 ### Community 170 - "services/hq.rs"
-Cohesion: 0.12
-Nodes (65): Box, DateTime, HqAuditLog, HqAuditLogView, HqCategory, HqDashboardStats, HqDispute, HqFinanceStats (+57 more)
+Cohesion: 0.11
+Nodes (69): Box, DateTime, Error, HashMap, PgPool, Result, HqAuditLog, HqAuditLogView (+61 more)
 
 ### Community 171 - "StorageClient"
-Cohesion: 0.22
-Nodes (7): Client, Clone, Option, Result, Self, String, StorageClient
+Cohesion: 0.09
+Nodes (26): Client, Clone, get_profile(), Data, HttpRequest, HttpResponse, Json, Path (+18 more)
 
-### Community 172 - "button.tsx"
-Cohesion: 0.10
-Nodes (18): PASSWORD_REQUIREMENTS, LoginPage(), PASSWORD_REQUIREMENTS, RegisterPage(), TODO: Implement email verification via backend, OPENINGS, CategoryPage(), formatSlug() (+10 more)
+### Community 172 - "react"
+Cohesion: 0.06
+Nodes (39): react, DeveloperRegisterPage(), handleRegister(), PASSWORD_REQUIREMENTS, ForgotPasswordPage(), handleSubmit(), PASSWORD_REQUIREMENTS, ResetPasswordForm() (+31 more)
 
 ### Community 173 - "React + TypeScript + Vite"
 Cohesion: 0.50
@@ -870,7 +889,7 @@ Nodes (22): 1. Executive Summary, 2. Problem Statement, 3. Solution Overview, 4.
 
 ### Community 176 - "profile.tsx"
 Cohesion: 0.09
-Nodes (23): fetchNotifications(), NotificationsPage(), EditProductPage(), handleDelete(), handleImageSelect(), handleSubmit(), formatRelativeTime(), getNotificationConfig() (+15 more)
+Nodes (20): EditProductPage(), handleDelete(), handleImageSelect(), handleSubmit(), NewProductPage(), handleSubmit(), formatRelativeTime(), getNotificationConfig() (+12 more)
 
 ### Community 178 - "KodeDock — Refund & Cancellation Policy"
 Cohesion: 0.10
@@ -909,8 +928,8 @@ Cohesion: 0.11
 Nodes (18): Contact Channels, Data Subject Requests (DSR), Effective Date: August 1, 2026, Emergency Contacts, Escalation Procedure, Feedback & Suggestions, For Business & Partnership Inquiries, For Career Opportunities (+10 more)
 
 ### Community 190 - "auth/client.ts"
-Cohesion: 0.11
-Nodes (17): GET(), BillingPage(), WalletCard(), WalletCardProps, DownloadsPage(), DashboardPage(), PurchasesPage(), WishlistPage() (+9 more)
+Cohesion: 0.12
+Nodes (20): GET(), getSellerProducts(), getSellerProfile(), Product, SellerProfile, SellerPublicPage(), BillingPage(), WalletCard() (+12 more)
 
 ### Community 191 - "Brand Consistency Checklist"
 Cohesion: 0.11
@@ -1268,9 +1287,9 @@ Nodes (5): 1. Design Philosophy, Core principles, KodeDock — UI/UX Design Syst
 Cohesion: 0.22
 Nodes (9): 2.1 Brand colors, 2.3 Dark Theme, 2.4 Semantic colors, 2. Brand Color System, Accent, Borders, Brand rule, Core (+1 more)
 
-### Community 284 - "react"
-Cohesion: 0.04
-Nodes (42): App(), AuditLog, Category, Integration, Setting, Staff, react, DeveloperRegisterPage() (+34 more)
+### Community 284 - "apiGet"
+Cohesion: 0.08
+Nodes (25): SellerHeader(), SellerHeaderProps, SellerEarningsPage(), Transaction, WalletData, OrderItem, OrderProduct, SellerOrdersPage() (+17 more)
 
 ### Community 285 - "Environment Setup"
 Cohesion: 0.40
@@ -1284,9 +1303,9 @@ Nodes (5): Actix-Web Server Fails to Start, Backend Issues, Database Query Error
 Cohesion: 0.40
 Nodes (5): Container Health Checks Failing, Docker & Container Issues, Docker Daemon Not Running, Port Conflicts, Slow Container Startup
 
-### Community 288 - "apiPost"
-Cohesion: 0.08
-Nodes (26): ForgotPasswordPage(), handleSubmit(), ResetPasswordForm(), handleSubmit(), NewProductPage(), handleSubmit(), CheckoutContent(), handleRazorpayPayment() (+18 more)
+### Community 288 - "ProductDetailPage"
+Cohesion: 0.39
+Nodes (7): getCart(), ProductDetailPage(), handleAddToCart(), handleBuy(), handleRemoveFromCart(), handleReviewSubmit(), saveCart()
 
 ### Community 289 - "7. DIAL DEFINITIONS (Technical Reference)"
 Cohesion: 0.50
@@ -1344,6 +1363,14 @@ Nodes (11): get_product(), list_products(), ListProductsQuery, Data, HttpRequest
 Cohesion: 0.50
 Nodes (4): 6. Grid & Layout, Browse layout, Browse visual rules, Desktop
 
+### Community 304 - "Marketplace.tsx"
+Cohesion: 0.29
+Nodes (3): ActionCell(), columns, Product
+
+### Community 307 - "Users.tsx"
+Cohesion: 0.33
+Nodes (3): ActionCell(), columns, User
+
 ### Community 308 - "Tech Stack"
 Cohesion: 0.50
 Nodes (4): ⚙️ Backend & Microservices, 🌐 Frontend & UI, 🗄️ Infrastructure & Storage, Tech Stack
@@ -1376,25 +1403,13 @@ Nodes (4): High Memory Usage, Performance Issues, Slow API Response Times, Slow 
 Cohesion: 0.67
 Nodes (3): $type, $value, 16
 
-### Community 317 - "mark_read"
-Cohesion: 0.33
-Nodes (13): get_preferences(), list_notifications(), mark_all_read(), mark_read(), Data, HttpRequest, HttpResponse, Json (+5 more)
-
 ### Community 318 - "8"
 Cohesion: 0.67
 Nodes (3): $type, $value, 8
 
-### Community 319 - "update_profile"
-Cohesion: 0.27
-Nodes (10): get_profile(), Data, HttpRequest, HttpResponse, Json, Path, PgPool, String (+2 more)
-
 ### Community 322 - "[2026-08-11 / 2026-08-12] - Core Engine Initial Fixes & Rate Limiting"
 Cohesion: 0.67
 Nodes (3): [2026-08-11 / 2026-08-12] - Core Engine Initial Fixes & Rate Limiting, Fixed, Security
-
-### Community 323 - "presign_upload"
-Cohesion: 0.27
-Nodes (9): extension_from_content_type(), presign_upload(), PresignRequest, PresignResponse, Data, HttpRequest, HttpResponse, Json (+1 more)
 
 ### Community 324 - "md"
 Cohesion: 0.67
@@ -1420,6 +1435,22 @@ Nodes (4): 9. Shape, Border & Elevation, Border radius, Borders, Shadows
 Cohesion: 0.67
 Nodes (3): $type, $value, 0
 
+### Community 337 - "update_product"
+Cohesion: 0.41
+Nodes (13): create_product(), delete_product(), get_seller_reviews(), get_stats(), list_seller_products(), Data, HttpRequest, HttpResponse (+5 more)
+
+### Community 338 - "dependencies"
+Cohesion: 0.06
+Nodes (33): axios, class-variance-authority, clsx, cmdk, framer-motion, @hookform/resolvers, dependencies, axios (+25 more)
+
+### Community 340 - "kodedock-hq/package.json"
+Cohesion: 0.20
+Nodes (9): name, private, scripts, build, dev, lint, preview, type (+1 more)
+
+### Community 341 - "table.tsx"
+Cohesion: 0.22
+Nodes (8): Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow
+
 ### Community 345 - "6"
 Cohesion: 0.67
 Nodes (3): $type, $value, 6
@@ -1432,37 +1463,53 @@ Nodes (3): primary, $type, $value
 Cohesion: 0.67
 Nodes (3): ⚙️ Architecture & Microservices, ✨ New Features, [v1.5.0] - 2026-08-22
 
-### Community 348 - "create_or_update_payout_account"
-Cohesion: 0.47
-Nodes (8): create_or_update_payout_account(), delete_payout_account(), get_payout_account(), Data, HttpRequest, HttpResponse, Json, PgPool
-
-### Community 349 - "extract_user_id"
-Cohesion: 0.38
-Nodes (10): HttpResponse, AuthClaims, extract_user_id(), HqAuthClaims, require_developer(), Error, HttpRequest, Result (+2 more)
+### Community 350 - "StaffManagement.tsx"
+Cohesion: 0.29
+Nodes (4): columns, inviteSchema, InviteValues, Staff
 
 ### Community 353 - "[v1.6.0] - 2026-08-24"
 Cohesion: 0.67
 Nodes (3): 🛡️ Core Engine Security & Database, 🏢 KodeDock HQ (Admin Control Plane), [v1.6.0] - 2026-08-24
 
+### Community 356 - "Catalog.tsx"
+Cohesion: 0.40
+Nodes (3): Category, categorySchema, CategoryValues
+
+### Community 357 - "PlatformSettings.tsx"
+Cohesion: 0.15
+Nodes (5): DataTableProps, platformSchema, PlatformValues, Setting, LoginPage()
+
+### Community 370 - "extract_user_id"
+Cohesion: 0.38
+Nodes (10): HttpResponse, AuthClaims, extract_user_id(), HqAuthClaims, require_developer(), Error, HttpRequest, Result (+2 more)
+
+### Community 371 - "create_or_update_payout_account"
+Cohesion: 0.47
+Nodes (8): create_or_update_payout_account(), delete_payout_account(), get_payout_account(), Data, HttpRequest, HttpResponse, Json, PgPool
+
+### Community 374 - "PayoutSettings"
+Cohesion: 0.29
+Nodes (3): PayoutSettings(), handleSave(), validate()
+
 ## Knowledge Gaps
-- **2096 isolated node(s):** `👑 Owner Dashboard (HQ) Features`, `🌐 Next.js Public Web Application Updates`, `🧹 Database & Codebase Optimization`, `🎨 UI/UX Redesigns & Enhancements`, `⚡ Real-Time Data & Synchronization` (+2091 more)
+- **2130 isolated node(s):** `FinanceStats`, `Withdrawal`, `PayoutRequest`, `payoutColumns`, `withdrawalColumns` (+2125 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **69 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **86 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `extract_user_id()` connect `extract_user_id` to `presign_upload`, `create_review`, `models/mod.rs`, `get_product`, `orders.rs`, `mark_read`, `update_profile`?**
+- **Why does `react` connect `react` to `theme.ts`, `cn`, `Finance.tsx`, `seller/page.tsx`, `AuthContext.tsx`, `apiGet`, `card.tsx`, `Marketplace.tsx`, `Safety.tsx`, `Support.tsx`, `Users.tsx`, `profile.tsx`, `appearance.tsx`, `auth/client.ts`, `(main)/page.tsx`, `Settings.tsx`, `app/layout.tsx`, `table.tsx`, `notifications.tsx`, `StaffManagement.tsx`, `Integrations.tsx`, `plugins`, `main.tsx`, `AuditLogs.tsx`, `Catalog.tsx`, `PlatformSettings.tsx`?**
+  _High betweenness centrality (0.008) - this node is a cross-community bridge._
+- **Why does `extract_user_id()` connect `extract_user_id` to `wallet.rs`, `mark_read`, `StorageClient`, `get_product`, `orders.rs`, `create_review`?**
   _High betweenness centrality (0.006) - this node is a cross-community bridge._
-- **Why does `react` connect `react` to `apiPost`, `plugins`, `verifyToken`, `cn`, `Finance.tsx`, `seller/page.tsx`, `app/layout.tsx`, `button.tsx`, `AuthContext.tsx`, `Marketplace.tsx`, `Safety.tsx`, `Support.tsx`, `Users.tsx`, `profile.tsx`, `auth/client.ts`, `security.tsx`, `(main)/page.tsx`?**
-  _High betweenness centrality (0.005) - this node is a cross-community bridge._
-- **Why does `jsonwebtoken` connect `services/auth.rs` to `services/hq.rs`, `extract_user_id`?**
-  _High betweenness centrality (0.005) - this node is a cross-community bridge._
+- **Why does `require_hq_access()` connect `handlers/hq.rs` to `extract_user_id`?**
+  _High betweenness centrality (0.004) - this node is a cross-community bridge._
 - **Are the 2 inferred relationships involving `TailwindConfigGenerator` (e.g. with `TestGeneratedConfigIsValidJs` and `TestTailwindConfigGenerator`) actually correct?**
   _`TailwindConfigGenerator` has 2 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `👑 Owner Dashboard (HQ) Features`, `🌐 Next.js Public Web Application Updates`, `🧹 Database & Codebase Optimization` to the rest of the system?**
-  _2096 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **What connects `FinanceStats`, `Withdrawal`, `PayoutRequest` to the rest of the system?**
+  _2130 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Changelog` be split into smaller, more focused modules?**
   _Cohesion score 0.11764705882352941 - nodes in this community are weakly interconnected._
-- **Should `verifyToken` be split into smaller, more focused modules?**
-  _Cohesion score 0.08013937282229965 - nodes in this community are weakly interconnected._
+- **Should `theme.ts` be split into smaller, more focused modules?**
+  _Cohesion score 0.08139534883720931 - nodes in this community are weakly interconnected._
