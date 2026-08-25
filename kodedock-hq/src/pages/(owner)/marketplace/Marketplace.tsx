@@ -142,30 +142,70 @@ export default function Marketplace() {
     }
   });
 
-  const products = response?.data || [];
+  const products: Product[] = response?.data || [];
+  
+  const total = products.length;
+  const pending = products.filter(p => p.status === 'draft').length;
+  const active = products.filter(p => p.status === 'active').length;
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">Marketplace Hub</h1>
-          <p className="text-muted-foreground mt-1">Review and manage all products on KodeDock.</p>
+          <p className="text-muted-foreground mt-1 font-medium">Review, moderate, and manage platform products.</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 bg-secondary text-secondary-foreground border border-border px-3 py-2 rounded-md text-sm font-medium hover:bg-secondary/80">
+          <button className="flex items-center gap-2 bg-secondary text-foreground font-bold px-4 py-2 rounded-lg hover:bg-secondary/80 transition-colors shadow-sm">
             <Filter className="h-4 w-4" />
-            Filter
+            Filter Catalog
           </button>
         </div>
       </div>
 
-      <div className="bg-card shadow-sm overflow-visible">
+      {/* Mini Stats Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-card border border-border rounded-xl p-5 shadow-sm flex items-center gap-4">
+          <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+            <Archive className="h-6 w-6" />
+          </div>
+          <div>
+            <p className="text-sm font-bold text-muted-foreground">Total Catalog</p>
+            <h3 className="text-2xl font-black text-foreground">{total}</h3>
+          </div>
+        </div>
+        <div className="bg-card border border-border rounded-xl p-5 shadow-sm flex items-center gap-4">
+          <div className="h-12 w-12 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500">
+            <Clock className="h-6 w-6" />
+          </div>
+          <div>
+            <p className="text-sm font-bold text-muted-foreground">Pending Review</p>
+            <h3 className="text-2xl font-black text-foreground">{pending}</h3>
+          </div>
+        </div>
+        <div className="bg-card border border-border rounded-xl p-5 shadow-sm flex items-center gap-4">
+          <div className="h-12 w-12 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+            <CheckCircle className="h-6 w-6" />
+          </div>
+          <div>
+            <p className="text-sm font-bold text-muted-foreground">Active Products</p>
+            <h3 className="text-2xl font-black text-foreground">{active}</h3>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
         {isLoading ? (
-          <div className="p-10 text-center text-muted-foreground">Loading products...</div>
+          <div className="p-16 flex flex-col items-center justify-center text-muted-foreground">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+            <p className="font-medium">Loading catalog...</p>
+          </div>
         ) : isError ? (
-          <div className="p-10 text-center text-red-500">Error loading products.</div>
+          <div className="p-16 text-center text-red-500 font-bold bg-red-500/5">Failed to load catalog.</div>
         ) : (
-          <DataTable columns={columns} data={products} searchKey="title" />
+          <div className="p-2">
+            <DataTable columns={columns} data={products} searchKey="title" />
+          </div>
         )}
       </div>
     </div>
