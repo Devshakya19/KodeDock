@@ -1,39 +1,48 @@
-import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { ShieldAlert, ArrowRight, Command } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import axios from "axios";
+
+const loginSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(1, "Password is required"),
+});
+
+type LoginValues = z.infer<typeof loginSchema>;
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+  const form = useForm<LoginValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: "", password: "" }
+  });
 
-    try {
-      const res = await fetch(import.meta.env.VITE_API_URL + "/api/hq/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok && data.status === "success") {
+  const mutation = useMutation({
+    mutationFn: async (values: LoginValues) => {
+      // Login doesn't use the authenticated api client
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:4001'}/api/hq/login`, values);
+      return res.data;
+    },
+    onSuccess: (data) => {
+      if (data.status === "success") {
         login(data.data.token, data.data.staff);
+        toast.success("Authentication successful");
       } else {
-        setError(data.message || "Invalid credentials");
+        toast.error(data.message || "Invalid credentials");
       }
-    } catch (err) {
-      setError("Failed to connect to the server. Is the core-engine running?");
-    } finally {
-      setLoading(false);
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message || "Failed to connect to the server.");
     }
-  };
+  });
+
+  const onSubmit = (data: LoginValues) => mutation.mutate(data);
 
   return (
     <div className="min-h-screen w-full bg-black flex items-center justify-center relative overflow-hidden">
@@ -51,24 +60,21 @@ export default function Login() {
           <p className="text-zinc-400 text-sm">Enter your credentials to access the control plane</p>
         </div>
 
-        {error && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-4 py-3 rounded-lg mb-6 flex items-start gap-3">
-            <ShieldAlert className="h-5 w-5 shrink-0 mt-0.5" />
-            <p>{error}</p>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-zinc-300">Staff Email</label>
             <input
               type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-white transition-all placeholder:text-zinc-600"
+              {...form.register("email")}
+              className={cn(
+                "w-full bg-zinc-900/50 border rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-white transition-all placeholder:text-zinc-600",
+                form.formState.errors.email ? "border-rose-500" : "border-zinc-800"
+              )}
               placeholder="e.g., admin@kodedock.com"
             />
+            {form.formState.errors.email && (
+              <p className="text-xs text-rose-500 mt-1">{form.formState.errors.email.message}</p>
+            )}
           </div>
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
@@ -76,19 +82,23 @@ export default function Login() {
             </div>
             <input
               type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-white transition-all placeholder:text-zinc-600"
+              {...form.register("password")}
+              className={cn(
+                "w-full bg-zinc-900/50 border rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-white transition-all placeholder:text-zinc-600",
+                form.formState.errors.password ? "border-rose-500" : "border-zinc-800"
+              )}
               placeholder="••••••••"
             />
+            {form.formState.errors.password && (
+              <p className="text-xs text-rose-500 mt-1">{form.formState.errors.password.message}</p>
+            )}
           </div>
           <button
             type="submit"
-            disabled={loading}
+            disabled={mutation.isPending}
             className="w-full bg-white hover:bg-zinc-200 text-black font-semibold py-3 rounded-lg transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 group mt-2"
           >
-            {loading ? (
+            {mutation.isPending ? (
               <span className="animate-pulse">Authenticating...</span>
             ) : (
               <>
