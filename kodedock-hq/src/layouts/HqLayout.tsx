@@ -133,11 +133,17 @@ export default function HqLayout() {
       <aside className="w-full md:w-64 bg-[#0A0A0B] border-r border-white/10 p-4 flex flex-col justify-between overflow-y-auto relative z-20">
         <div>
           <div className="flex items-center gap-3 mb-8 px-2 mt-2 group cursor-pointer">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 transition-shadow">
-              <TerminalSquare className="w-4 h-4 text-white" />
-            </div>
-            <div>
-              <h1 className="font-black text-lg tracking-tight text-white leading-tight">KodeDock</h1>
+            <img 
+              src="/icons/logo/kd.svg" 
+              alt="KodeDock" 
+              className="w-10 h-10 drop-shadow-md"
+            />
+            <div className="flex flex-col justify-center">
+              <img 
+                src="/icons/logo/KodeDock-theme.svg" 
+                alt="KodeDock" 
+                className="h-5 w-auto mb-1.5"
+              />
               <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Headquarters</p>
             </div>
           </div>
