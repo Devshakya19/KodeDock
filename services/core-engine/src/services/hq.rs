@@ -211,19 +211,45 @@ pub async fn get_dashboard_stats(pool: &PgPool) -> Result<HqDashboardStats, Stri
             .map_err(|e| format!("Database error fetching products: {}", e))?;
     let products_pending = products_row.0;
 
-    // 4. Active Disputes (status IN 'open', 'under_review')
+    // 4. Active Disputes
     let disputes_row: (i64,) =
         sqlx::query_as("SELECT COUNT(*) FROM disputes WHERE status IN ('open', 'under_review')")
             .fetch_one(pool)
             .await
             .map_err(|e| format!("Database error fetching disputes: {}", e))?;
     let active_disputes = disputes_row.0;
+    
+    // 5. Revenue Chart (Last 7 Days)
+    let chart_records = sqlx::query_as::<_, (String, i64)>(
+        r#"
+        SELECT
+            trim(to_char(date_series, 'Dy')) as name,
+            COALESCE(SUM(o.amount_paise), 0)::bigint as revenue
+        FROM generate_series(
+            current_date - interval '6 days',
+            current_date,
+            '1 day'::interval
+        ) as date_series
+        LEFT JOIN orders o ON o.created_at::date = date_series::date AND o.status = 'completed'
+        GROUP BY date_series
+        ORDER BY date_series;
+        "#
+    )
+    .fetch_all(pool)
+    .await
+    .map_err(|e| format!("Database error fetching revenue chart: {}", e))?;
+
+    let revenue_chart = chart_records
+        .into_iter()
+        .map(|(name, revenue)| crate::models::hq::RevenueChartPoint { name, revenue })
+        .collect();
 
     Ok(HqDashboardStats {
         total_revenue_paise,
         active_sellers,
         products_pending,
         active_disputes,
+        revenue_chart,
     })
 }
 

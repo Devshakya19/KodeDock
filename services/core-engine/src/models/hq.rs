@@ -44,11 +44,18 @@ pub struct HqAuditLog {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct RevenueChartPoint {
+    pub name: String,
+    pub revenue: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct HqDashboardStats {
     pub total_revenue_paise: i64,
     pub active_sellers: i64,
     pub products_pending: i64,
     pub active_disputes: i64,
+    pub revenue_chart: Vec<RevenueChartPoint>,
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]

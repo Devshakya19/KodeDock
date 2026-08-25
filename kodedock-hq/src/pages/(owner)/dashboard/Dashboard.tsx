@@ -18,16 +18,7 @@ import {
   YAxis 
 } from "recharts";
 
-// Mock chart data until backend returns time-series data
-const chartData = [
-  { name: 'Mon', revenue: 4000 },
-  { name: 'Tue', revenue: 3000 },
-  { name: 'Wed', revenue: 5000 },
-  { name: 'Thu', revenue: 2780 },
-  { name: 'Fri', revenue: 6890 },
-  { name: 'Sat', revenue: 8390 },
-  { name: 'Sun', revenue: 9490 },
-];
+// Removed mock chartData
 
 function MetricCard({ title, value, icon: Icon, trend, subtitle }: any) {
   return (
@@ -58,7 +49,22 @@ export default function Dashboard() {
     queryFn: async () => await api.get("/api/hq/stats")
   });
   
-  const stats = statsRes?.data || { total_products: 0, total_users: 0, total_revenue_paise: 0 };
+  // Fetch latest 5 audit logs for the activity feed
+  const { data: auditRes } = useQuery({
+    queryKey: ['hq-audit-recent'],
+    queryFn: async () => await api.get("/api/hq/audit")
+  });
+  
+  // Wait for data or fallback safely
+  const stats = statsRes?.data?.data || { 
+    total_revenue_paise: 0, 
+    active_sellers: 0, 
+    products_pending: 0,
+    active_disputes: 0,
+    revenue_chart: []
+  };
+  
+  const recentActivity = (auditRes?.data?.data || []).slice(0, 5);
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
@@ -71,25 +77,25 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
         <MetricCard 
           title="Total Revenue (Platform)" 
-          value={`₹${(stats.total_revenue_paise / 100).toLocaleString()}`} 
+          value={`₹${(Number(stats.total_revenue_paise) / 100).toLocaleString()}`} 
           icon={Wallet}
           trend="+12.5%"
           subtitle="All time marketplace GMV"
         />
         <MetricCard 
-          title="Total Products" 
-          value={stats.total_products.toLocaleString()} 
+          title="Pending Products" 
+          value={Number(stats.products_pending || 0).toLocaleString()} 
           icon={ShoppingBag}
-          trend="+4.2%"
+          subtitle="Awaiting moderation"
         />
         <MetricCard 
-          title="Active Users" 
-          value={stats.total_users.toLocaleString()} 
+          title="Active Sellers" 
+          value={Number(stats.active_sellers || 0).toLocaleString()} 
           icon={Users}
         />
         <MetricCard 
           title="Active Disputes" 
-          value="0" 
+          value={Number(stats.active_disputes || 0).toLocaleString()} 
           icon={ShieldAlert}
           subtitle="Requires immediate attention"
         />
@@ -111,7 +117,7 @@ export default function Dashboard() {
           
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+              <AreaChart data={stats.revenue_chart} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
@@ -166,22 +172,15 @@ export default function Dashboard() {
           </div>
           
           <div className="space-y-6 flex-1">
-            {/* Hardcoded feed for layout purposes - would ideally hook into AuditLogs */}
-            {[
-              { id: 1, action: "Payout Processed", user: "Seller ID #8291", time: "2m ago" },
-              { id: 2, action: "New Support Ticket", user: "Buyer ID #1092", time: "15m ago" },
-              { id: 3, action: "Category Created", user: "HQ Admin", time: "1h ago" },
-              { id: 4, action: "Product Suspended", user: "HQ Auto-Mod", time: "2h ago" },
-              { id: 5, action: "Staff Role Updated", user: "Super Admin", time: "5h ago" },
-            ].map((activity) => (
+            {recentActivity.map((activity: any) => (
               <div key={activity.id} className="flex gap-4 group cursor-pointer">
                 <div className="relative mt-1">
                   <div className="w-2 h-2 bg-border rounded-full group-hover:bg-primary transition-colors z-10 relative"></div>
                   <div className="absolute top-3 left-1 w-[1px] h-12 bg-border/50 group-hover:bg-primary/20 transition-colors"></div>
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">{activity.action}</p>
-                  <p className="text-xs font-semibold text-muted-foreground mt-0.5">{activity.user} • {activity.time}</p>
+                  <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors capitalize">{activity.action.replace(/_/g, ' ')}</p>
+                  <p className="text-xs font-semibold text-muted-foreground mt-0.5">{activity.entity_type} • {new Date(activity.created_at).toLocaleDateString()}</p>
                 </div>
               </div>
             ))}
