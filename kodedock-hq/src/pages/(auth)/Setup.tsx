@@ -1,43 +1,48 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ShieldCheck, ArrowRight, ServerCrash } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import axios from "axios";
+
+const setupSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+});
+
+type SetupValues = z.infer<typeof setupSchema>;
 
 export default function Setup() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
-    setLoading(true);
+  const form = useForm<SetupValues>({
+    resolver: zodResolver(setupSchema),
+    defaultValues: { name: "", email: "", password: "" }
+  });
 
-    try {
-      const res = await fetch(import.meta.env.VITE_API_URL + "/api/hq/setup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok && data.status === "success") {
-        setSuccess("System Initialized! Owner account created.");
+  const mutation = useMutation({
+    mutationFn: async (values: SetupValues) => {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:4001'}/api/hq/setup`, values);
+      return res.data;
+    },
+    onSuccess: (data) => {
+      if (data.status === "success") {
+        toast.success("System Initialized! Owner account created.");
         setTimeout(() => navigate("/login"), 2000);
       } else {
-        setError(data.message || "Failed to run setup.");
+        toast.error(data.message || "Failed to run setup.");
       }
-    } catch (err) {
-      setError("Failed to connect to the core-engine.");
-    } finally {
-      setLoading(false);
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message || "Failed to connect to the core-engine.");
     }
-  };
+  });
+
+  const onSubmit = (data: SetupValues) => mutation.mutate(data);
 
   return (
     <div className="min-h-screen w-full bg-black flex items-center justify-center relative overflow-hidden">
@@ -55,60 +60,61 @@ export default function Setup() {
           <p className="text-zinc-400 text-sm">Create the root OWNER account to begin</p>
         </div>
 
-        {error && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-4 py-3 rounded-lg mb-6">
-            {error}
-          </div>
-        )}
-
-        {success && (
-          <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm px-4 py-3 rounded-lg mb-6 flex items-start gap-3">
-            <ShieldCheck className="h-5 w-5 shrink-0 mt-0.5" />
-            <p>{success}</p>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-zinc-300">Full Name</label>
             <input
               type="text"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-white transition-all placeholder:text-zinc-600"
+              {...form.register("name")}
+              className={cn(
+                "w-full bg-zinc-900/50 border rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-white transition-all placeholder:text-zinc-600",
+                form.formState.errors.name ? "border-rose-500" : "border-zinc-800"
+              )}
               placeholder="e.g., Dev Shakya"
             />
+            {form.formState.errors.name && (
+              <p className="text-xs text-rose-500 mt-1">{form.formState.errors.name.message}</p>
+            )}
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-zinc-300">Root Email</label>
             <input
               type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-white transition-all placeholder:text-zinc-600"
+              {...form.register("email")}
+              className={cn(
+                "w-full bg-zinc-900/50 border rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-white transition-all placeholder:text-zinc-600",
+                form.formState.errors.email ? "border-rose-500" : "border-zinc-800"
+              )}
               placeholder="admin@kodedock.com"
             />
+            {form.formState.errors.email && (
+              <p className="text-xs text-rose-500 mt-1">{form.formState.errors.email.message}</p>
+            )}
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-zinc-300">Master Password</label>
             <input
               type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-white transition-all placeholder:text-zinc-600"
+              {...form.register("password")}
+              className={cn(
+                "w-full bg-zinc-900/50 border rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-white transition-all placeholder:text-zinc-600",
+                form.formState.errors.password ? "border-rose-500" : "border-zinc-800"
+              )}
               placeholder="Choose a strong password"
             />
+            {form.formState.errors.password && (
+              <p className="text-xs text-rose-500 mt-1">{form.formState.errors.password.message}</p>
+            )}
           </div>
           <button
             type="submit"
-            disabled={loading || !!success}
+            disabled={mutation.isPending || mutation.isSuccess}
             className="w-full bg-emerald-500 hover:bg-emerald-400 text-white font-semibold py-3 rounded-lg transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 group mt-2"
           >
-            {loading ? (
+            {mutation.isPending ? (
               <span className="animate-pulse">Configuring System...</span>
+            ) : mutation.isSuccess ? (
+              <span className="flex items-center gap-2"><ShieldCheck className="w-4 h-4" /> Ready</span>
             ) : (
               <>
                 Initialize Root Access
