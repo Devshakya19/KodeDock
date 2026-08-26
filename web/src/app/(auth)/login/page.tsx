@@ -44,14 +44,14 @@ export default function LoginPage() {
     }
   }
 
-    async function handleGithubLogin() {
+  async function handleGithubLogin() {
     setError("");
     setLoading(true);
     try {
       const res = await fetch("/api/auth/config", { cache: "no-store" });
       const data = await res.json();
       const clientId = data.github_client_id;
-      
+
       if (!clientId || clientId === "your_github_client_id") {
         setError("GitHub login is not configured");
         setLoading(false);
@@ -64,7 +64,7 @@ export default function LoginPage() {
       setError("Failed to connect to authentication server.");
       setLoading(false);
     }
-    }
+  }
 
   return (
     <div className="w-full max-w-md">

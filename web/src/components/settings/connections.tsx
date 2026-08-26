@@ -35,7 +35,7 @@ export function ConnectionsSettings() {
   }, []);
 
   async function handleConnectGithub() {
-        setError("");
+    setError("");
     setSuccess("");
     try {
       const res = await fetch("/api/auth/config", { cache: "no-store" });
@@ -47,7 +47,7 @@ export function ConnectionsSettings() {
       }
       const state = btoa("link|/seller/settings/connections");
       window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${window.location.origin}/api/auth/callback&scope=repo&state=${state}`;
-    } catch(e) {
+    } catch (e) {
       setError("Failed to fetch configuration.");
     }
   }
