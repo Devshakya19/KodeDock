@@ -1,3 +1,4 @@
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Outlet,
   Navigate,
@@ -6,6 +7,7 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import { api } from "@/lib/api";
 import {
   Users,
   ShoppingBag,
@@ -23,6 +25,9 @@ import {
   LayoutDashboard,
   Bell,
   Globe,
+  CheckCircle2,
+  AlertCircle,
+  TrendingUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useState, useCallback } from "react";
@@ -35,6 +40,38 @@ export default function HqLayout() {
   const [time, setTime] = useState(new Date());
   const [open, setOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  const [notifications, setNotifications] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const res = await api.get("/api/notifications");
+        if (res.data?.success) {
+          setNotifications(res.data.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch notifications", err);
+      }
+    };
+
+    if (isAuthenticated) {
+      fetchNotifications();
+      // Optional: Poll every 60 seconds
+      const interval = setInterval(fetchNotifications, 60000);
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated]);
+
+  const markAllRead = async () => {
+    try {
+      await api.post("/api/notifications/mark-all-read");
+      setNotifications(notifications.map((n) => ({ ...n, is_read: true })));
+    } catch (err) {
+      console.error("Failed to mark all read", err);
+    }
+  };
 
   const handleLogout = useCallback(() => {
     setIsLoggingOut(true);
@@ -373,10 +410,119 @@ export default function HqLayout() {
               })}
             </div>
 
-            <button className="relative p-2 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-full transition-colors">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-background"></span>
-            </button>
+            <div className="relative">
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="relative p-2 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-full transition-colors"
+              >
+                <Bell className="w-5 h-5" />
+                {notifications.filter((n) => !n.is_read).length > 0 && (
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-background"></span>
+                )}
+              </button>
+
+              <AnimatePresence>
+                {showNotifications && (
+                  <>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="fixed inset-0 z-40"
+                      onClick={() => setShowNotifications(false)}
+                    />
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-0 mt-2 w-80 bg-[#18181B]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden"
+                    >
+                      <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 bg-white/5">
+                        <span className="text-sm font-bold text-white">
+                          Notifications
+                        </span>
+                        <button
+                          onClick={markAllRead}
+                          className="text-[10px] uppercase tracking-wider font-bold text-indigo-400 hover:text-indigo-300 transition-colors"
+                        >
+                          Mark all read
+                        </button>
+                      </div>
+                      <div className="max-h-[300px] overflow-y-auto">
+                        {notifications.length === 0 ? (
+                          <div className="p-6 text-center text-xs text-muted-foreground">
+                            No new notifications
+                          </div>
+                        ) : (
+                          notifications.map((notif) => {
+                            const Icon =
+                              notif.type === "finance"
+                                ? TrendingUp
+                                : notif.type === "catalog"
+                                  ? CheckCircle2
+                                  : AlertCircle;
+                            const isUnread = !notif.is_read;
+
+                            return (
+                              <div
+                                key={notif.id}
+                                className={cn(
+                                  "flex items-start gap-3 p-4 border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer relative",
+                                  isUnread ? "bg-indigo-500/5" : "",
+                                )}
+                              >
+                                {isUnread && (
+                                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500" />
+                                )}
+                                <div
+                                  className={cn(
+                                    "p-2 rounded-lg shrink-0",
+                                    notif.type === "finance"
+                                      ? "bg-emerald-500/10 text-emerald-400"
+                                      : notif.type === "catalog"
+                                        ? "bg-blue-500/10 text-blue-400"
+                                        : "bg-rose-500/10 text-rose-400",
+                                  )}
+                                >
+                                  <Icon className="w-4 h-4" />
+                                </div>
+                                <div className="flex-1 overflow-hidden">
+                                  <p className="text-sm font-semibold text-white truncate">
+                                    {notif.title}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
+                                    {notif.message || notif.desc}
+                                  </p>
+                                  <p className="text-[10px] text-muted-foreground/60 mt-1">
+                                    {notif.created_at
+                                      ? new Date(
+                                          notif.created_at,
+                                        ).toLocaleString("en-US", {
+                                          hour: "numeric",
+                                          minute: "numeric",
+                                          hour12: true,
+                                          month: "short",
+                                          day: "numeric",
+                                        })
+                                      : notif.time}
+                                  </p>
+                                </div>
+                              </div>
+                            );
+                          })
+                        )}
+                      </div>
+                      <div className="p-2 border-t border-white/5 bg-black/20">
+                        <button className="w-full text-xs font-semibold text-muted-foreground hover:text-white py-2 text-center transition-colors">
+                          View All Activity
+                        </button>
+                      </div>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         </header>
 
