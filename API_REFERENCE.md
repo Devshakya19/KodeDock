@@ -254,3 +254,23 @@ For operational context, the primary relational entities backing the API are str
 - **Stateless Tokens:** JWTs are issued with short expirations and are designed to be stored in `HttpOnly` secure cookies by client implementations.
 - **SQLx Compilation:** All database queries in the Rust engine are verified at compile-time to prevent SQL injection vulnerabilities.
 - **Signed Uploads:** The API never ingests large files directly. It issues securely signed, time-limited presigned URLs allowing direct-to-storage proxying.
+
+
+## 👑 HQ (Admin) API
+
+> [!IMPORTANT]
+> All `/api/hq/*` routes require the caller to possess the `ADMIN` or `OWNER` role.
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| `GET`  | `/api/hq/integrations` | Fetch all platform integrations (GitHub, Stripe, etc.) | Yes (`ADMIN`) |
+| `PUT`  | `/api/hq/integrations` | Update an integration (triggers dynamic `.env` sync) | Yes (`ADMIN`) |
+| `GET`  | `/api/hq/catalog/categories` | Retrieve all categories for catalog management. | Yes (`ADMIN`) |
+| `POST` | `/api/hq/catalog/categories` | Create a new product category. | Yes (`ADMIN`) |
+| `DELETE`| `/api/hq/catalog/categories/:id` | Soft-delete or archive a category. | Yes (`ADMIN`) |
+| `GET`  | `/api/hq/finance/stats` | Retrieve global platform financial statistics. | Yes (`ADMIN`) |
+| `GET`  | `/api/hq/finance/payouts` | List all pending seller payout requests. | Yes (`ADMIN`) |
+| `POST` | `/api/hq/finance/payouts/:id/process` | Mark a payout as processed. | Yes (`ADMIN`) |
+| `GET`  | `/api/hq/audit-logs` | Retrieve system-wide audit logs for security tracking. | Yes (`ADMIN`) |
+| `GET`  | `/api/hq/users` | List platform users with advanced filtering. | Yes (`ADMIN`) |
+| `PATCH`| `/api/hq/users/:id/status` | Suspend or activate a user account. | Yes (`ADMIN`) |
