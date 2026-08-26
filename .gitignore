@@ -85,3 +85,7 @@ venv/
 
 # Docker
 docker-compose.override.yml
+
+# Graphify
+graphify-out/
+.cache/
