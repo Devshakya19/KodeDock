@@ -1,4 +1,4 @@
-PROPRIETARY SOFTWARE LICENSE AGREEMENT
+# PROPRIETARY SOFTWARE LICENSE AGREEMENT
 
 Copyright (c) 2024–2026 KodeDock. All rights reserved.
 
@@ -19,7 +19,7 @@ ACCESS OR USE THE SOFTWARE.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1. DEFINITIONS
+## 1. DEFINITIONS
 
    1.1  "Software" means the KodeDock platform in its entirety, including but
         not limited to all source code, object code, compiled binaries,
@@ -42,7 +42,7 @@ ACCESS OR USE THE SOFTWARE.
         information disclosed by KodeDock in connection with this Agreement,
         including technical, financial, business, and product information.
 
-2. GRANT OF LIMITED RIGHTS
+## 2. GRANT OF LIMITED RIGHTS
 
    Subject to your full compliance with this Agreement, KodeDock grants you
    a limited, non-exclusive, non-transferable, non-sublicensable, and
@@ -74,7 +74,7 @@ ACCESS OR USE THE SOFTWARE.
    (h) Use any automated system (bots, crawlers, scrapers, or similar tools)
        to extract, index, or copy any portion of the Software.
 
-3. INTELLECTUAL PROPERTY RIGHTS
+## 3. INTELLECTUAL PROPERTY RIGHTS
 
    3.1  Ownership. The Software and all copies thereof, together with all
         patents (pending or granted), copyrights, trade secrets, trademarks,
@@ -91,7 +91,7 @@ ACCESS OR USE THE SOFTWARE.
         the Software are voluntarily given and become the exclusive property
         of KodeDock, which may use such feedback without any obligation to you.
 
-4. CONFIDENTIALITY
+## 4. CONFIDENTIALITY
 
    4.1  The Software constitutes valuable Confidential Information of KodeDock.
         You agree to:
@@ -111,7 +111,7 @@ ACCESS OR USE THE SOFTWARE.
         of this Agreement for a period of five (5) years, or indefinitely
         with respect to information that qualifies as a trade secret.
 
-5. RESTRICTIONS & ACCEPTABLE USE
+## 5. RESTRICTIONS & ACCEPTABLE USE
 
    In addition to the prohibitions in Section 2, you shall not:
 
@@ -126,7 +126,7 @@ ACCESS OR USE THE SOFTWARE.
    (e) Conduct penetration testing, fuzzing, or security assessments of any
        KodeDock production systems without prior written authorisation.
 
-6. TERMINATION
+## 6. TERMINATION
 
    6.1  Automatic Termination. This Agreement and all rights granted hereunder
         terminate automatically and immediately, without notice, if you fail to
@@ -147,7 +147,7 @@ ACCESS OR USE THE SOFTWARE.
         Liability), 9 (Indemnification), 10 (Governing Law), and 12 (General)
         survive any termination of this Agreement.
 
-7. DISCLAIMER OF WARRANTIES
+## 7. DISCLAIMER OF WARRANTIES
 
    THE SOFTWARE IS PROVIDED "AS IS" AND "AS AVAILABLE," WITHOUT WARRANTY OF
    ANY KIND, EXPRESS OR IMPLIED. TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE
@@ -157,7 +157,7 @@ ACCESS OR USE THE SOFTWARE.
    SOFTWARE WILL MEET YOUR REQUIREMENTS, OPERATE WITHOUT INTERRUPTION, OR BE
    FREE OF ERRORS, DEFECTS, VIRUSES, OR OTHER HARMFUL COMPONENTS.
 
-8. LIMITATION OF LIABILITY
+## 8. LIMITATION OF LIABILITY
 
    8.1  IN NO EVENT SHALL KODEDOCK, ITS DIRECTORS, OFFICERS, EMPLOYEES,
         AGENTS, LICENSORS, OR SERVICE PROVIDERS BE LIABLE FOR ANY INDIRECT,
@@ -172,7 +172,7 @@ ACCESS OR USE THE SOFTWARE.
         CUMULATIVE LIABILITY ARISING OUT OF OR RELATED TO THIS AGREEMENT SHALL
         NOT EXCEED ONE HUNDRED INDIAN RUPEES (INR 100).
 
-9. INDEMNIFICATION
+## 9. INDEMNIFICATION
 
    You agree to indemnify, defend, and hold harmless KodeDock and its officers,
    directors, employees, agents, and successors from and against any claims,
@@ -181,7 +181,7 @@ ACCESS OR USE THE SOFTWARE.
    (b) your use or misuse of the Software; or (c) your violation of any
    applicable law or the rights of any third party.
 
-10. GOVERNING LAW & DISPUTE RESOLUTION
+## 10. GOVERNING LAW & DISPUTE RESOLUTION
 
     10.1  This Agreement shall be governed by and construed in accordance with
           the laws of India, without regard to its conflict of laws provisions.
@@ -195,7 +195,7 @@ ACCESS OR USE THE SOFTWARE.
           resolve any dispute in good faith through direct negotiations for a
           period of thirty (30) days following written notice of the dispute.
 
-11. CONTACT INFORMATION
+## 11. CONTACT INFORMATION
 
     For licensing inquiries, commercial arrangements, or general legal matters:
 
@@ -206,7 +206,7 @@ ACCESS OR USE THE SOFTWARE.
 
         Email:   security@kodedock.com
 
-12. GENERAL PROVISIONS
+## 12. GENERAL PROVISIONS
 
     12.1  Entire Agreement. This Agreement constitutes the entire agreement
           between the parties with respect to its subject matter and supersedes

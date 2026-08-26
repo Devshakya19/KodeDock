@@ -1,499 +1,285 @@
 # KodeDock Troubleshooting Guide
 
-This guide covers common issues encountered during development and deployment of KodeDock, along with their solutions.
+This guide provides professional diagnostics and resolutions for common issues encountered during the development and deployment of KodeDock.
+
+> [!NOTE]
+> Most issues stem from configuration drift, missing environment variables, or service connectivity blockages. Always verify your `.env` configuration before proceeding with complex diagnostics.
 
 ## Table of Contents
 1. [Docker & Container Issues](#docker--container-issues)
-2. [Database Issues](#database-issues)
-3. [Service Connection Issues](#service-connection-issues)
-4. [Frontend Issues](#frontend-issues)
-5. [Backend Issues](#backend-issues)
-6. [Authentication Issues](#authentication-issues)
-7. [Payment Issues](#payment-issues)
-8. [Performance Issues](#performance-issues)
-9. [Environment & Configuration](#environment--configuration)
+2. [Database Connectivity & State](#database-connectivity--state)
+3. [Service Communication](#service-communication)
+4. [Frontend Operations](#frontend-operations)
+5. [Backend & Rust Ecosystem](#backend--rust-ecosystem)
+6. [Authentication & Authorization](#authentication--authorization)
+7. [Payment & Wallet Integrations](#payment--wallet-integrations)
+8. [Performance & System Health](#performance--system-health)
+9. [Environment Configuration](#environment-configuration)
 
-## Docker & Container Issues
+---
 
-### Docker Daemon Not Running
-**Symptoms**: 
+## 1. Docker & Container Issues
+
+### Daemon Availability
+**Symptoms**
 - `docker compose up` fails with "Cannot connect to the Docker daemon"
-- `docker info` returns an error
+- `docker info` returns connection errors
 
-**Solution**:
+**Resolution**
+Ensure the Docker daemon is actively running on your host system:
 ```bash
-# Start Docker daemon
-sudo systemctl start docker  # Linux
-# Or start Docker Desktop application (Mac/Windows)
+# Start Docker daemon (Linux)
+sudo systemctl start docker
 
-# Verify
+# Verify health status
 docker info
 ```
 
 ### Port Conflicts
-**Symptoms**:
-- Services fail to start with "port is already in use"
-- Error messages like "Bind for 0.0.0.0:3000 failed: port is already allocated"
+**Symptoms**
+- Container fails to bind with "port is already in use" (e.g., `0.0.0.0:3000 failed`)
 
-**Solution**:
-1. Identify what's using the port:
+**Resolution**
+Identify the process consuming the required port and terminate it or adjust your `docker-compose.yml`.
 ```bash
-lsof -i :3000  # Replace with your port
-```
-2. Either stop the conflicting service or change the port in docker-compose.yml
-3. For development, you can stop common conflicting services:
-```bash
-# Example: stop another Next.js app
+# Identify port usage (e.g., port 3000)
+lsof -i :3000
+
+# Force-stop conflicting Next.js instances (if applicable)
 lsof -i :3000 | grep LISTEN | awk '{print $2}' | xargs kill -9
 ```
 
 ### Container Health Checks Failing
-**Symptoms**:
-- `docker compose ps` shows services as "unhealthy"
-- Repeated restarting of containers
+**Symptoms**
+- Services report as "unhealthy" via `docker compose ps`
+- Containers restart in an infinite loop
 
-**Solution**:
-1. Check the logs for the unhealthy service:
+**Resolution**
+Inspect the logs of the failing service. This often correlates to backend connections (e.g., Database, Redis).
 ```bash
 docker compose logs -f [service-name]
 ```
-2. Common causes:
-   - Database connection issues (check DATABASE_URL)
-   - Redis connection issues (check REDIS_URL)
-   - Missing environment variables
-   - Port conflicts between containers
 
-### Slow Container Startup
-**Symptoms**:
-- Services take a long time to become healthy
-- Timeout during startup
+---
 
-**Solution**:
-1. Increase health check timeouts in docker-compose.yml if needed
-2. Ensure sufficient system resources (RAM, CPU)
-3. Check if services are doing heavy initialization (database migrations, etc.)
+## 2. Database Connectivity & State
 
-## Database Issues
+### Connection Refusal
+**Symptoms**
+- Backend logs report: `Failed to create PostgreSQL pool`
+- `connection to server at "postgres" (172.XX.X.X), port 5432 failed: Connection refused`
 
-### Connection Refused
-**Symptoms**:
-- Backend service logs show "Failed to create PostgreSQL pool"
-- Error: "connection to server at "postgres" (172.XX.X.X), port 5432 failed: Connection refused"
-
-**Solution**:
-1. Verify PostgreSQL service is running:
+**Resolution**
+Verify the database service state and attempt a manual connection.
 ```bash
+# Check postgres service status
 docker compose ps postgres
-```
-2. Check PostgreSQL logs:
-```bash
-docker compose logs -f postgres
-```
-3. Ensure depends_on is set correctly in docker-compose.yml
-4. Manually test connection:
-```bash
+
+# Test connection internally
 docker compose exec postgres pg_isready -U kodedock -d kodedock
 ```
 
-### Authentication Failed
-**Symptoms**:
-- "password authentication failed for user "kodedock""
-- Database connection rejected despite service running
+### Authentication Failures
+**Symptoms**
+- `password authentication failed for user "kodedock"`
 
-**Solution**:
-1. Check the POSTGRES_PASSWORD in your .env file matches what's expected
-2. Verify the password was correctly passed to the container:
+**Resolution**
+Ensure the `POSTGRES_PASSWORD` in your `.env` matches the initialized volume. If credentials have drifted, you may need to recreate the database volume.
+
+> [!WARNING]
+> The following command wipes all persistent database data. Only execute this in development environments.
+
 ```bash
-docker compose exec postgres env | grep POSTGRES
-```
-3. If you changed the password, you may need to reset the database volume:
-```bash
-# WARNING: This will delete all data!
 docker compose down -v
 docker compose up -d
 ```
 
-### Schema Not Applied
-**Symptoms**:
-- Tables missing when querying
-- Application errors about missing tables/columns
+### Schema Unapplied
+**Symptoms**
+- Application panics due to missing tables or columns.
 
-**Solution**:
-1. Check if the initialization script ran:
-```bash
-docker compose logs postgres | grep "initdb"
-```
-2. Verify the SQL file is mounted correctly:
-```bash
-docker compose exec postgres ls -la /docker-entrypoint-initdb.d/
-```
-3. Manually apply schema if needed:
+**Resolution**
+Manually apply the initialization schema to the running database instance:
 ```bash
 docker compose exec -T postgres psql -U kodedock -d kodedock < sql/01-init.sql
 ```
 
-## Service Connection Issues
+---
 
-### Backend Cannot Connect to Redis
-**Symptoms**:
-- Error: "Failed to connect to Redis" or "Redis connection refused"
-- Services that depend on Redis (Core Engine, AI Service, Worker, Realtime) fail to start
+## 3. Service Communication
 
-**Solution**:
-1. Verify Redis service is healthy:
-```bash
-docker compose ps redis
-docker compose logs -f redis
-```
-2. Test Redis connectivity:
-```bash
-docker compose exec redis redis-cli ping
-```
-3. Check REDIS_URL in backend service .env files
-4. Ensure Redis port (6379) is not blocked
+### Redis Unavailability
+**Symptoms**
+- `Failed to connect to Redis` or `Redis connection refused` from Core Engine, AI, or Worker services.
 
-### Services Cannot Communicate Internally
-**Symptoms**:
-- One service calls another but gets connection refused or timeout
-- Internal API calls fail despite services running
+**Resolution**
+1. Check Redis container health (`docker compose ps redis`).
+2. Verify connectivity: `docker compose exec redis redis-cli ping`.
+3. Validate `REDIS_URL` in your configuration.
 
-**Solution**:
-1. Verify both services are on the same Docker network:
+### Internal Network Failures
+**Symptoms**
+- Inter-service requests fail with timeouts or connection refusals.
+
+**Resolution**
+Services must communicate via internal Docker DNS names, not `localhost`.
+- **Correct**: `http://core-engine:4001`
+- **Incorrect**: `http://localhost:4001`
+
+Test connectivity explicitly from the dependent container:
 ```bash
-docker compose config --services | xargs -I {} docker compose inspect {} | grep -A2 -B2 "networks"
-```
-2. Check that services are using internal service names (not localhost):
-   - Correct: `http://core-engine:4001`
-   - Incorrect for internal calls: `http://localhost:4001`
-3. Verify port mappings and service names in docker-compose.yml
-4. Test connectivity between containers:
-```bash
-# From core-engine container, test connecting to redis
 docker compose exec core-engine curl -s redis:6379
 ```
 
-### Proxy Returning 403 or 502 Errors
-**Symptoms**:
-- Frontend API calls return 403 (Path not allowed) or 502 (Backend connection failed)
-- Console shows errors like "Failed to fetch resource"
+### Reverse Proxy 403 / 502
+**Symptoms**
+- Client receives HTTP `403` (Path not allowed) or `502` (Bad Gateway).
 
-**Solution**:
-1. **403 Error** - Path not allowed in proxy:
-   - Check that the API path you're calling is in the ALLOWED_PREFIXES list in 
-     `web/src/app/api/proxy/[...path]/route.ts`
-   - Common missed paths: new API endpoints you've added
-2. **502 Error** - Backend connection failed:
-   - Verify the Core Engine service is running and healthy
-   - Check that CORE_ENGINE_URL in .env is correct (default: http://localhost:4001)
-   - Test direct connection to backend:
-   ```bash
-   curl -s http://localhost:4001/health
-   ```
+**Resolution**
+- **403 Errors**: Check `web/src/app/api/proxy/[...path]/route.ts`. The API path must be explicitly registered in `ALLOWED_PREFIXES`.
+- **502 Errors**: The proxy cannot reach the Core Engine. Verify `CORE_ENGINE_URL` is set correctly and the backend is healthy (`curl -s http://localhost:4001/health`).
 
-## Frontend Issues
+---
 
-### Next.js Development Server Problems
-**Symptoms**:
-- `npm run dev` fails to start
-- Browser shows blank page or hydration errors
-- Module not found errors
+## 4. Frontend Operations
 
-**Solution**:
-1. Clear Next.js cache and reinstall:
+### Next.js Development Server Failures
+**Symptoms**
+- `npm run dev` crashes or fails to compile
+- Hydration mismatches or module not found errors
+
+**Resolution**
+Purge the Next.js cache and verify dependencies:
 ```bash
 cd web
 rm -rf .next node_modules/cache
 npm install
 npm run dev
 ```
-2. Check for TypeScript errors:
-```bash
-npm run build  # Will show type-checking errors
-```
-3. Verify Node.js version (requires v20+):
-```bash
-node --version
-```
 
-### Environment Variables Not Loading
-**Symptoms**:
-- `process.env.NEXT_PUBLIC_VAR` is undefined in frontend
-- API calls failing due to missing configuration
+> [!TIP]
+> Ensure you are running Node.js version 20 or higher (`node --version`).
 
-**Solution**:
-1. Remember that only variables prefixed with `NEXT_PUBLIC_` are exposed to the browser
-2. Check that your .env.local or .env file contains the variables
-3. Restart the development server after changing environment variables
-4. Verify variable names are correct (case-sensitive)
+### Environment Variables Undefined
+**Symptoms**
+- `process.env.NEXT_PUBLIC_VAR` evaluates to `undefined` on the client.
 
-### CSS/Tailwind Issues
-**Symptoms**:
-- Styles not applying
-- Classes not being recognized
-- Unexpected styling behavior
+**Resolution**
+Ensure variables intended for the browser are prefixed with `NEXT_PUBLIC_`. Always restart the Next.js development server after altering `.env` or `.env.local`.
 
-**Solution**:
-1. Ensure Tailwind is properly configured in `tailwind.config.js` and `postcss.config.mjs`
-2. Check for conflicting CSS or CSS reset issues
-3. Verify that your content paths in tailwind.config.js include all necessary directories
-4. Try clearing the Next.js cache:
-```bash
-rm -rf .next
-```
+---
 
-## Backend Issues
+## 5. Backend & Rust Ecosystem
 
-### Rust Compilation Errors
-**Symptoms**:
-- `cargo run` fails with compilation errors
-- Missing dependencies or version conflicts
+### Actix-Web Boot Failures
+**Symptoms**
+- Server starts and exits instantly with cryptic panics.
 
-**Solution**:
-1. Check the error message for specific guidance
-2. Run `cargo clean` and try again:
-```bash
-cd services/core-engine
-cargo clean
-cargo run
-```
-3. Verify Rust toolchain is up to date:
-```bash
-rustup update
-```
-4. Check Cargo.toml for correct dependency versions
-
-### Actix-Web Server Fails to Start
-**Symptoms**:
-- Server starts but immediately exits
-- No error message or cryptic panic
-
-**Solution**:
-1. Enable detailed logging:
+**Resolution**
+Elevate logging levels to reveal configuration or connection panics:
 ```bash
 RUST_LOG=info cargo run
 ```
-2. Check if port is already in use
-3. Verify all required environment variables are set
-4. Look for panics in initialization code (database connection, etc.)
 
-### Rate Limiting Blocking Legitimate Requests
-**Symptoms**:
-- HTTP 429 (Too Many Requests) errors during normal development
-- API calls being blocked unexpectedly
+### Rate Limiting (Development)
+**Symptoms**
+- HTTP `429 Too Many Requests` when executing legitimate workflows.
 
-**Solution**:
-1. During development, you can temporarily increase limits in 
-   `services/core-engine/src/main.rs` in the GovernorConfigBuilder sections
-2. Ensure you're not making rapid-fire requests in loops
-3. Check if your IP is being rate-limited due to proxy forwarding issues
+**Resolution**
+Temporarily relax the limits in `services/core-engine/src/main.rs` via `GovernorConfigBuilder`. Ensure downstream proxy configuration passes genuine client IPs instead of the proxy address.
 
-### Database Query Errors
-**Symptoms**:
-- SQLx errors about missing columns or type mismatches
-- Panics during database operations
+---
 
-**Solution**:
-1. Verify your database schema matches what the code expects
-2. Check that migrations have been applied
-3. Ensure column types in SQL match Rust types in models/
-4. Run `cargo test` to catch schema mismatches early
+## 6. Authentication & Authorization
 
-## Authentication Issues
+### JWT / Session Validation Failures
+**Symptoms**
+- Unauthorized errors despite successful login workflows
+- Continuous redirection loops
 
-### JWT Token Problems
-**Symptoms**:
-- "Unauthorized" errors despite being logged in
-- Token validation failures
-- Redirect loops to login page
+**Resolution**
+1. Inspect the browser's application tab for the `kodedock_token` cookie.
+2. Confirm `JWT_SECRET` is synchronized across all services.
+3. Verify host system time. Significant clock drift invalidates JWT expiries.
 
-**Solution**:
-1. Check that the `kodedock_token` cookie is being set (Application > Cookies in devtools)
-2. Verify JWT_SECRET is consistent across services
-3. Check token expiration (tokens typically expire in 24h)
-4. Verify the cookie path and domain settings
-5. Check server time - JWT validation fails if server time is significantly off
+### OAuth Integrations (GitHub)
+**Symptoms**
+- Callback errors stating "invalid state" or mismatched signatures.
 
-### OAuth Issues (GitHub)
-**Symptoms**:
-- GitHub login fails or redirects incorrectly
-- "Invalid state" or "code verification failed" errors
+**Resolution**
+Ensure the GitHub OAuth App configuration precisely matches your local setup:
+- Callback URL must be: `http://localhost:3000/api/auth/github/callback`
+- Both Client ID and Secret must be populated in `.env`.
 
-**Solution**:
-1. Verify GitHub OAuth App configuration:
-   - Callback URL must match: `http://localhost:3000/api/auth/github/callback`
-   - Ensure Client ID and Secret are correct in .env
-2. Check that the session cookie is being set properly
-3. Verify the OAuth flow state is being stored and validated correctly
-4. Check logs for specific error messages from the OAuth handler
+---
 
-### Role-Based Access Issues
-**Symptoms**:
-- Users can't access features they should have access to
-- Admin features unavailable to admin users
+## 7. Payment & Wallet Integrations
 
-**Solution**:
-1. Verify the user's role in the database:
-```bash
-docker compose exec -T postgres psql -U kodedock -d kodedock -c "SELECT role FROM profiles WHERE id = 'user-uuid-here';"
-```
-2. Check that role-based middleware is correctly implemented
-3. Verify that the JWT token contains the correct role information
-4. Look for hardcoded role checks that may be incorrect
+### Razorpay Webhook Disconnects
+**Symptoms**
+- Orders stuck pending, wallet funds fail to top up, signature verification fails.
 
-## Payment Issues
+**Resolution**
+1. Validate your `.env` contains the correct Razorpay keys (e.g., `rzp_test_...`).
+2. Ensure the configured Webhook Secret matches the Razorpay dashboard.
+3. For local development, expose your environment using an ngrok tunnel so Razorpay can reach the webhook endpoints.
 
-### Razorpay Integration Problems
-**Symptoms**:
-- Payment verification fails
-- Orders stuck in pending state
-- Webhook signature verification errors
-
-**Solution**:
-1. Verify Razorpay keys are correctly set in .env
-2. Check that the webhook secret matches what's configured in Razorpay dashboard
-3. Test with Razorpay test mode keys (rzp_test_*)
-4. Verify that the amount being sent matches what Razorpay expects
-5. Check webhook logs:
 ```bash
 docker compose logs -f core-engine | grep razorpay
 ```
-6. Ensure your server is accessible from Razorpay's webhooks (ngrok for local dev)
 
-### Wallet Balance Issues
-**Symptoms**:
-- Incorrect wallet balances
-- Transactions not recording properly
-- Insufficient balance errors when funds should be available
+---
 
-**Solution**:
-1. Check wallet transactions for accuracy:
-```bash
-docker compose exec -T postgres psql -U kodedock -d kodedock -c "SELECT * FROM wallet_transactions ORDER BY created_at DESC LIMIT 10;"
-```
-2. Verify that transaction types are correctly interpreted (positive vs negative amounts)
-3. Check for race conditions in concurrent transactions
-4. Ensure that all balance updates happen within database transactions
+## 8. Performance & System Health
 
-## Performance Issues
+### Degraded API Response Times
+**Symptoms**
+- Queries take seconds to execute
+- System feels generally sluggish under low load
 
-### Slow API Response Times
-**Symptoms**:
-- API endpoints take seconds to respond
-- Frontend feels sluggish
-- Database queries are slow
+**Resolution**
+- **Database**: Consult `07-BACKEND.md` for proper indexing patterns. Analyze slow queries and run `EXPLAIN ANALYZE`.
+- **Compute**: Check for unoptimized N+1 query structures.
 
-**Solution**:
-1. Check database query performance:
-   - Look for missing indexes in 07-BACKEND.md
-   - Consider adding indexes for frequently queried columns
-2. Verify Redis caching is working for appropriate endpoints
-3. Check for N+1 query problems in backend code
-4. Profile slow endpoints with tracing tools
-5. Ensure services have adequate resources (CPU, memory)
+### Resource Exhaustion
+**Symptoms**
+- Docker daemon reporting extreme memory usage
+- System utilizing swap space
 
-### High Memory Usage
-**Symptoms**:
-- Containers hitting memory limits
-- System slowing down due to swapping
-- Docker showing high memory consumption
+**Resolution**
+1. Monitor memory consumption for leaks within long-running processes.
+2. Consider imposing pagination on large payload responses.
+3. Implement request body limits to mitigate resource exhaustion attacks.
 
-**Solution**:
-1. Check for memory leaks in long-running processes
-2. Verify that services are not caching excessive data in memory
-3. Check for large response payloads that could be paginated
-4. Consider implementing request/response size limits
-5. Increase memory limits in docker-compose.yml if needed and appropriate
+---
 
-### Slow Frontend Load Times
-**Symptoms**:
-- Initial page load takes several seconds
-- Users see blank screens or loading spinners for extended periods
+## 9. Environment Configuration
 
-**Solution**:
-1. Optimize Next.js build:
-   - Use `next build` and analyze output
-   - Check for large JavaScript bundles
-   - Implement code splitting and dynamic imports where appropriate
-2. Optimize images:
-   - Use next/image component
-   - Ensure images are properly compressed
-   - Use appropriate formats (WebP, AVIF)
-3. Implement proper caching headers
-4. Use CDN for static assets (in production)
-5. Reduce third-party scripts and external dependencies
+### Configuration Drift
+**Symptoms**
+- Discrepancies between local development, staging, and production behaviors.
 
-## Environment & Configuration
+**Resolution**
+Strictly maintain environment-specific configuration files (`.env.development`, `.env.production`). Do not rely on unversioned defaults. Validate infrastructure definitions (e.g., `docker-compose.yml`) through code review.
 
-### Missing Environment Variables
-**Symptoms**:
-- Services fail to start with "variable not set" errors
-- Features not working due to missing configuration
+### Timezone Discrepancies
+**Symptoms**
+- Escrow hold times calculate incorrectly; logs mismatch local time.
 
-**Solution**:
-1. Check which variables are required by looking at:
-   - The setup.sh script
-   - .env.example files
-   - Service-specific code that reads env vars
-2. Set missing variables in .env file
-3. Restart affected services after changes
-4. Use default values where appropriate and safe
-
-### Configuration Drift Between Environments
-**Symptoms**:
-- Works in development but fails in production/staging
-- Different behavior between similar setups
-
-**Solution**:
-1. Maintain consistent .env files across environments (with appropriate values for each)
-2. Use environment-specific .env files (.env.development, .env.production)
-3. Document required vs optional configuration
-4. Use configuration validation at startup
-5. Keep infrastructure as code (docker-compose.yml, etc.) version controlled
-
-### Timezone Issues
-**Symptoms**:
-- Timestamps appearing incorrect
-- Date-based logic not working as expected
-- Escrow hold times wrong
-
-**Solution**:
-1. Ensure all services use UTC internally
-2. Convert to local time only for display purposes
-3. Verify database timezone settings:
+**Resolution**
+All internal processing must use **UTC**.
+Validate PostgreSQL time configuration:
 ```bash
 docker compose exec -T postgres psql -U kodedock -d kodedock -c "SHOW timezone;"
 ```
-4. Check that application code handles timezones correctly (especially in escrow calculations)
-5. Use libraries like chrono (Rust) or datetime (Python) with proper timezone support
 
-## Getting Further Help
+---
 
-If you've exhausted this troubleshooting guide:
+## Advanced Troubleshooting Escalation
 
-1. **Check the Logs**: 
-   ```bash
-   docker compose logs -f [service-name]
-   ```
+If your issue persists past these initial diagnostics:
 
-2. **Check Existing Documentation**:
-   - Architecture: `docs/02-ARCHITECTURE.md`
-   - Backend & Schema: `docs/07-BACKEND.md`
-   - API Routes: See section 5 in `docs/07-BACKEND.md`
-
-3. **Search for Similar Issues**:
-   - Look for commented-out code or TODO items that might indicate known issues
-   - Check git history for recent changes that might have introduced the problem
-
-4. **Reproduce in Isolation**:
-   - Try to reproduce the issue with minimal setup
-   - Remove variables and simplify to isolate the problem
-
-5. **Ask for Help**:
-   - When asking for assistance, include:
-     - Exact error messages
-     - Relevant log snippets
-     - Steps to reproduce
-     - Environment details (Docker version, OS, etc.)
-     - What you've already tried
-
-Remember: Most issues are related to configuration, environment variables, or service connectivity. Start by verifying your .env file and checking that all services can communicate with their dependencies.
+1. **Enable Deep Logging**: `docker compose logs -f [service-name]`
+2. **Consult Architecture Specifications**: `docs/02-ARCHITECTURE.md` and `docs/07-BACKEND.md`
+3. **Isolate**: Strip the issue to a minimal reproducible scenario.
+4. **Escalate**: When requesting engineering support, always provide the exact error trace, service logs, and explicit steps to reproduce the fault.
