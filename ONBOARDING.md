@@ -1,17 +1,20 @@
-# KodeDock Developer Onboarding Guide
+# 🚀 KodeDock Developer Onboarding Guide
 
-This guide will help you set up the KodeDock development environment and understand the codebase structure.
+Welcome to the KodeDock development team! This guide will help you set up the development environment and understand the codebase structure.
 
-## Table of Contents
-1. [Prerequisites](#prerequisites)
-2. [Environment Setup](#environment-setup)
-3. [Running the Application](#running-the-application)
-4. [Codebase Overview](#codebase-overview)
-5. [Development Workflow](#development-workflow)
-6. [Testing](#testing)
-7. [Troubleshooting](#troubleshooting)
+> [!NOTE]
+> Please complete all prerequisites before attempting to build the project.
 
-## Prerequisites
+## 📑 Table of Contents
+1. [Prerequisites](#-prerequisites)
+2. [Environment Setup](#-environment-setup)
+3. [Running the Application](#-running-the-application)
+4. [Codebase Overview](#-codebase-overview)
+5. [Development Workflow](#-development-workflow)
+6. [Testing](#-testing)
+7. [Troubleshooting](#-troubleshooting)
+
+## 📋 Prerequisites
 
 Before you begin, ensure you have the following installed:
 
@@ -21,7 +24,7 @@ Before you begin, ensure you have the following installed:
 - [Rust](https://www.rust-lang.org/tools/install) - for backend development
 - [Git](https://git-scm.com/)
 
-## Environment Setup
+## ⚙️ Environment Setup
 
 ### 1. Clone the Repository
 
@@ -69,25 +72,19 @@ Run the test script to ensure all services are healthy:
 ./test-docker.sh
 ```
 
-You should see output indicating all services are healthy.
+> [!TIP]
+> You should see output indicating all services are healthy. If not, refer to the Troubleshooting section.
 
-## Running the Application
+## 🏃 Running the Application
 
 ### Using Docker Compose (Recommended)
 
-```bash
-# Start all services
-docker compose up -d
-
-# View logs
-docker compose logs -f
-
-# Stop all services
-docker compose down
-
-# Rebuild after code changes
-docker compose up -d --build
-```
+| Command | Description |
+|---------|-------------|
+| `docker compose up -d` | Start all services in the background |
+| `docker compose logs -f` | View logs continuously |
+| `docker compose down` | Stop all services |
+| `docker compose up -d --build` | Rebuild after code changes |
 
 ### Local Development
 
@@ -106,14 +103,14 @@ cd services/core-engine
 cargo run      # Runs on http://localhost:4001
 ```
 
-#### Other Services
-Follow similar patterns for AI Service (Python), Infra Worker (Go), and Real-time Service (Node.js).
+> [!NOTE]
+> Follow similar patterns for AI Service (Python), Infra Worker (Go), and Real-time Service (Node.js).
 
-## Codebase Overview
+## 🏗️ Codebase Overview
 
 KodeDock is a polyglot microservices architecture with five main services:
 
-### 1. Frontend (`web/`)
+### 1. 🌐 Frontend (`web/`)
 - **Technology**: Next.js 16, React 19, TypeScript
 - **Purpose**: User interface, server-side rendering for SEO
 - **Key Directories**:
@@ -121,45 +118,45 @@ KodeDock is a polyglot microservices architecture with five main services:
   - `features/` - Feature-specific components (auth, browse, seller, etc.)
   - `shared/` - Shared components, utilities, and API client
 
-### 2. Core Engine (`services/core-engine/`)
+### 2. ⚙️ Core Engine (`services/core-engine/`)
 - **Technology**: Rust, Actix-Web
 - **Purpose**: Main API gateway, security, transactions, wallet management
 - **Key Features**: JWT authentication, escrow system, payment processing
 - **Port**: 4001
 
-### 3. AI Service (`services/ai-service/`)
+### 3. 🧠 AI Service (`services/ai-service/`)
 - **Technology**: Python, FastAPI
 - **Purpose**: Recommendations, search, fraud detection
 - **Key Features**: Product recommendations, AI-powered search
 - **Port**: 4002
 
-### 4. Infra Worker (`services/infra-worker/`)
+### 4. 🏗️ Infra Worker (`services/infra-worker/`)
 - **Technology**: Go
 - **Purpose**: Background jobs, GitHub operations, Docker management
 - **Key Features**: Repository transfers, preview builds, email processing
 - **Port**: 4003
 
-### 5. Real-time Service (`services/realtime-service/`)
+### 5. ⚡ Real-time Service (`services/realtime-service/`)
 - **Technology**: Node.js, WebSocket (ws library)
 - **Purpose**: Live notifications, real-time updates
 - **Key Features**: WebSocket connections, Redis pub/sub, user presence
 - **Port**: 4004
 
-### Infrastructure
+### 🗄️ Infrastructure
 - **PostgreSQL**: Primary database (14 tables including users, products, orders, wallets)
 - **Redis**: Job queues, caching, rate limiting, pub/sub
 - **SeaweedFS**: S3-compatible object storage for product images and avatars
 
-## Development Workflow
+## 🔄 Development Workflow
 
 ### Making Changes
 
 1. **Frontend Changes**: Modify files in `web/src/` and see changes immediately with `npm run dev`
 2. **Backend Changes**: 
-   - Rust: Modify files in `services/core-engine/src/` and restart with `cargo run`
-   - Python: Modify files in `services/ai-service/app/` and restart the service
-   - Go: Modify files in `services/infra-worker/` and restart the service
-   - Node.js: Modify files in `services/realtime-service/src/` and restart the service
+   - **Rust**: Modify files in `services/core-engine/src/` and restart with `cargo run`
+   - **Python**: Modify files in `services/ai-service/app/` and restart the service
+   - **Go**: Modify files in `services/infra-worker/` and restart the service
+   - **Node.js**: Modify files in `services/realtime-service/src/` and restart the service
 
 ### Database Migrations
 
@@ -167,51 +164,46 @@ Database schema is managed through SQL files in `sql/`. The schema is automatica
 
 ### API Development
 
-All frontend API calls go through the Next.js proxy (`/api/proxy/[...path]`) which:
-- Forwards requests to the Rust backend (Core Engine)
-- Adds authentication from HttpOnly cookies
-- Provides SSRF protection through path whitelisting
+> [!IMPORTANT]
+> All frontend API calls go through the Next.js proxy (`/api/proxy/[...path]`).
 
-## Testing
+The proxy handles:
+- Forwarding requests to the Rust backend (Core Engine)
+- Adding authentication from HttpOnly cookies
+- Providing SSRF protection through path whitelisting
+
+## 🧪 Testing
 
 Currently, the codebase does not have automated test suites. Testing is primarily done through:
 - Manual verification via the user interface
 - Direct API testing with tools like curl or Postman
 - Docker health checks
 
-To verify your changes:
+**To verify your changes:**
 1. Start the affected service(s)
 2. Test the modified endpoints
 3. Check logs for errors
 4. Verify frontend behavior
 
-## Troubleshooting
+## 🚑 Troubleshooting
 
 See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for common issues and solutions.
 
-## Useful Commands
+## 💻 Useful Commands
 
-```bash
-# View running services
-docker compose ps
+| Command | Description |
+|---------|-------------|
+| `docker compose ps` | View running services |
+| `docker compose logs -f core-engine` | View logs for a specific service |
+| `docker compose exec core-engine sh` | Enter a service container for debugging |
+| `docker compose exec core-engine env` | Check environment variables in a container |
+| `docker compose build core-engine` | Rebuild a specific service |
+| `docker compose down -v` | Remove all data (use with caution!) |
 
-# View logs for a specific service
-docker compose logs -f core-engine
+> [!CAUTION]
+> The command `docker compose down -v` will remove all your local database volumes and stored data. Use this only when you intend to completely reset your environment.
 
-# Enter a service container for debugging
-docker compose exec core-engine sh
-
-# Check environment variables in a container
-docker compose exec core-engine env
-
-# Rebuild a specific service
-docker compose build core-engine
-
-# Remove all data (use with caution!)
-docker compose down -v
-```
-
-## Getting Help
+## 🤝 Getting Help
 
 If you encounter issues:
 1. Check the troubleshooting guide
@@ -219,5 +211,3 @@ If you encounter issues:
 3. Verify environment variables are set correctly
 4. Ensure ports are not conflicting with other applications
 5. Consult the architecture documentation in `docs/02-ARCHITECTURE.md`
-
-Welcome to the KodeDock development team!
