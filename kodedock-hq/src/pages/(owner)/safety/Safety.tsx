@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Shield, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
+import { Shield, AlertTriangle, CheckCircle } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { toast } from "sonner";

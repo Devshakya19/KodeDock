@@ -23,11 +23,9 @@ import {
   LayoutDashboard,
   Bell,
   Globe,
-  TerminalSquare,
-  Command,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Command as CommandPalette } from "cmdk";
 
 export default function HqLayout() {
@@ -36,11 +34,52 @@ export default function HqLayout() {
   const navigate = useNavigate();
   const [time, setTime] = useState(new Date());
   const [open, setOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = useCallback(() => {
+    setIsLoggingOut(true);
+    setTimeout(() => {
+      logout();
+    }, 1500);
+  }, [logout]);
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  // Auto-logout after 15 minutes of inactivity
+  useEffect(() => {
+    let inactivityTimer: NodeJS.Timeout;
+
+    const resetTimer = () => {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(
+        () => {
+          handleLogout();
+        },
+        15 * 60 * 1000,
+      ); // 15 minutes
+    };
+
+    const events = [
+      "mousedown",
+      "mousemove",
+      "keypress",
+      "scroll",
+      "touchstart",
+    ];
+    events.forEach((event) => document.addEventListener(event, resetTimer));
+
+    resetTimer();
+
+    return () => {
+      clearTimeout(inactivityTimer);
+      events.forEach((event) =>
+        document.removeEventListener(event, resetTimer),
+      );
+    };
+  }, [handleLogout]);
 
   // Toggle the command palette on Command+K or Ctrl+K, close on Escape
   useEffect(() => {
@@ -259,7 +298,7 @@ export default function HqLayout() {
               </p>
             </div>
             <button
-              onClick={logout}
+              onClick={handleLogout}
               className="p-2 text-muted-foreground hover:text-rose-400 hover:bg-rose-400/10 rounded-lg transition-colors"
               title="Sign Out"
             >
@@ -268,6 +307,29 @@ export default function HqLayout() {
           </div>
         </div>
       </aside>
+
+      {/* Logout Animation Overlay */}
+      {isLoggingOut && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/90 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="flex flex-col items-center gap-6">
+            <div className="relative flex items-center justify-center">
+              <div className="absolute w-24 h-24 border border-indigo-500/30 rounded-full animate-ping"></div>
+              <div className="absolute w-16 h-16 border border-indigo-500/50 rounded-full animate-pulse"></div>
+              <div className="w-16 h-16 bg-indigo-500/10 rounded-full flex items-center justify-center backdrop-blur-sm border border-indigo-500/20 shadow-[0_0_30px_rgba(99,102,241,0.3)]">
+                <Shield className="w-8 h-8 text-indigo-400" />
+              </div>
+            </div>
+            <div className="flex flex-col items-center gap-1">
+              <p className="text-sm font-bold text-white tracking-[0.2em] uppercase">
+                Securing Session
+              </p>
+              <p className="text-xs text-muted-foreground animate-pulse">
+                Logging you out safely...
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden bg-background rounded-l-[2rem] shadow-[-10px_0_30px_rgba(0,0,0,0.5)] border-l border-white/10 relative z-30">
