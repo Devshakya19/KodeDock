@@ -181,6 +181,13 @@ flowchart TD
 - `GET /api/notifications`
 - `PUT /api/notifications/:id/read`
 
+#### HQ Owner Dashboard (admin-only)
+- `GET /api/hq/integrations` *(Manage third-party connections)*
+- `PUT /api/hq/integrations`
+- `GET /api/hq/catalog` *(Global catalog management)*
+- `GET /api/hq/finance/ledger` *(Financial overview and platform fee tracking)*
+- `POST /api/hq/config/sync` *(Trigger Zero-Restart Dynamic Environment Sync)*
+
 #### Upload (rate-limited: 10 req / 6s)
 - `POST /api/upload/presign`
 

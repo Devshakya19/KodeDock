@@ -119,7 +119,7 @@ KodeDock is India's first developer-focused digital goods marketplace that deliv
 - [x] Seller Dashboard
 - [x] Product Listing (CRUD)
 - [x] Order History
-- [x] Basic Admin Panel
+- [x] HQ Owner Dashboard with live dynamic configuration
 - [x] Real Razorpay Payments integration
 - [x] GitHub Repo Transfer delivery mechanism
 - [x] Escrow System (7-day hold)
