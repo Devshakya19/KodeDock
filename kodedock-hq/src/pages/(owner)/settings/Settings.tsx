@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Settings as SettingsIcon, Save, User, Lock, Mail } from "lucide-react";
 import { useForm } from "react-hook-form";

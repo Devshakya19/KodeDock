@@ -2,8 +2,8 @@ import { useState } from "react";
 import {
   Layers,
   Plus,
-  Search,
-  MoreVertical,
+  
+  
   LayoutGrid,
   CheckCircle2,
   Trash2,
