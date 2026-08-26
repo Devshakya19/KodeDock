@@ -348,6 +348,10 @@ POST   /api/wallet/topup      # Top up wallet
 NEXT_PUBLIC_API_URL=http://localhost:4001
 ```
 
+### Rule: Dynamic Fetching for Public Keys
+
+Instead of relying on build-time `NEXT_PUBLIC_` hardcoding for sensitive public keys, explicitly mandate **Dynamic Fetching**. Fetch these keys at runtime via the `/api/auth/config` endpoint. This ensures configurations remain live and secure without needing full rebuilds.
+
 ---
 
 *Document Version: 1.3.0 | Last Updated: August 2026*

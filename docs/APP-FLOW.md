@@ -11,6 +11,7 @@
 4. [System Flows](#4-system-flows)
 5. [Company & Legal Page Flows](#5-company--legal-page-flows)
 6. [State Diagrams](#6-state-diagrams)
+7. [HQ (Owner) Flows](#7-hq-owner-flows)
 
 ---
 
@@ -405,4 +406,45 @@ stateDiagram-v2
 
 ---
 
-*Document Version: v1.3.0 | Last Updated: August 2026*
+## 7. HQ (Owner) Flows
+
+### 7.1 Dynamic Category Management
+
+```mermaid
+sequenceDiagram
+    actor HQ
+    participant Frontend
+    participant Backend as Rust Core
+    participant DB
+    
+    HQ->>Frontend: Accesses HQ Dashboard (/hq/categories)
+    HQ->>Frontend: Adds/Edits Category & Submits
+    Frontend->>Backend: POST /api/hq/categories
+    Backend->>Backend: Verifies HQ Role
+    Backend->>DB: Updates categories table
+    Backend->>Backend: Refreshes live memory state
+    Backend-->>Frontend: Success Response
+    Frontend->>Frontend: Users fetch updated categories dynamically
+```
+
+### 7.2 Live Integration Toggling
+
+```mermaid
+sequenceDiagram
+    actor HQ
+    participant Frontend
+    participant Backend as Rust Core
+    participant DB
+    
+    HQ->>Frontend: Navigates to Integrations (/hq/integrations)
+    HQ->>Frontend: Toggles Integration (e.g., Razorpay)
+    Frontend->>Backend: POST /api/hq/integrations/toggle
+    Backend->>DB: Updates integration settings
+    Backend->>Backend: Updates in-memory active integrations
+    Backend-->>Frontend: Confirms toggle success
+    Frontend->>Frontend: Clients fetch new state via /api/auth/config
+```
+
+---
+
+*Document Version: v1.4.0 | Last Updated: August 2026*

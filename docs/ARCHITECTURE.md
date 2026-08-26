@@ -12,6 +12,7 @@
 5. [Deployment Architecture](#5-deployment-architecture)
 6. [Network Isolation & Security](#6-network-isolation--security)
 7. [Scalability Strategy](#7-scalability-strategy)
+8. [Zero-Restart Dynamic Configuration](#8-zero-restart-dynamic-configuration)
 
 ---
 
@@ -237,4 +238,13 @@ To ensure maximum security and prevent unauthorized cross-service communication,
 
 ---
 
-*Document Version: 1.3.0 | Last Updated: August 2026*
+## 8. Zero-Restart Dynamic Configuration
+
+KodeDock utilizes a dynamic configuration architecture to apply settings, category changes, and integration toggles without restarting services:
+
+- **Rust Core Engine (Live Memory):** The Rust backend keeps active configuration state in memory. When changes are saved, it updates the database and refreshes its in-memory state instantly.
+- **Next.js Frontend (Dynamic Fetch):** Instead of relying on static build-time environment variables, the Next.js frontend fetches runtime configuration dynamically via the `/api/auth/config` endpoint. This propagates new features, integrations, and categories live to all connected clients.
+
+---
+
+*Document Version: 1.4.0 | Last Updated: August 2026*

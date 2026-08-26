@@ -45,6 +45,10 @@
 
 ## 2. Core Engine (Rust) Technical Specs
 
+### Key Features
+
+- **Zero-Restart Dynamic Environment Sync**: Leverages `std::env::set_var` in Rust to safely update environment configurations in memory. This eliminates the need to restart the process when deploying configuration changes, ensuring zero downtime for critical configuration syncs (triggered via the HQ dashboard).
+
 ### Stack
 
 | Technology | Purpose |
@@ -71,6 +75,12 @@ POST   /api/seller/products      # Create product
 PUT    /api/seller/products/:id  # Update product
 DELETE /api/seller/products/:id  # Delete product
 GET    /api/seller/stats         # Get seller statistics
+
+# HQ Owner Dashboard (Admin)
+GET    /api/hq/integrations      # Manage third-party integrations
+GET    /api/hq/catalog           # Global catalog management
+GET    /api/hq/finance/ledger    # Financial overview and platform fee tracking
+POST   /api/hq/config/sync       # Trigger Zero-Restart Dynamic Environment Sync
 ```
 
 ---
