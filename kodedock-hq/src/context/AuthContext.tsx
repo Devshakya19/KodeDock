@@ -1,4 +1,10 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 
 interface Staff {
   id: string;
@@ -18,7 +24,9 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [token, setToken] = useState<string | null>(localStorage.getItem("hq_token"));
+  const [token, setToken] = useState<string | null>(
+    localStorage.getItem("hq_token"),
+  );
   const [staff, setStaff] = useState<Staff | null>(() => {
     const saved = localStorage.getItem("hq_staff");
     return saved ? JSON.parse(saved) : null;
@@ -39,7 +47,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ token, staff, login, logout, isAuthenticated: !!token }}>
+    <AuthContext.Provider
+      value={{ token, staff, login, logout, isAuthenticated: !!token }}
+    >
       {children}
     </AuthContext.Provider>
   );

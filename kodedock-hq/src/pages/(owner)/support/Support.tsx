@@ -30,38 +30,38 @@ const TicketActionCell = ({ ticket }: { ticket: SupportTicket }) => {
     },
     onSuccess: () => {
       toast.success("Ticket status updated");
-      queryClient.invalidateQueries({ queryKey: ['hq-support-tickets'] });
+      queryClient.invalidateQueries({ queryKey: ["hq-support-tickets"] });
     },
     onError: () => {
       toast.error("Failed to update ticket status");
     },
-    onSettled: () => setProcessing(false)
+    onSettled: () => setProcessing(false),
   });
 
-  if (ticket.status !== 'open' && ticket.status !== 'in_progress') {
+  if (ticket.status !== "open" && ticket.status !== "in_progress") {
     return <span className="text-xs text-muted-foreground">-</span>;
   }
 
   return (
     <div className="flex justify-end gap-2">
-      {ticket.status === 'open' && (
-        <button 
-          onClick={() => mutation.mutate('in_progress')}
+      {ticket.status === "open" && (
+        <button
+          onClick={() => mutation.mutate("in_progress")}
           disabled={processing}
           className="px-2.5 py-1 bg-amber-500/10 text-amber-500 rounded hover:bg-amber-500/20 text-xs font-medium transition-colors disabled:opacity-50 flex items-center gap-1"
         >
           <Clock className="w-3 h-3" /> Progress
         </button>
       )}
-      <button 
-        onClick={() => mutation.mutate('resolved')}
+      <button
+        onClick={() => mutation.mutate("resolved")}
         disabled={processing}
         className="px-2.5 py-1 bg-emerald-500/10 text-emerald-500 rounded hover:bg-emerald-500/20 text-xs font-medium transition-colors disabled:opacity-50 flex items-center gap-1"
       >
         <CheckCircle className="w-3 h-3" /> Resolve
       </button>
-      <button 
-        onClick={() => mutation.mutate('closed')}
+      <button
+        onClick={() => mutation.mutate("closed")}
         disabled={processing}
         className="px-2.5 py-1 bg-secondary text-foreground rounded hover:bg-secondary/80 text-xs font-medium transition-colors disabled:opacity-50 flex items-center gap-1"
       >
@@ -77,7 +77,9 @@ const columns: ColumnDef<SupportTicket>[] = [
     header: "Subject & Message",
     cell: ({ row }) => (
       <div>
-        <p className="font-medium text-foreground max-w-[300px] truncate">{row.original.subject}</p>
+        <p className="font-medium text-foreground max-w-[300px] truncate">
+          {row.original.subject}
+        </p>
         <p className="text-xs text-muted-foreground mt-0.5 max-w-[300px] truncate">
           {row.original.message}
         </p>
@@ -89,8 +91,12 @@ const columns: ColumnDef<SupportTicket>[] = [
     header: "User",
     cell: ({ row }) => (
       <div>
-        <p className="font-medium text-foreground">{row.original.user_name || "No Name"}</p>
-        <p className="text-xs text-muted-foreground mt-0.5">{row.original.user_email || "No Email"}</p>
+        <p className="font-medium text-foreground">
+          {row.original.user_name || "No Name"}
+        </p>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          {row.original.user_email || "No Email"}
+        </p>
       </div>
     ),
   },
@@ -100,13 +106,18 @@ const columns: ColumnDef<SupportTicket>[] = [
     cell: ({ row }) => {
       const priority = row.original.priority;
       return (
-        <span className={cn(
-          "px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide",
-          priority === 'urgent' ? "bg-rose-500 text-white" :
-          priority === 'high' ? "bg-orange-500/20 text-orange-500" :
-          priority === 'low' ? "bg-slate-500/20 text-slate-500" :
-          "bg-blue-500/20 text-blue-500"
-        )}>
+        <span
+          className={cn(
+            "px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide",
+            priority === "urgent"
+              ? "bg-rose-500 text-white"
+              : priority === "high"
+                ? "bg-orange-500/20 text-orange-500"
+                : priority === "low"
+                  ? "bg-slate-500/20 text-slate-500"
+                  : "bg-blue-500/20 text-blue-500",
+          )}
+        >
           {priority}
         </span>
       );
@@ -118,14 +129,19 @@ const columns: ColumnDef<SupportTicket>[] = [
     cell: ({ row }) => {
       const status = row.original.status;
       return (
-        <span className={cn(
-          "px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border inline-flex items-center gap-1",
-          status === 'open' ? "bg-sky-500/10 text-sky-500 border-sky-500/20" :
-          status === 'in_progress' ? "bg-amber-500/10 text-amber-500 border-amber-500/20" :
-          status === 'resolved' ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
-          "bg-secondary text-muted-foreground border-border"
-        )}>
-          {status.replace('_', ' ')}
+        <span
+          className={cn(
+            "px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border inline-flex items-center gap-1",
+            status === "open"
+              ? "bg-sky-500/10 text-sky-500 border-sky-500/20"
+              : status === "in_progress"
+                ? "bg-amber-500/10 text-amber-500 border-amber-500/20"
+                : status === "resolved"
+                  ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                  : "bg-secondary text-muted-foreground border-border",
+          )}
+        >
+          {status.replace("_", " ")}
         </span>
       );
     },
@@ -134,20 +150,20 @@ const columns: ColumnDef<SupportTicket>[] = [
     id: "actions",
     header: () => <div className="text-right">Actions</div>,
     cell: ({ row }) => <TicketActionCell ticket={row.original} />,
-  }
+  },
 ];
 
 export default function Support() {
   const { data: response, isLoading } = useQuery({
-    queryKey: ['hq-support-tickets'],
-    queryFn: async () => await api.get("/api/hq/support/tickets?limit=100")
+    queryKey: ["hq-support-tickets"],
+    queryFn: async () => await api.get("/api/hq/support/tickets?limit=100"),
   });
 
   const tickets: SupportTicket[] = response?.data || [];
-  
+
   const total = tickets.length;
-  const open = tickets.filter(t => t.status === 'open').length;
-  const inProgress = tickets.filter(t => t.status === 'in_progress').length;
+  const open = tickets.filter((t) => t.status === "open").length;
+  const inProgress = tickets.filter((t) => t.status === "in_progress").length;
 
   return (
     <div className="space-y-8 pb-20 max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -157,7 +173,9 @@ export default function Support() {
             <LifeBuoy className="h-8 w-8 text-sky-500" />
             Support Inbox
           </h1>
-          <p className="text-muted-foreground mt-1 font-medium">Manage and resolve user queries and issues.</p>
+          <p className="text-muted-foreground mt-1 font-medium">
+            Manage and resolve user queries and issues.
+          </p>
         </div>
       </div>
 
@@ -168,7 +186,9 @@ export default function Support() {
             <CheckCircle className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-sm font-bold text-muted-foreground">Open Tickets</p>
+            <p className="text-sm font-bold text-muted-foreground">
+              Open Tickets
+            </p>
             <h3 className="text-2xl font-black text-foreground">{open}</h3>
           </div>
         </div>
@@ -177,8 +197,12 @@ export default function Support() {
             <Clock className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-sm font-bold text-muted-foreground">In Progress</p>
-            <h3 className="text-2xl font-black text-foreground">{inProgress}</h3>
+            <p className="text-sm font-bold text-muted-foreground">
+              In Progress
+            </p>
+            <h3 className="text-2xl font-black text-foreground">
+              {inProgress}
+            </h3>
           </div>
         </div>
         <div className="bg-card border border-border rounded-xl p-5 shadow-sm flex items-center gap-4">
@@ -186,7 +210,9 @@ export default function Support() {
             <LifeBuoy className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-sm font-bold text-muted-foreground">Total Tickets</p>
+            <p className="text-sm font-bold text-muted-foreground">
+              Total Tickets
+            </p>
             <h3 className="text-2xl font-black text-foreground">{total}</h3>
           </div>
         </div>
@@ -194,9 +220,13 @@ export default function Support() {
 
       <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
         {isLoading ? (
-          <div className="p-12 text-center text-muted-foreground">Loading tickets...</div>
+          <div className="p-12 text-center text-muted-foreground">
+            Loading tickets...
+          </div>
         ) : tickets.length === 0 ? (
-          <div className="p-12 text-center text-muted-foreground">Inbox zero! No active support tickets.</div>
+          <div className="p-12 text-center text-muted-foreground">
+            Inbox zero! No active support tickets.
+          </div>
         ) : (
           <DataTable columns={columns} data={tickets} />
         )}

@@ -23,44 +23,70 @@ const DisputeActionCell = ({ dispute }: { dispute: Dispute }) => {
   const [processing, setProcessing] = useState(false);
 
   const mutation = useMutation({
-    mutationFn: async ({ status, resolution }: { status: string, resolution: string }) => {
+    mutationFn: async ({
+      status,
+      resolution,
+    }: {
+      status: string;
+      resolution: string;
+    }) => {
       setProcessing(true);
-      await api.put(`/api/hq/safety/disputes/${dispute.id}`, { status, resolution });
+      await api.put(`/api/hq/safety/disputes/${dispute.id}`, {
+        status,
+        resolution,
+      });
     },
     onSuccess: () => {
       toast.success("Dispute status updated");
-      queryClient.invalidateQueries({ queryKey: ['hq-safety-disputes'] });
+      queryClient.invalidateQueries({ queryKey: ["hq-safety-disputes"] });
     },
     onError: () => {
       toast.error("Failed to update dispute status");
     },
-    onSettled: () => setProcessing(false)
+    onSettled: () => setProcessing(false),
   });
 
-  if (dispute.status !== 'open' && dispute.status !== 'under_review') {
+  if (dispute.status !== "open" && dispute.status !== "under_review") {
     return <span className="text-xs text-muted-foreground">-</span>;
   }
 
   return (
     <div className="flex justify-end gap-2">
-      {dispute.status === 'open' && (
-        <button 
-          onClick={() => mutation.mutate({ status: 'under_review', resolution: 'Investigation started' })}
+      {dispute.status === "open" && (
+        <button
+          onClick={() =>
+            mutation.mutate({
+              status: "under_review",
+              resolution: "Investigation started",
+            })
+          }
           disabled={processing}
           className="px-2.5 py-1 bg-amber-500/10 text-amber-500 rounded hover:bg-amber-500/20 text-xs font-medium transition-colors disabled:opacity-50"
         >
           Review
         </button>
       )}
-      <button 
-        onClick={() => { if(confirm('Resolve and refund?')) mutation.mutate({ status: 'resolved', resolution: 'Resolved by HQ Admin' }) }}
+      <button
+        onClick={() => {
+          if (confirm("Resolve and refund?"))
+            mutation.mutate({
+              status: "resolved",
+              resolution: "Resolved by HQ Admin",
+            });
+        }}
         disabled={processing}
         className="px-2.5 py-1 bg-emerald-500/10 text-emerald-500 rounded hover:bg-emerald-500/20 text-xs font-medium transition-colors disabled:opacity-50"
       >
         Resolve
       </button>
-      <button 
-        onClick={() => { if(confirm('Reject and close claim?')) mutation.mutate({ status: 'closed', resolution: 'Closed without action' }) }}
+      <button
+        onClick={() => {
+          if (confirm("Reject and close claim?"))
+            mutation.mutate({
+              status: "closed",
+              resolution: "Closed without action",
+            });
+        }}
         disabled={processing}
         className="px-2.5 py-1 bg-secondary text-foreground rounded hover:bg-secondary/80 text-xs font-medium transition-colors disabled:opacity-50"
       >
@@ -86,7 +112,11 @@ const columns: ColumnDef<Dispute>[] = [
   {
     accessorKey: "raised_by_name",
     header: "Raised By",
-    cell: ({ row }) => <span className="text-foreground">{row.original.raised_by_name || "Unknown"}</span>,
+    cell: ({ row }) => (
+      <span className="text-foreground">
+        {row.original.raised_by_name || "Unknown"}
+      </span>
+    ),
   },
   {
     accessorKey: "status",
@@ -94,15 +124,20 @@ const columns: ColumnDef<Dispute>[] = [
     cell: ({ row }) => {
       const status = row.original.status;
       return (
-        <span className={cn(
-          "px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border inline-flex items-center gap-1",
-          status === 'open' ? "bg-rose-500/10 text-rose-500 border-rose-500/20" :
-          status === 'under_review' ? "bg-amber-500/10 text-amber-500 border-amber-500/20" :
-          status === 'resolved' ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
-          "bg-secondary text-muted-foreground border-border"
-        )}>
-          {status === 'open' && <AlertTriangle className="h-3 w-3" />}
-          {status.replace('_', ' ')}
+        <span
+          className={cn(
+            "px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border inline-flex items-center gap-1",
+            status === "open"
+              ? "bg-rose-500/10 text-rose-500 border-rose-500/20"
+              : status === "under_review"
+                ? "bg-amber-500/10 text-amber-500 border-amber-500/20"
+                : status === "resolved"
+                  ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                  : "bg-secondary text-muted-foreground border-border",
+          )}
+        >
+          {status === "open" && <AlertTriangle className="h-3 w-3" />}
+          {status.replace("_", " ")}
         </span>
       );
     },
@@ -120,20 +155,20 @@ const columns: ColumnDef<Dispute>[] = [
     id: "actions",
     header: () => <div className="text-right">Actions</div>,
     cell: ({ row }) => <DisputeActionCell dispute={row.original} />,
-  }
+  },
 ];
 
 export default function Safety() {
   const { data: response, isLoading } = useQuery({
-    queryKey: ['hq-safety-disputes'],
-    queryFn: async () => await api.get("/api/hq/safety/disputes?limit=100")
+    queryKey: ["hq-safety-disputes"],
+    queryFn: async () => await api.get("/api/hq/safety/disputes?limit=100"),
   });
 
   const disputes: Dispute[] = response?.data || [];
-  
+
   const total = disputes.length;
-  const open = disputes.filter(d => d.status === 'open').length;
-  const resolved = disputes.filter(d => d.status === 'resolved').length;
+  const open = disputes.filter((d) => d.status === "open").length;
+  const resolved = disputes.filter((d) => d.status === "resolved").length;
 
   return (
     <div className="space-y-8 pb-20 max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -143,7 +178,9 @@ export default function Safety() {
             <Shield className="h-8 w-8 text-rose-500" />
             Trust & Safety
           </h1>
-          <p className="text-muted-foreground mt-1 font-medium">Manage order disputes, reports, and platform integrity.</p>
+          <p className="text-muted-foreground mt-1 font-medium">
+            Manage order disputes, reports, and platform integrity.
+          </p>
         </div>
       </div>
 
@@ -154,7 +191,9 @@ export default function Safety() {
             <AlertTriangle className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-sm font-bold text-muted-foreground">Action Required</p>
+            <p className="text-sm font-bold text-muted-foreground">
+              Action Required
+            </p>
             <h3 className="text-2xl font-black text-foreground">{open}</h3>
           </div>
         </div>
@@ -163,7 +202,9 @@ export default function Safety() {
             <Shield className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-sm font-bold text-muted-foreground">Total Disputes</p>
+            <p className="text-sm font-bold text-muted-foreground">
+              Total Disputes
+            </p>
             <h3 className="text-2xl font-black text-foreground">{total}</h3>
           </div>
         </div>
@@ -180,9 +221,13 @@ export default function Safety() {
 
       <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
         {isLoading ? (
-          <div className="p-12 text-center text-muted-foreground">Loading disputes...</div>
+          <div className="p-12 text-center text-muted-foreground">
+            Loading disputes...
+          </div>
         ) : disputes.length === 0 ? (
-          <div className="p-12 text-center text-muted-foreground">No active disputes! The platform is safe.</div>
+          <div className="p-12 text-center text-muted-foreground">
+            No active disputes! The platform is safe.
+          </div>
         ) : (
           <DataTable columns={columns} data={disputes} />
         )}
