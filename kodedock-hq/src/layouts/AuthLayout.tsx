@@ -8,7 +8,7 @@ export default function AuthLayout() {
     return <Navigate to="/dashboard" replace />;
   }
 
-  // Removing any global padding or background here so the Login page 
+  // Removing any global padding or background here so the Login page
   // can completely control the full-screen cinematic experience.
   return <Outlet />;
 }

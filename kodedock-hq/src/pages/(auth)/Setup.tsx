@@ -21,12 +21,15 @@ export default function Setup() {
 
   const form = useForm<SetupValues>({
     resolver: zodResolver(setupSchema),
-    defaultValues: { name: "", email: "", password: "" }
+    defaultValues: { name: "", email: "", password: "" },
   });
 
   const mutation = useMutation({
     mutationFn: async (values: SetupValues) => {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:4001'}/api/hq/setup`, values);
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL || "http://localhost:4001"}/api/hq/setup`,
+        values,
+      );
       return res.data;
     },
     onSuccess: (data) => {
@@ -38,8 +41,10 @@ export default function Setup() {
       }
     },
     onError: (err: any) => {
-      toast.error(err?.response?.data?.message || "Failed to connect to the core-engine.");
-    }
+      toast.error(
+        err?.response?.data?.message || "Failed to connect to the core-engine.",
+      );
+    },
   });
 
   const onSubmit = (data: SetupValues) => mutation.mutate(data);
@@ -56,54 +61,76 @@ export default function Setup() {
           <div className="h-14 w-14 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center shadow-2xl mb-6">
             <ServerCrash className="h-7 w-7 text-emerald-500" />
           </div>
-          <h2 className="text-3xl font-bold tracking-tight text-white mb-2">HQ Initialization</h2>
-          <p className="text-zinc-400 text-sm">Create the root OWNER account to begin</p>
+          <h2 className="text-3xl font-bold tracking-tight text-white mb-2">
+            HQ Initialization
+          </h2>
+          <p className="text-zinc-400 text-sm">
+            Create the root OWNER account to begin
+          </p>
         </div>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-zinc-300">Full Name</label>
+            <label className="text-sm font-medium text-zinc-300">
+              Full Name
+            </label>
             <input
               type="text"
               {...form.register("name")}
               className={cn(
                 "w-full bg-zinc-900/50 border rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-white transition-all placeholder:text-zinc-600",
-                form.formState.errors.name ? "border-rose-500" : "border-zinc-800"
+                form.formState.errors.name
+                  ? "border-rose-500"
+                  : "border-zinc-800",
               )}
               placeholder="e.g., Dev Shakya"
             />
             {form.formState.errors.name && (
-              <p className="text-xs text-rose-500 mt-1">{form.formState.errors.name.message}</p>
+              <p className="text-xs text-rose-500 mt-1">
+                {form.formState.errors.name.message}
+              </p>
             )}
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-zinc-300">Root Email</label>
+            <label className="text-sm font-medium text-zinc-300">
+              Root Email
+            </label>
             <input
               type="email"
               {...form.register("email")}
               className={cn(
                 "w-full bg-zinc-900/50 border rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-white transition-all placeholder:text-zinc-600",
-                form.formState.errors.email ? "border-rose-500" : "border-zinc-800"
+                form.formState.errors.email
+                  ? "border-rose-500"
+                  : "border-zinc-800",
               )}
               placeholder="admin@kodedock.com"
             />
             {form.formState.errors.email && (
-              <p className="text-xs text-rose-500 mt-1">{form.formState.errors.email.message}</p>
+              <p className="text-xs text-rose-500 mt-1">
+                {form.formState.errors.email.message}
+              </p>
             )}
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-zinc-300">Master Password</label>
+            <label className="text-sm font-medium text-zinc-300">
+              Master Password
+            </label>
             <input
               type="password"
               {...form.register("password")}
               className={cn(
                 "w-full bg-zinc-900/50 border rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-white transition-all placeholder:text-zinc-600",
-                form.formState.errors.password ? "border-rose-500" : "border-zinc-800"
+                form.formState.errors.password
+                  ? "border-rose-500"
+                  : "border-zinc-800",
               )}
               placeholder="Choose a strong password"
             />
             {form.formState.errors.password && (
-              <p className="text-xs text-rose-500 mt-1">{form.formState.errors.password.message}</p>
+              <p className="text-xs text-rose-500 mt-1">
+                {form.formState.errors.password.message}
+              </p>
             )}
           </div>
           <button
@@ -114,7 +141,9 @@ export default function Setup() {
             {mutation.isPending ? (
               <span className="animate-pulse">Configuring System...</span>
             ) : mutation.isSuccess ? (
-              <span className="flex items-center gap-2"><ShieldCheck className="w-4 h-4" /> Ready</span>
+              <span className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4" /> Ready
+              </span>
             ) : (
               <>
                 Initialize Root Access

@@ -20,13 +20,16 @@ export default function Login() {
 
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", password: "" }
+    defaultValues: { email: "", password: "" },
   });
 
   const mutation = useMutation({
     mutationFn: async (values: LoginValues) => {
       // Login doesn't use the authenticated api client
-      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:4001'}/api/hq/login`, values);
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL || "http://localhost:4001"}/api/hq/login`,
+        values,
+      );
       return res.data;
     },
     onSuccess: (data) => {
@@ -38,8 +41,10 @@ export default function Login() {
       }
     },
     onError: (err: any) => {
-      toast.error(err?.response?.data?.message || "Failed to connect to the server.");
-    }
+      toast.error(
+        err?.response?.data?.message || "Failed to connect to the server.",
+      );
+    },
   });
 
   const onSubmit = (data: LoginValues) => mutation.mutate(data);
@@ -56,41 +61,57 @@ export default function Login() {
           <div className="h-14 w-14 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center shadow-2xl mb-6">
             <Command className="h-7 w-7 text-primary" />
           </div>
-          <h2 className="text-3xl font-bold tracking-tight text-white mb-2">KodeDock HQ</h2>
-          <p className="text-zinc-400 text-sm">Enter your credentials to access the control plane</p>
+          <h2 className="text-3xl font-bold tracking-tight text-white mb-2">
+            KodeDock HQ
+          </h2>
+          <p className="text-zinc-400 text-sm">
+            Enter your credentials to access the control plane
+          </p>
         </div>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-zinc-300">Staff Email</label>
+            <label className="text-sm font-medium text-zinc-300">
+              Staff Email
+            </label>
             <input
               type="email"
               {...form.register("email")}
               className={cn(
                 "w-full bg-zinc-900/50 border rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-white transition-all placeholder:text-zinc-600",
-                form.formState.errors.email ? "border-rose-500" : "border-zinc-800"
+                form.formState.errors.email
+                  ? "border-rose-500"
+                  : "border-zinc-800",
               )}
               placeholder="e.g., admin@kodedock.com"
             />
             {form.formState.errors.email && (
-              <p className="text-xs text-rose-500 mt-1">{form.formState.errors.email.message}</p>
+              <p className="text-xs text-rose-500 mt-1">
+                {form.formState.errors.email.message}
+              </p>
             )}
           </div>
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-zinc-300">Password</label>
+              <label className="text-sm font-medium text-zinc-300">
+                Password
+              </label>
             </div>
             <input
               type="password"
               {...form.register("password")}
               className={cn(
                 "w-full bg-zinc-900/50 border rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-white transition-all placeholder:text-zinc-600",
-                form.formState.errors.password ? "border-rose-500" : "border-zinc-800"
+                form.formState.errors.password
+                  ? "border-rose-500"
+                  : "border-zinc-800",
               )}
               placeholder="••••••••"
             />
             {form.formState.errors.password && (
-              <p className="text-xs text-rose-500 mt-1">{form.formState.errors.password.message}</p>
+              <p className="text-xs text-rose-500 mt-1">
+                {form.formState.errors.password.message}
+              </p>
             )}
           </div>
           <button

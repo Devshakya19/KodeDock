@@ -36,7 +36,7 @@ export default function App() {
           <Route path="/owner" element={<HqLayout />}>
             {/* Redirect /owner to dashboard */}
             <Route index element={<Navigate to="dashboard" replace />} />
-            
+
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="marketplace" element={<Marketplace />} />
             <Route path="catalog" element={<Catalog />} />
@@ -52,7 +52,10 @@ export default function App() {
           </Route>
 
           {/* Fallback */}
-          <Route path="*" element={<Navigate to="/owner/dashboard" replace />} />
+          <Route
+            path="*"
+            element={<Navigate to="/owner/dashboard" replace />}
+          />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
