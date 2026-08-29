@@ -15,15 +15,15 @@
 
 <p align="center">
   <a href="https://github.com/Devshakya19/KodeDock/actions"><img src="https://img.shields.io/github/actions/workflow/status/Devshakya19/KodeDock/ci.yml?branch=main&style=flat-square&label=CI" alt="CI Status"></a>
-  <a href="https://github.com/Devshakya19/KodeDock/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Proprietary-red?style=flat-square" alt="License: Proprietary"></a>
+  <a href="https://github.com/Devshakya19/KodeDock/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="License: MIT"></a>
   <a href="https://nodejs.org/en"><img src="https://img.shields.io/badge/node-%3E%3D%2020.x-brightgreen?style=flat-square" alt="Node.js ≥ 20"></a>
   <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/rust-%3E%3D%201.70-orange?style=flat-square" alt="Rust ≥ 1.70"></a>
   <a href="https://docs.docker.com/"><img src="https://img.shields.io/badge/docker-%3E%3D%2024.0-blue?style=flat-square" alt="Docker ≥ 24.0"></a>
-  <img src="https://img.shields.io/badge/version-1.3.0-informational?style=flat-square" alt="Version 1.3.0">
+  <img src="https://img.shields.io/badge/version-1.7.0-informational?style=flat-square" alt="Version 1.7.0">
 </p>
 
-> **⚠️ PROPRIETARY SOFTWARE** — This repository contains proprietary and confidential code owned by KodeDock.
-> Unauthorized copying, cloning, distribution, or use of this code is strictly prohibited and may result in legal action.
+> **🔓 OPEN SOURCE SOFTWARE** — This repository is licensed under the MIT License.
+> You are free to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software.
 > See [LICENSE](LICENSE) for full terms.
 
 ---
@@ -268,11 +268,11 @@ KodeDock maintains comprehensive documentation for developers, contributors, and
 
 ## License
 
-This project is **proprietary software** owned by KodeDock. All rights reserved.
+This project is licensed under the **MIT License**.
 
-- Unauthorized copying, cloning, or distribution is **strictly prohibited**
+- You are free to use, modify, and distribute this software
 - See [LICENSE](LICENSE) for the complete license agreement
-- Licensing inquiries: **legal@kodedock.me**
+- General inquiries: **hello@kodedock.com**
 
 ---
 

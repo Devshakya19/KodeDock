@@ -39,7 +39,7 @@ Team leaders have the right and responsibility to remove, edit, or reject commen
 
 ## 🌐 Scope
 
-This Code of Conduct applies within all project spaces, including the proprietary codebase, internal communication channels, GitHub repositories, and issue trackers. It also applies when an individual is officially representing KodeDock in public spaces. Examples of representing our project include:
+This Code of Conduct applies within all project spaces, including the open source codebase, internal communication channels, GitHub repositories, and issue trackers. It also applies when an individual is officially representing KodeDock in public spaces. Examples of representing our project include:
 - Using an official email address
 - Posting via an official social media account
 - Acting as an appointed representative at an online or offline event

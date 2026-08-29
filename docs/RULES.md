@@ -354,4 +354,4 @@ Instead of relying on build-time `NEXT_PUBLIC_` hardcoding for sensitive public 
 
 ---
 
-*Document Version: 1.3.0 | Last Updated: August 2026*
+*Document Version: 1.7.0 | Last Updated: August 2026*
