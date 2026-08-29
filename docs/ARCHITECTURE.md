@@ -247,4 +247,4 @@ KodeDock utilizes a dynamic configuration architecture to apply settings, catego
 
 ---
 
-*Document Version: 1.4.0 | Last Updated: August 2026*
+*Document Version: 1.7.0 | Last Updated: August 2026*

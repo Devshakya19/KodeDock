@@ -8,7 +8,7 @@ Thank you for your interest in contributing to KodeDock! We are thrilled to welc
 ## 📜 License and Intellectual Property
 
 > [!WARNING]
-> KodeDock is **proprietary software**. External contributions are accepted only through an explicit written agreement with the KodeDock team.
+> KodeDock is **open source software** under the MIT License. External contributions are welcome and greatly appreciated.
 
 To ensure the integrity of our platform and protect intellectual property, all contributions must go through our official channels. If you wish to contribute code, features, or bug fixes, you will need to sign a Contributor License Agreement (CLA) or establish a written agreement with us.
 

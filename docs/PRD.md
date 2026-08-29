@@ -109,7 +109,7 @@ KodeDock is India's first developer-focused digital goods marketplace that deliv
 
 ## 6. MVP Scope (Phase 1) & Current Status
 
-### What's Included (Implemented in v1.3.0)
+### What's Included (Implemented in v1.7.0)
 
 - [x] Authentication (Email + GitHub OAuth)
 - [x] Product Browsing (Search, Filter, Category)
@@ -172,4 +172,4 @@ KodeDock is India's first developer-focused digital goods marketplace that deliv
 
 ---
 
-*Document Version: 1.3.0 | Last Updated: August 2026*
+*Document Version: 1.7.0 | Last Updated: August 2026*

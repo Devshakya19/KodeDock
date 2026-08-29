@@ -13,7 +13,7 @@
 
 Welcome to KodeDock ("we," "us," "our," or "the Platform"). By creating an account, browsing the marketplace, purchasing products, or listing products for sale, you agree to be bound by these Terms of Service ("Terms"). If you do not agree with any part of these Terms, you must not use the Platform.
 
-KodeDock is operated as a proprietary service. These Terms constitute a legally binding agreement between you and KodeDock, governed by the laws of India.
+KodeDock is operated as an open source service. These Terms constitute a legally binding agreement between you and KodeDock, governed by the laws of India.
 
 ---
 
@@ -127,7 +127,7 @@ To protect both buyers and sellers, KodeDock employs a 7-day escrow:
 ## 8. Intellectual Property
 
 ### 8.1 Platform IP
-The KodeDock Platform, including its code, design, logo, and brand assets, is **proprietary software** owned by KodeDock. Unauthorized copying, cloning, or distribution is strictly prohibited.
+The KodeDock Platform, including its code, design, logo, and brand assets, is **open source software** licensed under the MIT License.
 
 ### 8.2 Product IP
 - Sellers retain ownership of their code

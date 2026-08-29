@@ -272,4 +272,4 @@ sequenceDiagram
 
 ---
 
-*Document Version: v1.3.0 | Last Updated: August 2026*
+*Document Version: v1.7.0 | Last Updated: August 2026*
