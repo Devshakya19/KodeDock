@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Moved configuration secrets and enable/disable toggles into a polished modal to improve focus and prevent accidental edits.
 
 ### Changed
+- **HQ Platform Configuration Overhaul:** Completely redesigned `PlatformSettings.tsx` into a high-end enterprise command center.
+  - Implemented the "Double-Bezel" gradient card architecture with ultra-premium shadows.
+  - Upgraded inputs to oversized editorial typography (`text-4xl font-black`) for financial controls.
+  - Integrated `framer-motion` for spring-based staggered entry animations and fluid tab transitions.
+  - Separated concerns using an asymmetrical grid layout with a sticky left sidebar navigation.
 - **Open Source Transition:** Officially licensed the KodeDock platform under the MIT License. Swept and removed all proprietary clauses across `README.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, and `TERMS-OF-SERVICE.md`. Upgraded all technical documentation in `/docs` to version `1.7.0`.
 - **Dynamic Platform Commission:** Removed the hardcoded 2.5% platform fee inside `core-engine`. The Rust backend now dynamically queries the live Postgres `platform_settings` table to calculate commission for each checkout.
 - **Strict Financial Math:** Upgraded the database schema and backend calculations to use Basis Points (BPS) (`{"bps": 250}` instead of a float percentage). This enforces pure 64-bit integer math in Rust, eliminating any risk of floating-point rounding errors during financial transactions.
