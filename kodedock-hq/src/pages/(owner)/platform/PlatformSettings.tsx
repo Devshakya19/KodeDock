@@ -54,8 +54,8 @@ export default function PlatformSettings() {
       );
 
       form.reset({
-        commission_rate: comm ? parseFloat(comm.value) : 2.5,
-        maintenance_mode: maint ? maint.value === true : false,
+        commission_rate: comm ? (comm.value?.bps ? comm.value.bps / 100 : 2.5) : 2.5,
+        maintenance_mode: maint ? maint.value?.enabled === true : false,
       });
     }
   }, [response?.data, form]);
@@ -130,7 +130,7 @@ export default function PlatformSettings() {
               onClick={() =>
                 mutation.mutate({
                   key: "commission_rate",
-                  value: form.getValues().commission_rate,
+                  value: { bps: Math.round(form.getValues().commission_rate * 100) },
                 })
               }
               disabled={mutation.isPending}
@@ -169,7 +169,7 @@ export default function PlatformSettings() {
                   form.setValue("maintenance_mode", e.target.checked);
                   mutation.mutate({
                     key: "maintenance_mode",
-                    value: e.target.checked,
+                    value: { enabled: e.target.checked, message: "We are currently undergoing scheduled maintenance." },
                   });
                 }}
               />
