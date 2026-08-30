@@ -202,7 +202,7 @@ export function AppNavbar({ variant, email = "", fullName, searchQuery = "" }: N
                 onClick={() => setProfileDropdownOpen(false)}
                 className="flex items-center gap-3 px-3 py-2.5 text-[14px] font-medium text-muted-foreground hover:bg-secondary hover:text-foreground rounded-xl transition-colors"
               >
-                <Download className="w-[18px] h-[18px] text-muted-foreground" /> Downloads &
+                <Download className="w-[18px] h-[18px] text-muted-foreground" /> Downloads &amp;
                 Licenses
               </Link>
               <Link
