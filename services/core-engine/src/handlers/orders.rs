@@ -82,7 +82,7 @@ pub async fn create_order(
 
     // Fetch dynamic commission rate from DB (in Basis Points)
     let setting = sqlx::query_scalar::<_, serde_json::Value>(
-        "SELECT value FROM platform_settings WHERE key = 'commission_rate'"
+        "SELECT value FROM platform_settings WHERE key = 'commission_rate'",
     )
     .fetch_optional(pool.get_ref())
     .await
