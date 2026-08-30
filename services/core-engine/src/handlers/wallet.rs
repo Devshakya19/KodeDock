@@ -1,4 +1,6 @@
-use crate::middleware::{extract_user_id, require_developer};
+use crate::middleware::{
+    extract_user_id, extract_user_uuid, require_developer, require_developer_uuid,
+};
 use crate::models::{
     ListTransactionsQuery, TopupOrderResponse, TopupRequest, TopupVerifyRequest, Wallet,
     WalletTopup, WalletTransaction, WithdrawRequest,
@@ -10,52 +12,21 @@ use serde::Deserialize;
 use sqlx::PgPool;
 
 pub async fn get_balance(pool: web::Data<PgPool>, req: HttpRequest) -> HttpResponse {
-    let user_id = match extract_user_id(&req) {
-        Ok(id) => id,
-        Err(_) => {
-            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized"))
-        }
-    };
-
-    let user_uuid = match uuid::Uuid::parse_str(&user_id) {
+    let user_uuid = match extract_user_uuid(&req) {
         Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID"))
-        }
+        Err(resp) => return resp,
     };
 
-    let wallet = match sqlx::query_as::<_, Wallet>("SELECT * FROM wallets WHERE user_id = $1")
-        .bind(user_uuid)
-        .fetch_optional(pool.get_ref())
-        .await
+    let wallet = match sqlx::query_as::<_, Wallet>(
+        "INSERT INTO wallets (user_id) VALUES ($1) ON CONFLICT (user_id) DO UPDATE SET user_id=EXCLUDED.user_id RETURNING *"
+    )
+    .bind(user_uuid)
+    .fetch_one(pool.get_ref())
+    .await
     {
-        Ok(Some(w)) => w,
-        Ok(None) => {
-            match sqlx::query_as::<_, Wallet>(
-                "INSERT INTO wallets (user_id) VALUES ($1) ON CONFLICT (user_id) DO NOTHING RETURNING *"
-            )
-            .bind(user_uuid)
-            .fetch_optional(pool.get_ref())
-            .await
-            {
-                Ok(Some(w)) => w,
-                _ => {
-                    match sqlx::query_as::<_, Wallet>("SELECT * FROM wallets WHERE user_id = $1")
-                        .bind(user_uuid)
-                        .fetch_one(pool.get_ref())
-                        .await
-                    {
-                        Ok(w) => w,
-                        Err(e) => {
-                            log::error!("Failed to fetch/create wallet: {}", e);
-                            return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Wallet error"));
-                        }
-                    }
-                }
-            }
-        }
+        Ok(w) => w,
         Err(e) => {
-            log::error!("Failed to fetch wallet: {}", e);
+            log::error!("Failed to fetch/create wallet: {}", e);
             return HttpResponse::InternalServerError().json(ApiResponse::<()>::error("Database error"));
         }
     };
@@ -202,18 +173,9 @@ pub async fn verify_topup(
     req: HttpRequest,
     body: web::Json<TopupVerifyRequest>,
 ) -> HttpResponse {
-    let user_id = match extract_user_id(&req) {
-        Ok(id) => id,
-        Err(_) => {
-            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized"))
-        }
-    };
-
-    let user_uuid = match uuid::Uuid::parse_str(&user_id) {
+    let user_uuid = match extract_user_uuid(&req) {
         Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID"))
-        }
+        Err(resp) => return resp,
     };
 
     // Verify payment signature first
@@ -259,18 +221,9 @@ pub async fn list_transactions(
     req: HttpRequest,
     query: web::Query<ListTransactionsQuery>,
 ) -> HttpResponse {
-    let user_id = match extract_user_id(&req) {
-        Ok(id) => id,
-        Err(_) => {
-            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized"))
-        }
-    };
-
-    let user_uuid = match uuid::Uuid::parse_str(&user_id) {
+    let user_uuid = match extract_user_uuid(&req) {
         Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID"))
-        }
+        Err(resp) => return resp,
     };
 
     let page = query.page.unwrap_or(1).max(1);
@@ -299,16 +252,9 @@ pub async fn withdraw(
     req: HttpRequest,
     body: web::Json<WithdrawRequest>,
 ) -> HttpResponse {
-    let user_id = match require_developer(&req) {
-        Ok(id) => id,
-        Err(resp) => return resp,
-    };
-
-    let user_uuid = match uuid::Uuid::parse_str(&user_id) {
+    let user_uuid = match require_developer_uuid(&req) {
         Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID"))
-        }
+        Err(resp) => return resp,
     };
 
     if body.amount_paise < 50000 {

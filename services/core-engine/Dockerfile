@@ -30,8 +30,8 @@ RUN touch src/main.rs && cargo build --release
 # ==============================================================
 FROM debian:bookworm-slim
 
-# Install runtime dependencies (certificates for HTTPS/APIs)
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates tzdata && rm -rf /var/lib/apt/lists/*
+# Install runtime dependencies (certificates for HTTPS/APIs) and curl (for healthchecks)
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates tzdata curl && rm -rf /var/lib/apt/lists/*
 
 # Run as non-root user for security
 RUN useradd -r -s /bin/false appuser

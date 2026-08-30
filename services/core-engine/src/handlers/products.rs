@@ -85,14 +85,9 @@ pub async fn list_products(
 pub async fn get_product(
     pool: web::Data<PgPool>,
     req: HttpRequest,
-    path: web::Path<String>,
+    path: web::Path<uuid::Uuid>,
 ) -> HttpResponse {
-    let id = match uuid::Uuid::parse_str(&path.into_inner()) {
-        Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid product ID"))
-        }
-    };
+    let id = path.into_inner();
 
     // Track unique views per user (not per request)
     // Try to get user ID from token; if not logged in, use IP-based tracking

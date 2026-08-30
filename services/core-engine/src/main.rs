@@ -3,8 +3,8 @@ use actix_governor::{Governor, GovernorConfigBuilder, KeyExtractor};
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use dotenvy::dotenv;
 use sqlx::postgres::PgPoolOptions;
-use std::env;
 
+mod config;
 mod handlers;
 mod middleware;
 mod models;
@@ -46,8 +46,18 @@ async fn main() -> std::io::Result<()> {
     dotenv().ok();
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
 
-    let port = env::var("PORT").unwrap_or_else(|_| "4001".to_string());
-    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let config = config::AppConfig::from_env();
+    let database_url = config.database_url.clone();
+    let port = config.port.to_string();
+    
+    // Initialize Redis Multiplexed Connection once
+    let redis_client = redis::Client::open(config.redis_url.clone())
+        .expect("Invalid Redis URL");
+    let redis_multiplexed = redis_client
+        .get_multiplexed_async_connection()
+        .await
+        .expect("Failed to connect to Redis");
+    log::info!("Connected to Redis");
 
     let pool = PgPoolOptions::new()
         .min_connections(2)
@@ -65,12 +75,7 @@ async fn main() -> std::io::Result<()> {
     let storage = storage::StorageClient::new().await;
     log::info!("Storage client initialized");
 
-    let cors_origins: Vec<String> = env::var("CORS_ORIGINS")
-        .unwrap_or_else(|_| "http://localhost:3000,http://localhost:3001".to_string())
-        .split(',')
-        .map(|s| s.trim().to_string())
-        .filter(|s| !s.is_empty())
-        .collect();
+    let cors_origins = config.cors_origins.clone();
 
     let auth_limiter = GovernorConfigBuilder::default()
         .seconds_per_request(12)
@@ -115,6 +120,9 @@ async fn main() -> std::io::Result<()> {
         }
 
         App::new()
+            .app_data(actix_web::web::Data::new(config.clone()))
+            .app_data(actix_web::web::Data::new(config.jwt_secret.clone()))
+            .app_data(actix_web::web::Data::new(redis_multiplexed.clone()))
             .wrap(cors)
             .wrap(Logger::default())
             .app_data(web::Data::new(pool.clone()))

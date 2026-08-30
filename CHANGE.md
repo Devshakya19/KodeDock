@@ -14,6 +14,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Moved configuration secrets and enable/disable toggles into a polished modal to improve focus and prevent accidental edits.
 
 ### Changed
+- **Core Engine Production Audit:** Applied a massive "Ponytail" refactor across `services/core-engine` to harden the backend for scale.
+  - Eliminated the "Panic Bomb" where `std::env::var().expect()` was called on every incoming request for JWT verification. Secrets are now securely injected into the Actix `AppConfig` state exactly once at startup.
+  - Resolved a severe file-descriptor leak in Redis. Converted per-request Redis TCP connections into a single `MultiplexedConnection` state pool.
+  - Enforced strict "Fail-Fast" container boot validations by removing `unwrap_or_else` silent fallbacks. Missing environment variables now crash the container immediately to prevent broken deployments.
+  - Shrunk boilerplate by over 600 lines across 40+ endpoints by replacing manual UUID path extraction blocks with native `web::Path<uuid::Uuid>` Actix extractors.
+  - Replaced brittle 3-query nested wallet creation logic with a single, atomic PostgreSQL UPSERT.
+- **Docker Infrastructure:** Fixed generic `debian-slim` healthcheck failures by injecting `curl` directly into the runtime `core-engine` and `ai-service` containers. Repaired broken CORS variable mappings that blocked HQ Vite logins.
 - **HQ Platform Configuration Overhaul:** Completely redesigned `PlatformSettings.tsx` into a high-end enterprise command center.
   - Implemented the "Double-Bezel" gradient card architecture with ultra-premium shadows.
   - Upgraded inputs to oversized editorial typography (`text-4xl font-black`) for financial controls.

@@ -16,7 +16,7 @@
 //! row, seller wallet balance, wallet transaction, and notification are all
 //! applied atomically — or all rolled back.
 
-use crate::middleware::extract_user_id;
+use crate::middleware::extract_user_uuid;
 use crate::models::{CheckoutOrderResponse, CreateOrderRequest, Order, VerifyOrderRequest};
 use crate::services::{payment, ApiResponse};
 use actix_web::{web, HttpRequest, HttpResponse};
@@ -28,21 +28,13 @@ const ESCROW_HOLD_DAYS: i64 = 7;
 
 pub async fn create_order(
     pool: web::Data<PgPool>,
+    redis: web::Data<redis::aio::MultiplexedConnection>,
     req: HttpRequest,
     body: web::Json<CreateOrderRequest>,
 ) -> HttpResponse {
-    let buyer_id = match extract_user_id(&req) {
-        Ok(id) => id,
-        Err(_) => {
-            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized"))
-        }
-    };
-
-    let buyer_uuid = match uuid::Uuid::parse_str(&buyer_id) {
+    let buyer_uuid = match extract_user_uuid(&req) {
         Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid buyer ID"))
-        }
+        Err(resp) => return resp,
     };
 
     // Fetch the product
@@ -118,6 +110,7 @@ pub async fn create_order(
     if wallet_balance >= price_paise {
         return pay_from_wallet(
             pool.get_ref(),
+            redis.get_ref(),
             buyer_uuid,
             &product,
             price_paise,
@@ -193,6 +186,7 @@ pub async fn create_order(
 /// Pay from buyer's wallet balance (instant completion, no Razorpay needed).
 async fn pay_from_wallet(
     pool: &PgPool,
+    redis: &redis::aio::MultiplexedConnection,
     buyer_uuid: uuid::Uuid,
     product: &crate::models::Product,
     price_paise: i32,
@@ -336,7 +330,7 @@ async fn pay_from_wallet(
 
     match tx.commit().await {
         Ok(_) => {
-            let _ = dispatch_order_events(&order).await;
+            let _ = dispatch_order_events(&order, redis.clone()).await;
             HttpResponse::Ok().json(ApiResponse::success(order, "Payment completed from wallet"))
         }
         Err(e) => {
@@ -437,21 +431,13 @@ async fn complete_order_atomic(
 
 pub async fn verify_order(
     pool: web::Data<PgPool>,
+    redis: web::Data<redis::aio::MultiplexedConnection>,
     req: HttpRequest,
     body: web::Json<VerifyOrderRequest>,
 ) -> HttpResponse {
-    let buyer_id = match extract_user_id(&req) {
-        Ok(id) => id,
-        Err(_) => {
-            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized"))
-        }
-    };
-
-    let buyer_uuid = match uuid::Uuid::parse_str(&buyer_id) {
+    let buyer_uuid = match extract_user_uuid(&req) {
         Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid buyer ID"))
-        }
+        Err(resp) => return resp,
     };
 
     if let Err(e) = payment::verify_payment_signature(
@@ -500,7 +486,7 @@ pub async fn verify_order(
 
     match complete_order_atomic(pool.get_ref(), order.id, &body.razorpay_payment_id).await {
         Ok(_just_completed) => {
-            let _ = dispatch_order_events(&order).await;
+            let _ = dispatch_order_events(&order, redis.get_ref().clone()).await;
             let order = sqlx::query_as::<_, Order>("SELECT * FROM orders WHERE id = $1")
                 .bind(order.id)
                 .fetch_one(pool.get_ref())
@@ -516,12 +502,10 @@ pub async fn verify_order(
     }
 }
 
-async fn dispatch_order_events(order: &Order) -> Result<(), Box<dyn std::error::Error>> {
-    let redis_url =
-        std::env::var("REDIS_URL").unwrap_or_else(|_| "redis://localhost:6379".to_string());
-    let client = redis::Client::open(redis_url)?;
-    let mut con = client.get_multiplexed_async_connection().await?;
-
+async fn dispatch_order_events(
+    order: &Order,
+    mut con: redis::aio::MultiplexedConnection,
+) -> Result<(), Box<dyn std::error::Error>> {
     // 1. Job for Go Infra Worker (Repo Transfer)
     let repo_job = serde_json::json!({
         "order_id": order.id,
@@ -589,18 +573,9 @@ pub async fn list_orders(
     req: HttpRequest,
     query: web::Query<std::collections::HashMap<String, String>>,
 ) -> HttpResponse {
-    let user_id = match extract_user_id(&req) {
-        Ok(id) => id,
-        Err(_) => {
-            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized"))
-        }
-    };
-
-    let user_uuid = match uuid::Uuid::parse_str(&user_id) {
+    let user_uuid = match extract_user_uuid(&req) {
         Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID"))
-        }
+        Err(resp) => return resp,
     };
 
     let mut sql = String::from("SELECT * FROM orders WHERE (buyer_id = $1 OR seller_id = $1)");
@@ -638,28 +613,14 @@ pub async fn list_orders(
 pub async fn get_order(
     pool: web::Data<PgPool>,
     req: HttpRequest,
-    path: web::Path<String>,
+    path: web::Path<uuid::Uuid>,
 ) -> HttpResponse {
-    let user_id = match extract_user_id(&req) {
-        Ok(id) => id,
-        Err(_) => {
-            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized"))
-        }
+    let user_uuid = match extract_user_uuid(&req) {
+        Ok(uuid) => uuid,
+        Err(resp) => return resp,
     };
 
-    let user_uuid = match uuid::Uuid::parse_str(&user_id) {
-        Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID"))
-        }
-    };
-
-    let order_id = match uuid::Uuid::parse_str(&path.into_inner()) {
-        Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid order ID"))
-        }
-    };
+    let order_id = path.into_inner();
 
     match sqlx::query_as::<_, Order>(
         "SELECT * FROM orders WHERE id = $1 AND (buyer_id = $2 OR seller_id = $2)",
@@ -724,6 +685,7 @@ struct WebhookOrder {
 
 pub async fn razorpay_webhook(
     pool: web::Data<PgPool>,
+    redis: web::Data<redis::aio::MultiplexedConnection>,
     req: HttpRequest,
     body: web::Bytes,
 ) -> HttpResponse {
@@ -791,7 +753,7 @@ pub async fn razorpay_webhook(
 
     match complete_order_atomic(pool.get_ref(), order.id, &payment_id).await {
         Ok(true) => {
-            let _ = dispatch_order_events(&order).await;
+            let _ = dispatch_order_events(&order, redis.get_ref().clone()).await;
             log::info!("Order {} completed via webhook", order.id);
         }
         Ok(false) => log::info!("Webhook: order {} already completed", order.id),

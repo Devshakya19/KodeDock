@@ -1,4 +1,4 @@
-use crate::middleware::extract_user_id;
+use crate::middleware::extract_user_uuid;
 use crate::models::{CreateReviewRequest, Review};
 use crate::services::ApiResponse;
 use actix_web::{web, HttpRequest, HttpResponse};
@@ -22,13 +22,8 @@ pub struct ReviewWithUser {
     pub user_avatar: Option<String>,
 }
 
-pub async fn list_reviews(pool: web::Data<PgPool>, path: web::Path<String>) -> HttpResponse {
-    let product_id = match uuid::Uuid::parse_str(&path.into_inner()) {
-        Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid product ID"))
-        }
-    };
+pub async fn list_reviews(pool: web::Data<PgPool>, path: web::Path<uuid::Uuid>) -> HttpResponse {
+    let product_id = path.into_inner();
 
     match sqlx::query_as::<_, ReviewWithUser>(
         r#"SELECT r.id, r.product_id, r.user_id, r.order_id, r.rating, r.title, r.comment,
@@ -95,18 +90,9 @@ pub async fn create_review(
     req: HttpRequest,
     body: web::Json<CreateReviewRequest>,
 ) -> HttpResponse {
-    let user_id = match extract_user_id(&req) {
-        Ok(id) => id,
-        Err(_) => {
-            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized"))
-        }
-    };
-
-    let user_uuid = match uuid::Uuid::parse_str(&user_id) {
+    let user_uuid = match extract_user_uuid(&req) {
         Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID"))
-        }
+        Err(resp) => return resp,
     };
 
     // Validate rating range

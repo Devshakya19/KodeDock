@@ -11,7 +11,6 @@ use jsonwebtoken::{
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use sqlx::{FromRow, PgPool};
-use std::env;
 use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
@@ -86,8 +85,7 @@ pub fn verify_token(token: &str, secret: &str) -> Result<Claims, String> {
 
 /// Encrypt a GitHub token using a simple XOR-based encryption with the JWT secret.
 /// This provides basic obfuscation to avoid storing tokens in plaintext.
-pub fn encrypt_github_token(token: &str) -> String {
-    let secret = env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+pub fn encrypt_github_token(token: &str, secret: &str) -> String {
     // Create a key by hashing the secret
     let mut hasher = Sha256::new();
     hasher.update(secret.as_bytes());
@@ -319,8 +317,9 @@ pub async fn store_github_token(
     pool: &PgPool,
     user_id: Uuid,
     access_token: &str,
+    secret: &str,
 ) -> Result<(), String> {
-    let encrypted_token = encrypt_github_token(access_token);
+    let encrypted_token = encrypt_github_token(access_token, secret);
     sqlx::query("INSERT INTO profiles (id, github_access_token) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET github_access_token = $2")
         .bind(user_id)
         .bind(&encrypted_token)
