@@ -1,4 +1,4 @@
-use crate::middleware::extract_user_id;
+use crate::middleware::{extract_user_id, extract_user_uuid};
 use crate::models::Profile;
 use crate::services::ApiResponse;
 use crate::storage::StorageClient;
@@ -8,19 +8,14 @@ use sqlx::PgPool;
 pub async fn get_profile(
     pool: web::Data<PgPool>,
     req: HttpRequest,
-    path: web::Path<String>,
+    path: web::Path<uuid::Uuid>,
 ) -> HttpResponse {
     // Allow viewing any profile — the marketplace requires buyers to see seller profiles.
     // Authentication is optional: if the caller is logged in, we use it for context;
     // if not, we still serve the public profile fields.
     let _user_id = extract_user_id(&req).ok(); // optional auth
 
-    let id = match uuid::Uuid::parse_str(&path.into_inner()) {
-        Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid profile ID"))
-        }
-    };
+    let id = path.into_inner();
 
     match sqlx::query_as::<_, Profile>("SELECT *, (github_access_token IS NOT NULL) AS is_github_connected FROM profiles WHERE id = $1")
         .bind(id)
@@ -42,18 +37,9 @@ pub async fn update_profile(
     req: HttpRequest,
     body: web::Json<serde_json::Value>,
 ) -> HttpResponse {
-    let user_id = match extract_user_id(&req) {
-        Ok(id) => id,
-        Err(_) => {
-            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized"))
-        }
-    };
-
-    let user_uuid = match uuid::Uuid::parse_str(&user_id) {
+    let user_uuid = match extract_user_uuid(&req) {
         Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID"))
-        }
+        Err(resp) => return resp,
     };
 
     // ID from body must match authenticated user

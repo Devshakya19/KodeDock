@@ -1,20 +1,13 @@
-use crate::middleware::require_developer;
+use crate::middleware::require_developer_uuid;
 use crate::models::{CreatePayoutAccountRequest, PayoutAccount, PayoutAccountResponse};
 use crate::services::ApiResponse;
 use actix_web::{web, HttpRequest, HttpResponse};
 use sqlx::PgPool;
 
 pub async fn get_payout_account(pool: web::Data<PgPool>, req: HttpRequest) -> HttpResponse {
-    let seller_id = match require_developer(&req) {
-        Ok(id) => id,
-        Err(resp) => return resp,
-    };
-
-    let seller_uuid = match uuid::Uuid::parse_str(&seller_id) {
+    let seller_uuid = match require_developer_uuid(&req) {
         Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID"))
-        }
+        Err(resp) => return resp,
     };
 
     match sqlx::query_as::<_, PayoutAccount>(
@@ -43,16 +36,9 @@ pub async fn create_or_update_payout_account(
     req: HttpRequest,
     body: web::Json<CreatePayoutAccountRequest>,
 ) -> HttpResponse {
-    let seller_id = match require_developer(&req) {
-        Ok(id) => id,
-        Err(resp) => return resp,
-    };
-
-    let seller_uuid = match uuid::Uuid::parse_str(&seller_id) {
+    let seller_uuid = match require_developer_uuid(&req) {
         Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID"))
-        }
+        Err(resp) => return resp,
     };
 
     // Validate account_type
@@ -187,16 +173,9 @@ pub async fn create_or_update_payout_account(
 }
 
 pub async fn delete_payout_account(pool: web::Data<PgPool>, req: HttpRequest) -> HttpResponse {
-    let seller_id = match require_developer(&req) {
-        Ok(id) => id,
-        Err(resp) => return resp,
-    };
-
-    let seller_uuid = match uuid::Uuid::parse_str(&seller_id) {
+    let seller_uuid = match require_developer_uuid(&req) {
         Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID"))
-        }
+        Err(resp) => return resp,
     };
 
     match sqlx::query("DELETE FROM seller_payout_accounts WHERE seller_id = $1")

@@ -25,7 +25,11 @@ pub struct AuthResponse {
     pub token: String,
 }
 
-pub async fn register(pool: web::Data<PgPool>, body: web::Json<RegisterRequest>) -> HttpResponse {
+pub async fn register(
+    secret: web::Data<String>,
+    pool: web::Data<PgPool>,
+    body: web::Json<RegisterRequest>,
+) -> HttpResponse {
     // Allow "user" or "developer" role from self-registration — no other roles
     let role = match body.role.as_deref() {
         Some("developer") => "developer",
@@ -105,7 +109,7 @@ pub async fn register(pool: web::Data<PgPool>, body: web::Json<RegisterRequest>)
     };
 
     // Generate token
-    let secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+    let secret = secret.to_string();
     let token = match auth::generate_token(&user, &secret) {
         Ok(token) => token,
         Err(e) => {
@@ -135,7 +139,11 @@ pub async fn register(pool: web::Data<PgPool>, body: web::Json<RegisterRequest>)
     ))
 }
 
-pub async fn login(pool: web::Data<PgPool>, body: web::Json<LoginRequest>) -> HttpResponse {
+pub async fn login(
+    secret: web::Data<String>,
+    pool: web::Data<PgPool>,
+    body: web::Json<LoginRequest>,
+) -> HttpResponse {
     let cleaned_email = body.email.trim().to_lowercase();
 
     // Get user by email
@@ -171,7 +179,7 @@ pub async fn login(pool: web::Data<PgPool>, body: web::Json<LoginRequest>) -> Ht
     };
 
     // Generate token
-    let secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+    let secret = secret.to_string();
     let token = match auth::generate_token(&user, &secret) {
         Ok(token) => token,
         Err(e) => {
@@ -187,7 +195,11 @@ pub async fn login(pool: web::Data<PgPool>, body: web::Json<LoginRequest>) -> Ht
     ))
 }
 
-pub async fn me(pool: web::Data<PgPool>, req: HttpRequest) -> HttpResponse {
+pub async fn me(
+    secret: web::Data<String>,
+    pool: web::Data<PgPool>,
+    req: HttpRequest,
+) -> HttpResponse {
     // Extract token from Authorization header
     let auth_header = req.headers().get("Authorization");
     let token = match auth_header {
@@ -202,7 +214,7 @@ pub async fn me(pool: web::Data<PgPool>, req: HttpRequest) -> HttpResponse {
     };
 
     // Verify token
-    let secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+    let secret = secret.to_string();
     let claims = match auth::verify_token(token, &secret) {
         Ok(claims) => claims,
         Err(_) => {
@@ -286,8 +298,7 @@ pub async fn forgot_password(
     }
 
     // Build reset URL using APP_BASE_URL env var (no token in logs)
-    let base_url =
-        std::env::var("APP_BASE_URL").unwrap_or_else(|_| "http://localhost:3000".to_string());
+    let base_url = std::env::var("APP_BASE_URL").expect("APP_BASE_URL must be set");
     let _reset_url = format!("{}/reset-password?token={}", base_url, token);
     log::info!(
         "Password reset requested for {} (token generated)",
@@ -378,6 +389,7 @@ pub struct ChangePasswordRequest {
 }
 
 pub async fn change_password(
+    secret: web::Data<String>,
     pool: web::Data<PgPool>,
     req: HttpRequest,
     body: web::Json<ChangePasswordRequest>,
@@ -395,7 +407,7 @@ pub async fn change_password(
         }
     };
 
-    let secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+    let secret = secret.to_string();
     let claims = match auth::verify_token(token, &secret) {
         Ok(claims) => claims,
         Err(_) => {
@@ -471,7 +483,11 @@ pub async fn change_password(
     })
 }
 
-pub async fn delete_account(pool: web::Data<PgPool>, req: HttpRequest) -> HttpResponse {
+pub async fn delete_account(
+    secret: web::Data<String>,
+    pool: web::Data<PgPool>,
+    req: HttpRequest,
+) -> HttpResponse {
     // Extract user ID from JWT
     let auth_header = req.headers().get("Authorization");
     let token = match auth_header {
@@ -485,7 +501,7 @@ pub async fn delete_account(pool: web::Data<PgPool>, req: HttpRequest) -> HttpRe
         }
     };
 
-    let secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+    let secret = secret.to_string();
     let claims = match auth::verify_token(token, &secret) {
         Ok(claims) => claims,
         Err(_) => {
@@ -589,6 +605,7 @@ pub struct GithubAuthRequest {
 ///   2. Links GitHub to an existing email-matched user, or
 ///   3. Creates a brand-new account.
 pub async fn github_oauth(
+    secret: web::Data<String>,
     pool: web::Data<PgPool>,
     body: web::Json<GithubAuthRequest>,
 ) -> HttpResponse {
@@ -685,7 +702,7 @@ pub async fn github_oauth(
                         .bind(&full_name)
                         .bind(role)
                         .bind(&gh_user.login)
-                        .bind(auth::encrypt_github_token(&access_token))
+                        .bind(auth::encrypt_github_token(&access_token, &secret))
                         .execute(pool.get_ref())
                         .await;
 
@@ -701,10 +718,10 @@ pub async fn github_oauth(
     };
 
     // Store (or update) the GitHub access token in the profile
-    let _ = auth::store_github_token(pool.get_ref(), user.id, &access_token).await;
+    let _ = auth::store_github_token(pool.get_ref(), user.id, &access_token, &secret).await;
 
     // 6. Generate JWT
-    let secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+    let secret = secret.to_string();
     let token = match auth::generate_token(&user, &secret) {
         Ok(token) => token,
         Err(e) => {
@@ -726,6 +743,7 @@ pub struct GithubLinkRequest {
 }
 
 pub async fn github_link(
+    secret: web::Data<String>,
     pool: web::Data<PgPool>,
     req: HttpRequest,
     body: web::Json<GithubLinkRequest>,
@@ -744,7 +762,7 @@ pub async fn github_link(
         }
     };
 
-    let secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+    let secret = secret.to_string();
     let claims = match auth::verify_token(token, &secret) {
         Ok(claims) => claims,
         Err(_) => {
@@ -803,7 +821,8 @@ pub async fn github_link(
     }
 
     // 5. Store GitHub access token
-    if let Err(e) = auth::store_github_token(pool.get_ref(), user_id, &access_token).await {
+    if let Err(e) = auth::store_github_token(pool.get_ref(), user_id, &access_token, &secret).await
+    {
         log::error!("Failed to store GitHub token: {}", e);
         return HttpResponse::InternalServerError()
             .json(ApiResponse::<()>::error("Failed to store GitHub token"));
@@ -817,7 +836,11 @@ pub async fn github_link(
     })
 }
 
-pub async fn github_unlink(pool: web::Data<PgPool>, req: HttpRequest) -> HttpResponse {
+pub async fn github_unlink(
+    secret: web::Data<String>,
+    pool: web::Data<PgPool>,
+    req: HttpRequest,
+) -> HttpResponse {
     // 1. Authenticate user
     let auth_header = req.headers().get("Authorization");
     let token = match auth_header {
@@ -832,7 +855,7 @@ pub async fn github_unlink(pool: web::Data<PgPool>, req: HttpRequest) -> HttpRes
         }
     };
 
-    let secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+    let secret = secret.to_string();
     let claims = match auth::verify_token(token, &secret) {
         Ok(claims) => claims,
         Err(_) => {

@@ -1,22 +1,13 @@
-use crate::middleware::extract_user_id;
+use crate::middleware::extract_user_uuid;
 use crate::models::Notification;
 use crate::services::ApiResponse;
 use actix_web::{web, HttpRequest, HttpResponse};
 use sqlx::PgPool;
 
 pub async fn list_notifications(pool: web::Data<PgPool>, req: HttpRequest) -> HttpResponse {
-    let user_id = match extract_user_id(&req) {
-        Ok(id) => id,
-        Err(_) => {
-            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized"))
-        }
-    };
-
-    let user_uuid = match uuid::Uuid::parse_str(&user_id) {
+    let user_uuid = match extract_user_uuid(&req) {
         Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID"))
-        }
+        Err(resp) => return resp,
     };
 
     match sqlx::query_as::<_, Notification>(
@@ -42,18 +33,9 @@ pub async fn mark_read(
     req: HttpRequest,
     path: web::Path<String>,
 ) -> HttpResponse {
-    let user_id = match extract_user_id(&req) {
-        Ok(id) => id,
-        Err(_) => {
-            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized"))
-        }
-    };
-
-    let user_uuid = match uuid::Uuid::parse_str(&user_id) {
+    let user_uuid = match extract_user_uuid(&req) {
         Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID"))
-        }
+        Err(resp) => return resp,
     };
 
     let id = match uuid::Uuid::parse_str(&path.into_inner()) {
@@ -86,18 +68,9 @@ pub async fn mark_read(
 }
 
 pub async fn mark_all_read(pool: web::Data<PgPool>, req: HttpRequest) -> HttpResponse {
-    let user_id = match extract_user_id(&req) {
-        Ok(id) => id,
-        Err(_) => {
-            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized"))
-        }
-    };
-
-    let user_uuid = match uuid::Uuid::parse_str(&user_id) {
+    let user_uuid = match extract_user_uuid(&req) {
         Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID"))
-        }
+        Err(resp) => return resp,
     };
 
     match sqlx::query(

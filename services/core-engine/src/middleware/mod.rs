@@ -34,7 +34,10 @@ fn verify_bearer(req: &HttpRequest) -> Result<AuthClaims, Error> {
     validation.validate_aud = false; // JWTs may not have audience
 
     // Get JWT secret from environment — no fallback, must be set
-    let jwt_secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set in environment");
+    let jwt_secret = req
+        .app_data::<actix_web::web::Data<String>>()
+        .expect("JWT_SECRET missing in app_data")
+        .as_ref();
 
     match decode::<serde_json::Value>(
         token,
@@ -133,7 +136,10 @@ pub fn require_hq_access(req: &HttpRequest) -> Result<HqAuthClaims, HttpResponse
     let mut validation = Validation::new(Algorithm::HS256);
     validation.validate_aud = false;
 
-    let jwt_secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+    let jwt_secret = req
+        .app_data::<actix_web::web::Data<String>>()
+        .expect("JWT_SECRET missing in app_data")
+        .as_ref();
 
     match decode::<serde_json::Value>(
         token,
@@ -180,4 +186,19 @@ pub fn require_hq_access(req: &HttpRequest) -> Result<HqAuthClaims, HttpResponse
                 .json(ApiResponse::<()>::error("Invalid or expired HQ token")))
         }
     }
+}
+
+/// Extract user ID as UUID directly
+pub fn extract_user_uuid(req: &HttpRequest) -> Result<uuid::Uuid, HttpResponse> {
+    let claims = verify_bearer(req)
+        .map_err(|_| HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Unauthorized")))?;
+    uuid::Uuid::parse_str(&claims.user_id)
+        .map_err(|_| HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID")))
+}
+
+/// Require developer and return UUID directly
+pub fn require_developer_uuid(req: &HttpRequest) -> Result<uuid::Uuid, HttpResponse> {
+    let user_id = require_developer(req)?;
+    uuid::Uuid::parse_str(&user_id)
+        .map_err(|_| HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid user ID")))
 }

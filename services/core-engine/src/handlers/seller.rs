@@ -1,4 +1,4 @@
-use crate::middleware::require_developer;
+use crate::middleware::require_developer_uuid;
 use crate::models::{CreateProductRequest, Product, SellerStats, UpdateProductRequest};
 use crate::services::ApiResponse;
 use crate::storage::StorageClient;
@@ -10,16 +10,9 @@ pub async fn create_product(
     req: HttpRequest,
     body: web::Json<CreateProductRequest>,
 ) -> HttpResponse {
-    let seller_id = match require_developer(&req) {
-        Ok(id) => id,
-        Err(resp) => return resp,
-    };
-
-    let seller_uuid = match uuid::Uuid::parse_str(&seller_id) {
+    let seller_uuid = match require_developer_uuid(&req) {
         Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID"))
-        }
+        Err(resp) => return resp,
     };
 
     // Validate input lengths
@@ -77,7 +70,7 @@ pub async fn create_product(
 
     // Validate image_url if provided — must be from our storage or empty
     if let Some(ref url) = body.image_url {
-        let s3_public_url = std::env::var("S3_PUBLIC_URL").unwrap_or_default();
+        let s3_public_url = std::env::var("S3_PUBLIC_URL").expect("S3_PUBLIC_URL must be set");
         if !s3_public_url.is_empty() && !url.starts_with(&s3_public_url) {
             return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid image URL"));
         }
@@ -140,16 +133,9 @@ pub async fn create_product(
 }
 
 pub async fn list_seller_products(pool: web::Data<PgPool>, req: HttpRequest) -> HttpResponse {
-    let seller_id = match require_developer(&req) {
-        Ok(id) => id,
-        Err(resp) => return resp,
-    };
-
-    let seller_uuid = match uuid::Uuid::parse_str(&seller_id) {
+    let seller_uuid = match require_developer_uuid(&req) {
         Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID"))
-        }
+        Err(resp) => return resp,
     };
 
     match sqlx::query_as::<_, Product>(
@@ -170,27 +156,15 @@ pub async fn list_seller_products(pool: web::Data<PgPool>, req: HttpRequest) -> 
 pub async fn update_product(
     pool: web::Data<PgPool>,
     req: HttpRequest,
-    path: web::Path<String>,
+    path: web::Path<uuid::Uuid>,
     body: web::Json<UpdateProductRequest>,
 ) -> HttpResponse {
-    let seller_id = match require_developer(&req) {
-        Ok(id) => id,
+    let seller_uuid = match require_developer_uuid(&req) {
+        Ok(uuid) => uuid,
         Err(resp) => return resp,
     };
 
-    let seller_uuid = match uuid::Uuid::parse_str(&seller_id) {
-        Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID"))
-        }
-    };
-
-    let id = match uuid::Uuid::parse_str(&path.into_inner()) {
-        Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid product ID"))
-        }
-    };
+    let id = path.into_inner();
 
     // Verify ownership and fetch current price
     let current_price = match sqlx::query_scalar::<_, i32>(
@@ -319,26 +293,14 @@ pub async fn delete_product(
     pool: web::Data<PgPool>,
     storage: web::Data<StorageClient>,
     req: HttpRequest,
-    path: web::Path<String>,
+    path: web::Path<uuid::Uuid>,
 ) -> HttpResponse {
-    let seller_id = match require_developer(&req) {
-        Ok(id) => id,
+    let seller_uuid = match require_developer_uuid(&req) {
+        Ok(uuid) => uuid,
         Err(resp) => return resp,
     };
 
-    let seller_uuid = match uuid::Uuid::parse_str(&seller_id) {
-        Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID"))
-        }
-    };
-
-    let id = match uuid::Uuid::parse_str(&path.into_inner()) {
-        Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid product ID"))
-        }
-    };
+    let id = path.into_inner();
 
     // Verify ownership before deletion
     match sqlx::query_scalar::<_, uuid::Uuid>("SELECT seller_id FROM products WHERE id = $1")
@@ -420,16 +382,9 @@ pub async fn delete_product(
 }
 
 pub async fn get_stats(pool: web::Data<PgPool>, req: HttpRequest) -> HttpResponse {
-    let seller_id = match require_developer(&req) {
-        Ok(id) => id,
-        Err(resp) => return resp,
-    };
-
-    let seller_uuid = match uuid::Uuid::parse_str(&seller_id) {
+    let seller_uuid = match require_developer_uuid(&req) {
         Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID"))
-        }
+        Err(resp) => return resp,
     };
 
     // Single query for all stats
@@ -464,16 +419,9 @@ pub async fn get_stats(pool: web::Data<PgPool>, req: HttpRequest) -> HttpRespons
 }
 
 pub async fn get_seller_reviews(pool: web::Data<PgPool>, req: HttpRequest) -> HttpResponse {
-    let seller_id = match require_developer(&req) {
-        Ok(id) => id,
-        Err(resp) => return resp,
-    };
-
-    let seller_uuid = match uuid::Uuid::parse_str(&seller_id) {
+    let seller_uuid = match require_developer_uuid(&req) {
         Ok(uuid) => uuid,
-        Err(_) => {
-            return HttpResponse::BadRequest().json(ApiResponse::<()>::error("Invalid seller ID"))
-        }
+        Err(resp) => return resp,
     };
 
     match sqlx::query_as::<_, crate::models::SellerReviewItem>(

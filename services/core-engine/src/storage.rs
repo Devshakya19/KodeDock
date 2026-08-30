@@ -28,8 +28,8 @@ impl StorageClient {
         let endpoint = env::var("S3_ENDPOINT").expect("S3_ENDPOINT must be set");
         let access_key = env::var("S3_ACCESS_KEY").expect("S3_ACCESS_KEY must be set");
         let secret_key = env::var("S3_SECRET_KEY").expect("S3_SECRET_KEY must be set");
-        let bucket = env::var("S3_BUCKET").unwrap_or_else(|_| "kodedock-media".to_string());
-        let region = env::var("S3_REGION").unwrap_or_else(|_| "us-east-1".to_string());
+        let bucket = env::var("S3_BUCKET").expect("S3_BUCKET must be set");
+        let region = env::var("S3_REGION").expect("S3_REGION must be set");
 
         let credentials =
             Credentials::new(access_key, secret_key, None, None, "kodedock-seaweedfs");
