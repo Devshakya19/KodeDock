@@ -14,11 +14,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Moved configuration secrets and enable/disable toggles into a polished modal to improve focus and prevent accidental edits.
 
 ### Changed
+- **Open Source Transition:** Officially licensed the KodeDock platform under the MIT License. Swept and removed all proprietary clauses across `README.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, and `TERMS-OF-SERVICE.md`. Upgraded all technical documentation in `/docs` to version `1.7.0`.
+- **Dynamic Platform Commission:** Removed the hardcoded 2.5% platform fee inside `core-engine`. The Rust backend now dynamically queries the live Postgres `platform_settings` table to calculate commission for each checkout.
+- **Strict Financial Math:** Upgraded the database schema and backend calculations to use Basis Points (BPS) (`{"bps": 250}` instead of a float percentage). This enforces pure 64-bit integer math in Rust, eliminating any risk of floating-point rounding errors during financial transactions.
 - **Real-Time Integrations Dynamic Sync:**
   - Next.js frontend now fetches the GitHub Client ID dynamically at runtime via `/api/auth/config` instead of hardcoding `NEXT_PUBLIC_GITHUB_CLIENT_ID` at build time.
   - Rust `core-engine` instantly sets `std::env::set_var` when the HQ dashboard updates configurations, avoiding the need for backend process restarts.
 
 ### Fixed
+- **Platform Settings Integrity:** Resolved a critical `500 Internal Server Error` when updating platform settings from HQ. The `updated_by` foreign key in the `platform_settings` table was incorrectly referencing the `profiles` table instead of `hq_staff`. Altered the constraint live and updated `01-init.sql`.
+- **HQ Settings Payload Formatting:** Fixed `PlatformSettings.tsx` JSON handling. It now seamlessly transforms the admin-facing percentage value (e.g., `2.5%`) into the strict `{"bps": 250}` structure required by the database upon saving.
 - **HQ Search (Command Palette):** 
   - Added `Escape` key handler to close the global command menu.
   - Disabled browser autocomplete, auto-correct, and password manager autofill on the search input to prevent queries from being saved as passwords.

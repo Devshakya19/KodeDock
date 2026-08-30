@@ -80,8 +80,26 @@ pub async fn create_order(
             .json(ApiResponse::<()>::error("Cannot purchase your own product"));
     }
 
+    // Fetch dynamic commission rate from DB (in Basis Points)
+    let setting = sqlx::query_scalar::<_, serde_json::Value>(
+        "SELECT value FROM platform_settings WHERE key = 'commission_rate'"
+    )
+    .fetch_optional(pool.get_ref())
+    .await
+    .unwrap_or(None);
+
+    let mut commission_bps = 250_i64; // Fallback: 250 BPS (2.5%)
+    if let Some(val) = setting {
+        if let Some(bps) = val.get("bps").and_then(|v| v.as_i64()) {
+            commission_bps = bps;
+        } else if let Some(pct) = val.get("percentage").and_then(|v| v.as_f64()) {
+            // Backward compatibility for old percentage format
+            commission_bps = (pct * 100.0).round() as i64;
+        }
+    }
+
     let price_paise = product.price_paise;
-    let platform_fee = (price_paise as i64 * 25 / 1000) as i32; // 2.5%
+    let platform_fee = ((price_paise as i64 * commission_bps) / 10000) as i32;
     let seller_amount = price_paise - platform_fee;
 
     // Check buyer's wallet balance
