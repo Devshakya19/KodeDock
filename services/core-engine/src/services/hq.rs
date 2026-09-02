@@ -27,52 +27,7 @@ pub fn read_env_file() -> std::collections::HashMap<String, String> {
     map
 }
 
-pub fn update_env_file(
-    updates: &std::collections::HashMap<String, String>,
-) -> Result<(), Box<dyn std::error::Error>> {
-    let env_path = Path::new("/app/.env");
-    let mut env_content = String::new();
 
-    if env_path.exists() {
-        env_content = fs::read_to_string(env_path)?;
-    } else {
-        // If not running in docker or volume not mounted, fallback to local
-        let local_path = Path::new("../../.env");
-        if local_path.exists() {
-            env_content = fs::read_to_string(local_path)?;
-        }
-    }
-
-    let mut lines: Vec<String> = env_content.lines().map(String::from).collect();
-
-    for (k, v) in updates {
-        let mut found = false;
-        for line in lines.iter_mut() {
-            if line.starts_with(&format!("{}=", k)) {
-                *line = format!("{}={}", k, v);
-                found = true;
-                break;
-            }
-        }
-        if !found {
-            lines.push(format!("{}={}", k, v));
-        }
-        std::env::set_var(k, v);
-    }
-
-    let new_content = lines.join("\n") + "\n";
-
-    if env_path.exists() {
-        fs::write(env_path, new_content.clone())?;
-    } else {
-        let local_path = Path::new("../../.env");
-        if local_path.exists() {
-            fs::write(local_path, new_content)?;
-        }
-    }
-
-    Ok(())
-}
 use crate::models::hq::HqStaff;
 use crate::services::auth::{hash_password, verify_password};
 use chrono::{Duration, Utc};
@@ -851,28 +806,20 @@ pub async fn update_platform_integration(
     .bind(is_active).bind(config.clone()).bind(admin_uuid).bind(provider)
     .execute(pool).await?;
 
-    // Convert config to HashMap
+    // Set env var dynamically for the current process, but don't mutate .env file (Render/Fly handle this securely)
     if let Some(obj) = config.as_object() {
-        let mut updates = std::collections::HashMap::new();
         for (k, v) in obj {
             let val_str = match v {
                 serde_json::Value::String(s) => s.clone(),
                 _ => v.to_string(),
             };
             let env_key = format!("{}_{}", provider.to_uppercase(), k.to_uppercase());
-            if !is_active {
-                updates.insert(env_key.clone(), "".to_string());
-                if env_key == "GITHUB_CLIENT_ID" {
-                    updates.insert("NEXT_PUBLIC_GITHUB_CLIENT_ID".to_string(), "".to_string());
-                }
+            if is_active {
+                std::env::set_var(&env_key, val_str);
             } else {
-                updates.insert(env_key.clone(), val_str.clone());
-                if env_key == "GITHUB_CLIENT_ID" {
-                    updates.insert("NEXT_PUBLIC_GITHUB_CLIENT_ID".to_string(), val_str);
-                }
+                std::env::remove_var(&env_key);
             }
         }
-        let _ = update_env_file(&updates);
     }
 
     crate::services::hq::log_audit(
