@@ -1,6 +1,6 @@
 use crate::services::auth;
 use crate::services::ApiResponse;
-use actix_web::{web, HttpRequest, HttpResponse};
+use actix_web::{web, HttpResponse};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
@@ -196,34 +196,10 @@ pub async fn login(
 }
 
 pub async fn me(
-    secret: web::Data<String>,
     pool: web::Data<PgPool>,
-    req: HttpRequest,
+    claims: crate::middleware::AuthClaims,
 ) -> HttpResponse {
-    // Extract token from Authorization header
-    let auth_header = req.headers().get("Authorization");
-    let token = match auth_header {
-        Some(header) => {
-            let header_str = header.to_str().unwrap_or("");
-            header_str.strip_prefix("Bearer ").unwrap_or(header_str)
-        }
-        None => {
-            return HttpResponse::Unauthorized()
-                .json(ApiResponse::<()>::error("Missing Authorization header"));
-        }
-    };
-
-    // Verify token
-    let secret = secret.to_string();
-    let claims = match auth::verify_token(token, &secret) {
-        Ok(claims) => claims,
-        Err(_) => {
-            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid token"));
-        }
-    };
-
-    // Get user
-    let user_id = match uuid::Uuid::parse_str(&claims.sub) {
+    let user_id = match uuid::Uuid::parse_str(&claims.user_id) {
         Ok(id) => id,
         Err(_) => {
             return HttpResponse::Unauthorized()
@@ -389,33 +365,11 @@ pub struct ChangePasswordRequest {
 }
 
 pub async fn change_password(
-    secret: web::Data<String>,
     pool: web::Data<PgPool>,
-    req: HttpRequest,
+    claims: crate::middleware::AuthClaims,
     body: web::Json<ChangePasswordRequest>,
 ) -> HttpResponse {
-    // Extract user ID from JWT
-    let auth_header = req.headers().get("Authorization");
-    let token = match auth_header {
-        Some(header) => {
-            let header_str = header.to_str().unwrap_or("");
-            header_str.strip_prefix("Bearer ").unwrap_or(header_str)
-        }
-        None => {
-            return HttpResponse::Unauthorized()
-                .json(ApiResponse::<()>::error("Missing Authorization header"));
-        }
-    };
-
-    let secret = secret.to_string();
-    let claims = match auth::verify_token(token, &secret) {
-        Ok(claims) => claims,
-        Err(_) => {
-            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid token"));
-        }
-    };
-
-    let user_id = match uuid::Uuid::parse_str(&claims.sub) {
+    let user_id = match uuid::Uuid::parse_str(&claims.user_id) {
         Ok(id) => id,
         Err(_) => {
             return HttpResponse::Unauthorized()
@@ -484,32 +438,10 @@ pub async fn change_password(
 }
 
 pub async fn delete_account(
-    secret: web::Data<String>,
     pool: web::Data<PgPool>,
-    req: HttpRequest,
+    claims: crate::middleware::AuthClaims,
 ) -> HttpResponse {
-    // Extract user ID from JWT
-    let auth_header = req.headers().get("Authorization");
-    let token = match auth_header {
-        Some(header) => {
-            let header_str = header.to_str().unwrap_or("");
-            header_str.strip_prefix("Bearer ").unwrap_or(header_str)
-        }
-        None => {
-            return HttpResponse::Unauthorized()
-                .json(ApiResponse::<()>::error("Missing Authorization header"));
-        }
-    };
-
-    let secret = secret.to_string();
-    let claims = match auth::verify_token(token, &secret) {
-        Ok(claims) => claims,
-        Err(_) => {
-            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid token"));
-        }
-    };
-
-    let user_id = match uuid::Uuid::parse_str(&claims.sub) {
+    let user_id = match uuid::Uuid::parse_str(&claims.user_id) {
         Ok(id) => id,
         Err(_) => {
             return HttpResponse::Unauthorized()
@@ -745,32 +677,10 @@ pub struct GithubLinkRequest {
 pub async fn github_link(
     secret: web::Data<String>,
     pool: web::Data<PgPool>,
-    req: HttpRequest,
+    claims: crate::middleware::AuthClaims,
     body: web::Json<GithubLinkRequest>,
 ) -> HttpResponse {
-    // 1. Authenticate user
-    let auth_header = req.headers().get("Authorization");
-    let token = match auth_header {
-        Some(header) => header
-            .to_str()
-            .unwrap_or("")
-            .strip_prefix("Bearer ")
-            .unwrap_or(header.to_str().unwrap_or("")),
-        None => {
-            return HttpResponse::Unauthorized()
-                .json(ApiResponse::<()>::error("Missing Authorization header"))
-        }
-    };
-
-    let secret = secret.to_string();
-    let claims = match auth::verify_token(token, &secret) {
-        Ok(claims) => claims,
-        Err(_) => {
-            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid token"))
-        }
-    };
-
-    let user_id = match uuid::Uuid::parse_str(&claims.sub) {
+    let user_id = match uuid::Uuid::parse_str(&claims.user_id) {
         Ok(id) => id,
         Err(_) => {
             return HttpResponse::Unauthorized()
@@ -837,33 +747,10 @@ pub async fn github_link(
 }
 
 pub async fn github_unlink(
-    secret: web::Data<String>,
     pool: web::Data<PgPool>,
-    req: HttpRequest,
+    claims: crate::middleware::AuthClaims,
 ) -> HttpResponse {
-    // 1. Authenticate user
-    let auth_header = req.headers().get("Authorization");
-    let token = match auth_header {
-        Some(header) => header
-            .to_str()
-            .unwrap_or("")
-            .strip_prefix("Bearer ")
-            .unwrap_or(header.to_str().unwrap_or("")),
-        None => {
-            return HttpResponse::Unauthorized()
-                .json(ApiResponse::<()>::error("Missing Authorization header"))
-        }
-    };
-
-    let secret = secret.to_string();
-    let claims = match auth::verify_token(token, &secret) {
-        Ok(claims) => claims,
-        Err(_) => {
-            return HttpResponse::Unauthorized().json(ApiResponse::<()>::error("Invalid token"))
-        }
-    };
-
-    let user_id = match uuid::Uuid::parse_str(&claims.sub) {
+    let user_id = match uuid::Uuid::parse_str(&claims.user_id) {
         Ok(id) => id,
         Err(_) => {
             return HttpResponse::Unauthorized()
