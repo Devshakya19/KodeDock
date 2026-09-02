@@ -10,6 +10,15 @@ pub struct AuthClaims {
     pub role: String,
 }
 
+impl actix_web::FromRequest for AuthClaims {
+    type Error = Error;
+    type Future = std::future::Ready<Result<Self, Self::Error>>;
+
+    fn from_request(req: &HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
+        std::future::ready(verify_bearer(req))
+    }
+}
+
 /// Decode + signature-verify the Bearer JWT and return its claims.
 ///
 /// Unlike the Next.js middleware (which previously trusted an unsigned
@@ -108,6 +117,15 @@ pub struct HqAuthClaims {
     pub staff_id: String,
     pub role_id: String,
     pub is_hq: bool,
+}
+
+impl actix_web::FromRequest for HqAuthClaims {
+    type Error = Error;
+    type Future = std::future::Ready<Result<Self, Self::Error>>;
+
+    fn from_request(req: &HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
+        std::future::ready(require_hq_access(req).map_err(|e| actix_web::error::InternalError::from_response("", e).into()))
+    }
 }
 
 /// Require the authenticated user to be a valid KodeDock HQ Staff member.
