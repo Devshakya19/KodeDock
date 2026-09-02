@@ -282,318 +282,337 @@ export default function ProductDetailPage() {
     typeof product.rating === "string" ? parseFloat(product.rating) : product.rating;
 
   return (
-    <div className="min-h-screen bg-secondary/50 pb-20">
-      {/* Top Navigation */}
-      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/60">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link
-            href="/browse"
-            className="flex items-center gap-2 text-[13px] font-bold text-muted-foreground hover:text-foreground transition-colors group"
-          >
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back
-            to Browse
+    <div className="min-h-screen bg-background pb-32 font-sans selection:bg-primary/20 selection:text-primary">
+      <main className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        
+        {/* Breadcrumb Navigation */}
+        <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-8">
+          <Link href="/" className="hover:text-foreground transition-colors">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
           </Link>
-          <div className="flex items-center gap-4 text-[13px] font-bold text-muted-foreground">
-            <span className="flex items-center gap-1.5">
-              <Eye className="w-4 h-4" /> {product.view_count} views
-            </span>
-            <span className="w-1 h-1 rounded-full bg-border/80" />
-            <span className="flex items-center gap-1.5">
-              <ShoppingCart className="w-4 h-4" /> {product.sales_count} sales
-            </span>
-          </div>
-        </div>
-      </header>
+          <span>/</span>
+          <Link href="/browse" className="hover:text-foreground transition-colors">Web Templates</Link>
+          <span>/</span>
+          <Link href={`/browse?category=${product.category_name}`} className="hover:text-foreground transition-colors">
+            {product.category_name || "Admin & Dashboard"}
+          </Link>
+          <span>/</span>
+          <span className="text-foreground">{product.title}</span>
+        </nav>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 lg:pt-12">
-        <div className="grid lg:grid-cols-12 gap-10 lg:gap-14">
-          {/* Left Column: Image & Details */}
-          <div className="lg:col-span-8 space-y-12">
-            {/* Product Showcase Image */}
-            <div className="relative rounded-[32px] overflow-hidden bg-background border border-border/60 shadow-sm group">
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/10 to-transparent pointer-events-none z-10" />
-              <div className="aspect-[16/10] sm:aspect-[21/9] lg:aspect-[16/10] relative flex items-center justify-center bg-secondary/30 p-4 sm:p-8">
+        <div className="grid lg:grid-cols-12 gap-8">
+          {/* Left Column: Product Information */}
+          <div className="lg:col-span-8 space-y-6">
+            
+            {/* Header Info */}
+            <div className="space-y-4">
+              <div>
+                <span className="inline-block bg-[#291752] text-[#B388FF] text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full">
+                  {product.category_name || "WEB TEMPLATE"}
+                </span>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <h1 className="text-4xl font-bold text-foreground tracking-tight">
+                  {product.title}
+                </h1>
+                <CheckCircle2 className="w-6 h-6 text-primary fill-primary/20" />
+              </div>
+              
+              <div className="flex flex-wrap items-center gap-3 text-sm font-medium text-muted-foreground">
+                <span className="flex items-center gap-1.5 hover:text-foreground transition-colors cursor-pointer">
+                  <Eye className="w-4 h-4 text-primary" /> {product.view_count.toLocaleString()} views
+                </span>
+                <span className="text-[10px]">◆</span>
+                <span className="flex items-center gap-1.5 hover:text-foreground transition-colors cursor-pointer">
+                  <ShoppingCart className="w-4 h-4 text-primary" /> {product.sales_count.toLocaleString()} sales
+                </span>
+                <span className="text-[10px]">◆</span>
+                <span className="flex items-center gap-1.5 hover:text-foreground transition-colors cursor-pointer">
+                  <Star className="w-4 h-4 text-primary" /> Add Review
+                </span>
+              </div>
+              
+              <p className="text-[15px] text-muted-foreground/90 leading-relaxed max-w-2xl pt-2">
+                {product.description}
+              </p>
+
+              {/* Tags / Tech Stack */}
+              <div className="flex flex-wrap gap-3 pt-2">
+                {(product.tech_stack?.length ? product.tech_stack : product.tags || []).slice(0, 4).map((tech, i) => (
+                  <div
+                    key={tech}
+                    className="bg-[#18181B] border border-[#27272A] text-foreground px-3.5 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 hover:border-primary/50 transition-colors cursor-default"
+                  >
+                    {i === 0 && <span className="w-2 h-2 rounded-full bg-[#339933]" />}
+                    {i === 2 && <span className="w-2 h-2 rounded-sm bg-[#F7DF1E]" />}
+                    {tech}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Product Image Gallery */}
+            <div>
+              <div className="w-full aspect-[16/9] bg-[#111113] border border-[#27272A] rounded-2xl overflow-hidden relative flex items-center justify-center p-8 group">
+                <button className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-[#18181B] border border-[#27272A] flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 transition-all z-10 opacity-0 group-hover:opacity-100">
+                  <ChevronRight className="w-5 h-5 rotate-180" />
+                </button>
+                <button className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-[#18181B] border border-[#27272A] flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 transition-all z-10 opacity-0 group-hover:opacity-100">
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+
                 {product.image_url ? (
                   <img
                     src={product.image_url}
                     alt={product.title}
-                    className="w-full h-full object-contain rounded-2xl transition-transform duration-700 group-hover:scale-[1.02]"
+                    className="w-full h-full object-contain drop-shadow-[0_0_40px_rgba(124,58,237,0.15)]"
                   />
                 ) : (
-                  <GithubIcon className="w-32 h-32 text-muted-foreground/60" />
-                )}
-              </div>
-            </div>
-
-            {/* Header Info (Mobile & Desktop) */}
-            <div>
-              <div className="flex flex-wrap items-center gap-3 mb-5">
-                <Badge
-                  variant="outline"
-                  className="border-border bg-background text-muted-foreground text-[11px] font-bold tracking-wider uppercase px-2.5 py-1"
-                >
-                  {product.category_name || "Uncategorized"}
-                </Badge>
-                {discount > 0 && (
-                  <Badge className="bg-success/20 text-success border-success/30 text-[11px] font-bold tracking-wider uppercase px-2.5 py-1">
-                    Save {discount}%
-                  </Badge>
-                )}
-              </div>
-              <h1 className="text-3xl sm:text-4xl lg:text-[44px] font-black text-foreground leading-[1.15] tracking-tight mb-5">
-                {product.title}
-              </h1>
-              <p className="text-lg text-muted-foreground font-medium leading-relaxed max-w-4xl">
-                {product.description}
-              </p>
-            </div>
-
-            {/* Content Sections */}
-            <div className="space-y-10">
-              {/* Features / Included */}
-              {product.long_description && (
-                <section>
-                  <h2 className="text-xl font-extrabold text-foreground mb-6 flex items-center gap-2">
-                    <Code2 className="w-6 h-6 text-accent" /> What&apos;s Included
-                  </h2>
-                  <div className="prose prose-slate max-w-none text-muted-foreground font-medium leading-relaxed bg-background p-8 rounded-[24px] border border-border/60 shadow-sm whitespace-pre-wrap">
-                    {product.long_description}
+                  <div className="flex flex-col items-center gap-3 text-muted-foreground">
+                    <GithubIcon className="w-16 h-16 opacity-30" />
+                    <span className="text-sm font-medium">No preview available</span>
                   </div>
-                </section>
+                )}
+              </div>
+              
+              {/* Thumbnails */}
+              <div className="flex items-center justify-center gap-3 mt-4">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div
+                    key={i}
+                    className={`w-20 h-12 rounded-lg border overflow-hidden cursor-pointer transition-all ${
+                      i === 1 ? 'border-primary ring-1 ring-primary' : 'border-[#27272A] opacity-60 hover:opacity-100'
+                    }`}
+                  >
+                    {product.image_url ? (
+                      <img src={product.image_url} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-[#18181B]" />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Bottom Full-Width Benefits Bar (Desktop layout) */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-[#111113] border border-[#27272A] rounded-2xl p-6 mt-8">
+              <div className="flex items-start gap-4">
+                <Zap className="w-5 h-5 text-primary shrink-0 mt-0.5 fill-primary/20" />
+                <div>
+                  <h4 className="text-sm font-bold text-foreground">Instant Download</h4>
+                  <p className="text-xs text-muted-foreground mt-1">Get your files instantly</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6 text-primary shrink-0 mt-0.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21.193 15.53m-15.557 2.83a9 9 0 010-12.728m0 0l2.829 2.829M5.636 5.636L2.807 8.464" />
+                </svg>
+                <div>
+                  <h4 className="text-sm font-bold text-foreground">Lifetime Access</h4>
+                  <p className="text-xs text-muted-foreground mt-1">Use forever, anywhere</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <Code2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="text-sm font-bold text-foreground">Easy to Customize</h4>
+                  <p className="text-xs text-muted-foreground mt-1">Clean & well structured</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 text-primary shrink-0 mt-0.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <div>
+                  <h4 className="text-sm font-bold text-foreground">Regular Updates</h4>
+                  <p className="text-xs text-muted-foreground mt-1">Bug fixes & improvements</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Reviews Section */}
+            <section className="pt-10">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-1 h-6 bg-primary rounded-full"></div>
+                    <h2 className="text-xl font-bold text-foreground">Customer Reviews</h2>
+                  </div>
+                  
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 bg-[#18181B] border border-[#27272A] px-3 py-1.5 rounded-full">
+                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                      <span className="text-sm font-bold text-foreground">{ratingNum.toFixed(1)}</span>
+                    </div>
+                    <span className="text-sm text-muted-foreground">
+                      Based on {product.review_count} reviews
+                    </span>
+                  </div>
+                </div>
+                
+                {eligibleOrderId && !showReviewForm && (
+                  <Button
+                    onClick={() => setShowReviewForm(true)}
+                    variant="outline"
+                    className="bg-primary/5 border-primary/30 text-primary hover:bg-primary/10 hover:text-primary hover:border-primary/50 h-10 px-5 rounded-lg font-medium text-sm transition-colors"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 mr-2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                    Write a Review
+                  </Button>
+                )}
+              </div>
+
+              {/* Review Form */}
+              {showReviewForm && (
+                <div className="mb-8 p-6 rounded-xl border border-[#27272A] bg-[#111113]">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-base font-semibold text-foreground">Write a Review</h3>
+                    <button
+                      onClick={() => setShowReviewForm(false)}
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {reviewError && (
+                    <div className="mb-6 p-4 rounded-lg bg-destructive/10 text-sm font-medium text-destructive border border-destructive/20">
+                      {reviewError}
+                    </div>
+                  )}
+                  {reviewSuccess && (
+                    <div className="mb-6 p-4 rounded-lg bg-success/10 text-sm font-medium text-success border border-success/20">
+                      {reviewSuccess}
+                    </div>
+                  )}
+
+                  <form onSubmit={handleReviewSubmit} className="space-y-5">
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-2">Rating</label>
+                      <Stars rating={reviewRating} size="w-5 h-5" interactive onRate={setReviewRating} />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-2">Title</label>
+                      <input
+                        value={reviewTitle}
+                        onChange={(e) => setReviewTitle(e.target.value)}
+                        placeholder="Summary of your experience"
+                        className="w-full rounded-lg border border-[#27272A] px-4 py-2.5 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-shadow"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-2">Review</label>
+                      <textarea
+                        rows={4}
+                        value={reviewComment}
+                        onChange={(e) => setReviewComment(e.target.value)}
+                        placeholder="What did you think of the code quality and documentation?"
+                        className="w-full rounded-lg border border-[#27272A] px-4 py-2.5 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-shadow resize-none"
+                      />
+                    </div>
+                    <div className="flex justify-end pt-2">
+                      <Button
+                        type="submit"
+                        disabled={reviewSubmitting}
+                        className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg h-10 px-6 font-medium text-sm"
+                      >
+                        {reviewSubmitting && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+                        Submit
+                      </Button>
+                    </div>
+                  </form>
+                </div>
               )}
 
-              {/* Tech Stack & Tags */}
-              <div className="grid sm:grid-cols-2 gap-8">
-                {product.tech_stack && product.tech_stack.length > 0 && (
-                  <section>
-                    <h3 className="text-sm font-bold text-foreground uppercase tracking-widest mb-4">
-                      Tech Stack
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {product.tech_stack.map((tech) => (
-                        <div
-                          key={tech}
-                          className="bg-accent/10 border border-accent/20 text-accent px-3 py-1.5 rounded-lg text-[13px] font-bold"
-                        >
-                          {tech}
-                        </div>
-                      ))}
-                    </div>
-                  </section>
-                )}
-
-                {product.tags && product.tags.length > 0 && (
-                  <section>
-                    <h3 className="text-sm font-bold text-foreground uppercase tracking-widest mb-4">
-                      Tags
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {product.tags.map((tag) => (
-                        <div
-                          key={tag}
-                          className="bg-background border border-border text-muted-foreground px-3 py-1.5 rounded-lg text-[13px] font-bold shadow-sm"
-                        >
-                          {tag}
-                        </div>
-                      ))}
-                    </div>
-                  </section>
-                )}
-              </div>
-
-              {/* Reviews Section */}
-              <section className="pt-6 border-t border-border/60">
-                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-8">
-                  <div>
-                    <h2 className="text-2xl font-extrabold text-foreground tracking-tight mb-2">
-                      Customer Reviews
-                    </h2>
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2 bg-warning/10 px-3 py-1 rounded-full border border-amber-100">
-                        <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                        <span className="font-bold text-warning">{ratingNum.toFixed(1)}</span>
-                      </div>
-                      <span className="text-sm font-bold text-muted-foreground">
-                        Based on {product.review_count} reviews
-                      </span>
-                    </div>
+              {/* Reviews List */}
+              {reviews.length === 0 ? (
+                <div className="text-center py-10 rounded-xl border border-dashed border-primary/20 bg-primary/5 flex flex-col items-center justify-center">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                    <Star className="w-5 h-5 text-primary" />
                   </div>
-
-                  {eligibleOrderId && !showReviewForm && (
-                    <Button
-                      onClick={() => setShowReviewForm(true)}
-                      className="bg-background text-foreground border border-border hover:bg-secondary/50 font-bold rounded-xl h-11 px-6 shadow-sm"
-                    >
-                      <MessageSquare className="w-4 h-4 mr-2" /> Write a Review
-                    </Button>
-                  )}
+                  <h3 className="text-base font-bold text-foreground mb-1">No reviews yet</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Be the first to review this product!
+                  </p>
                 </div>
-
-                {/* Review Form */}
-                {showReviewForm && (
-                  <div className="mb-8 p-6 rounded-[24px] border border-border bg-background shadow-sm">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-lg font-bold text-foreground">Share your experience</h3>
-                      <button
-                        onClick={() => setShowReviewForm(false)}
-                        className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-
-                    {reviewError && (
-                      <div className="mb-4 p-3 rounded-xl bg-rose-50 text-sm font-bold text-rose-700 border border-rose-100">
-                        {reviewError}
-                      </div>
-                    )}
-                    {reviewSuccess && (
-                      <div className="mb-4 p-3 rounded-xl bg-success/10 text-sm font-bold text-success border border-success/20">
-                        {reviewSuccess}
-                      </div>
-                    )}
-
-                    <form onSubmit={handleReviewSubmit} className="space-y-4">
-                      <div>
-                        <label className="block text-[13px] font-bold text-foreground mb-2">
-                          Overall Rating
-                        </label>
-                        <Stars
-                          rating={reviewRating}
-                          size="w-6 h-6"
-                          interactive
-                          onRate={setReviewRating}
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[13px] font-bold text-foreground mb-2">
-                          Title (Optional)
-                        </label>
-                        <input
-                          value={reviewTitle}
-                          onChange={(e) => setReviewTitle(e.target.value)}
-                          placeholder="Summarize your review"
-                          className="w-full rounded-xl border border-border px-4 py-3 text-sm font-medium focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-shadow bg-secondary/50 focus:bg-background"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[13px] font-bold text-foreground mb-2">
-                          Your Review
-                        </label>
-                        <textarea
-                          rows={4}
-                          value={reviewComment}
-                          onChange={(e) => setReviewComment(e.target.value)}
-                          placeholder="What did you like or dislike? What is this product best used for?"
-                          className="w-full rounded-xl border border-border px-4 py-3 text-sm font-medium focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-shadow bg-secondary/50 focus:bg-background resize-none"
-                        />
-                      </div>
-                      <div className="flex justify-end pt-2">
-                        <Button
-                          type="submit"
-                          disabled={reviewSubmitting}
-                          className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-xl h-11 px-8 shadow-lg shadow-foreground/5"
-                        >
-                          {reviewSubmitting ? (
-                            <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                          ) : null}
-                          Submit Review
-                        </Button>
-                      </div>
-                    </form>
-                  </div>
-                )}
-
-                {/* Reviews List */}
-                {reviews.length === 0 ? (
-                  <div className="text-center py-16 bg-background rounded-[24px] border border-border/60 border-dashed">
-                    <Star className="w-10 h-10 mx-auto mb-3 text-muted-foreground/80" />
-                    <h3 className="text-lg font-bold text-foreground mb-1">No reviews yet</h3>
-                    <p className="text-sm text-muted-foreground font-medium">
-                      Be the first to review this product!
-                    </p>
-                  </div>
-                ) : (
-                  <div className="grid gap-4">
-                    {reviews.map((r) => (
-                      <div
-                        key={r.id}
-                        className="p-6 rounded-[24px] bg-background border border-border/60 shadow-sm hover:shadow-md transition-shadow"
-                      >
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center font-bold text-muted-foreground">
-                              {(r.user_name || "A")[0].toUpperCase()}
-                            </div>
-                            <div>
-                              <p className="text-sm font-bold text-foreground">
-                                {r.user_name || "Anonymous User"}
-                              </p>
-                              <p className="text-xs font-medium text-muted-foreground">
-                                {new Date(r.created_at).toLocaleDateString("en-IN", {
-                                  month: "long",
-                                  day: "numeric",
-                                  year: "numeric",
-                                })}
-                              </p>
-                            </div>
+              ) : (
+                <div className="grid gap-4">
+                  {reviews.map((r) => (
+                    <div key={r.id} className="p-6 rounded-xl bg-[#111113] border border-[#27272A]">
+                      <div className="flex items-start justify-between gap-4 mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center font-medium text-sm text-foreground">
+                            {(r.user_name || "A")[0].toUpperCase()}
                           </div>
-                          <Stars rating={r.rating} size="w-4 h-4" />
+                          <div>
+                            <p className="text-sm font-medium text-foreground">
+                              {r.user_name || "Anonymous User"}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              {new Date(r.created_at).toLocaleDateString("en-IN", {
+                                month: "long",
+                                day: "numeric",
+                                year: "numeric",
+                              })}
+                            </p>
+                          </div>
                         </div>
-                        {r.title && (
-                          <h4 className="text-base font-bold text-foreground mb-2">{r.title}</h4>
-                        )}
-                        <p className="text-[15px] text-muted-foreground font-medium leading-relaxed">
-                          {r.comment}
-                        </p>
+                        <Stars rating={r.rating} size="w-3.5 h-3.5" />
                       </div>
-                    ))}
-                  </div>
-                )}
-              </section>
-            </div>
+                      {r.title && (
+                        <h4 className="text-sm font-medium text-foreground mb-2">{r.title}</h4>
+                      )}
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {r.comment}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
           </div>
 
-          {/* Right Column: Pricing & Action Card */}
+          {/* Right Column: Checkout & Summary */}
           <div className="lg:col-span-4">
-            <div className="lg:sticky lg:top-24">
-              <div className="bg-background rounded-[32px] p-6 sm:p-8 border border-border/80 shadow-lg">
-                <div className="mb-8">
-                  <p className="text-[13px] font-bold text-muted-foreground uppercase tracking-widest mb-3">
-                    License & Access
+            <div className="lg:sticky lg:top-8">
+              <div className="bg-[#111113] rounded-[1.5rem] p-6 border border-[#27272A]">
+                
+                <div className="mb-6">
+                  <p className="text-[10px] font-bold text-primary uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                    <Shield className="w-3 h-3" /> LICENSE & ACCESS
                   </p>
-                  <div className="flex items-end gap-3 flex-wrap">
-                    <span
-                      className={`text-[40px] font-black tracking-tight leading-none ${price === 0 ? "text-success" : "text-foreground"}`}
-                    >
+                  <div className="flex flex-col gap-1.5 mb-2">
+                    <span className={`text-4xl font-bold tracking-tight ${price === 0 ? "text-emerald-500" : "text-foreground"}`}>
                       {price === 0
                         ? "Free"
                         : `₹${price.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
                     </span>
-                    {origPrice && price > 0 && (
-                      <span className="text-lg text-muted-foreground font-bold line-through mb-1">
-                        ₹{origPrice.toLocaleString()}
-                      </span>
-                    )}
+                    <span className="text-sm text-muted-foreground">
+                      Forever
+                    </span>
                   </div>
-                  {discount > 0 && (
-                    <div className="inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 bg-success/10 text-success rounded-lg text-[13px] font-bold">
-                      <Zap className="w-4 h-4 fill-emerald-500 text-success" />
-                      You save ₹{(origPrice! - price).toLocaleString()}
-                    </div>
-                  )}
                 </div>
 
                 <div className="space-y-3 mb-8">
                   <Button
                     onClick={handleBuy}
                     disabled={buying}
-                    className="w-full h-14 bg-primary text-primary-foreground hover:bg-primary/90 text-base font-bold rounded-2xl shadow-lg shadow-foreground/10 transition-all hover:-translate-y-0.5"
+                    className="w-full h-12 bg-primary text-white hover:bg-primary/90 text-sm font-medium rounded-xl"
                   >
                     {buying ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
-                      <>{price === 0 ? "Download Free Code" : "Buy Now"}</>
+                      <>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 mr-2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        {price === 0 ? "Download Free Code" : "Buy Now"}
+                      </>
                     )}
                   </Button>
 
@@ -601,7 +620,7 @@ export default function ProductDetailPage() {
                     <Button
                       onClick={handleRemoveFromCart}
                       variant="outline"
-                      className="w-full h-12 border-destructive/30 text-destructive hover:bg-red-50 hover:text-red-700 rounded-2xl text-[15px] font-bold transition-colors"
+                      className="w-full h-12 border-[#27272A] bg-transparent text-muted-foreground hover:bg-[#18181B] hover:text-foreground text-sm font-medium rounded-xl"
                     >
                       <X className="w-4 h-4 mr-2" /> Remove from Cart
                     </Button>
@@ -609,67 +628,56 @@ export default function ProductDetailPage() {
                     <Button
                       onClick={handleAddToCart}
                       variant="outline"
-                      className="w-full h-12 border-border text-foreground hover:bg-secondary/50 hover:text-foreground rounded-2xl text-[15px] font-bold transition-colors"
+                      className="w-full h-12 border-[#27272A] bg-transparent text-foreground hover:bg-[#18181B] text-sm font-medium rounded-xl transition-colors"
                     >
                       <ShoppingCart className="w-4 h-4 mr-2" /> Add to Cart
                     </Button>
                   )}
                 </div>
 
-                <div className="space-y-4 pt-6 border-t border-border">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center shrink-0">
-                      <Shield className="w-4 h-4 text-success" />
+                {/* Trust Indicators */}
+                <div className="space-y-6 pt-6 border-t border-[#27272A]">
+                  <div className="flex gap-4 items-center">
+                    <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0 border border-emerald-500/20">
+                      <Shield className="w-4 h-4 text-emerald-500" />
                     </div>
                     <div>
-                      <p className="text-[13px] font-bold text-foreground">Secure Payment</p>
-                      <p className="text-[11px] font-medium text-muted-foreground">
-                        256-bit encryption
+                      <p className="text-sm font-bold text-foreground">Secure Payment</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        256-bit SSL encryption
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
-                      <Package className="w-4 h-4 text-accent" />
+                  
+                  <div className="flex gap-4 items-center">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20">
+                      <Code2 className="w-4 h-4 text-primary" />
                     </div>
                     <div>
-                      <p className="text-[13px] font-bold text-foreground">Full Source Code</p>
-                      <p className="text-[11px] font-medium text-muted-foreground">
+                      <p className="text-sm font-bold text-foreground">Full Source Code</p>
+                      <p className="text-xs text-muted-foreground mt-1">
                         Instant repository access
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center shrink-0">
-                      <Users className="w-4 h-4 text-indigo-600" />
+
+                  <div className="flex gap-4 items-center">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20">
+                      <Users className="w-4 h-4 text-primary" />
                     </div>
                     <div>
-                      <p className="text-[13px] font-bold text-foreground">Trusted by Developers</p>
-                      <p className="text-[11px] font-medium text-muted-foreground">
-                        {product.sales_count} successful purchases
+                      <p className="text-sm font-bold text-foreground">Trusted by Developers</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {product.sales_count.toLocaleString()} successful purchases
                       </p>
                     </div>
                   </div>
                 </div>
 
-                {product.demo_url && (
-                  <div className="mt-8 pt-6 border-t border-border">
-                    <a
-                      href={product.demo_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-between px-5 py-4 bg-secondary/50 hover:bg-secondary rounded-2xl transition-colors group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <ExternalLink className="w-5 h-5 text-muted-foreground group-hover:text-accent transition-colors" />
-                        <span className="text-[15px] font-bold text-foreground group-hover:text-foreground">
-                          View Live Demo
-                        </span>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-muted-foreground/80 group-hover:text-foreground group-hover:translate-x-0.5 transition-all" />
-                    </a>
-                  </div>
-                )}
+                <div className="mt-8 pt-4 border-t border-[#27272A] flex items-center justify-between text-xs font-medium text-muted-foreground">
+                  <span>License</span>
+                  <span className="text-foreground">MIT License</span>
+                </div>
               </div>
             </div>
           </div>
