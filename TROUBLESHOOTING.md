@@ -101,7 +101,7 @@ docker compose up -d
 **Resolution**
 Manually apply the initialization schema to the running database instance:
 ```bash
-docker compose exec -T postgres psql -U kodedock -d kodedock < sql/01-init.sql
+docker compose exec -T postgres psql -U kodedock -d kodedock < sql/init.sql
 ```
 
 ---
