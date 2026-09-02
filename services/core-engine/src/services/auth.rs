@@ -3,13 +3,8 @@ use argon2::{
     Argon2, PasswordHash, PasswordVerifier,
 };
 use chrono::{Duration, Utc};
-use hex::encode as hex_encode;
-use jsonwebtoken::{
-    decode as jwt_decode, encode as jwt_encode, Algorithm, DecodingKey, EncodingKey, Header,
-    Validation,
-};
+use jsonwebtoken::{encode as jwt_encode, EncodingKey, Header};
 use serde::{Deserialize, Serialize};
-use sha2::{Digest, Sha256};
 use sqlx::{FromRow, PgPool};
 use uuid::Uuid;
 
@@ -72,35 +67,17 @@ pub fn generate_token(user: &User, secret: &str) -> Result<String, String> {
     .map_err(|e| format!("Token generation error: {}", e))
 }
 
-pub fn verify_token(token: &str, secret: &str) -> Result<Claims, String> {
-    let token_data = jwt_decode::<Claims>(
-        token,
-        &DecodingKey::from_secret(secret.as_bytes()),
-        &Validation::new(Algorithm::HS256),
-    )
-    .map_err(|e| format!("Token verification error: {}", e))?;
 
-    Ok(token_data.claims)
+
+/// Encrypt a GitHub token using AES-256-GCM authenticated encryption.
+pub fn encrypt_github_token(token: &str, secret: &str) -> String {
+    crate::security::crypto::encrypt_github_token(token, secret)
 }
 
-/// Encrypt a GitHub token using a simple XOR-based encryption with the JWT secret.
-/// This provides basic obfuscation to avoid storing tokens in plaintext.
-pub fn encrypt_github_token(token: &str, secret: &str) -> String {
-    // Create a key by hashing the secret
-    let mut hasher = Sha256::new();
-    hasher.update(secret.as_bytes());
-    let key_result = hasher.finalize();
-    let key = key_result.as_slice();
-
-    // XOR the token with the key (repeating if necessary)
-    let token_bytes = token.as_bytes();
-    let mut encrypted = Vec::with_capacity(token_bytes.len());
-    for (i, byte) in token_bytes.iter().enumerate() {
-        encrypted.push(byte ^ key[i % key.len()]);
-    }
-
-    // Return as hex string for storage
-    hex_encode(encrypted)
+/// Decrypt a GitHub token using AES-256-GCM with legacy XOR fallback.
+#[allow(dead_code)]
+pub fn decrypt_github_token(encrypted_hex: &str, secret: &str) -> Result<String, String> {
+    crate::security::crypto::decrypt_github_token(encrypted_hex, secret)
 }
 
 pub async fn create_user(
@@ -111,14 +88,12 @@ pub async fn create_user(
     role: &str,
 ) -> Result<User, String> {
     let password_hash = hash_password(password)?;
-    let id = Uuid::new_v4();
 
     let user = sqlx::query_as::<_, User>(
-        r#"INSERT INTO users (id, email, password_hash, full_name, role)
-           VALUES ($1, $2, $3, $4, $5)
+        r#"INSERT INTO users (email, password_hash, full_name, role)
+           VALUES ($1, $2, $3, $4)
            RETURNING id, email, full_name, role, github_username"#,
     )
-    .bind(id)
     .bind(email)
     .bind(&password_hash)
     .bind(full_name)
@@ -270,13 +245,11 @@ pub async fn create_github_user(
     full_name: &str,
     role: &str,
 ) -> Result<User, String> {
-    let id = Uuid::new_v4();
     sqlx::query_as::<_, User>(
-        r#"INSERT INTO users (id, email, full_name, role, github_id, github_username)
-           VALUES ($1, $2, $3, $4, $5, $6)
+        r#"INSERT INTO users (email, full_name, role, github_id, github_username)
+           VALUES ($1, $2, $3, $4, $5)
            RETURNING id, email, full_name, role, github_username"#,
     )
-    .bind(id)
     .bind(email)
     .bind(full_name)
     .bind(role)
