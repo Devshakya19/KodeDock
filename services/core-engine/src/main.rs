@@ -1,5 +1,4 @@
 use actix_cors::Cors;
-use actix_governor::{Governor, GovernorConfigBuilder, KeyExtractor};
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use dotenvy::dotenv;
 use sqlx::postgres::PgPoolOptions;
@@ -8,38 +7,11 @@ mod config;
 mod handlers;
 mod middleware;
 mod models;
+mod routes;
+mod security;
 mod services;
 mod storage;
 mod utils;
-
-/// Custom key extractor that reads the client IP from X-Forwarded-For header
-/// (set by the Next.js proxy) or falls back to the direct connection IP.
-/// This ensures rate limiting applies per-user, not per-proxy-server.
-#[derive(Clone)]
-struct ForwardedIpKeyExtractor;
-
-impl KeyExtractor for ForwardedIpKeyExtractor {
-    type Key = String;
-    type KeyExtractionError = std::convert::Infallible;
-
-    fn extract(
-        &self,
-        req: &actix_web::dev::ServiceRequest,
-    ) -> Result<Self::Key, Self::KeyExtractionError> {
-        let ip = req
-            .headers()
-            .get("x-forwarded-for")
-            .and_then(|v| v.to_str().ok())
-            .and_then(|v| v.split(',').next())
-            .map(|s| s.trim().to_string())
-            .unwrap_or_else(|| {
-                req.peer_addr()
-                    .map(|addr| addr.ip().to_string())
-                    .unwrap_or_else(|| "unknown".to_string())
-            });
-        Ok(ip)
-    }
-}
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -47,64 +19,40 @@ async fn main() -> std::io::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
 
     let config = config::AppConfig::from_env();
-    let database_url = config.database_url.clone();
-    let port = config.port.to_string();
-    
-    // Initialize Redis Multiplexed Connection once
+    let port = config.port;
+    let cors_origins = config.cors_origins.clone();
+
+    // 1. Initialize Redis Multiplexed Async Connection
     let redis_client = redis::Client::open(config.redis_url.clone())
-        .expect("Invalid Redis URL");
+        .expect("Invalid Redis URL in configuration");
     let redis_multiplexed = redis_client
         .get_multiplexed_async_connection()
         .await
-        .expect("Failed to connect to Redis");
-    log::info!("Connected to Redis");
+        .expect("Failed to establish multiplexed connection to Redis");
+    log::info!("Connected to Redis multiplexed pool");
 
+    // 2. Initialize PostgreSQL Connection Pool (Optimized for High Concurrency)
     let pool = PgPoolOptions::new()
-        .min_connections(2)
-        .max_connections(20)
+        .min_connections(5)
+        .max_connections(30)
         .idle_timeout(std::time::Duration::from_secs(300))
         .max_lifetime(std::time::Duration::from_secs(1800))
         .acquire_timeout(std::time::Duration::from_secs(10))
-        .connect(&database_url)
+        .connect(&config.database_url)
         .await
-        .expect("Failed to create PostgreSQL pool");
+        .expect("Failed to connect to PostgreSQL database");
+    log::info!("Connected to PostgreSQL database pool");
+
+    // 3. Initialize S3 / Cloudflare R2 Storage Client
+    let storage = storage::StorageClient::new().await;
+    log::info!("S3/R2 Storage client initialized");
+
+    // 4. Initialize Production Rate Limiters
+    let limiters = routes::RateLimiters::new();
 
     log::info!("Starting KodeDock Core Engine on port {}", port);
-    log::info!("Connected to PostgreSQL");
 
-    let storage = storage::StorageClient::new().await;
-    log::info!("Storage client initialized");
-
-    let cors_origins = config.cors_origins.clone();
-
-    let auth_limiter = GovernorConfigBuilder::default()
-        .seconds_per_request(12)
-        .burst_size(5)
-        .key_extractor(ForwardedIpKeyExtractor)
-        .finish()
-        .expect("Failed to build auth rate limiter");
-
-    let upload_limiter = GovernorConfigBuilder::default()
-        .seconds_per_request(6)
-        .burst_size(10)
-        .key_extractor(ForwardedIpKeyExtractor)
-        .finish()
-        .expect("Failed to build upload rate limiter");
-
-    let verify_limiter = GovernorConfigBuilder::default()
-        .seconds_per_request(6)
-        .burst_size(10)
-        .key_extractor(ForwardedIpKeyExtractor)
-        .finish()
-        .expect("Failed to build verify rate limiter");
-
-    let order_limiter = GovernorConfigBuilder::default()
-        .seconds_per_request(5) // Max 1 order every 5 seconds per IP
-        .burst_size(3)
-        .key_extractor(ForwardedIpKeyExtractor)
-        .finish()
-        .expect("Failed to build order rate limiter");
-
+    // 5. Start High-Performance HTTP Server
     HttpServer::new(move || {
         let mut cors = Cors::default()
             .allowed_methods(vec!["GET", "POST", "PUT", "DELETE", "OPTIONS"])
@@ -120,318 +68,16 @@ async fn main() -> std::io::Result<()> {
         }
 
         App::new()
-            .app_data(actix_web::web::Data::new(config.clone()))
-            .app_data(actix_web::web::Data::new(config.jwt_secret.clone()))
-            .app_data(actix_web::web::Data::new(redis_multiplexed.clone()))
             .wrap(cors)
             .wrap(Logger::default())
+            .app_data(web::Data::new(config.clone()))
+            .app_data(web::Data::new(config.jwt_secret.clone()))
+            .app_data(web::Data::new(redis_multiplexed.clone()))
             .app_data(web::Data::new(pool.clone()))
             .app_data(web::Data::new(storage.clone()))
-            // Health check
-            .route("/health", web::get().to(handlers::health::health_check))
-            // HQ (Admin Control Plane)
-            .route(
-                "/api/public/categories",
-                web::get().to(handlers::hq::get_public_categories_handler),
-            )
-            .route("/api/hq/health", web::get().to(handlers::hq::health_check))
-            .route("/api/hq/setup", web::post().to(handlers::hq::setup))
-            .route("/api/hq/login", web::post().to(handlers::hq::login))
-            .route("/api/hq/me", web::get().to(handlers::hq::me))
-            .route("/api/hq/stats", web::get().to(handlers::hq::stats))
-            .route(
-                "/api/hq/products",
-                web::get().to(handlers::hq::get_products),
-            )
-            .route(
-                "/api/hq/products/{id}/status",
-                web::put().to(handlers::hq::set_product_status),
-            )
-            .route("/api/hq/users", web::get().to(handlers::hq::get_users))
-            .route(
-                "/api/hq/users/{id}/status",
-                web::put().to(handlers::hq::set_user_status),
-            )
-            .route(
-                "/api/hq/finance/stats",
-                web::get().to(handlers::hq::finance_stats),
-            )
-            .route(
-                "/api/hq/finance/withdrawals",
-                web::get().to(handlers::hq::get_withdrawals),
-            )
-            .route(
-                "/api/hq/finance/payouts",
-                web::get().to(handlers::hq::get_payout_requests),
-            )
-            .route(
-                "/api/hq/finance/payouts/{id}/process",
-                web::put().to(handlers::hq::process_payout),
-            )
-            .route(
-                "/api/hq/safety/disputes",
-                web::get().to(handlers::hq::get_disputes),
-            )
-            .route(
-                "/api/hq/safety/disputes/{id}",
-                web::put().to(handlers::hq::set_dispute_status),
-            )
-            .route(
-                "/api/hq/settings",
-                web::put().to(handlers::hq::set_settings),
-            )
-            .route(
-                "/api/hq/platform/settings",
-                web::get().to(handlers::hq::get_settings),
-            )
-            .route(
-                "/api/hq/audit-logs",
-                web::get().to(handlers::hq::get_audit_logs),
-            )
-            .route("/api/hq/staff", web::get().to(handlers::hq::get_staff))
-            .route("/api/hq/staff", web::post().to(handlers::hq::invite_staff))
-            .route(
-                "/api/hq/staff/{id}/status",
-                web::put().to(handlers::hq::set_staff_status),
-            )
-            .route(
-                "/api/hq/staff/{id}/role",
-                web::put().to(handlers::hq::set_staff_role),
-            )
-            .route(
-                "/api/hq/catalog/categories",
-                web::get().to(handlers::hq::get_categories),
-            )
-            .route(
-                "/api/hq/catalog/categories",
-                web::post().to(handlers::hq::create_category),
-            )
-            .route(
-                "/api/hq/catalog/categories/{id}",
-                web::delete().to(handlers::hq::delete_category_handler),
-            )
-            .route(
-                "/api/hq/platform/settings/{key}",
-                web::put().to(handlers::hq::update_setting),
-            )
-            .route(
-                "/api/hq/platform/integrations",
-                web::get().to(handlers::hq::get_integrations),
-            )
-            .route(
-                "/api/hq/platform/integrations/{provider}",
-                web::put().to(handlers::hq::update_integration),
-            )
-            .route(
-                "/api/hq/support/tickets",
-                web::get().to(handlers::hq::get_support_tickets),
-            )
-            .route(
-                "/api/hq/support/tickets/{id}/status",
-                web::put().to(handlers::hq::set_ticket_status),
-            )
-            // Auth (rate-limited)
-            .route(
-                "/api/auth/register",
-                web::post()
-                    .to(handlers::auth::register)
-                    .wrap(Governor::new(&auth_limiter)),
-            )
-            .route(
-                "/api/auth/login",
-                web::post()
-                    .to(handlers::auth::login)
-                    .wrap(Governor::new(&auth_limiter)),
-            )
-            .route(
-                "/api/auth/forgot-password",
-                web::post()
-                    .to(handlers::auth::forgot_password)
-                    .wrap(Governor::new(&auth_limiter)),
-            )
-            .route(
-                "/api/auth/reset-password",
-                web::post()
-                    .to(handlers::auth::reset_password)
-                    .wrap(Governor::new(&auth_limiter)),
-            )
-            .route("/api/auth/logout", web::post().to(handlers::auth::logout))
-            .route("/api/auth/me", web::get().to(handlers::auth::me))
-            .route(
-                "/api/auth/config",
-                web::get().to(handlers::auth::get_auth_config),
-            )
-            .route(
-                "/api/auth/change-password",
-                web::post().to(handlers::auth::change_password),
-            )
-            .route(
-                "/api/auth/delete-account",
-                web::delete().to(handlers::auth::delete_account),
-            )
-            .route(
-                "/api/auth/github",
-                web::post()
-                    .to(handlers::auth::github_oauth)
-                    .wrap(Governor::new(&auth_limiter)),
-            )
-            .route(
-                "/api/auth/github/link",
-                web::post()
-                    .to(handlers::auth::github_link)
-                    .wrap(Governor::new(&auth_limiter)),
-            )
-            .route(
-                "/api/auth/github/unlink",
-                web::post().to(handlers::auth::github_unlink),
-            )
-            // Profile
-            .route(
-                "/api/profile/{id}",
-                web::get().to(handlers::profile::get_profile),
-            )
-            .route(
-                "/api/profile",
-                web::put().to(handlers::profile::update_profile),
-            )
-            // Products (public)
-            .route(
-                "/api/products",
-                web::get().to(handlers::products::list_products),
-            )
-            .route(
-                "/api/products/{id}",
-                web::get().to(handlers::products::get_product),
-            )
-            // Seller products
-            .route(
-                "/api/seller/products",
-                web::get().to(handlers::seller::list_seller_products),
-            )
-            .route(
-                "/api/seller/products",
-                web::post()
-                    .to(handlers::seller::create_product)
-                    .wrap(Governor::new(&upload_limiter)),
-            )
-            .route(
-                "/api/seller/products/{id}",
-                web::put().to(handlers::seller::update_product),
-            )
-            .route(
-                "/api/seller/products/{id}",
-                web::delete().to(handlers::seller::delete_product),
-            )
-            .route(
-                "/api/seller/stats",
-                web::get().to(handlers::seller::get_stats),
-            )
-            .route(
-                "/api/seller/reviews",
-                web::get().to(handlers::seller::get_seller_reviews),
-            )
-            // Seller payout account
-            .route(
-                "/api/seller/payout-account",
-                web::get().to(handlers::payout::get_payout_account),
-            )
-            .route(
-                "/api/seller/payout-account",
-                web::post().to(handlers::payout::create_or_update_payout_account),
-            )
-            .route(
-                "/api/seller/payout-account",
-                web::delete().to(handlers::payout::delete_payout_account),
-            )
-            // Seller Notification Preferences
-            .route(
-                "/api/seller/notification-preferences",
-                web::get().to(handlers::notifications::get_preferences),
-            )
-            .route(
-                "/api/seller/notification-preferences",
-                web::post().to(handlers::notifications::update_preferences),
-            )
-            // Wallet
-            .route("/api/wallet", web::get().to(handlers::wallet::get_balance))
-            .route(
-                "/api/wallet/topup",
-                web::post().to(handlers::wallet::create_topup),
-            )
-            .route(
-                "/api/wallet/topup/verify",
-                web::post().to(handlers::wallet::verify_topup),
-            )
-            .route(
-                "/api/wallet/transactions",
-                web::get().to(handlers::wallet::list_transactions),
-            )
-            .route(
-                "/api/wallet/withdraw",
-                web::post().to(handlers::wallet::withdraw),
-            )
-            .route(
-                "/api/wallet/release-escrow",
-                web::post().to(handlers::wallet::release_escrow),
-            )
-            // Orders
-            .route(
-                "/api/orders",
-                web::post()
-                    .to(handlers::orders::create_order)
-                    .wrap(Governor::new(&order_limiter)),
-            )
-            .route(
-                "/api/orders/verify",
-                web::post()
-                    .to(handlers::orders::verify_order)
-                    .wrap(Governor::new(&verify_limiter)),
-            )
-            .route("/api/orders", web::get().to(handlers::orders::list_orders))
-            .route(
-                "/api/orders/{id}",
-                web::get().to(handlers::orders::get_order),
-            )
-            // Razorpay webhooks
-            .route(
-                "/api/webhooks/razorpay",
-                web::post().to(handlers::orders::razorpay_webhook),
-            )
-            .route(
-                "/api/webhooks/wallet-topup",
-                web::post().to(handlers::wallet::wallet_topup_webhook),
-            )
-            // Reviews
-            .route(
-                "/api/reviews/{product_id}",
-                web::get().to(handlers::reviews::list_reviews),
-            )
-            .route(
-                "/api/reviews",
-                web::post().to(handlers::reviews::create_review),
-            )
-            // Notifications
-            .route(
-                "/api/notifications",
-                web::get().to(handlers::notifications::list_notifications),
-            )
-            .route(
-                "/api/notifications/{id}/read",
-                web::put().to(handlers::notifications::mark_read),
-            )
-            .route(
-                "/api/notifications/read-all",
-                web::put().to(handlers::notifications::mark_all_read),
-            )
-            // Upload (rate-limited)
-            .route(
-                "/api/upload/presign",
-                web::post()
-                    .to(handlers::upload::presign_upload)
-                    .wrap(Governor::new(&upload_limiter)),
-            )
+            .configure(|cfg| routes::configure_routes(cfg, &limiters))
     })
-    .bind(format!("0.0.0.0:{}", port))?
+    .bind(("0.0.0.0", port))?
     .run()
     .await
 }
