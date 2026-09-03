@@ -8,12 +8,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Marketplace Browse Redesign (`/browse`):**
+  - Completely redesigned the KodeDock marketplace browse experience inspired by modern developer hub aesthetics.
+  - Implemented a persistent sticky dark sidebar (`BrowseSidebar`) featuring the official KodeDock vector logo lockup (`full-logo-light.svg`), category navigation, and live GitHub connection status widget.
+  - Created a responsive header (`BrowseHeader`) with global command search (`⌘K` / `Ctrl+K`), live wallet balance pill, cart badge drawer, wishlist shortcut, notifications trigger, and an elevated glassmorphic User Profile dropdown menu with quick stat telemetry and sub-action links.
+  - Designed an immersive Sci-Fi hero banner (`BrowseHero`) using `browse-hero.png` with gradient overlay lighting and a glassmorphic telemetry dock displaying real-time platform metrics (`Curated Assets`, `Instant Delivery`, `Escrow Protection`).
+  - Added responsive mobile navigation drawer utilizing modern accessible sheet primitives.
 - **HQ Integrations UI Overhaul:**
   - Redesigned the `Integrations` page in HQ to use an aesthetic grid of cards.
   - Implemented dynamic logo loading from `/icons/tech` for each integration card with a graceful fallback.
   - Moved configuration secrets and enable/disable toggles into a polished modal to improve focus and prevent accidental edits.
 
 ### Changed
+- **Dynamic Marketplace Data & Clean Architecture:**
+  - Connected `ProductGrid` and `BrowseFilters` directly to backend API endpoints (`/products` and `/api/proxy/public/categories`), removing all static showcase mock datasets.
+  - Upgraded `ProductCard` to render live dynamic metrics (real ratings, review counts, sales counts, and technology tags).
+  - Streamlined `(shop)/layout.tsx` to provide an isolated, distraction-free container (`bg-[#07060b]`) without duplicate legacy headers or footers.
+  - Refined navbar profile avatar and section headers by eliminating distracting status dots and standardizing typography across all controls.
 - **Core Engine Production Audit:** Applied a massive "Ponytail" refactor across `services/core-engine` to harden the backend for scale.
   - Eliminated the "Panic Bomb" where `std::env::var().expect()` was called on every incoming request for JWT verification. Secrets are now securely injected into the Actix `AppConfig` state exactly once at startup.
   - Resolved a severe file-descriptor leak in Redis. Converted per-request Redis TCP connections into a single `MultiplexedConnection` state pool.
