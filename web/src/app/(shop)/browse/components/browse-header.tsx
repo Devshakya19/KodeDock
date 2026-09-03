@@ -96,12 +96,12 @@ export function BrowseHeader({ email = "", fullName, onOpenMobileSidebar }: Brow
 
   return (
     <>
-      <header className="sticky top-0 z-30 w-full h-16 md:h-20 bg-[#08070d]/85 backdrop-blur-xl border-b border-[#1e1b2e] px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+      <header className="sticky top-0 z-30 w-full h-16 md:h-20 bg-white/85 dark:bg-[#08070d]/85 backdrop-blur-xl border-b border-slate-200 dark:border-[#1e1b2e] px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 transition-colors duration-200">
         {/* Left: Mobile Sidebar Trigger */}
         <div className="flex items-center gap-3 lg:hidden">
           <button
             onClick={onOpenMobileSidebar}
-            className="w-10 h-10 rounded-full bg-[#141220] border border-[#232038] flex items-center justify-center text-slate-300 hover:text-white transition-colors"
+            className="w-10 h-10 rounded-full bg-slate-100 dark:bg-[#141220] border border-slate-200 dark:border-[#232038] flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
             aria-label="Toggle Navigation"
           >
             <Menu className="w-5 h-5" />
@@ -111,16 +111,16 @@ export function BrowseHeader({ email = "", fullName, onOpenMobileSidebar }: Brow
         {/* Center/Left: Search Bar with Command Shortcut */}
         <form onSubmit={handleSearchSubmit} className="flex-1 max-w-xl relative group">
           <div className="relative flex items-center">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-violet-400 transition-colors" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500 group-focus-within:text-violet-600 dark:group-focus-within:text-violet-400 transition-colors" />
             <Input
               ref={searchInputRef}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search templates, UI kits, projects, boilerplates..."
-              className="h-11 pl-11 pr-16 rounded-full bg-[#110f1c] border-[#232038] text-[13px] md:text-[14px] text-white placeholder:text-slate-500 focus:border-violet-500/60 focus:ring-2 focus:ring-violet-500/20 shadow-inner transition-all w-full"
+              className="h-11 pl-11 pr-16 rounded-full bg-slate-100 dark:bg-[#110f1c] border-slate-200 dark:border-[#232038] text-[13px] md:text-[14px] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-violet-500/60 focus:ring-2 focus:ring-violet-500/20 shadow-inner transition-all w-full"
             />
             <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center pointer-events-none">
-              <kbd className="hidden sm:inline-flex items-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-400 bg-[#1a172c] border border-[#2b2744] rounded-md shadow-sm">
+              <kbd className="hidden sm:inline-flex items-center gap-0.5 px-2 py-0.5 text-[10px] font-bold text-slate-500 dark:text-slate-400 bg-white dark:bg-[#1a172c] border border-slate-200 dark:border-[#2b2744] rounded-md shadow-sm">
                 <span className="text-[11px]">⌘</span>K
               </kbd>
             </div>
@@ -132,13 +132,13 @@ export function BrowseHeader({ email = "", fullName, onOpenMobileSidebar }: Brow
           {/* Wallet Balance Pill */}
           <button
             onClick={() => setShowWallet(true)}
-            className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/25 text-violet-300 hover:text-white transition-all group shadow-sm"
+            className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-violet-50 dark:bg-violet-500/10 hover:bg-violet-100 dark:hover:bg-violet-500/20 border border-violet-200 dark:border-violet-500/25 text-violet-700 dark:text-violet-300 hover:text-violet-900 dark:hover:text-white transition-all group shadow-sm"
             title="Wallet Balance"
           >
-            <div className="w-5 h-5 rounded-full bg-violet-500/20 flex items-center justify-center text-violet-400 group-hover:scale-110 transition-transform">
+            <div className="w-5 h-5 rounded-full bg-violet-100 dark:bg-violet-500/20 flex items-center justify-center text-violet-600 dark:text-violet-400 group-hover:scale-110 transition-transform">
               <Wallet className="w-3 h-3" />
             </div>
-            <span className="text-[13px] font-bold tracking-tight text-slate-100">
+            <span className="text-[13px] font-bold tracking-tight text-slate-900 dark:text-slate-100">
               ₹{walletBalance !== null ? (walletBalance / 100).toLocaleString() : "0"}
             </span>
           </button>
@@ -146,12 +146,12 @@ export function BrowseHeader({ email = "", fullName, onOpenMobileSidebar }: Brow
           {/* Shopping Cart */}
           <button
             onClick={() => setShowCart(true)}
-            className="relative w-10 h-10 rounded-full bg-[#131122] hover:bg-[#1b1730] border border-[#26223d] hover:border-violet-500/40 flex items-center justify-center text-slate-300 hover:text-white transition-colors"
+            className="relative w-10 h-10 rounded-full bg-slate-100 dark:bg-[#131122] hover:bg-slate-200/80 dark:hover:bg-[#1b1730] border border-slate-200 dark:border-[#26223d] hover:border-violet-500/40 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
             title="Shopping Cart"
           >
             <ShoppingCart className="w-4 h-4" />
             {cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-violet-600 text-white text-[10px] font-extrabold flex items-center justify-center shadow-md shadow-violet-900/50 ring-2 ring-[#08070d]">
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-violet-600 text-white text-[10px] font-extrabold flex items-center justify-center shadow-md shadow-violet-900/50 ring-2 ring-white dark:ring-[#08070d]">
                 {cartCount}
               </span>
             )}
@@ -160,7 +160,7 @@ export function BrowseHeader({ email = "", fullName, onOpenMobileSidebar }: Brow
           {/* Wishlist Link */}
           <Link
             href="/dashboard/wishlist"
-            className="hidden sm:flex w-10 h-10 rounded-full bg-[#131122] hover:bg-[#1b1730] border border-[#26223d] hover:border-violet-500/40 items-center justify-center text-slate-300 hover:text-white transition-colors"
+            className="hidden sm:flex w-10 h-10 rounded-full bg-slate-100 dark:bg-[#131122] hover:bg-slate-200/80 dark:hover:bg-[#1b1730] border border-slate-200 dark:border-[#26223d] hover:border-violet-500/40 items-center justify-center text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
             title="Wishlist"
           >
             <Heart className="w-4 h-4" />
@@ -169,7 +169,7 @@ export function BrowseHeader({ email = "", fullName, onOpenMobileSidebar }: Brow
           {/* Notifications */}
           <button
             onClick={() => setShowNotifications(true)}
-            className="relative w-10 h-10 rounded-full bg-[#131122] hover:bg-[#1b1730] border border-[#26223d] hover:border-violet-500/40 flex items-center justify-center text-slate-300 hover:text-white transition-colors"
+            className="relative w-10 h-10 rounded-full bg-slate-100 dark:bg-[#131122] hover:bg-slate-200/80 dark:hover:bg-[#1b1730] border border-slate-200 dark:border-[#26223d] hover:border-violet-500/40 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
             title="Notifications"
           >
             <Bell className="w-4 h-4" />
@@ -179,19 +179,19 @@ export function BrowseHeader({ email = "", fullName, onOpenMobileSidebar }: Brow
           <div className="relative">
             <button
               onClick={() => setProfileOpen(!profileOpen)}
-              className="flex items-center gap-2 pl-1.5 pr-3 py-1 rounded-full bg-[#131122] hover:bg-[#1c1733] border border-[#26223d] hover:border-violet-500/50 transition-all shadow-sm group"
+              className="flex items-center gap-2 pl-1.5 pr-3 py-1 rounded-full bg-slate-100 dark:bg-[#131122] hover:bg-slate-200/80 dark:hover:bg-[#1c1733] border border-slate-200 dark:border-[#26223d] hover:border-violet-500/50 transition-all shadow-sm group"
             >
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-violet-600 to-purple-500 flex items-center justify-center text-white text-[13px] font-black shadow-md shadow-violet-900/30 ring-2 ring-[#221c38] group-hover:ring-violet-500/50 transition-all">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-violet-600 to-purple-500 flex items-center justify-center text-white text-[13px] font-black shadow-md shadow-violet-900/30 ring-2 ring-slate-200 dark:ring-[#221c38] group-hover:ring-violet-500/50 transition-all">
                 {initial}
               </div>
 
-              <span className="hidden md:inline-block text-[13px] font-bold text-slate-200 group-hover:text-white max-w-[100px] truncate">
+              <span className="hidden md:inline-block text-[13px] font-bold text-slate-800 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white max-w-[100px] truncate">
                 {firstName}
               </span>
 
               <ChevronDown
-                className={`w-3.5 h-3.5 text-slate-400 group-hover:text-violet-300 transition-transform duration-200 ${
-                  profileOpen ? "rotate-180 text-violet-400" : ""
+                className={`w-3.5 h-3.5 text-slate-500 dark:text-slate-400 group-hover:text-violet-600 dark:group-hover:text-violet-300 transition-transform duration-200 ${
+                  profileOpen ? "rotate-180 text-violet-600 dark:text-violet-400" : ""
                 }`}
               />
             </button>
@@ -200,20 +200,24 @@ export function BrowseHeader({ email = "", fullName, onOpenMobileSidebar }: Brow
             {profileOpen && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setProfileOpen(false)} />
-                <div className="absolute right-0 mt-2.5 w-[280px] bg-[#0e0c1a]/95 backdrop-blur-2xl rounded-2xl shadow-[0_20px_50px_-10px_rgba(0,0,0,0.9),0_0_30px_-5px_rgba(139,92,246,0.15)] border border-[#282244] p-2.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+                <div className="absolute right-0 mt-2.5 w-[280px] bg-white/95 dark:bg-[#0e0c1a]/95 backdrop-blur-2xl rounded-2xl shadow-[0_20px_50px_-10px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_-10px_rgba(0,0,0,0.9),0_0_30px_-5px_rgba(139,92,246,0.15)] border border-slate-200 dark:border-[#282244] p-2.5 z-50 animate-in fade-in zoom-in-95 duration-150">
                   {/* User Profile Header Card */}
-                  <div className="flex items-center gap-3 px-3 py-3 mb-2 rounded-xl bg-[#161226] border border-[#2b2446]">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-violet-600 to-purple-500 flex items-center justify-center text-white font-black text-sm shadow-md ring-2 ring-[#332a54]">
+                  <div className="flex items-center gap-3 px-3 py-3 mb-2 rounded-xl bg-slate-50 dark:bg-[#161226] border border-slate-200 dark:border-[#2b2446]">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-violet-600 to-purple-500 flex items-center justify-center text-white font-black text-sm shadow-md ring-2 ring-slate-200 dark:ring-[#332a54]">
                       {initial}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <p className="text-[13px] font-bold text-white truncate">{displayName}</p>
-                        <span className="px-1.5 py-0.2 text-[9px] font-extrabold rounded bg-violet-500/20 text-violet-300 border border-violet-500/30 uppercase">
+                        <p className="text-[13px] font-bold text-slate-900 dark:text-white truncate">
+                          {displayName}
+                        </p>
+                        <span className="px-1.5 py-0.2 text-[9px] font-extrabold rounded bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-500/30 uppercase">
                           Buyer
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-400 truncate mt-0.5">{email}</p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                        {email}
+                      </p>
                     </div>
                   </div>
 
@@ -224,12 +228,12 @@ export function BrowseHeader({ email = "", fullName, onOpenMobileSidebar }: Brow
                         setProfileOpen(false);
                         setShowWallet(true);
                       }}
-                      className="p-2 rounded-xl bg-[#130f24] border border-[#231b38] hover:border-violet-500/40 text-left transition-all group"
+                      className="p-2 rounded-xl bg-slate-50 dark:bg-[#130f24] border border-slate-200 dark:border-[#231b38] hover:border-violet-500/40 text-left transition-all group"
                     >
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                      <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                         Wallet
                       </span>
-                      <span className="text-[13px] font-extrabold text-violet-300 group-hover:text-violet-200">
+                      <span className="text-[13px] font-extrabold text-violet-700 dark:text-violet-300 group-hover:text-violet-900 dark:group-hover:text-violet-200">
                         ₹{walletBalance !== null ? (walletBalance / 100).toLocaleString() : "0"}
                       </span>
                     </button>
@@ -237,13 +241,14 @@ export function BrowseHeader({ email = "", fullName, onOpenMobileSidebar }: Brow
                     <Link
                       href="/dashboard/purchases"
                       onClick={() => setProfileOpen(false)}
-                      className="p-2 rounded-xl bg-[#130f24] border border-[#231b38] hover:border-violet-500/40 text-left transition-all group"
+                      className="p-2 rounded-xl bg-slate-50 dark:bg-[#130f24] border border-slate-200 dark:border-[#231b38] hover:border-violet-500/40 text-left transition-all group"
                     >
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                      <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                         Purchases
                       </span>
-                      <span className="text-[13px] font-extrabold text-slate-200 group-hover:text-white flex items-center gap-1">
-                        View <ArrowUpRight className="w-3 h-3 text-violet-400" />
+                      <span className="text-[13px] font-extrabold text-slate-700 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white flex items-center gap-1">
+                        View{" "}
+                        <ArrowUpRight className="w-3 h-3 text-violet-600 dark:text-violet-400" />
                       </span>
                     </Link>
                   </div>
@@ -253,54 +258,59 @@ export function BrowseHeader({ email = "", fullName, onOpenMobileSidebar }: Brow
                     <Link
                       href="/dashboard"
                       onClick={() => setProfileOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2 text-[13px] font-medium text-slate-300 hover:bg-[#1b1633] hover:text-white rounded-xl transition-colors"
+                      className="flex items-center gap-3 px-3 py-2 text-[13px] font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#1b1633] hover:text-slate-900 dark:hover:text-white rounded-xl transition-colors"
                     >
-                      <LayoutDashboard className="w-4 h-4 text-violet-400" /> Buyer Dashboard
+                      <LayoutDashboard className="w-4 h-4 text-violet-600 dark:text-violet-400" />{" "}
+                      Buyer Dashboard
                     </Link>
                     <Link
                       href="/dashboard/purchases"
                       onClick={() => setProfileOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2 text-[13px] font-medium text-slate-300 hover:bg-[#1b1633] hover:text-white rounded-xl transition-colors"
+                      className="flex items-center gap-3 px-3 py-2 text-[13px] font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#1b1633] hover:text-slate-900 dark:hover:text-white rounded-xl transition-colors"
                     >
-                      <Package className="w-4 h-4 text-violet-400" /> My Purchases
+                      <Package className="w-4 h-4 text-violet-600 dark:text-violet-400" /> My
+                      Purchases
                     </Link>
                     <Link
                       href="/dashboard/downloads"
                       onClick={() => setProfileOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2 text-[13px] font-medium text-slate-300 hover:bg-[#1b1633] hover:text-white rounded-xl transition-colors"
+                      className="flex items-center gap-3 px-3 py-2 text-[13px] font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#1b1633] hover:text-slate-900 dark:hover:text-white rounded-xl transition-colors"
                     >
-                      <Download className="w-4 h-4 text-violet-400" /> Downloads &amp; Licenses
+                      <Download className="w-4 h-4 text-violet-600 dark:text-violet-400" />{" "}
+                      Downloads &amp; Licenses
                     </Link>
                     <Link
                       href="/dashboard/wishlist"
                       onClick={() => setProfileOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2 text-[13px] font-medium text-slate-300 hover:bg-[#1b1633] hover:text-white rounded-xl transition-colors"
+                      className="flex items-center gap-3 px-3 py-2 text-[13px] font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#1b1633] hover:text-slate-900 dark:hover:text-white rounded-xl transition-colors"
                     >
-                      <Heart className="w-4 h-4 text-violet-400" /> My Wishlist
+                      <Heart className="w-4 h-4 text-violet-600 dark:text-violet-400" /> My Wishlist
                     </Link>
                   </div>
 
-                  <div className="h-px bg-gradient-to-r from-transparent via-[#282244] to-transparent my-1.5" />
+                  <div className="h-px bg-gradient-to-r from-transparent via-slate-200 dark:via-[#282244] to-transparent my-1.5" />
 
                   {/* Settings & Support */}
                   <div className="space-y-0.5">
                     <Link
                       href="/dashboard/settings"
                       onClick={() => setProfileOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2 text-[13px] font-medium text-slate-300 hover:bg-[#1b1633] hover:text-white rounded-xl transition-colors"
+                      className="flex items-center gap-3 px-3 py-2 text-[13px] font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#1b1633] hover:text-slate-900 dark:hover:text-white rounded-xl transition-colors"
                     >
-                      <Settings className="w-4 h-4 text-slate-400" /> Account Settings
+                      <Settings className="w-4 h-4 text-slate-500 dark:text-slate-400" /> Account
+                      Settings
                     </Link>
                     <Link
                       href="/contact"
                       onClick={() => setProfileOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2 text-[13px] font-medium text-slate-300 hover:bg-[#1b1633] hover:text-white rounded-xl transition-colors"
+                      className="flex items-center gap-3 px-3 py-2 text-[13px] font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#1b1633] hover:text-slate-900 dark:hover:text-white rounded-xl transition-colors"
                     >
-                      <LifeBuoy className="w-4 h-4 text-slate-400" /> Help Center
+                      <LifeBuoy className="w-4 h-4 text-slate-500 dark:text-slate-400" /> Help
+                      Center
                     </Link>
                   </div>
 
-                  <div className="h-px bg-gradient-to-r from-transparent via-[#282244] to-transparent my-1.5" />
+                  <div className="h-px bg-gradient-to-r from-transparent via-slate-200 dark:via-[#282244] to-transparent my-1.5" />
 
                   {/* Logout */}
                   <form
@@ -315,9 +325,9 @@ export function BrowseHeader({ email = "", fullName, onOpenMobileSidebar }: Brow
                   >
                     <button
                       type="submit"
-                      className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-semibold text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-colors"
+                      className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-700 dark:hover:text-rose-300 transition-colors"
                     >
-                      <LogOut className="w-4 h-4 text-rose-400" /> Log out
+                      <LogOut className="w-4 h-4 text-rose-600 dark:text-rose-400" /> Log out
                     </button>
                   </form>
                 </div>

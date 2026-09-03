@@ -28,7 +28,7 @@ export function BrowseClientShell({
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-[#07060b] text-slate-100 font-sans selection:bg-violet-500/30 selection:text-white">
+    <div className="flex min-h-screen bg-slate-50 dark:bg-[#07060b] text-slate-900 dark:text-slate-100 font-sans selection:bg-violet-500/30 selection:text-white transition-colors duration-200">
       {/* Desktop Left Sidebar (Fixed) */}
       <div className="hidden lg:block fixed inset-y-0 left-0 z-40">
         <BrowseSidebar />
@@ -36,7 +36,10 @@ export function BrowseClientShell({
 
       {/* Mobile Sidebar Sheet */}
       <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
-        <SheetContent side="left" className="p-0 w-[280px] bg-[#08070d] border-r border-[#1e1b2e]">
+        <SheetContent
+          side="left"
+          className="p-0 w-[280px] bg-white dark:bg-[#08070d] border-r border-slate-200 dark:border-[#1e1b2e]"
+        >
           <SheetTitle className="sr-only">Browse Navigation</SheetTitle>
           <BrowseSidebar isMobile={true} onCloseMobile={() => setMobileSidebarOpen(false)} />
         </SheetContent>
