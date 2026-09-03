@@ -38,10 +38,7 @@ export function BrowseClientShell({
       <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
         <SheetContent side="left" className="p-0 w-[280px] bg-[#08070d] border-r border-[#1e1b2e]">
           <SheetTitle className="sr-only">Browse Navigation</SheetTitle>
-          <BrowseSidebar
-            isMobile={true}
-            onCloseMobile={() => setMobileSidebarOpen(false)}
-          />
+          <BrowseSidebar isMobile={true} onCloseMobile={() => setMobileSidebarOpen(false)} />
         </SheetContent>
       </Sheet>
 

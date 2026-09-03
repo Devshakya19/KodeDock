@@ -18,8 +18,6 @@ import {
 import { GithubIcon } from "@/shared/components/icons/github";
 
 interface BrowseSidebarProps {
-  activeTab?: string;
-  onSelectCategory?: (category: string) => void;
   isMobile?: boolean;
   onCloseMobile?: () => void;
 }
@@ -33,12 +31,7 @@ interface NavItem {
   badge?: string;
 }
 
-export function BrowseSidebar({
-  activeTab = "browse",
-  onSelectCategory,
-  isMobile = false,
-  onCloseMobile,
-}: BrowseSidebarProps) {
+export function BrowseSidebar({ isMobile = false, onCloseMobile }: BrowseSidebarProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentCategory = searchParams.get("category") || "";
@@ -139,9 +132,7 @@ export function BrowseSidebar({
             >
               <div className="flex items-center gap-3">
                 <Icon
-                  className={`w-4 h-4 ${
-                    item.isActive ? "text-violet-400" : "text-slate-400"
-                  }`}
+                  className={`w-4 h-4 ${item.isActive ? "text-violet-400" : "text-slate-400"}`}
                 />
                 <span>{item.label}</span>
               </div>
@@ -163,7 +154,9 @@ export function BrowseSidebar({
             <div className="w-6 h-6 rounded-lg bg-[#1a172c] flex items-center justify-center text-slate-300 border border-[#2b2744]">
               <GithubIcon className="w-3.5 h-3.5 text-white" />
             </div>
-            <span className="text-[13px] font-bold text-white tracking-tight">GitHub Connected</span>
+            <span className="text-[13px] font-bold text-white tracking-tight">
+              GitHub Connected
+            </span>
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 ml-auto" />
           </div>
           <p className="text-[11px] text-slate-400 leading-relaxed mb-3">
@@ -177,8 +170,6 @@ export function BrowseSidebar({
             Configure
           </Link>
         </div>
-
-
       </div>
 
       {/* Footer Navigation Links */}
