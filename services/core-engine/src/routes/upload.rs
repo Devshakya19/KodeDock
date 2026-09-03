@@ -6,12 +6,11 @@ use crate::routes::limiters::RateLimitConfig;
 
 pub fn configure(cfg: &mut web::ServiceConfig, upload_limiter: &RateLimitConfig) {
     cfg.service(
-        web::scope("/api/upload")
-            .route(
-                "/presign",
-                web::post()
-                    .to(handlers::upload::presign_upload)
-                    .wrap(Governor::new(upload_limiter)),
-            ),
+        web::scope("/api/upload").route(
+            "/presign",
+            web::post()
+                .to(handlers::upload::presign_upload)
+                .wrap(Governor::new(upload_limiter)),
+        ),
     );
 }

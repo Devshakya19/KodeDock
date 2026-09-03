@@ -27,7 +27,6 @@ pub fn read_env_file() -> std::collections::HashMap<String, String> {
     map
 }
 
-
 use crate::models::hq::HqStaff;
 use crate::services::auth::{hash_password, verify_password};
 use chrono::{Duration, Utc};

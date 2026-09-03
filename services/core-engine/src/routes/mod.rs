@@ -13,8 +13,8 @@ pub mod webhooks;
 
 pub use limiters::RateLimiters;
 
-use actix_web::web;
 use crate::handlers;
+use actix_web::web;
 
 /// Register all application routes with their appropriate scopes and rate limiters
 pub fn configure_routes(cfg: &mut web::ServiceConfig, limiters: &RateLimiters) {

@@ -124,7 +124,10 @@ impl actix_web::FromRequest for HqAuthClaims {
     type Future = std::future::Ready<Result<Self, Self::Error>>;
 
     fn from_request(req: &HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
-        std::future::ready(require_hq_access(req).map_err(|e| actix_web::error::InternalError::from_response("", e).into()))
+        std::future::ready(
+            require_hq_access(req)
+                .map_err(|e| actix_web::error::InternalError::from_response("", e).into()),
+        )
     }
 }
 

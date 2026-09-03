@@ -34,8 +34,14 @@ pub fn configure(cfg: &mut web::ServiceConfig, auth_limiter: &RateLimitConfig) {
             .route("/logout", web::post().to(handlers::auth::logout))
             .route("/me", web::get().to(handlers::auth::me))
             .route("/config", web::get().to(handlers::auth::get_auth_config))
-            .route("/change-password", web::post().to(handlers::auth::change_password))
-            .route("/delete-account", web::delete().to(handlers::auth::delete_account))
+            .route(
+                "/change-password",
+                web::post().to(handlers::auth::change_password),
+            )
+            .route(
+                "/delete-account",
+                web::delete().to(handlers::auth::delete_account),
+            )
             .route(
                 "/github",
                 web::post()
@@ -48,6 +54,9 @@ pub fn configure(cfg: &mut web::ServiceConfig, auth_limiter: &RateLimitConfig) {
                     .to(handlers::auth::github_link)
                     .wrap(Governor::new(auth_limiter)),
             )
-            .route("/github/unlink", web::post().to(handlers::auth::github_unlink)),
+            .route(
+                "/github/unlink",
+                web::post().to(handlers::auth::github_unlink),
+            ),
     );
 }
