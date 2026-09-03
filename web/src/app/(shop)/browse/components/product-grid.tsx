@@ -73,14 +73,14 @@ export function ProductGrid({
         {Array.from({ length: 8 }).map((_, i) => (
           <div
             key={i}
-            className="animate-pulse bg-[#110f1c] p-3 rounded-[22px] border border-[#211d35]"
+            className="animate-pulse bg-white dark:bg-[#110f1c] p-3 rounded-[22px] border border-slate-200 dark:border-[#211d35] shadow-xs"
           >
-            <div className="aspect-[16/10] bg-[#1a162b] rounded-[16px] mb-3.5" />
+            <div className="aspect-[16/10] bg-slate-100 dark:bg-[#1a162b] rounded-[16px] mb-3.5" />
             <div className="px-1.5 space-y-2.5 pb-2">
-              <div className="h-3 bg-[#1e1933] rounded w-1/3" />
-              <div className="h-4 bg-[#1e1933] rounded w-3/4" />
-              <div className="h-3 bg-[#1e1933] rounded w-1/2" />
-              <div className="h-5 bg-[#1e1933] rounded w-1/4 mt-4" />
+              <div className="h-3 bg-slate-100 dark:bg-[#1e1933] rounded w-1/3" />
+              <div className="h-4 bg-slate-100 dark:bg-[#1e1933] rounded w-3/4" />
+              <div className="h-3 bg-slate-100 dark:bg-[#1e1933] rounded w-1/2" />
+              <div className="h-5 bg-slate-100 dark:bg-[#1e1933] rounded w-1/4 mt-4" />
             </div>
           </div>
         ))}
@@ -90,12 +90,12 @@ export function ProductGrid({
 
   if (products.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center bg-[#100e1c] rounded-[24px] border border-[#231f38] border-dashed">
-        <div className="w-16 h-16 rounded-2xl bg-[#1a162b] flex items-center justify-center mb-4 text-slate-500">
-          <SearchX className="w-8 h-8 text-violet-400" />
+      <div className="flex flex-col items-center justify-center py-20 text-center bg-white dark:bg-[#100e1c] rounded-[24px] border border-slate-200 dark:border-[#231f38] border-dashed shadow-xs">
+        <div className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-[#1a162b] flex items-center justify-center mb-4 text-slate-400 dark:text-slate-500">
+          <SearchX className="w-8 h-8 text-violet-600 dark:text-violet-400" />
         </div>
-        <p className="text-white text-lg font-bold mb-1">No templates found</p>
-        <p className="text-slate-400 text-[14px] max-w-sm">
+        <p className="text-slate-900 dark:text-white text-lg font-bold mb-1">No templates found</p>
+        <p className="text-slate-500 dark:text-slate-400 text-[14px] max-w-sm">
           We couldn't find any products matching your current filters. Try adjusting your search
           terms or categories.
         </p>

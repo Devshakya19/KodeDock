@@ -94,24 +94,24 @@ export function BrowseFilters({
 
   return (
     <div className="space-y-6 mb-8">
-      {/* Section Header: Trending Products ● + View All */}
+      {/* Section Header: Trending Products + View All */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-[20px] sm:text-[24px] font-black text-white tracking-tight">
+          <h2 className="text-[20px] sm:text-[24px] font-black text-slate-900 dark:text-white tracking-tight">
             {activeSearch
               ? `Search Results for "${activeSearch}"`
               : activeCategory
                 ? categories.find((c) => c.value === activeCategory)?.label || "Filtered Products"
                 : "Trending Products"}
           </h2>
-          <p className="text-[13px] sm:text-[14px] text-slate-400 font-medium mt-1">
+          <p className="text-[13px] sm:text-[14px] text-slate-500 dark:text-slate-400 font-medium mt-1">
             Handpicked digital assets loved by developers this week.
           </p>
         </div>
 
         <Link
           href="/browse"
-          className="inline-flex items-center gap-1 text-[13px] sm:text-[14px] font-bold text-violet-400 hover:text-violet-300 transition-colors group"
+          className="inline-flex items-center gap-1 text-[13px] sm:text-[14px] font-bold text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 transition-colors group"
         >
           View All
           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -131,7 +131,7 @@ export function BrowseFilters({
                 className={`px-4 py-2 text-[13px] font-bold rounded-xl whitespace-nowrap shrink-0 transition-all duration-200 ${
                   isActive
                     ? "bg-violet-600 text-white shadow-[0_0_20px_-3px_rgba(139,92,246,0.5)] border border-violet-400/40"
-                    : "bg-[#120f20] text-slate-400 hover:text-slate-200 hover:bg-[#1a162e] border border-[#231f38]"
+                    : "bg-white dark:bg-[#120f20] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#1a162e] border border-slate-200 dark:border-[#231f38] shadow-xs"
                 }`}
               >
                 {cat.label}
@@ -145,32 +145,32 @@ export function BrowseFilters({
           <div className="relative">
             <button
               onClick={() => setSortOpen(!sortOpen)}
-              className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-[13px] font-semibold text-slate-300 bg-[#120f20] hover:bg-[#1a162e] border border-[#231f38] transition-colors"
+              className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-[13px] font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-[#120f20] hover:bg-slate-100 dark:hover:bg-[#1a162e] border border-slate-200 dark:border-[#231f38] shadow-xs transition-colors"
             >
-              <span className="text-slate-400">Sort by:</span>
-              <span className="text-white font-bold">{currentSortLabel}</span>
+              <span className="text-slate-500 dark:text-slate-400">Sort by:</span>
+              <span className="text-slate-900 dark:text-white font-bold">{currentSortLabel}</span>
               <ChevronDown
-                className={`w-3.5 h-3.5 text-slate-400 transition-transform ${
+                className={`w-3.5 h-3.5 text-slate-500 dark:text-slate-400 transition-transform ${
                   sortOpen ? "rotate-180" : ""
                 }`}
               />
             </button>
 
             {sortOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-[#110f1c] rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.8)] border border-[#27233c] p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-[#110f1c] rounded-2xl shadow-xl dark:shadow-[0_10px_30px_rgba(0,0,0,0.8)] border border-slate-200 dark:border-[#27233c] p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
                 {SORT_OPTIONS.map((opt) => (
                   <button
                     key={opt.value}
                     onClick={() => handleSortChange(opt.value)}
                     className={`w-full flex items-center justify-between px-3 py-2 text-[12px] font-semibold rounded-xl transition-colors ${
                       (searchParams.get("sort") || "popular") === opt.value
-                        ? "bg-violet-600/20 text-violet-300 font-bold"
-                        : "text-slate-300 hover:bg-[#1b172e] hover:text-white"
+                        ? "bg-violet-50 dark:bg-violet-600/20 text-violet-700 dark:text-violet-300 font-bold"
+                        : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#1b172e] hover:text-slate-900 dark:hover:text-white"
                     }`}
                   >
                     <span>{opt.label}</span>
                     {(searchParams.get("sort") || "popular") === opt.value && (
-                      <Check className="w-3.5 h-3.5 text-violet-400" />
+                      <Check className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
                     )}
                   </button>
                 ))}
@@ -179,7 +179,7 @@ export function BrowseFilters({
           </div>
 
           <button
-            className="w-9 h-9 rounded-xl bg-[#120f20] hover:bg-[#1a162e] border border-[#231f38] flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+            className="w-9 h-9 rounded-xl bg-white dark:bg-[#120f20] hover:bg-slate-100 dark:hover:bg-[#1a162e] border border-slate-200 dark:border-[#231f38] shadow-xs flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
             title="Filter Settings"
           >
             <SlidersHorizontal className="w-4 h-4" />
