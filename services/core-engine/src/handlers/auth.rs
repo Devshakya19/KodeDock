@@ -195,10 +195,7 @@ pub async fn login(
     ))
 }
 
-pub async fn me(
-    pool: web::Data<PgPool>,
-    claims: crate::middleware::AuthClaims,
-) -> HttpResponse {
+pub async fn me(pool: web::Data<PgPool>, claims: crate::middleware::AuthClaims) -> HttpResponse {
     let user_id = match uuid::Uuid::parse_str(&claims.user_id) {
         Ok(id) => id,
         Err(_) => {

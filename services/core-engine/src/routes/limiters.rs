@@ -29,7 +29,8 @@ impl KeyExtractor for ForwardedIpKeyExtractor {
     }
 }
 
-pub type RateLimitConfig = GovernorConfig<ForwardedIpKeyExtractor, actix_governor::governor::middleware::NoOpMiddleware>;
+pub type RateLimitConfig =
+    GovernorConfig<ForwardedIpKeyExtractor, actix_governor::governor::middleware::NoOpMiddleware>;
 
 #[derive(Clone)]
 pub struct RateLimiters {

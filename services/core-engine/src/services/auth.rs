@@ -67,8 +67,6 @@ pub fn generate_token(user: &User, secret: &str) -> Result<String, String> {
     .map_err(|e| format!("Token generation error: {}", e))
 }
 
-
-
 /// Encrypt a GitHub token using AES-256-GCM authenticated encryption.
 pub fn encrypt_github_token(token: &str, secret: &str) -> String {
     crate::security::crypto::encrypt_github_token(token, secret)

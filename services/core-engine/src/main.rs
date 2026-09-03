@@ -23,8 +23,8 @@ async fn main() -> std::io::Result<()> {
     let cors_origins = config.cors_origins.clone();
 
     // 1. Initialize Redis Multiplexed Async Connection
-    let redis_client = redis::Client::open(config.redis_url.clone())
-        .expect("Invalid Redis URL in configuration");
+    let redis_client =
+        redis::Client::open(config.redis_url.clone()).expect("Invalid Redis URL in configuration");
     let redis_multiplexed = redis_client
         .get_multiplexed_async_connection()
         .await
