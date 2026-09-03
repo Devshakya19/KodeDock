@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Search,
@@ -11,16 +11,13 @@ import {
   Wallet,
   ChevronDown,
   Menu,
-  Sparkles,
   Package,
   Download,
   LifeBuoy,
   Settings,
   LogOut,
   LayoutDashboard,
-  Shield,
   ArrowUpRight,
-  User,
 } from "lucide-react";
 import { Input } from "@/shared/ui/input";
 import { apiGet } from "@/shared/lib/api/client";
@@ -43,14 +40,9 @@ function getCartCount(): number {
   }
 }
 
-export function BrowseHeader({
-  email = "",
-  fullName,
-  onOpenMobileSidebar,
-}: BrowseHeaderProps) {
+export function BrowseHeader({ email = "", fullName, onOpenMobileSidebar }: BrowseHeaderProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const pathname = usePathname();
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const [search, setSearch] = useState(searchParams.get("search") || "");
@@ -117,10 +109,7 @@ export function BrowseHeader({
         </div>
 
         {/* Center/Left: Search Bar with Command Shortcut */}
-        <form
-          onSubmit={handleSearchSubmit}
-          className="flex-1 max-w-xl relative group"
-        >
+        <form onSubmit={handleSearchSubmit} className="flex-1 max-w-xl relative group">
           <div className="relative flex items-center">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-violet-400 transition-colors" />
             <Input
@@ -210,10 +199,7 @@ export function BrowseHeader({
             {/* Profile Dropdown */}
             {profileOpen && (
               <>
-                <div
-                  className="fixed inset-0 z-40"
-                  onClick={() => setProfileOpen(false)}
-                />
+                <div className="fixed inset-0 z-40" onClick={() => setProfileOpen(false)} />
                 <div className="absolute right-0 mt-2.5 w-[280px] bg-[#0e0c1a]/95 backdrop-blur-2xl rounded-2xl shadow-[0_20px_50px_-10px_rgba(0,0,0,0.9),0_0_30px_-5px_rgba(139,92,246,0.15)] border border-[#282244] p-2.5 z-50 animate-in fade-in zoom-in-95 duration-150">
                   {/* User Profile Header Card */}
                   <div className="flex items-center gap-3 px-3 py-3 mb-2 rounded-xl bg-[#161226] border border-[#2b2446]">
@@ -222,9 +208,7 @@ export function BrowseHeader({
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <p className="text-[13px] font-bold text-white truncate">
-                          {displayName}
-                        </p>
+                        <p className="text-[13px] font-bold text-white truncate">{displayName}</p>
                         <span className="px-1.5 py-0.2 text-[9px] font-extrabold rounded bg-violet-500/20 text-violet-300 border border-violet-500/30 uppercase">
                           Buyer
                         </span>
@@ -345,9 +329,7 @@ export function BrowseHeader({
 
       {/* Popups */}
       {showCart && <CartPopup onClose={() => setShowCart(false)} />}
-      {showNotifications && (
-        <NotificationPopup onClose={() => setShowNotifications(false)} />
-      )}
+      {showNotifications && <NotificationPopup onClose={() => setShowNotifications(false)} />}
       {showWallet && <WalletPopup onClose={() => setShowWallet(false)} />}
     </>
   );

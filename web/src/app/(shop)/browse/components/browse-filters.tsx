@@ -89,7 +89,7 @@ export function BrowseFilters({
   }
 
   const currentSortLabel =
-    SORT_OPTIONS.find((s) => s.value === (searchParams.get("sort") || "popular"))?.label ||
+    SORT_OPTIONS.find((s) => s.value === (searchParams.get("sort") || activeSort))?.label ||
     "Popular";
 
   return (

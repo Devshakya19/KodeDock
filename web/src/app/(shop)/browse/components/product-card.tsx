@@ -98,10 +98,17 @@ export function ProductCard({
         {/* Card Body */}
         <div className="px-1.5 flex-1 flex flex-col justify-between space-y-2.5">
           <div>
-            {/* Category / Asset Type Subtitle */}
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-              {category || "Uncategorized"}
-            </span>
+            {/* Category / Asset Type Subtitle & Creator */}
+            <div className="flex items-center justify-between gap-2 mb-1">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider truncate">
+                {category || "Uncategorized"}
+              </span>
+              {seller && (
+                <span className="text-[11px] font-medium text-slate-500 truncate max-w-[110px]">
+                  by {seller}
+                </span>
+              )}
+            </div>
 
             {/* Title */}
             <h3 className="font-bold text-white text-[15px] leading-snug group-hover:text-violet-300 transition-colors line-clamp-1 mb-1">
@@ -109,9 +116,7 @@ export function ProductCard({
             </h3>
 
             {/* Tech Stack or Description */}
-            <p className="text-[12px] text-slate-400 font-medium truncate">
-              {displayTags}
-            </p>
+            <p className="text-[12px] text-slate-400 font-medium truncate">{displayTags}</p>
           </div>
 
           {/* Rating and Pricing Footer */}
@@ -122,9 +127,7 @@ export function ProductCard({
               <span className="text-[12px] font-bold text-white">
                 {rating > 0 ? rating.toFixed(1) : "0.0"}
               </span>
-              <span className="text-[11px] font-medium text-slate-500">
-                ({reviews})
-              </span>
+              <span className="text-[11px] font-medium text-slate-500">({reviews})</span>
             </div>
 
             {/* Price */}

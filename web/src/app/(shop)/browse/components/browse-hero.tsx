@@ -1,6 +1,4 @@
-"use client";
-
-import { Sparkles, GitBranch, ShieldCheck, Box, Zap } from "lucide-react";
+import { GitBranch, ShieldCheck, Box } from "lucide-react";
 import Image from "next/image";
 
 export function BrowseHero() {
