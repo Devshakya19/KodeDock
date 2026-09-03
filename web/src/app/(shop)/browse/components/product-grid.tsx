@@ -24,48 +24,63 @@ interface Product {
 interface ProductGridProps {
   searchQuery?: string;
   categoryFilter?: string;
+  sortFilter?: string;
+  priceFilter?: string;
 }
 
-export function ProductGrid({ searchQuery = "", categoryFilter = "" }: ProductGridProps) {
+export function ProductGrid({
+  searchQuery = "",
+  categoryFilter = "",
+  sortFilter = "popular",
+  priceFilter = "",
+}: ProductGridProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProducts = async () => {
+      setLoading(true);
       try {
         const params = new URLSearchParams();
         if (searchQuery) params.set("search", searchQuery);
         if (categoryFilter) params.set("category", categoryFilter);
+        if (sortFilter && sortFilter !== "popular") params.set("sort", sortFilter);
+        if (priceFilter) params.set("price", priceFilter);
 
         const qs = params.toString();
         const path = `/products${qs ? `?${qs}` : ""}`;
         const result = await apiGet<Product[]>(path);
-        if (result.success && result.data) {
+
+        if (result.success && Array.isArray(result.data)) {
           setProducts(result.data);
+        } else {
+          setProducts([]);
         }
       } catch (error) {
         console.error("Failed to fetch products:", error);
+        setProducts([]);
       } finally {
         setLoading(false);
       }
     };
 
     fetchProducts();
-  }, [searchQuery, categoryFilter]);
+  }, [searchQuery, categoryFilter, sortFilter, priceFilter]);
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
         {Array.from({ length: 8 }).map((_, i) => (
           <div
             key={i}
-            className="animate-pulse bg-background p-2 rounded-[20px] border border-border"
+            className="animate-pulse bg-[#110f1c] p-3 rounded-[22px] border border-[#211d35]"
           >
-            <div className="aspect-[4/3] bg-secondary rounded-[14px] mb-4" />
-            <div className="px-2 space-y-3 pb-2">
-              <div className="h-4 bg-secondary rounded w-3/4" />
-              <div className="h-3 bg-secondary rounded w-full" />
-              <div className="h-3 bg-secondary rounded w-1/2" />
+            <div className="aspect-[16/10] bg-[#1a162b] rounded-[16px] mb-3.5" />
+            <div className="px-1.5 space-y-2.5 pb-2">
+              <div className="h-3 bg-[#1e1933] rounded w-1/3" />
+              <div className="h-4 bg-[#1e1933] rounded w-3/4" />
+              <div className="h-3 bg-[#1e1933] rounded w-1/2" />
+              <div className="h-5 bg-[#1e1933] rounded w-1/4 mt-4" />
             </div>
           </div>
         ))}
@@ -75,21 +90,21 @@ export function ProductGrid({ searchQuery = "", categoryFilter = "" }: ProductGr
 
   if (products.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 text-center bg-background rounded-[24px] border border-border border-dashed">
-        <div className="w-20 h-20 rounded-full bg-secondary/50 flex items-center justify-center mb-6">
-          <SearchX className="w-10 h-10 text-muted-foreground/80" />
+      <div className="flex flex-col items-center justify-center py-20 text-center bg-[#100e1c] rounded-[24px] border border-[#231f38] border-dashed">
+        <div className="w-16 h-16 rounded-2xl bg-[#1a162b] flex items-center justify-center mb-4 text-slate-500">
+          <SearchX className="w-8 h-8 text-violet-400" />
         </div>
-        <p className="text-foreground text-xl font-bold mb-2">No templates found</p>
-        <p className="text-muted-foreground text-[15px] max-w-sm">
-          We couldn't find any products matching your current search filters. Try adjusting your
-          search terms.
+        <p className="text-white text-lg font-bold mb-1">No templates found</p>
+        <p className="text-slate-400 text-[14px] max-w-sm">
+          We couldn't find any products matching your current filters. Try adjusting your search
+          terms or categories.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
       {products.map((product) => (
         <ProductCard
           key={product.id}
@@ -100,12 +115,13 @@ export function ProductGrid({ searchQuery = "", categoryFilter = "" }: ProductGr
           originalPrice={
             product.original_price_paise ? product.original_price_paise / 100 : undefined
           }
-          category={product.category_name || "Uncategorized"}
-          seller={product.seller_name || "Unknown"}
-          rating={product.rating}
-          reviews={product.review_count}
+          category={product.category_name || product.category?.name || "Uncategorized"}
+          seller={product.seller_name || "Creator"}
+          rating={product.rating || 0}
+          reviews={product.review_count || 0}
           image={product.image_url || undefined}
           tags={product.tags || []}
+          salesCount={product.sales_count || 0}
         />
       ))}
     </div>
