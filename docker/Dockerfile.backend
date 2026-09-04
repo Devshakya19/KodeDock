@@ -1,0 +1,52 @@
+# =============================================================
+# Stage 1: Build Optimized Rust Release Binary
+# =============================================================
+FROM rust:1.80-slim-bullseye AS builder
+
+WORKDIR /app
+
+# Install system dependencies for compiling OpenSSL and C bindings
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    pkg-config \
+    libssl-dev \
+    git \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy workspace manifest and source code
+COPY Cargo.toml Cargo.lock ./
+COPY src ./src
+
+# Build release binary with optimization
+RUN cargo build --release
+
+# =============================================================
+# Stage 2: Ultra-Lightweight Production Runtime (< 35MB)
+# =============================================================
+FROM debian:bullseye-slim AS runner
+
+WORKDIR /app
+
+# Install runtime dependencies (OpenSSL, CA certificates, and Git for cloner worker)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    libssl1.1 \
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy compiled binary from builder stage
+COPY --from=builder /app/target/release/kodedock /app/kodedock
+
+# Non-root user for security
+RUN useradd -m -u 1001 -U -s /bin/sh kodedock && \
+    chown -R kodedock:kodedock /app
+
+USER kodedock
+
+ENV RUST_LOG=info
+ENV PORT=8080
+
+EXPOSE 8080
+
+CMD ["/app/kodedock"]
