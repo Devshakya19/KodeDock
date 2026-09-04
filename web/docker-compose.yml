@@ -1,0 +1,27 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:4001
+        NEXT_PUBLIC_GITHUB_CLIENT_ID: ${NEXT_PUBLIC_GITHUB_CLIENT_ID:-}
+    container_name: web
+    ports:
+      - "3000:3000"
+    environment:
+      - TZ=Asia/Kolkata
+      - NEXT_PUBLIC_API_URL=http://localhost:4001
+      - CORE_ENGINE_URL=http://core:4001
+      - REALTIME_URL=http://realtime:4004
+      - JWT_SECRET=${JWT_SECRET:-kodedock-super-secret-jwt-key-change-in-production-2024}
+      - SEAWEEDFS_URL=http://seaweedfs:8333
+      - SEAWEEDFS_FILER_URL=http://seaweedfs:8888
+    networks:
+      - default
+    restart: unless-stopped
+
+networks:
+  default:
+    name: kodedock-network
+    external: true

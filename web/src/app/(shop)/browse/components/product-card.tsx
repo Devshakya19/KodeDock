@@ -146,11 +146,10 @@ export function ProductCard({
                 </span>
               )}
               <span
-                className={`text-[16px] font-black tracking-tight ${
-                  price === 0
+                className={`text-[16px] font-black tracking-tight ${price === 0
                     ? "text-emerald-600 dark:text-emerald-400"
                     : "text-slate-900 dark:text-white"
-                }`}
+                  }`}
               >
                 {price === 0 ? "Free" : `₹${price}`}
               </span>
