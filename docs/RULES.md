@@ -1,357 +1,154 @@
-# KodeDock — Rules & Conventions
-
-> Consistency is key. Every developer should follow these rules to keep the codebase professional.
-
----
-
-## Table of Contents
-1. [Folder Structure Rules](#1-folder-structure-rules)
-2. [Naming Conventions](#2-naming-conventions)
-3. [Code Style Rules](#3-code-style-rules)
-4. [Git Rules](#4-git-rules)
-5. [API Design Rules](#5-api-design-rules)
-6. [Database Rules](#6-database-rules)
-7. [Security Rules](#7-security-rules)
-8. [Performance Rules](#8-performance-rules)
-9. [Testing Rules](#9-testing-rules)
-10. [Documentation Rules](#10-documentation-rules)
-11. [Environment Variables](#11-environment-variables)
+# 📜 KodeDock Engineering & Architectural Rules (RULES.md)
+**Document Version:** 1.0.0  
+**Status:** Mandatory Engineering Standard  
+**Applies To:** All Engineers, Contributors, AI Coding Agents & Code Reviewers  
 
 ---
 
-## 1. Folder Structure Rules
+## 🏛️ Purpose of This Document
+This document defines the **Non-Negotiable Engineering Rules, Invariants, and Coding Standards** for the KodeDock codebase. Every line of code added to this repository must strictly adhere to these rules to guarantee:
+1. **Financial Integrity & Zero Double-Spending**
+2. **Bank-Grade Security & Zero Vulnerabilities**
+3. **Zero Server Crash & Low-Memory Efficiency**
+4. **Clean, Modular, Self-Contained Domain Architecture**
 
-### Frontend (Next.js)
+---
 
-```mermaid
-flowchart LR
-    src --> features
-    src --> shared
-    src --> app
-    src --> middleware.ts
-    
-    features --> featureA[<feature>]
-    featureA --> components
-    featureA --> pages
-    featureA --> page.tsx
-    featureA --> index.ts
-    
-    shared --> sh_components[components]
-    shared --> sh_ui[ui]
-    shared --> sh_lib[lib]
-    shared --> sh_hooks[hooks]
-```
+## 💳 Rule 1: Fintech & Financial Ledger Invariants
 
-**Rule:** Never put feature-specific code in `shared/`. Never put shared code in `features/`.
+### 1.1 The Zero Floating-Point Law
+* ❌ **FORBIDDEN:** Never use `f32`, `f64`, `float`, or `double` for prices, escrow balances, fees, TDS taxes, or payouts.
+* ✅ **MANDATORY:** Always use integer **Paise / Cents** (`i64` in Rust, `BIGINT` in PostgreSQL).
+  - $₹1.00 = 100\text{ Paise}$
+  - $\$1.00 = 100\text{ Cents}$
+  - Example: `base_price_paise: i64 = 49900; // ₹499.00`
 
-### Backend (Per Service)
+### 1.2 Double-Entry Journal Invariant
+* Every monetary transaction MUST insert balanced debit and credit rows into `ledger_entries`.
+* The platform invariant must always hold:
+  $$\sum \text{Debits} - \sum \text{Credits} = 0$$
 
-```
+### 1.3 Atomic Row-Level Locking on Balances
+* Balance modifications (checkout, escrow release, refund, withdrawal) must ALWAYS be wrapped in an explicit SQL transaction with row-level locks:
+  ```sql
+  SELECT id, available_balance_paise, pending_escrow_paise 
+  FROM user_accounts 
+  WHERE user_id = $1 
+  FOR UPDATE;
+  ```
+
+### 1.4 Webhook Idempotency
+* Webhooks from payment gateways (Razorpay, Stripe) must be verified via HMAC-SHA256 signature and recorded in `webhook_events(provider, event_id)` with a database unique constraint. Duplicate webhook deliveries must return `HTTP 200 OK` immediately without re-executing ledger operations.
+
+---
+
+## 🔐 Rule 2: Security & Authentication Rules
+
+### 2.1 Password Security
+* Passwords must NEVER be logged, transmitted in plaintext, or hashed with MD5/SHA256/Bcrypt.
+* Passwords must ALWAYS be hashed using **Argon2id** (64MB memory, 3 iterations, 4 parallelism).
+
+### 2.2 Short-Lived Access Tokens & Refresh Rotation
+* Access JWTs must expire within **15 minutes**.
+* Refresh tokens must follow **Token Family Rotation**:
+  - Each refresh token can be used exactly **once**.
+  - If a consumed token is presented again (indicating token replay/theft), the entire token family must be **purged immediately**, revoking all active sessions for that user.
+
+### 2.3 Two-Factor Authentication (TOTP 2FA)
+* Payout bank account changes, UPI ID updates, and large withdrawals (> ₹10,000) **require mandatory TOTP 2FA verification (RFC 6238)**.
+* TOTP secrets in the database must be encrypted with **AES-256-GCM**.
+
+### 2.4 Rate Limiting & Anti-Brute Force
+* All public HTTP endpoints must be protected with rate limiting (`actix-governor`).
+* General endpoints: Maximum 100 requests/minute per IP.
+* Auth endpoints (`/login`, `/signup`, `/refresh`): Maximum 10 requests/minute per IP.
+
+---
+
+## 🦀 Rule 3: Zero-Crash & Rust Best Practices
+
+### 3.1 The Zero-`unwrap()` Law
+* ❌ **FORBIDDEN:** Never use `.unwrap()` or `.expect()` in request handlers, background jobs, or production code paths.
+* ✅ **MANDATORY:** Always propagate errors using the `?` operator and return typed domain errors (`Result<T, AppError>`).
+
+### 3.2 Bounded Asynchronous Queues
+* ❌ **FORBIDDEN:** Unbounded channels (`tokio::sync::mpsc::unbounded_channel()`) are banned because traffic spikes can cause Out-Of-Memory (OOM) crashes.
+* ✅ **MANDATORY:** Always use bounded channels with fixed capacity (e.g., `tokio::sync::mpsc::channel(1024)`).
+
+### 3.3 Zero-Memory File Streaming (64KB Chunks)
+* Never load large files (> 5MB) into server RAM with `std::fs::read` or `tokio::fs::read`.
+* Always use **64KB streaming buffers** (`AsyncReadExt::read_buf`) or **S3 Presigned Direct Uploads/Downloads**.
+
+---
+
+## 📁 Rule 4: Clean Modular Domain Architecture
+
+### 4.1 Strict Domain Encapsulation
+Every backend feature must live in its dedicated domain module under `src/`:
+```text
 src/
-├── handlers/          # Request handlers / controllers
-├── models/            # Data models / schemas
-├── services/          # Business logic
-├── middleware/         # Auth, validation, rate limiting
-├── utils/             # Helper functions
-└── main.rs/go/app.py  # Entry point
+├── auth/           # Identity, JWT, Token Family Rotation, TOTP 2FA
+├── marketplace/    # Products, Versions, pgvector Semantic Search
+├── fintech/        # 7-Day Escrow, Double-Entry Ledger, Webhooks
+├── tax/            # 1% TDS (Sec 194-O), GST Calculation, PDF Invoices
+├── storage/        # Presigned S3 Tickets, Vault DRM, Streaming
+├── security/       # Tree-Sitter AST & Secret Leak Scanner
+├── realtime/       # Tokio Async WebSockets (Chat, Notifications)
+└── jobs/           # Tokio Distributed Cron Schedulers
 ```
+
+### 4.2 Layer Responsibilities:
+1. **`handlers.rs`:** Only parses incoming HTTP requests, checks permissions, calls service functions, and formats HTTP responses. **Zero business logic.**
+2. **`service.rs`:** Contains 100% of business logic, validations, calculations, and domain orchestrations.
+3. **`repository.rs`:** Contains SQLx database queries. **No raw string queries with `format!()` (prevents SQL injection).**
+4. **`models.rs`:** Contains pure Rust structs and serde serialization definitions.
 
 ---
 
-## 2. Naming Conventions
+## 💾 Rule 5: Multi-Asset Storage & Security
 
-### Files
+### 5.1 Bucket Separation
+* **Public Bucket (`kodedock-public-assets`):** Avatars, thumbnails, video previews, public markdown documentation. Cached globally via CDN.
+* **Vault Bucket (`kodedock-vault-deliverables`):** Paid deliverables (ZIPs, `.blend`, `.obj`, game packs). **Private by default, AES-256 encrypted at rest.**
 
-| Type | Convention | Example |
-|------|-----------|---------|
-| React Components | `kebab-case.tsx` | `product-card.tsx` |
-| Utilities | `kebab-case.ts` | `use-mobile.ts` |
-| Page files | `page.tsx` | `app/browse/page.tsx` |
-| Layout files | `layout.tsx` | `app/seller/layout.tsx` |
-| API routes | `route.ts` | `app/api/auth/callback/route.ts` |
-| Index files | `index.ts` | `features/browse/index.ts` |
-
-### Components
-
-| Type | Convention | Example |
-|------|-----------|---------|
-| Component files | `kebab-case` | `product-card.tsx` |
-| Component names | `PascalCase` | `ProductCard` |
-| Props interfaces | `PascalCase + Props` | `ProductCardProps` |
-| Default exports | Named function | `export function ProductCard()` |
-
-### Variables & Functions
-
-| Type | Convention | Example |
-|------|-----------|---------|
-| Variables | `camelCase` | `userName`, `isSelected` |
-| Functions | `camelCase` | `getUserRole()`, `formatPrice()` |
-| Constants | `UPPER_SNAKE_CASE` | `ROLES`, `API_URL` |
-| Types/Interfaces | `PascalCase` | `UserRole`, `ProductCardProps` |
-
-### Routes
-
-| Type | Convention | Example |
-|------|-----------|---------|
-| Pages | `kebab-case` | `/seller/products/new` |
-| API routes | `kebab-case` | `/api/auth/callback` |
-| Dynamic routes | `[param]` | `/products/[id]` |
+### 5.2 Paid Download Protection
+* Deliverables can **NEVER** have public read access.
+* Downloads are only permitted via **15-minute temporary presigned URLs** generated after verifying database purchase ownership and active buyer session.
 
 ---
 
-## 3. Code Style Rules
+## ⚖️ Rule 6: Tax & Compliance Rules
 
-### TypeScript
+### 6.1 Indian Section 194-O TDS
+* Exactly **1.0% TDS** must be deducted on the gross transaction amount for Indian resident creators.
+* Seller PAN card number must be recorded and validated using regex format `[A-Z]{5}[0-9]{4}[A-Z]{1}`.
 
-```typescript
-// ✅ DO: Use explicit types for function parameters
-function formatPrice(price: number): string {
-  return `₹${price}`;
-}
-
-// ✅ DO: Use interface for props
-interface ProductCardProps {
-  title: string;
-  price: number;
-}
-
-// ❌ DON'T: Use `any`
-const data: any = {};
-
-// ❌ DON'T: Use `var`
-var x = 1;
-```
-
-### React
-
-```typescript
-// ✅ DO: Use functional components
-export function ProductCard({ title }: ProductCardProps) {
-  return <div>{title}</div>;
-}
-
-// ✅ DO: Use proper imports
-import { Button } from "@/shared/ui/button";
-
-// ❌ DON'T: Use class components
-class ProductCard extends React.Component {}
-```
-
-### CSS/Tailwind
-
-```tsx
-// ✅ DO: Use Tailwind classes
-<div className="flex items-center gap-4">
-
-// ✅ DO: Use cn() for conditional classes
-className={cn("base-class", isActive && "active-class")}
-
-// ❌ DON'T: Use inline styles
-<div style={{ display: "flex" }}>
-```
+### 6.2 Goods & Services Tax (GST)
+* Intrastate sales: 9% CGST + 9% SGST.
+* Interstate sales: 18% IGST.
+* Export sales: 0% Zero-rated GST.
+* System must generate a sequentially numbered PDF tax invoice for every order.
 
 ---
 
-## 4. Git Rules
+## 🌐 Rule 7: Web Frontend & UI Standards
 
-### Git Workflow
+### 7.1 Server Components for SEO
+* Public marketplace pages (`/`, `/explore`, `/p/[slug]`) must use Next.js **Server Components (SSR)** to guarantee 100/100 Google Lighthouse SEO scores.
 
-```mermaid
-gitGraph
-    commit id: "Initial commit"
-    branch develop
-    checkout develop
-    commit id: "Setup project"
-    branch feature/product-listing
-    checkout feature/product-listing
-    commit id: "Add product cards"
-    commit id: "Integrate API"
-    checkout develop
-    merge feature/product-listing
-    branch fix/login-redirect
-    checkout fix/login-redirect
-    commit id: "Fix redirect logic"
-    checkout develop
-    merge fix/login-redirect
-    checkout main
-    merge develop tag: "v1.0.0"
-    branch hotfix/payment-crash
-    checkout hotfix/payment-crash
-    commit id: "Fix critical payment bug"
-    checkout main
-    merge hotfix/payment-crash tag: "v1.0.1"
-```
+### 7.2 Client Component Discipline
+* `'use client'` must only be used when stateful browser interactivity is strictly required (Monaco Editor, WebContainers VM, Three.js 3D Canvas, Realtime WebSockets).
 
-### Branch Naming
-
-| Type | Pattern | Example |
-|------|---------|---------|
-| Feature | `feature/<name>` | `feature/product-listing` |
-| Bug fix | `fix/<name>` | `fix/login-redirect` |
-| Hotfix | `hotfix/<name>` | `hotfix/payment-crash` |
-| Refactor | `refactor/<name>` | `refactor/auth-flow` |
-
-### Commit Messages
-
-```
-<type>: <description>
-
-Types:
-  feat:     New feature
-  fix:      Bug fix
-  docs:     Documentation
-  style:    Code style (formatting, no logic change)
-  refactor: Code refactoring
-  test:     Adding tests
-  chore:    Build/config changes
-
-Examples:
-  feat: add product listing page
-  fix: redirect after login for sellers
-  docs: update architecture document
-```
-
-### Pull Requests
-
-- Title: Clear description of changes
-- Description: What changed and why, impact, testing instructions.
-- Link to issue if applicable
-- Self-review before requesting review
+### 7.3 Accessibility & Design
+* All UI components must use **Shadcn UI (Radix Primitives)** with full keyboard navigation (`Tab`, `Esc`, `Enter`), ARIA attributes, and dark-mode support.
 
 ---
 
-## 5. API Design Rules
+## 🚀 Rule 8: Deployment & Container Discipline
 
-### REST Endpoints
-
-```
-GET    /api/products          # List products
-GET    /api/products/:id      # Get product
-POST   /api/products          # Create product
-PUT    /api/products/:id      # Update product
-DELETE /api/products/:id      # Delete product
-
-GET    /api/orders            # List orders
-POST   /api/orders            # Create order
-GET    /api/orders/:id        # Get order
-
-GET    /api/wallet            # Get wallet balance
-POST   /api/wallet/topup      # Top up wallet
-```
-
-### Response Format
-
-```json
-{
-  "success": true,
-  "data": { ... },
-  "message": "Product created successfully"
-}
-
-{
-  "success": false,
-  "error": "Insufficient balance",
-  "code": "INSUFFICIENT_BALANCE"
-}
-```
-
-### Status Codes
-
-| Code | Meaning |
-|------|---------|
-| 200 | Success |
-| 201 | Created |
-| 400 | Bad Request |
-| 401 | Unauthorized |
-| 403 | Forbidden |
-| 404 | Not Found |
-| 500 | Internal Server Error |
-
----
-
-## 6. Database Rules
-
-### Table Naming
-
-- Plural: `products`, `orders`, `users`
-- Snake case: `wallet_transactions`, `order_items`
-
-### Column Naming
-
-- Snake case: `created_at`, `user_id`, `price_paise`
-- Primary keys: `id` (UUID)
-- Foreign keys: `<table>_id` (e.g., `user_id`, `product_id`)
-
-### Monetary Values
-
-- Always store as integers in paise (not decimals)
-- `price_paise: 49900` = ₹499.00
-- Never use floating point for money
-
----
-
-## 7. Security Rules
-
-1. **Never expose** service-role keys to the frontend
-2. **Always verify** JWT tokens on every API request
-3. **Validate** all inputs on the backend
-4. **Validate** all inputs with Zod on the frontend
-5. **Rate limit** all API endpoints (especially Auth and Payments)
-6. **Sanitize** user inputs to prevent XSS
-7. **Use HTTPS** everywhere in production
-8. **Encrypt** sensitive data (GitHub tokens, API keys)
-
----
-
-## 8. Performance Rules
-
-1. **Avoid N+1 Queries**: Always use JOINs or data loaders in Rust/Python when fetching relationships (e.g., fetching products and their seller profiles).
-2. **Use Connection Pools**: Ensure every backend service connects to PostgreSQL through a connection pool (e.g., `sqlx::PgPool` in Rust).
-3. **Pagination**: Always paginate list endpoints (`/api/products`, `/api/orders`) using cursor or limit/offset strategy.
-4. **Caching**: Cache immutable or slow-changing data (like categories) in Redis.
-5. **Debouncing**: Debounce high-frequency frontend actions (like search input typing).
-
----
-
-## 9. Testing Rules
-
-1. **Frontend Testing**: Use `npm test` for running Jest/Vitest tests. Critical components should have unit tests.
-2. **Backend Testing (Rust)**: Use `cargo test` for unit testing models, services, and utils.
-3. **Integration Tests**: Critical paths like payment flow and GitHub repo transfer must have end-to-end integration tests.
-4. **Test Independence**: Tests should not rely on existing data; mock external dependencies appropriately.
-
----
-
-## 10. Documentation Rules
-
-1. **Code Documentation**: Complex functions, custom hooks, and core backend logic should have inline comments explaining *why*, not *what*.
-2. **API Handlers**: Document every API handler endpoint in Rust/Go/Python using appropriate docstrings specifying expected parameters and returns.
-3. **READMEs**: Every microservice must contain a `README.md` describing how to run, test, and configure the service.
-4. **JSDoc/Rustdoc**: Use `///` in Rust and `/** */` in TypeScript for public library functions.
-
----
-
-## 11. Environment Variables
-
-### Rule: Never commit .env files
-
-```gitignore
-.env
-.env.local
-.env.*.local
-```
-
-### Rule: Document all env vars
-
-```env
-# .env.example (committed to git)
-NEXT_PUBLIC_API_URL=http://localhost:4001
-```
-
-### Rule: Dynamic Fetching for Public Keys
-
-Instead of relying on build-time `NEXT_PUBLIC_` hardcoding for sensitive public keys, explicitly mandate **Dynamic Fetching**. Fetch these keys at runtime via the `/api/auth/config` endpoint. This ensures configurations remain live and secure without needing full rebuilds.
-
----
-
-*Document Version: 1.7.0 | Last Updated: August 2026*
+### 8.1 The 1-Command Deployment Invariant
+* The entire platform must always be deployable via:
+  ```bash
+  docker compose up --build -d
+  ```
+* PostgreSQL migrations in `docker/migrations/` must be idempotent and apply automatically on initial container boot without requiring manual developer intervention.

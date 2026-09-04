@@ -1,219 +1,37 @@
-# KodeDock — Enterprise Security Policy & Vulnerability Disclosure
+# 🛡️ Security Policy
 
-This document outlines KodeDock's enterprise-grade security architecture, threat mitigation strategies, responsible disclosure processes, and operational security guidelines. All implementations described herein are grounded in the active codebase and align with industry best practices, including ISO/IEC 27001, SOC 2, and GDPR standards.
+## Supported Versions
+We actively release security patches and updates for the following versions of KodeDock:
 
----
-
-## Table of Contents
-
-1. [Vulnerability Disclosure & Bug Bounty](#vulnerability-disclosure--bug-bounty)
-2. [Supported Versions & Lifecycle](#supported-versions--lifecycle)
-3. [Authentication, Authorization & Access Control](#authentication-authorization--access-control)
-4. [Data Protection & Cryptography](#data-protection--cryptography)
-5. [Network, Infrastructure & Cloud Security](#network-infrastructure--cloud-security)
-6. [Application Security & DevSecOps](#application-security--devsecops)
-7. [Payment Security & PCI-DSS Scope](#payment-security--pci-dss-scope)
-8. [Threat Mitigation Strategies](#threat-mitigation-strategies)
-9. [Incident Response & Data Breach Policy](#incident-response--data-breach-policy)
-10. [Compliance, Privacy & Data Retention](#compliance-privacy--data-retention)
-11. [Monitoring, Logging & Audit](#monitoring-logging--audit)
-12. [Known Limitations & Security Roadmap](#known-limitations--security-roadmap)
+| Version | Supported          |
+| :---    | :---               |
+| 1.x.x   | :white_check_mark: |
+| < 1.0.0 | :x:                |
 
 ---
 
-## Vulnerability Disclosure & Bug Bounty
-
-**Do not open public GitHub issues for security vulnerabilities.**
-
-KodeDock is committed to working with security researchers. If you discover a security vulnerability, please disclose it responsibly. 
-
-| Channel | Details |
-|---------|---------|
-| 📧 **Email** | security@kodedock.com |
-| 🔐 **Encryption** | PGP key available on request |
-| ⏱️ **Response SLA** | Initial acknowledgement within **48 hours** |
-| 🏁 **Resolution Target** | Critical issues patched within **7 days** |
-
-### Disclosure Policy (Coordinated Disclosure)
-We ask that you:
-1. Give us reasonable time to investigate and patch before any public disclosure.
-2. Avoid accessing, modifying, or deleting user data during testing.
-3. Refrain from automated scanning that degrades service availability (e.g., DoS/DDoS).
-
-We will publicly credit researchers who report valid, previously unknown vulnerabilities (unless anonymity is preferred). 
+## 🔒 Security Architecture Highlights
+KodeDock enforces bank-grade security across every layer:
+1. **Password Hashing:** Argon2id (64MB memory cost, 3 iterations, 4 parallelism).
+2. **Session Security:** 15-minute Access JWTs + 7-Day Refresh Token Family Rotation with automatic replay/theft revocation.
+3. **Sensitive Data Encryption:** Database TOTP 2FA secret keys, PAN numbers, and payout bank details are encrypted at rest with **AES-256-GCM**.
+4. **Codebase Protection:** Pre-publish Tree-Sitter AST & Aho-Corasick Regex scanner detecting leaked AWS keys, Stripe tokens, and private SSH/RSA keys.
+5. **Fintech Integrity:** Row-level locks (`SELECT ... FOR UPDATE`) and double-entry integer paise accounting preventing race conditions and double-spending.
 
 ---
 
-## Supported Versions & Lifecycle
+## 🚨 Reporting a Vulnerability
 
-| Version | Status | Security Updates |
-|---------|--------|-----------------|
-| **v1.3.x** (current) | ✅ Active | Yes |
-| v1.2.x | ⚠️ Maintenance | Critical fixes only |
-| < v1.2.0 | ❌ End-of-life | No |
+We take the security of KodeDock, our creators, and our buyers extremely seriously. If you discover a security vulnerability, please follow our **Responsible Disclosure Policy**:
 
----
+### How to Report:
+1. **Do NOT open a public GitHub issue.**
+2. Send an email with full technical details, reproduction steps, and proof-of-concept (PoC) to:
+   - 📧 **`security@kodedock.internal`** (or through private repository security advisories).
+3. If reporting cryptographic or financial vulnerabilities, please include relevant transaction IDs or trace headers.
 
-## Authentication, Authorization & Access Control
-
-### JWT Token Handling
-- **Algorithm**: HS256 (HMAC-SHA256)
-- **Storage**: HttpOnly cookies — never exposed to browser JavaScript.
-- **Flags**: `Secure` (HTTPS-only) + `SameSite` (CSRF mitigation).
-- **Expiry**: Configurable (default 24 hours).
-- **Enforcement**: Handled via `services/core-engine/src/main.rs` (token validation middleware).
-
-### Password Security
-- **Algorithm**: Argon2 (memory-hard, ASIC/GPU-resistant).
-- **Tuning**: Argon2 parameters (memory cost, time cost, parallelism) are periodically reviewed against NIST recommendations.
-- **Enforcement**: Applied during registration and authentication (`services/core-engine/src/handlers/auth.rs`).
-
-### Role-Based Access Control (RBAC)
-
-| Role | Permissions |
-|------|------------|
-| `user` | Browse, purchase, manage own profile and wallet. |
-| `developer` | All user permissions + list products, manage payouts. |
-| `admin` | Full platform access, dispute resolution, administrative overrides. |
-
-### OAuth Integration (GitHub)
-- State parameters (cryptographically random) strictly prevent CSRF.
-- Authorization code exchanged server-side; client secrets remain completely isolated from the frontend.
-- Tokens are encrypted at rest in the database.
-
----
-
-## Data Protection & Cryptography
-
-### SQL Injection Prevention
-KodeDock uses **SQLx** with compile-time query validation. Every database query is a parameterized statement checked at compile time. String-concatenated SQL is structurally impossible.
-
-### Sensitive Data Masking & PII Handling
-
-| Data Type | API Behaviour |
-|-----------|-------------|
-| Bank account numbers | Only last 4 digits returned (`XXXX XXXX XXXX 1234`). |
-| UPI IDs | Masked on retrieval. |
-| GitHub access tokens | Encrypted in DB; never returned in API responses. |
-| Payment card data | Never stored — handled exclusively by Razorpay. |
-
-### File Upload Security
-Uploads utilize a **presigned URL** flow, shifting large payloads off application servers:
-1. Client requests a presigned PUT URL.
-2. Core Engine validates JWT & generates a SeaweedFS presigned URL.
-3. Client uploads directly to SeaweedFS (bypassing the application layer).
-- Rate limits and file-type enforcement mitigate upload abuse.
-
-### Encryption at Rest & Cryptographic Standards
-- OAuth tokens stored AES-GCM encrypted in PostgreSQL.
-- Database volumes and SeaweedFS block devices are encrypted at the host level (AES-256).
-
----
-
-## Network, Infrastructure & Cloud Security
-
-### Rate Limiting & DoS Protection
-Implemented via `actix-governor` with IP extraction (`X-Forwarded-For` from trusted proxies):
-
-| Endpoint Category | Limit |
-|-------------------|-------|
-| Authentication (`/api/auth/*`) | 5 requests / 12 seconds |
-| Upload presign (`/api/upload/presign`) | 10 requests / 6 seconds |
-| Order verification (`/api/orders/verify`) | 10 requests / 6 seconds |
-
-### CORS Policy
-- Configured via the `CORS_ORIGINS` environment variable.
-- Dynamic origin validation — no wildcard (`*`) origins permitted in production.
-
-### Network Isolation (Docker & VPC)
-PostgreSQL and Redis are **never** exposed to the host network. All inter-service traffic stays within internal Docker bridge networks or isolated private VPC subnets.
-
-### TLS / HTTPS Configuration
-- TLS termination (TLS 1.2 / 1.3 only) handled by external reverse proxies (NGINX/Cloudflare).
-- The application layer strictly expects HTTPS.
-
----
-
-## Application Security & DevSecOps
-
-### Security Headers
-| Header | Value | Purpose |
-|--------|-------|---------|
-| `X-Frame-Options` | `DENY` | Prevent clickjacking. |
-| `X-Content-Type-Options` | `nosniff` | Block MIME-type sniffing. |
-| `X-XSS-Protection` | `1; mode=block` | Legacy XSS filter. |
-| `Cache-Control` | Configured per-route | Prevent sensitive data caching. |
-
-### DevSecOps & Dependency Management
-- **Secrets Management**: Secrets passed strictly via ENV variables. For production, integration with AWS Secrets Manager or HashiCorp Vault is required.
-- **Dependency Audits**: Automated vulnerability scans (`cargo audit`, `npm audit`, `pip-audit`) run continuously.
-
----
-
-## Payment Security & PCI-DSS Scope
-
-### Razorpay Integration
-KodeDock delegates payment processing entirely, ensuring card data **never** touches our servers.
-- **Signature Verification**: HMAC-SHA256 + constant-time comparison.
-- **Webhook Authenticity & Idempotency**: Signatures are verified before state mutation; duplicate completions are blocked.
-- **Amount Validation**: Expected amounts fetched from DB and compared server-side.
-- **PCI Scope**: SAQ A-EP applies (outsourced payment page with server-to-server webhook).
-
-### Escrow System
-Buyer funds are held in escrow for **7 days** post-purchase. This is enforced via PostgreSQL `FOR UPDATE` row locks, preventing race conditions.
-
----
-
-## Threat Mitigation Strategies
-
-- **XSS**: Mitigated by HttpOnly JWT cookies and React's built-in output encoding.
-- **CSRF**: Mitigated by `SameSite` cookies, OAuth state parameters, and Content-Type validation.
-- **SQLi**: Prevented structurally by SQLx compile-time validations.
-- **Brute Force**: Thwarted by strict rate limiting and Argon2 password hashing.
-- **SSRF**: API proxies enforce an allowlist of permitted paths. No user-controlled URLs are fetched server-side.
-
----
-
-## Incident Response & Data Breach Policy
-
-KodeDock maintains an Incident Response Plan (IRP) modeled on NIST guidelines:
-1. **Identification & Triage**: Automated alerts page the on-call security team.
-2. **Containment**: Affected services are isolated or rate-limited.
-3. **Eradication & Recovery**: Vulnerabilities are patched; services are safely restored.
-4. **Notification**: In the event of a data breach affecting PII, KodeDock will notify affected users and relevant authorities within 72 hours, as per GDPR requirements.
-
----
-
-## Compliance, Privacy & Data Retention
-
-### GDPR & Privacy Alignment
-- **Data Minimization**: Only strictly necessary data is collected.
-- **User Rights**: Users can permanently delete accounts via `DELETE /api/auth/delete-account`.
-- **Consent**: Marketing consent is explicit and tracked separately.
-
-### Data Retention
-- Audit logs and financial transaction records (e.g., `wallet_transactions`, `orders`) are retained for a minimum of 7 years for compliance and dispute resolution.
-
----
-
-## Monitoring, Logging & Audit
-
-- **Health Checks**: Every service exposes a `/health` endpoint for uptime monitoring.
-- **Structured Logging**: All services log security-relevant events (auth failures, validation errors) with correlation IDs.
-- **Alert Thresholds**: Sustained auth failures (>20/min per IP) or high 5xx error rates trigger immediate automated alerts.
-
----
-
-## Known Limitations & Security Roadmap
-
-KodeDock approaches security as an ongoing discipline. Current roadmap items include:
-- [ ] **Content Security Policy (CSP)** & Modern Headers (`Permissions-Policy`, `Referrer-Policy`).
-- [ ] **HTTP Strict Transport Security (HSTS)** enforcement.
-- [ ] **JWT Refresh Token + Blacklist** for instantaneous session revocation.
-- [ ] **Multi-Factor Authentication (MFA)** (TOTP) for high-risk operations (e.g., withdrawals).
-- [ ] **Automated Container Image Scanning** (Trivy/Grype) integrated into CI.
-- [ ] **API Versioning** (`/api/v1/`) for seamless deprecation of older endpoints.
-
----
-
-*Security policy accurate as of **v1.7.0** (2026-08-25). For implementation details, refer directly to the source code. To report a vulnerability, contact **security@kodedock.com**.*
+### Our Commitment:
+- **Acknowledgment:** We will acknowledge receipt of your vulnerability report within **24 hours**.
+- **Assessment:** Our engineering team will assess and validate the issue within **48 hours**.
+- **Remediation:** We will release a patch and notify affected users promptly.
+- **Credit:** We will publicly credit your responsible disclosure in our release notes (unless you prefer anonymity).

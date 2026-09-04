@@ -1,64 +1,33 @@
-# 🤝 KodeDock Code of Conduct
-
-> [!NOTE]
-> This document outlines our expectations for participants within the KodeDock community, as well as steps for reporting unacceptable behavior. We are committed to providing a welcoming and inspiring community for all.
+# Contributor Covenant Code of Conduct
 
 ## Our Pledge
+We as members, contributors, and leaders pledge to make participation in our community a harassment-free experience for everyone, regardless of age, body size, visible or invisible disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, caste, color, religion, or sexual identity and orientation.
 
-We as members, contributors, and leaders pledge to make participation in our community and team a harassment-free experience for everyone, regardless of age, body size, visible or invisible disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, religion, or sexual identity and orientation.
-
-We pledge to act and interact in ways that contribute to an open, welcoming, diverse, inclusive, and healthy environment.
+We pledge to act and interact in ways that contribute to an open, welcoming, diverse, inclusive, and healthy community.
 
 ## Our Standards
-
-### ✅ Expected Behavior
-
 Examples of behavior that contributes to a positive environment for our community include:
-
-* **Demonstrating empathy and kindness** toward other people.
-* **Being respectful** of differing opinions, viewpoints, and experiences.
-* **Giving and gracefully accepting** constructive feedback.
-* **Accepting responsibility** and apologizing to those affected by our mistakes, and learning from the experience.
-* **Focusing on what is best** not just for us as individuals, but for the overall community and platform.
-
-### ❌ Unacceptable Behavior
+* Demonstrating empathy and kindness toward other people
+* Being respectful of differing opinions, viewpoints, and experiences
+* Giving and gracefully accepting constructive feedback
+* Accepting responsibility and apologizing to those affected by our mistakes, and learning from the experience
+* Focusing on what is best not just for us as individuals, but for the overall community
 
 Examples of unacceptable behavior include:
+* The use of sexualized language or imagery, and sexual attention or advances of any kind
+* Trolling, insulting or derogatory comments, and personal or political attacks
+* Public or private harassment
+* Publishing others' private information, such as a physical or email address, without their explicit permission
+* Other conduct which could reasonably be considered inappropriate in a professional setting
 
-* The use of sexualized language or imagery, and sexual attention or advances of any kind.
-* Trolling, insulting or derogatory comments, and personal or political attacks.
-* Public or private harassment.
-* Publishing others' private information, such as a physical or email address, without their explicit permission.
-* Other conduct which could reasonably be considered inappropriate in a professional setting.
+## Enforcement Responsibilities
+Community leaders are responsible for clarifying and enforcing our standards of acceptable behavior and will take appropriate and fair corrective action in response to any behavior that they deem inappropriate, threatening, offensive, or harmful.
 
-## 🛡️ Enforcement Responsibilities
+## Scope
+This Code of Conduct applies within all project spaces, and also applies when an individual is officially representing the community in public spaces.
 
-KodeDock leadership is responsible for clarifying and enforcing our standards of acceptable behavior and will take appropriate and fair corrective action in response to any behavior that they deem inappropriate, threatening, offensive, or harmful.
+## Enforcement
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the project administrators at `security@kodedock.internal` or via private repository issues. All complaints will be reviewed and investigated promptly and fairly.
 
-Team leaders have the right and responsibility to remove, edit, or reject comments, commits, code, wiki edits, issues, and other contributions that are not aligned to this Code of Conduct, and will communicate reasons for moderation decisions when appropriate.
-
-## 🌐 Scope
-
-This Code of Conduct applies within all project spaces, including the open source codebase, internal communication channels, GitHub repositories, and issue trackers. It also applies when an individual is officially representing KodeDock in public spaces. Examples of representing our project include:
-- Using an official email address
-- Posting via an official social media account
-- Acting as an appointed representative at an online or offline event
-
-## 🚨 Enforcement and Reporting
-
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the KodeDock leadership team. All complaints will be reviewed and investigated promptly and fairly. All team members are obligated to respect the privacy and security of the reporter of any incident.
-
-| Contact Area | Email Address |
-| --- | --- |
-| **Code of Conduct Reports** | [hello@kodedock.com](mailto:hello@kodedock.com) |
-| **Security Concerns** | [security@kodedock.com](mailto:security@kodedock.com) |
-
-> [!IMPORTANT]
-> The project team is obligated to maintain confidentiality with regard to the reporter of an incident. Further details of specific enforcement policies may be posted separately.
-
-## 📝 Attribution
-
-This Code of Conduct is adapted from the [Contributor Covenant][homepage], version 2.1, available at [https://www.contributor-covenant.org/version/2/1/code_of_conduct.html][v2.1].
-
-[homepage]: https://www.contributor-covenant.org
-[v2.1]: https://www.contributor-covenant.org/version/2/1/code_of_conduct.html
+## Attribution
+This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org), version 2.1.
