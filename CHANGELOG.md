@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-09-04
+
 ### Added
 - **Marketplace Browse Redesign (`/browse`):**
   - Completely redesigned the KodeDock marketplace browse experience inspired by modern developer hub aesthetics.

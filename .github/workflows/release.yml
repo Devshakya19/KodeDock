@@ -24,15 +24,17 @@ jobs:
         run: |
           # Get the tag name (e.g., v1.5.0)
           TAG_NAME=${GITHUB_REF#refs/tags/}
+          # Strip 'v' from tag to match CHANGELOG.md (e.g., 1.5.0)
+          VERSION=${TAG_NAME#v}
           
-          # Extract notes from CHANGE.md between current tag and the next tag/footer
-          # We look for "## [$TAG_NAME]" and print until we hit the next "## [" or "---"
-          awk -v tag="## [$TAG_NAME]" '
+          # Extract notes from CHANGELOG.md between current tag and the next tag/footer
+          # We look for "## [$VERSION]" and print until we hit the next "## [" or "---"
+          awk -v tag="## [$VERSION]" '
             index($0, tag) == 1 {flag=1; next}
             /^## \[/ && flag {flag=0; exit}
             /^---/ && flag {flag=0; exit}
             flag {print}
-          ' CHANGE.md > release_notes.md
+          ' CHANGELOG.md > release_notes.md
           
           echo "Extracted notes:"
           cat release_notes.md
