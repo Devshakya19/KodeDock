@@ -190,9 +190,8 @@ export function BrowseHeader({ email = "", fullName, onOpenMobileSidebar }: Brow
               </span>
 
               <ChevronDown
-                className={`w-3.5 h-3.5 text-slate-500 dark:text-slate-400 group-hover:text-violet-600 dark:group-hover:text-violet-300 transition-transform duration-200 ${
-                  profileOpen ? "rotate-180 text-violet-600 dark:text-violet-400" : ""
-                }`}
+                className={`w-3.5 h-3.5 text-slate-500 dark:text-slate-400 group-hover:text-violet-600 dark:group-hover:text-violet-300 transition-transform duration-200 ${profileOpen ? "rotate-180 text-violet-600 dark:text-violet-400" : ""
+                  }`}
               />
             </button>
 
@@ -320,7 +319,7 @@ export function BrowseHeader({ email = "", fullName, onOpenMobileSidebar }: Brow
                     onSubmit={() => {
                       try {
                         localStorage.removeItem("kodedock_cart");
-                      } catch {}
+                      } catch { }
                     }}
                   >
                     <button
