@@ -1,4 +1,5 @@
-use crate::auth::models::{LoginRequest, SignupRequest, TotpSetupRequest, TotpVerifyRequest, SendVerificationEmailRequest, VerifyEmailRequest, OAuthCallbackRequest};
+use crate::auth::middleware::AuthenticatedUser;
+use crate::auth::models::{LoginRequest, SignupRequest, TotpVerifyRequest, SendVerificationEmailRequest, VerifyEmailRequest, OAuthCallbackRequest};
 use crate::auth::service::AuthService;
 use crate::common::ApiResponse;
 use crate::config::AppConfig;
@@ -79,9 +80,9 @@ pub async fn logout() -> Result<HttpResponse, AppError> {
 pub async fn setup_2fa(
     pool: web::Data<PgPool>,
     config: web::Data<AppConfig>,
-    req: web::Json<TotpSetupRequest>,
+    auth_user: AuthenticatedUser,
 ) -> Result<HttpResponse, AppError> {
-    let result = AuthService::setup_totp(&pool, &config, &req.email).await?;
+    let result = AuthService::setup_totp(&pool, &config, &auth_user.email).await?;
     Ok(HttpResponse::Ok().json(ApiResponse::success_with_message(
         result,
         "TOTP 2FA secret generated successfully",
@@ -91,17 +92,18 @@ pub async fn setup_2fa(
 pub async fn verify_2fa(
     pool: web::Data<PgPool>,
     config: web::Data<AppConfig>,
+    auth_user: AuthenticatedUser,
     req: web::Json<TotpVerifyRequest>,
 ) -> Result<HttpResponse, AppError> {
-    // Note: In Phase 3 (Auth Middleware), we will extract `email` from JWT claims directly.
-    // For Phase 2, we simulate verification using a placeholder email or require it in the request.
-    // For simplicity, let's assume the client passes a token and we just decode it.
-    // To conform to zero-mock, we will decode the Authorization header manually for now.
-    
-    Ok(HttpResponse::Ok().json(ApiResponse::success_with_message(
-        true,
-        "TOTP 2FA verified successfully. (Requires Auth Extractor)",
-    )))
+    let is_valid = AuthService::verify_totp(&pool, &config, &auth_user.email, &req.token).await?;
+    if is_valid {
+        Ok(HttpResponse::Ok().json(ApiResponse::success_with_message(
+            true,
+            "TOTP 2FA verified and enabled successfully",
+        )))
+    } else {
+        Err(AppError::Unauthorized("Invalid 2FA token".to_string()))
+    }
 }
 
 pub async fn send_verification_email(

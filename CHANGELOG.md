@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2026-09-04
 
 ### Added
+- **Phase 3: JWT Auth Middleware (Extractors):**
+  - Implemented `AuthenticatedUser` Actix-web Extractor (`src/auth/middleware.rs`) to automatically intercept, decode, and validate `Authorization: Bearer <token>` headers.
+  - Implemented `AdminUser` Extractor for role-based access control (RBAC).
+  - Protected `setup_2fa` and `verify_2fa` endpoints by injecting the `AuthenticatedUser` context directly, eliminating the need to pass email payloads in JSON and achieving true Zero-Mock security for 2FA validation.
 - **Phase 2: Bank-Grade Native Auth Engine:**
   - Added migration `007_oauth_and_email.sql` for OAuth identities and unified unique constraints.
   - Refactored OAuth to scalable `src/auth/oauth/` folder with generic `OAuthUserProfile` and added Google OAuth (`google.rs`) alongside GitHub.
