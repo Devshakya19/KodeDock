@@ -1,9 +1,0 @@
-import { SecuritySettings } from "@/components/settings/security";
-export default function SellerSecuritySettingsPage() {
-  return (
-    <SecuritySettings
-      deleteWarningText="Are you sure you want to delete your account?"
-      hideHeader={true}
-    />
-  );
-}
