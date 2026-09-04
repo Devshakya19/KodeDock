@@ -56,3 +56,8 @@ Thumbs.db
 .idea/
 *.sublime-project
 *.sublime-workspace
+
+# Graphify / AI Agent Caches
+graphify-out/
+.graphify*
+.cache/
