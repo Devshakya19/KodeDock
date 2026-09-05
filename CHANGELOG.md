@@ -10,6 +10,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2026-09-04
 
 ### Added
+- **Frontend Foundation:**
+  - Created `www` directory with Next.js 15 App Router scaffold for the main KodeDock marketplace.
+- **Phase 5: Zero-RAM Storage Engine:**
+  - Implemented `src/storage` domain with `aws-sdk-s3` integration.
+  - Developed Zero-RAM upload strategy using temporary Presigned PUT URLs for direct-to-disk (SeaweedFS) file uploads.
+  - Developed secure Asset Delivery API generating 15-minute Presigned GET URLs for downloads.
+  - Linked S3 `object_key` securely to products via the `product_assets` table.
+- **Phase 4: Marketplace Products Engine:**
+  - Designed zero-float (`i64` paise) schema for `products`.
+  - Added `categories`, `tags`, and `product_assets` base tables.
+  - Enabled `pgvector` with 384 dimensions and `hnsw` index for AI semantic search.
+  - Created secure `src/marketplace/` domain module (models, repository, service, handlers).
+  - Protected marketplace CRUD routes with `AuthenticatedUser` extractor to ensure users can only create products tied strictly to their own ID.
 - **Phase 3: JWT Auth Middleware (Extractors):**
   - Implemented `AuthenticatedUser` Actix-web Extractor (`src/auth/middleware.rs`) to automatically intercept, decode, and validate `Authorization: Bearer <token>` headers.
   - Implemented `AdminUser` Extractor for role-based access control (RBAC).
