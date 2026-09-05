@@ -30,6 +30,8 @@ pub enum AppError {
 
     #[error("Internal server error: {0}")]
     InternalError(String),
+    #[error("Validation error: {0}")]
+    ValidationError(String),
 }
 
 #[derive(Serialize)]
@@ -51,6 +53,7 @@ impl ResponseError for AppError {
             AppError::FintechError(_) => StatusCode::UNPROCESSABLE_ENTITY,
             AppError::DatabaseError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             AppError::InternalError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            AppError::ValidationError(_) => StatusCode::BAD_REQUEST,
         }
     }
 
@@ -65,6 +68,7 @@ impl ResponseError for AppError {
             AppError::FintechError(_) => "FINTECH_ERROR",
             AppError::DatabaseError(_) => "DATABASE_ERROR",
             AppError::InternalError(_) => "INTERNAL_SERVER_ERROR",
+            AppError::ValidationError(_) => "VALIDATION_ERROR",
         };
 
         HttpResponse::build(self.status_code()).json(ErrorResponse {

@@ -69,6 +69,7 @@ dotenvy = "0.15"
 lettre = { version = "0.11.23", features = ["tokio1", "tokio1-native-tls", "builder"] }
 reqwest = { version = "0.13.4", features = ["form", "json"] }
 base64 = "0.23.1"
+slug = "0.1.6"
 
 [profile.release]
 opt-level = 3
