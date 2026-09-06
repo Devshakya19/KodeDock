@@ -1,22 +1,16 @@
-use actix_web::{web, HttpResponse};
-use crate::common::ApiResponse;
+pub mod models;
+pub mod repository;
+pub mod service;
+pub mod handlers;
+
+use actix_web::web;
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/fintech")
-            .route("/wallet", web::get().to(get_wallet_balance))
-            .route("/webhooks/razorpay", web::post().to(razorpay_webhook)),
+            .route("/wallet", web::get().to(handlers::my_wallet))
+            .route("/orders", web::post().to(handlers::create_order))
+            .route("/webhooks/razorpay", web::post().to(handlers::razorpay_webhook))
+            .route("/disputes", web::get().to(handlers::get_disputes)),
     );
-}
-
-async fn get_wallet_balance() -> HttpResponse {
-    HttpResponse::Ok().json(ApiResponse::success(serde_json::json!({
-        "available_balance_paise": 0,
-        "pending_escrow_paise": 0,
-        "currency": "INR"
-    })))
-}
-
-async fn razorpay_webhook() -> HttpResponse {
-    HttpResponse::Ok().json(ApiResponse::success(true))
 }
