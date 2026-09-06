@@ -7,6 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.0] - 2026-09-06
+
+### Added
+- **Frontend Authentication Suite & Design System (`www/src/app/(auth)`):**
+  - **Custom Dark Cybernetic Background Asset:** Generated high-resolution dark-mode futuristic code vault artwork (`auth-bg.jpg` and `auth-bg.png`) with violet neon nodes and circuit traces matching `#1D1D21` and `#8535FC` theme in `www/public/images/`.
+  - **Unified Floating Cyber Console Auth Architecture (`layout.tsx`):**
+    - Completely replaced the standard vertical 50/50 split-screen with an elevated **Unified Floating Cyber Console** workstation frame (`max-w-7xl`, `rounded-3xl`, glassmorphic backdrop `bg-[#18181C]/90`).
+    - Added sticky top navigation bar with brand emblem, live protocol status indicator, and dynamic segmented mode switcher (`🛒 Buyer Portal` vs `⚡ Developer Studio`).
+    - Implemented dynamic route-aware theme adaptability (`usePathname`) smoothly transitioning between KodeDock Violet (`#8535FC`) for buyers and Cyan (`#06B6D4`) for developers.
+    - Integrated interactive **Live Code Escrow Terminal Simulator** (`escrow_contract.rs`) demonstrating real-time AST leak scanning, dual-entry ACID locking, and presigned S3 chunked delivery in Rust syntax.
+    - Added ambient cybernetic mesh grid, dual glowing blurred nebula orbs, hardware-style window controls, and global cryptographic security footer.
+  - **Reusable Form UI Components:**
+    - `Input` component (`www/src/components/ui/input.tsx`) tailored with dark charcoal backdrop, subtle inset shadows, and violet focus rings.
+    - `Badge` component (`www/src/components/ui/badge.tsx`) supporting bank-grade status chips and indicators.
+  - **Authentication Route Pages:**
+    - **Login (`/login`):** Email/password credentials, show/hide password toggle, remember-me trust token option, GitHub & Google OAuth buttons, and direct link to 2FA prompt.
+    - **Buyer Register (`/register`):** Dedicated registration flow for buyers/enterprises, real-time 4-stage password entropy strength meter, terms acceptance, and GitHub/Google sign-up.
+    - **Developer Register (`/developer/register`):** Dedicated registration flow for developers/sellers to create their cryptographic vault.
+    - **Forgot Password (`/forgot-password`):** Work email recovery form with submission confirmation state and 60-second cooldown timer for token resend.
+    - **Reset Password (`/reset-password`):** Secure token password update with token family session revocation notice and strength indicator.
+    - **Verify 2FA (`/verify-2fa`):** Bank-grade RFC 6238 TOTP 6-digit numeric input with auto-focus advance, backspace navigation, clipboard paste support, and backup recovery key fallback mode.
+  - **Dependencies:** Installed `clsx` and `tailwind-merge` utility packages for robust Tailwind v4 styling.
+
+### Security
+- **Eliminated URL Password Leakage Risk:**
+  - Added explicit `method="POST"` and `action="#"` to all authentication forms (`/login`, `/register`, `/forgot-password`, `/reset-password`, `/verify-2fa`) to prevent browsers from executing native `GET` submissions which append passwords to URL query parameters in server logs and history.
+  - Implemented client-side query string scrubber (`useEffect` with `window.history.replaceState`) on `/login` and `/register` to instantly wipe any accidental credentials passed in query parameters from browser address bar and history.
+
+### Fixed
+- **Next.js Image `sizes` Warning:** Added `sizes="(max-width: 1024px) 100vw, 52vw"` to `/images/auth-bg.jpg` in `layout.tsx` to optimize responsive image delivery and resolve Next.js runtime console warning.
+- **Route 404 on `/auth`:** Configured Next.js redirect in `next.config.ts` and created `src/app/auth/page.tsx` fallback to seamlessly route `/auth` requests to `/login` (307 redirect).
+
+## [1.1.0] - 2026-09-06
+
+### Added
+- **Phase 2: Bank-Grade Fintech Engine:**
+  - Implemented `src/fintech` domain with real double-entry accounting in Rust.
+  - Added PostgreSQL Row-Level Locks (`SELECT ... FOR UPDATE`) in `repository.rs` to prevent race conditions during balance modifications.
+  - Developed webhook idempotency checking and `HMAC-SHA256` signature verification for Razorpay payments.
+  - Built zero-float (`i64` paise) math to perfectly deduct Platform Fees and Section 194-O TDS withholding.
+
+### Changed
+- **Schema & Routing Fixes:**
+  - Harmonized database migrations by removing conflicting `products` table from `008_marketplace_schema.sql`.
+  - Standardized AI semantic search on `vector(1536)` (OpenAI compatibility) inside `002_marketplace_products.sql`.
+  - Fixed route nesting bug in `src/marketplace/mod.rs` and `src/storage/mod.rs` to remove redundant `/api/v1/api/v1` prefixes.
+
 ## [1.0.0] - 2026-09-04
 
 ### Added
