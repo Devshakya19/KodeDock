@@ -16,11 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Platform Root Redirect & Routing Cleanup (`platform/src/app/page.tsx`):**
   - Replaced the platform's root storefront page with an automatic server-side Next.js `redirect('/login')` to directly show the authentication flow by default.
   - Removed redundant `platform/src/app/auth` folder since the Next.js `(auth)` route group already handles all authentication pages (`/login`, `/register`, etc.).
-- **Buyer Flow Architecture & Directory Restructuring (`platform/src/app/(buyer)`):**
+- **Buyer & Shop Domain Separation (`platform/src/app/(buyer)` & `(shop)`):**
   - Removed lingering `app/developer` directory to strictly enforce a "Buyer-First" focus and eliminate unapproved seller UI components outside of auth.
-  - Established a dedicated `(buyer)` Next.js route group to neatly encapsulate all post-login buyer workflows.
-  - Restored the Marketplace Storefront (formerly `page.tsx`) to `(buyer)/explore/page.tsx` to serve as the post-login product discovery catalog.
-  - Migrated `dashboard` to `(buyer)/dashboard/` and `product/[slug]` to `(buyer)/product/[slug]/` ensuring clean architectural boundaries.
+  - Separated concerns by creating two distinct Next.js route groups: `(buyer)` for account management and `(shop)` for the marketplace experience.
+  - Restored the Marketplace Storefront (formerly `page.tsx`) and migrated it to `(shop)/explore/page.tsx` to serve as the product discovery catalog.
+  - Migrated codebase product detail pages to `(shop)/product/[slug]/`.
+  - Encapsulated the buyer's private Escrow Vault and purchases inside `(buyer)/dashboard/`.
 - **Codebase Product Dossier & Escrow Purchase (`platform/src/app/product/[slug]/page.tsx`):**
   - Implemented comprehensive technical specification sheet with full architecture overview.
   - Live AST Security Audit Card detailing Tree-Sitter syntax verification, zero leaked secrets, Shannon entropy pass, and AES-256 deliverable packaging.
