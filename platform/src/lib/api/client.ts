@@ -1,5 +1,19 @@
-// KodeDock API Client Wrapper
-import { AuthResponse, CatalogProduct, CatalogResponse, CreateProductInput, OrderItem, ProductDetail } from '../types';
+import {
+  AuthResponse,
+  CatalogProduct,
+  CatalogResponse,
+  CreateDisputeInput,
+  CreateProductInput,
+  DisputeItem,
+  DisputeMessage,
+  LedgerEntry,
+  OrderItem,
+  ProductDetail,
+  UpdateProfileInput,
+  UserAccountBalance,
+  UserProfile,
+  UserSession,
+} from '../types';
 
 function getApiBaseUrl(): string {
   let url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
@@ -75,6 +89,29 @@ export const authApi = {
       body: JSON.stringify(data),
     });
   },
+  getMe: () => {
+    return fetchApi<{ data: UserProfile }>('/auth/me');
+  },
+  updateProfile: (data: UpdateProfileInput) => {
+    return fetchApi<{ data: UserProfile; message?: string }>('/auth/profile', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+  getSessions: () => {
+    return fetchApi<{ data: UserSession[] }>('/auth/sessions');
+  },
+  revokeSession: (id: string) => {
+    return fetchApi<{ data: boolean; message?: string }>(`/auth/sessions/${id}`, {
+      method: 'DELETE',
+    });
+  },
+  changePassword: (data: { current_password: string; new_password: string }) => {
+    return fetchApi<{ data: boolean; message?: string }>('/auth/password', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
 };
 
 export const marketplaceApi = {
@@ -112,7 +149,18 @@ export const marketplaceApi = {
 };
 
 export const fintechApi = {
-  getWallet: () => fetchApi<{ data: any }>('/fintech/wallet'),
+  getWallet: () => fetchApi<UserAccountBalance | { data: UserAccountBalance }>('/fintech/wallet'),
+
+  getWalletTransactions: () => {
+    return fetchApi<{ data: LedgerEntry[] }>('/fintech/wallet/transactions');
+  },
+
+  topupWallet: (amountPaise: number) => {
+    return fetchApi<{ data: UserAccountBalance; message?: string }>('/fintech/wallet/topup', {
+      method: 'POST',
+      body: JSON.stringify({ amount_paise: amountPaise }),
+    });
+  },
   
   createOrder: (productId: string, paymentProvider: 'razorpay' | 'stripe' | 'wallet' = 'razorpay') => {
     return fetchApi<{ data: OrderItem }>('/fintech/orders', {
@@ -130,4 +178,44 @@ export const fintechApi = {
       method: 'POST',
     });
   },
+
+  getDisputes: () => {
+    return fetchApi<{ data: DisputeItem[] }>('/fintech/disputes');
+  },
+
+  createDispute: (data: CreateDisputeInput) => {
+    return fetchApi<{ data: DisputeItem; message?: string }>('/fintech/disputes', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  getDisputeMessages: (disputeId: string) => {
+    return fetchApi<{ data: DisputeMessage[] }>(`/fintech/disputes/${disputeId}/messages`);
+  },
+
+  sendDisputeMessage: (disputeId: string, message: string, attachmentUrl?: string) => {
+    return fetchApi<{ data: DisputeMessage }>(`/fintech/disputes/${disputeId}/messages`, {
+      method: 'POST',
+      body: JSON.stringify({ message, attachment_url: attachmentUrl }),
+    });
+  },
 };
+
+export const storageApi = {
+  downloadOrderPackage: (orderId: string) => {
+    return fetchApi<{
+      status: string;
+      data: {
+        download_url: string;
+        order_id: string;
+        order_number: string;
+        product_title: string;
+        license_key: string;
+        archive_filename: string;
+        status: string;
+      };
+    }>(`/storage/download/order/${orderId}`);
+  },
+};
+
