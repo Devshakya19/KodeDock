@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  
+  --color-card: var(--card);
+  --color-card-foreground: var(--foreground);
+  
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--foreground);
+  
+  --color-primary: var(--primary);
+  --color-primary-foreground: #ffffff;
+  
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  
+  --color-border: var(--border);
+}
+
+/* KodeDock Cybernetic Theme */
+:root {
+  --background: #1D1D21;
+  --foreground: #EDEDF0;
+  --card: #27272A;
+  --popover: #27272A;
+  --primary: #8535FC;
+  --muted: #141417;
+  --muted-foreground: #A1A1AA;
+  --border: #414146;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
