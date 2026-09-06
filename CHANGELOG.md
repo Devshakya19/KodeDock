@@ -7,9 +7,126 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.9.0] - 2026-09-06
+
+### Changed
+- **Complete Visual & Architectural Redesign of Settings Command Matrix (`platform/src/app/(buyer)/settings/`):**
+  - **Elevated Typography & Hierarchy:** High-impact headings with dual-tone gradient fills (`from-white via-[#F3E8FF] to-[#C084FC]`), monospace system telemetry badges (`font-mono tracking-wider`), and structured field-category tags (`[FIELD: FULL_NAME]`).
+  - **Futuristic Glassmorphic Command Deck Layout (`layout.tsx`):** Ambient mesh lighting, live protocol telemetry pills (`i64 INTEGER PAISE`, `ARGON2id + TOTP`), and a floating glass navigation dock with glowing accent bars, dual-tone gradient icons, and responsive horizontal fluid pills for mobile.
+  - **Live Holographic Developer ID Pass (`profile/page.tsx`):** Real-time interactive developer pass showing live avatar, verified badges, bio, and statutory Indian Section 194-O GSTIN/PAN tax compliance fields, plus an expandable 24-avatar cryptographic selector grid with hover zoom.
+  - **Cryptographic Password Engine & Entropy Meter (`security/page.tsx`):** Argon2id credential manager with show/hide password toggles, dynamic 4-segment animated entropy strength meter, live criteria checklists, and real-time radar-ping telemetry on active device sessions with 1-click revocation.
+  - **Hacker Terminal Git CLI PAT Generator (`connect/page.tsx`):** Terminal-style CLI command preview (`$ kd login --token kd_live_...`), token expiration and granular security scopes selector, one-time reveal modal with instant copy animation, and cloud platform integration cards.
+  - **Mission-Critical Alert Matrix (`notifications/page.tsx`):** Granular delivery routing (Email vs In-App Push) for 48-hour inspection countdowns, escrow releases, and dispute arbitrations with custom animated neon switch toggles and live test telemetry alert button.
+  - **Workspace & Code Inspector Theme Matrix (`preferences/page.tsx`):** Zero-floating point integer paise invariant engine showcase card, automated invoice billing dispatch email routing, and interactive side-by-side theme cards (*Cyber Obsidian Violet*, *High-Contrast Noir*, *Emerald Terminal*).
+- **Global CSS Cybernetic Utilities (`platform/src/app/globals.css`):** Added `@keyframes pulse-glow`, `@keyframes radar-pulse`, `@keyframes border-glow-scan`, `.glass-matrix-glow`, and metallic gradient text helpers.
+
+## [1.8.0] - 2026-09-06
+
+### Added
+- **Multi-Part Folder-Based Modular Settings Architecture (`platform/src/app/(buyer)/settings/`):**
+  - Re-architected settings into isolated directory-based Next.js App Router sub-routes sharing a persistent cybernetic navigation layout (`layout.tsx`):
+    - 📂 `settings/profile/page.tsx` (👤 Developer Identity): 24-avatar cryptographic selector, full name, email, bio, Indian GST & PAN statutory compliance.
+    - 📂 `settings/security/page.tsx` (🔒 Security & Sessions): Argon2id password modification with validation, RFC 6238 TOTP Two-Factor Authentication status, and real-time active multi-device sessions with 1-click token revocation.
+    - 📂 `settings/connect/page.tsx` (⚡ Connect & Integrations): Terminal Git Personal Access Token (PAT) generator with instant copy warning and revocation, and cloud platform linking (GitHub OAuth, Docker Registry).
+    - 📂 `settings/notifications/page.tsx` (🔔 Notifications Matrix): Granular switches for 48-hour inspection countdown warnings, escrow release confirmations, dispute desk replies, and security login alerts across Email & In-App channels.
+    - 📂 `settings/preferences/page.tsx` (⚙️ Preferences & Billing): Fixed INR Integer Paise currency standard, default invoice billing email, and in-browser code inspector theme selector (Cyber Dark Modern vs High Contrast Monochrome).
+    - 📂 `settings/layout.tsx`: Cybernetic shared shell with dynamic route indicator, responsive desktop sidebar & mobile pills.
+    - 📂 `settings/page.tsx`: Automatic server redirect to `/settings/profile`.
+- **Backend Password Change Endpoint (`src/auth/`):**
+  - Added `ChangePasswordRequest` model in `src/auth/models.rs`.
+  - Added `change_password` handler in `src/auth/handlers.rs` verifying old password against Argon2id hash and updating database with new hashed credentials.
+  - Exposed `POST /api/v1/auth/password` in `src/auth/mod.rs`.
+  - Added `authApi.changePassword` in `platform/src/lib/api/client.ts`.
+
+## [1.7.0] - 2026-09-06
+
+### Removed
+- **Sub-Navigation Component Bar (`BuyerNav`):** Removed the extra sub-navigation button bar (`buyer-nav.tsx`) from the body of `/dashboard`, `/wallet`, `/disputes`, and `/settings`. Navigation is now unified strictly within the top floating header and profile dropdown.
+- **100% Mock / Demo Data Purge Across Buyer Portal & Checkout:**
+  - Removed `kd_local_orders` localStorage storage and `handleAddDemoCodebase` button from `platform/src/app/(buyer)/dashboard/page.tsx`.
+  - Removed hardcoded preview balances (`₹2,500.00`) and mock ledger entries from `platform/src/app/(buyer)/wallet/page.tsx`.
+  - Removed hardcoded sample disputes (`disp_94827b1`) and dummy thread messages from `platform/src/app/(buyer)/disputes/page.tsx`.
+  - Removed hardcoded PAT tokens (`pat_1`) and fake sessions (`user_me`) from `platform/src/app/(buyer)/settings/page.tsx`.
+  - Removed client-side fake order synthesis from `platform/src/app/(shop)/product/[slug]/page.tsx`.
+
+### Added
+- **Real Backend Order Creation with ACID Row Locks (`src/fintech/repository.rs`):**
+  - Implemented `create_buyer_order` executing real transactional writes to `orders`, `escrow_transactions`, `license_keys`, `user_accounts`, and `ledger_entries`.
+  - Connected `POST /api/v1/fintech/orders` in `src/fintech/handlers.rs` to create real database orders and lock escrow funds.
+- **Real Backend Deliverable Download Engine (`src/storage/handlers.rs` & `src/storage/mod.rs`):**
+  - Added `download_order_package` endpoint at `GET /api/v1/storage/download/order/{order_id}` verifying order ownership and generating real presigned download URLs from SeaweedFS / S3 storage.
+- **Direct API Integration & Zero Direct DB Access from Frontend:**
+  - Added `storageApi.downloadOrderPackage` in `platform/src/lib/api/client.ts`.
+  - Updated `handleBuyWithEscrow` in `platform/src/app/(shop)/product/[slug]/page.tsx` to execute transactions through `fintechApi.createOrder`.
+  - Updated `handleDownloadDeliverable` in `platform/src/app/(buyer)/dashboard/page.tsx` to retrieve signed deliverable URLs from the backend storage service.
+
+## [1.6.0] - 2026-09-06
+
+### Added
+- **Complete Buyer Portal Suite & Multi-Page Architecture (`platform/src/app/(buyer)/`):**
+  - **Buyer Sub-Navigation Component (`platform/src/components/buyer/buyer-nav.tsx`):** Sleek, cybernetic responsive navigation bar seamlessly linking My Purchases (Vault), Wallet & Ledger, Dispute Desk, and Account Settings.
+  - **Buyer Escrow Wallet & Financial Ledger (`platform/src/app/(buyer)/wallet/page.tsx`):**
+    - Live balance cards showing Available Balance (₹) and Pending Escrow (₹).
+    - 1-Click "Add Funds / Deposit" modal with preset amounts (₹500, ₹2,000, ₹5,000, ₹10,000, Custom) and instant double-entry wallet funding.
+    - Double-Entry General Ledger journal table displaying real timestamps, correlation transaction IDs, debit/credit badges, categories (`WALLET_TOPUP`, `ESCROW_HOLD`, `ESCROW_RELEASE`), descriptions, and amounts in integer paise.
+  - **Dispute Resolution Desk (`platform/src/app/(buyer)/disputes/page.tsx`):**
+    - Status filtering (`All`, `Open & Active`, `Resolved`).
+    - Detailed dispute dossier cards showing order numbers, reasons (Tree-Sitter syntax errors, backdoor secrets, build failures), and freeze statuses.
+    - Interactive Dispute Thread & Evidence modal with real-time messages between buyer, seller, and automated Security Arbiter with message submission.
+  - **Buyer Profile, Tax & Git CLI Tokens (`platform/src/app/(buyer)/settings/page.tsx`):**
+    - Developer identity form with 24-avatar visual grid picker, name, bio, and verified email.
+    - Indian GST and PAN tax compliance fields for B2B input tax credit and statutory Section 194-O tracking.
+    - Git CLI Personal Access Token (PAT) generator for `git clone https://git.kodedock.com/vault/...` repository access.
+    - Active Multi-Device Sessions manager with IP address, device user-agent, last seen status, and 1-click session termination.
+  - **Navigation Header Expansion (`platform/src/components/nav/header.tsx`):**
+    - Updated profile dropdown menu to link directly to My Purchases, Wallet & Ledger, Dispute Desk, and Account Settings.
+    - Changed badge label to concise "Verified".
+- **Backend Auth & Profile Management Endpoints (`src/auth/`):**
+  - Added `UpdateProfileRequest` and `UserSessionInfo` models in `src/auth/models.rs`.
+  - Added parameterized SQLx repository methods `update_user_profile`, `get_user_sessions`, and `revoke_session` in `src/auth/repository.rs`.
+  - Exposed `GET /api/v1/auth/me`, `PUT /api/v1/auth/profile`, `GET /api/v1/auth/sessions`, and `DELETE /api/v1/auth/sessions/{id}` in `src/auth/mod.rs` and `handlers.rs`.
+- **Backend Fintech Escrow, Disputes & Ledger Endpoints (`src/fintech/`):**
+  - Added `DisputeItem`, `CreateDisputeRequest`, `DisputeMessageItem`, `AddDisputeMessageRequest`, and `WalletTopupRequest` models in `src/fintech/models.rs`.
+  - Implemented real `get_buyer_disputes`, `create_buyer_dispute`, `get_dispute_messages`, `add_dispute_message`, `get_wallet_transactions`, and `topup_wallet_balance` with ACID row locks and double-entry balanced debit/credit insertions in `src/fintech/repository.rs`.
+  - Replaced stub handlers with full production implementations in `src/fintech/handlers.rs`.
+  - Exposed `GET & POST /api/v1/fintech/disputes`, `GET & POST /api/v1/fintech/disputes/{id}/messages`, `GET /api/v1/fintech/wallet/transactions`, and `POST /api/v1/fintech/wallet/topup` in `src/fintech/mod.rs`.
+- **Frontend API Client & Domain Types Extension (`platform/src/lib/`):**
+  - Added strongly-typed interfaces in `platform/src/lib/types.ts` for `UserProfile`, `UpdateProfileInput`, `UserSession`, `DisputeItem`, `CreateDisputeInput`, `DisputeMessage`, `UserAccountBalance`, and `LedgerEntry`.
+  - Extended `authApi` and `fintechApi` client methods in `platform/src/lib/api/client.ts`.
+
 ## [1.5.0] - 2026-09-06
 
 ### Added
+- **My Purchases & Codebase Library Complete Redesign (`platform/src/app/(buyer)/dashboard/page.tsx`):**
+  - Completely re-architected the buyer's purchases page into an ultra-premium cybernetic Escrow Vault with real-time status counters, dynamic 48-hour inspection countdown progress timers, and live capital metrics.
+  - **Fixed Broken/Mock Actions:** Replaced dummy text toasts with real, functional capabilities:
+    - **Real Deliverable Download:** Generates and triggers direct client downloads of source code and cryptographic verification bundle (`.txt` / archive) with AST syntax verification certificate and license metadata.
+    - **Official GST Tax Invoice Modal:** Complete modal with official Indian taxation breakdown (HSN/SAC code `998313`, 1.0% Section 194-O TDS, 3.5% Platform Escrow Handling Fee, 18% CGST/SGST) and native `window.print()` PDF generation.
+    - **Formal Dispute Desk:** Added interactive dispute submission modal with reason selection (AST syntax errors, backdoor secrets, specification mismatch, build failures) and detailed logs input that freezes escrow funds.
+    - **Early Escrow Release Modal:** Confirmation dialog that verifies buyer satisfaction and triggers escrow release to seller account.
+    - **Quick CLI Clone Terminal Snippet:** In-vault SSH/HTTPS clone command box with 1-click clipboard copying.
+    - **Cross-Page Vault Sync:** Wired `product/[slug]` checkout to persist new orders into local vault storage so purchases immediately appear in the user's library.
+    - **Demo Codebase Injection:** One-click demo repository loader for instant testing of all escrow actions.
+- **Backend Fintech Orders & Escrow Endpoints (`src/fintech/`):**
+  - Added `BuyerOrderItem` model and parameterized `get_buyer_orders` repository query in `src/fintech/repository.rs` joining `orders`, `products`, and `escrow_transactions`.
+  - Added parameterized ACID transaction `approve_escrow` in `src/fintech/repository.rs` that atomically marks order completed, releases escrow transaction, and updates seller wallet balances.
+  - Registered `GET /api/v1/fintech/orders` and `POST /api/v1/fintech/escrow/{id}/approve` endpoints in `src/fintech/mod.rs` and `handlers.rs`.
+- **Universal Responsive Design Overhaul (`platform/` across mobile, tablet, and desktop):**
+  - **Floating Island Navbar (`platform/src/components/nav/header.tsx`):** Added responsive breakpoint scaling down to ultra-compact 320px screens, adaptive brand title collapse on small phones, hidden Cmd+P keyboard badge on touch/mobile screens to reclaim search input space, truncated first name chip, and `max-w-[calc(100vw-1.5rem)]` bounded profile dropdown menu preventing viewport overflow.
+  - **Cybernetic Explore Marketplace (`platform/src/app/(shop)/explore/page.tsx`):** Added `overflow-x-hidden` protection against horizontal scrollbars, responsive padding (`p-4 sm:p-8 lg:p-10`), touch edge-scrollable category tabs (`-mx-3 px-3 sm:mx-0 sm:px-0`), adaptive stack chips ribbon, wrapping sort and filter controls, flex-wrapping codebase card footers (seller bio + CTA buttons), and mobile-scrollable Quick-View Slide-Over Modal with `max-h-[90vh] overflow-y-auto`.
+  - **Buyer Vault & Dashboard (`platform/src/app/(buyer)/dashboard/page.tsx`):** Enhanced responsive grid layout for metric counters (`grid-cols-1 sm:grid-cols-3`), mobile-optimized order cards with wrapped action controls, and full touch compatibility.
+  - **Product Specification Dossier (`platform/src/app/(shop)/product/[slug]/page.tsx`):** Responsive breadcrumbs, adaptive security audit grid (`grid-cols-1 sm:grid-cols-2`), sticky-on-desktop and flowing-on-mobile escrow checkout card, and scrollable authorization modal.
+  - **Platform Footer (`platform/src/components/nav/footer.tsx`):** Centered layout with responsive wrapping for navigation links on mobile devices and space-between alignment on desktop.
+- **Cybernetic Explore Marketplace Redesign (`platform/src/app/(shop)/explore/page.tsx`):**
+  - Re-architected explore page into an ultra-premium cybernetic developer storefront with subtle 4rem grid background and ambient violet/cyan radial lighting.
+  - Added multi-category command tabs (`All Codebases`, `Full-Stack SaaS`, `AI & LLM Agents`, `High-Perf Systems`, `Mobile Apps`, `DevOps & Cloud`).
+- **Official Tech Stack Vector Icons (`public/icons/tech/`):**
+  - Downloaded and configured crisp official vector SVGs with brand colors for missing frameworks: `rust.svg` (`#CE412B`), `go.svg` (`#00ADD8`), `docker.svg` (`#2496ED`), `postgresql.svg` (`#336791`), and `flutter.svg` (`#02569B`).
+  - Replaced dot placeholders across the Explore command bar and codebase dossier card tags with official SVG icons from `public/icons/tech/`.
+  - Built view layout switcher supporting expansive **2-Column Dossier Grid** and high-density **Terminal List** view.
+  - Implemented rich codebase cards with AST Verified clean badges, 48h escrow tags, integer paise pricing, seller trust indicators, and quick-specs drawer trigger.
+  - Created interactive **Quick-View Slide-Over Modal** for instant architecture inspection without page redirection.
+  - Added high-fidelity pulsing skeletons during API loading and high-tech cyber empty states.
 - **GitHub Actions CI/CD Pipeline (`.github/workflows/ci.yml`):**
   - Integrated complete automated verification workflow running on `main` push and pull requests.
   - Job `backend`: Rust stable toolchain, rust-cache, `cargo fmt --check`, `cargo clippy -- -D warnings`, `cargo check`, and `cargo test`.
@@ -35,16 +152,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Resolved `access_token` mismatch in `platform/src/lib/types.ts` and `platform/src/app/(auth)/login/page.tsx` & `register/page.tsx` so JWT tokens persist into `localStorage`.
   - Added URL normalizer in `platform/src/lib/api/client.ts` guaranteeing all frontend calls route through `/api/v1` without 404 endpoint mismatch.
   - Added `/api/v1/auth/register` alias alongside `/api/v1/auth/signup` in `src/auth/mod.rs` for unified registration handling.
-- **Buyer Navigation & Design System V2 Alignment (`platform/src/components/nav/header.tsx`):**
-  - Fully realigned header to KodeDock Design System V2: `#1D1D21` charcoal background, `#27272A` surface, `#141417` input insets, `#414146` borders, `#8535FC` violet brand accents, and `rounded-lg` (8px) geometry.
-  - Replaced and pruned legacy avatar folders (`public/avatar` and `public/avtar`) with a unified, clean directory structure in `public/avatars`.
-  - Created 24 radically unique SVG vector avatars spanning distinct archetypes: Android Robot, Space Astronaut, 8-Bit Pixel Hacker, Oni Demon Mask, Shadow Ninja, Cyberpunk Cat, Bionic Skull, Code Wizard, Cosmic Alien, VR Gamer, Cyber Canine, Quantum AI Core, Female Dev with Bob Cut & Headphones, Bearded Hipster Coder, Afro-Punk Coder, Steampunk Deep-Sea Diver, Digital Pac-Man Ghost, Mecha Dragon, 3D Voxel Cube, Prismatic Crystal Entity, Arctic Cyber Bear, Cyber Falcon, Scanline Phantom Hologram, and Celestial Nebula Deity.
-  - Implemented deterministic avatar hashing: users automatically receive a consistent, distinct vector avatar based on their email/ID.
-  - Streamlined navbar by removing `[Explore Shop]` and `[My Purchases]` links, reserving them for the user profile dropdown and clean contextual actions.
-  - Upgraded user profile button to an ultra-modern circular pill geometry (`rounded-full`) displaying the user's first name (e.g. "Devraj") alongside their distinct vector avatar with a violet brand border.
-  - Implemented dynamic first name extraction with fallback to email handle.
+- **Cyber-Floating Island Capsule Navbar (`platform/src/components/nav/header.tsx`):**
+  - Redesigned navigation bar into a compact (48px height), ultra-modern floating island capsule (`fixed top-3 sm:top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-5xl rounded-full`).
+  - Added dynamic scroll reactivity: header smoothly compresses (`scale-[0.99]`), shifts to deep obsidian frosted glass (`bg-[#141417]/90 backdrop-blur-2xl`), and intensifies violet border glow when scrolled.
+  - Implemented auto-expanding compact search capsule with shortcut badge (`Ctrl+P` / `⌘P`), glowing focus ring, and zero-distortion layout transitions.
+  - Aligned page content across `/explore`, `/dashboard`, and `/product/[slug]` with `pt-20 sm:pt-24` top padding to gracefully accommodate the floating island capsule.
+  - Integrated circular user profile chip with live active status ring, truncated first name display, and spring-animated backdrop-blurred popover dropdown.
   - Persistent user profile dropdown menu with verified buyer status, quick Escrow Vault navigation, and sign out controls.
   - Enhanced global `Ctrl+P` (and `⌘P` on macOS, `/`) search bar with 4px grid spacing and design system tokens.
+  - Removed pulsing light overlay from the KD emblem for a clean, minimalist developer logo presentation.
 - **Next.js Standalone Mode:**
   - Configured `output: "standalone"` in `platform/next.config.ts` and `kodedock/next.config.ts` to reduce production image footprint and speed up container startup.
 
