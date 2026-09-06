@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Marketplace Storefront & Codebase Catalog (`platform/src/app/page.tsx`):**
   - Built high-performance Cybernetic Marketplace Storefront with live search input, keyboard shortcut (`/`), framework filter chips (Rust, Next.js, Go, Python, Flutter, React, PostgreSQL, Docker), and sorting.
   - Product cards featuring verified Tree-Sitter AST badges, 48h escrow tags, integer paise-to-₹ formatting, seller reputation chips, and direct inspection links.
+- **Platform Root Redirect & Routing Cleanup (`platform/src/app/page.tsx`):**
+  - Replaced the platform's root storefront page with an automatic server-side Next.js `redirect('/login')` to directly show the authentication flow by default.
+  - Removed redundant `platform/src/app/auth` folder since the Next.js `(auth)` route group already handles all authentication pages (`/login`, `/register`, etc.).
 - **Codebase Product Dossier & Escrow Purchase (`platform/src/app/product/[slug]/page.tsx`):**
   - Implemented comprehensive technical specification sheet with full architecture overview.
   - Live AST Security Audit Card detailing Tree-Sitter syntax verification, zero leaked secrets, Shannon entropy pass, and AES-256 deliverable packaging.
