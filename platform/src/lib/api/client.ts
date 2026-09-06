@@ -1,5 +1,5 @@
 // KodeDock API Client Wrapper
-import { CatalogProduct, CatalogResponse, CreateProductInput, OrderItem, ProductDetail } from '../types';
+import { AuthResponse, CatalogProduct, CatalogResponse, CreateProductInput, OrderItem, ProductDetail } from '../types';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
 
@@ -51,6 +51,21 @@ export async function fetchApi<T>(endpoint: string, options: RequestInit = {}): 
 
   return response.json() as Promise<T>;
 }
+
+export const authApi = {
+  login: (data: any) => {
+    return fetchApi<{ data: AuthResponse }>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  register: (data: any) => {
+    return fetchApi<{ data: AuthResponse }>('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+};
 
 export const marketplaceApi = {
   getCatalog: (params?: { q?: string; asset_type?: string; sort?: string; page?: number; limit?: number }) => {

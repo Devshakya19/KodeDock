@@ -28,6 +28,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Rewrote dashboard mapping logic to natively consume the Rust API's `OrderItem` type (`gross_amount_paise`, `product_title`, etc.).
   - Removed `INITIAL_CATALOG` fallback from the Marketplace Storefront (`explore/page.tsx`), ensuring buyers only see real, verified codebase listings.
   - Implemented dynamic loading spinners ("Decrypting Escrow Ledger..." and "Syncing Marketplace Ledger...") to handle async API delays gracefully.
+- **Zero-Mock Auth Integration (`platform/src/app/(auth)`):**
+  - Removed `setTimeout` mock delays and fake demo modes from `/login` and `/register` pages.
+  - Created `authApi` wrapper in `lib/api/client.ts` pointing to real `/api/v1/auth/login` and `/api/v1/auth/register` endpoints.
+  - Implemented real JWT token parsing (`kd_access_token`) into browser `localStorage` to securely persist sessions.
+  - Wired up automatic redirect to `/dashboard` upon successful authentication, eliminating the manual/fake redirection loop.
 - **Codebase Product Dossier & Escrow Purchase (`platform/src/app/product/[slug]/page.tsx`):**
   - Implemented comprehensive technical specification sheet with full architecture overview.
   - Live AST Security Audit Card detailing Tree-Sitter syntax verification, zero leaked secrets, Shannon entropy pass, and AES-256 deliverable packaging.

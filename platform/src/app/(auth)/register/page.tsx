@@ -6,7 +6,11 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+import { authApi } from "@/lib/api/client";
+import { useRouter } from "next/navigation";
+
 export default function RegisterPage() {
+  const router = useRouter();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -68,10 +72,19 @@ export default function RegisterPage() {
     }
 
     setIsLoading(true);
-    setTimeout(() => {
+    try {
+      const res = await authApi.register({ email, password, full_name: fullName });
+      if (res?.data?.token) {
+        localStorage.setItem("kd_access_token", res.data.token);
+        setIsSuccess(true);
+      } else {
+        setErrorMessage("Registration successful, but no token returned. Please login.");
+      }
+    } catch (err: any) {
+      setErrorMessage(err.message || "Registration failed. Please try again.");
+    } finally {
       setIsLoading(false);
-      setIsSuccess(true);
-    }, 1200);
+    }
   };
 
   if (isSuccess) {

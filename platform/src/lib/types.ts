@@ -73,5 +73,14 @@ export interface CreateProductInput {
   base_price_paise: number;
   demo_url?: string;
   github_repo_url?: string;
-  tags?: string[];
+}
+
+export interface AuthResponse {
+  token: string;
+  user: {
+    id: string;
+    email: string;
+    username: string;
+    role: string;
+  };
 }

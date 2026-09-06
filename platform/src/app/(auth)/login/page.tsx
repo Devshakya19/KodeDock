@@ -6,7 +6,11 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+import { useRouter } from "next/navigation";
+import { authApi } from "@/lib/api/client";
+
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -36,17 +40,19 @@ export default function LoginPage() {
     }
 
     setIsLoading(true);
-    // Simulate real auth handshake delay
-    setTimeout(() => {
-      setIsLoading(false);
-      // For demonstration of bank-grade 2FA prompt:
-      if (email.includes("2fa")) {
-        window.location.href = "/verify-2fa";
+    try {
+      const res = await authApi.login({ email, password });
+      if (res?.data?.token) {
+        localStorage.setItem("kd_access_token", res.data.token);
+        router.push("/dashboard");
       } else {
-        // Will connect directly to backend /api/v1/auth/login
-        setErrorMessage("Demo mode: Hooked to real backend API endpoint /api/v1/auth/login");
+        setErrorMessage("Invalid credentials.");
       }
-    }, 1000);
+    } catch (err: any) {
+      setErrorMessage(err.message || "Authentication failed.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
