@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.0] - 2026-09-06
+
+### Added
+- **Marketplace Storefront & Codebase Catalog (`platform/src/app/page.tsx`):**
+  - Built high-performance Cybernetic Marketplace Storefront with live search input, keyboard shortcut (`/`), framework filter chips (Rust, Next.js, Go, Python, Flutter, React, PostgreSQL, Docker), and sorting.
+  - Product cards featuring verified Tree-Sitter AST badges, 48h escrow tags, integer paise-to-₹ formatting, seller reputation chips, and direct inspection links.
+- **Codebase Product Dossier & Escrow Purchase (`platform/src/app/product/[slug]/page.tsx`):**
+  - Implemented comprehensive technical specification sheet with full architecture overview.
+  - Live AST Security Audit Card detailing Tree-Sitter syntax verification, zero leaked secrets, Shannon entropy pass, and AES-256 deliverable packaging.
+  - Interactive Escrow Checkout modal with real-time integer paise breakdown of Gross Price, 3.5% Platform Fee, 18% GST, and 1% Section 194-O TDS.
+- **Developer Listing Studio (`platform/src/app/developer/products/new/page.tsx`):**
+  - Multi-step codebase submission wizard with real-time title auto-slugging, tag selection, and Git repository URL attachment.
+  - Integrated Live Financial Settlement Calculator displaying exact net seller payouts with zero floating-point arithmetic.
+- **Buyer Repository Vault & Escrow State Machine (`platform/src/app/dashboard/page.tsx`):**
+  - Dedicated buyer dashboard with order tracking, active 48-hour inspection countdown timer, and one-click AES-256 deliverable downloads.
+  - Interactive escrow controls: Early escrow release to seller and dispute raising mechanism for frozen audits.
+- **Global Platform Navigation Components (`platform/src/components/nav/`):**
+  - `PlatformHeader`: Sticky glassmorphic navbar with search bar, protocol status, and CTAs.
+  - `PlatformFooter`: Protocol invariants display, audit operational status, and cross-site navigation links.
+- **Backend Rust Marketplace API Extensions (`src/marketplace`):**
+  - Added `CatalogProductItem`, `CatalogQuery`, and `CatalogResponse` in `src/marketplace/models.rs`.
+  - Implemented parameterized `list_catalog` and `publish_product` in `src/marketplace/repository.rs`.
+  - Registered public unauthenticated `GET /api/v1/marketplace/catalog` and authenticated `POST /api/v1/marketplace/products/{id}/publish` endpoints.
+
 ## [1.3.0] - 2026-09-06
 
 ### Changed
