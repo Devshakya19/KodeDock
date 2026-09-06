@@ -1,11 +1,11 @@
-pub mod middleware;
+pub mod email;
 pub mod handlers;
+pub mod middleware;
 pub mod models;
+pub mod oauth;
 pub mod repository;
 pub mod service;
-pub mod email;
 pub mod totp;
-pub mod oauth;
 
 use actix_web::web;
 
@@ -19,10 +19,13 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
             .route("/logout", web::post().to(handlers::logout))
             .route("/2fa/setup", web::post().to(handlers::setup_2fa))
             .route("/2fa/verify", web::post().to(handlers::verify_2fa))
-            .route("/email/send-verification", web::post().to(handlers::send_verification_email))
+            .route(
+                "/email/send-verification",
+                web::post().to(handlers::send_verification_email),
+            )
             .route("/email/verify", web::post().to(handlers::verify_email))
             .route("/github/login", web::get().to(handlers::github_login))
-                        .route("/github/callback", web::get().to(handlers::github_callback))
+            .route("/github/callback", web::get().to(handlers::github_callback))
             .route("/google/login", web::get().to(handlers::google_login))
             .route("/google/callback", web::get().to(handlers::google_callback)),
     );

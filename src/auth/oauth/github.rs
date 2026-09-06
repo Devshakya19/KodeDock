@@ -1,7 +1,7 @@
+use super::OAuthUserProfile;
+use crate::errors::AppError;
 use reqwest::Client;
 use serde::Deserialize;
-use crate::errors::AppError;
-use super::OAuthUserProfile;
 
 #[derive(Deserialize, Debug)]
 struct GitHubTokenResponse {
@@ -51,13 +51,15 @@ pub async fn exchange_code(
             .map_err(|e| AppError::InternalError(format!("GitHub token parse failed: {}", e)))?;
         Ok(token_resp.access_token)
     } else {
-        Err(AppError::InternalError("Failed to exchange GitHub code".to_string()))
+        Err(AppError::InternalError(
+            "Failed to exchange GitHub code".to_string(),
+        ))
     }
 }
 
 pub async fn get_profile(access_token: &str) -> Result<OAuthUserProfile, AppError> {
     let client = Client::new();
-    
+
     let user_res = client
         .get("https://api.github.com/user")
         .header("Authorization", format!("Bearer {}", access_token))
@@ -72,7 +74,7 @@ pub async fn get_profile(access_token: &str) -> Result<OAuthUserProfile, AppErro
         .map_err(|e| AppError::InternalError(format!("GitHub user parse failed: {}", e)))?;
 
     let mut primary_email = user.email.clone();
-    
+
     if primary_email.is_none() {
         let emails_res = client
             .get("https://api.github.com/user/emails")
@@ -81,12 +83,9 @@ pub async fn get_profile(access_token: &str) -> Result<OAuthUserProfile, AppErro
             .send()
             .await
             .map_err(|_| AppError::InternalError("GitHub emails request failed".to_string()))?;
-            
-        let emails: Vec<GitHubEmail> = emails_res
-            .json()
-            .await
-            .unwrap_or_default();
-            
+
+        let emails: Vec<GitHubEmail> = emails_res.json().await.unwrap_or_default();
+
         if let Some(email) = emails.into_iter().find(|e| e.primary && e.verified) {
             primary_email = Some(email.email);
         }

@@ -14,6 +14,9 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
             // Authenticated Seller routes
             .route("/products", web::post().to(handlers::create_product))
             .route("/products", web::get().to(handlers::my_products))
-            .route("/products/{id}/publish", web::post().to(handlers::publish_product))
+            .route(
+                "/products/{id}/publish",
+                web::post().to(handlers::publish_product),
+            ),
     );
 }

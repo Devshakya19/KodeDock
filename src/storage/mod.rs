@@ -9,6 +9,9 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
         web::scope("/storage")
             .route("/upload-intent", web::post().to(handlers::upload_intent))
             .route("/upload-confirm", web::post().to(handlers::upload_confirm))
-            .route("/download/{asset_id}", web::get().to(handlers::download_intent))
+            .route(
+                "/download/{asset_id}",
+                web::get().to(handlers::download_intent),
+            ),
     );
 }

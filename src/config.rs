@@ -51,17 +51,17 @@ impl AppConfig {
         let redis_url = env::var("REDIS_URL")
             .map_err(|_| "REDIS_URL environment variable is missing".to_string())?;
 
-        let s3_endpoint = env::var("S3_ENDPOINT")
-            .unwrap_or_else(|_| "http://storage:8333".to_string());
+        let s3_endpoint =
+            env::var("S3_ENDPOINT").unwrap_or_else(|_| "http://storage:8333".to_string());
 
-        let s3_public_bucket = env::var("S3_PUBLIC_BUCKET")
-            .unwrap_or_else(|_| "kodedock-public-assets".to_string());
+        let s3_public_bucket =
+            env::var("S3_PUBLIC_BUCKET").unwrap_or_else(|_| "kodedock-public-assets".to_string());
 
         let s3_vault_bucket = env::var("S3_VAULT_BUCKET")
             .unwrap_or_else(|_| "kodedock-vault-deliverables".to_string());
 
-        let s3_access_key = env::var("S3_ACCESS_KEY")
-            .unwrap_or_else(|_| "kodedock_s3_admin_key".to_string());
+        let s3_access_key =
+            env::var("S3_ACCESS_KEY").unwrap_or_else(|_| "kodedock_s3_admin_key".to_string());
 
         let s3_secret_key = env::var("S3_SECRET_KEY")
             .unwrap_or_else(|_| "kodedock_s3_admin_secret_super_secure_key".to_string());
@@ -79,8 +79,10 @@ impl AppConfig {
             .parse::<i64>()
             .unwrap_or(604800);
 
-        let master_encryption_key_hex = env::var("MASTER_ENCRYPTION_KEY_HEX")
-            .unwrap_or_else(|_| "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef".to_string());
+        let master_encryption_key_hex =
+            env::var("MASTER_ENCRYPTION_KEY_HEX").unwrap_or_else(|_| {
+                "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef".to_string()
+            });
 
         let drm_ed25519_private_key_base64 = env::var("DRM_ED25519_PRIVATE_KEY_BASE64")
             .unwrap_or_else(|_| "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=".to_string());
@@ -106,7 +108,8 @@ impl AppConfig {
             .unwrap_or(1025);
         let smtp_user = env::var("SMTP_USER").unwrap_or_else(|_| "".to_string());
         let smtp_pass = env::var("SMTP_PASSWORD").unwrap_or_else(|_| "".to_string());
-        let smtp_from = env::var("SMTP_FROM_EMAIL").unwrap_or_else(|_| "no-reply@kodedock.com".to_string());
+        let smtp_from =
+            env::var("SMTP_FROM_EMAIL").unwrap_or_else(|_| "no-reply@kodedock.com".to_string());
 
         Ok(Self {
             environment,

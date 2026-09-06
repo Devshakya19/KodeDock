@@ -42,7 +42,10 @@ async fn main() -> std::io::Result<()> {
         .json()
         .init();
 
-    info!("⚓ Booting KodeDock Universal Digital Marketplace Engine v{}...", env!("CARGO_PKG_VERSION"));
+    info!(
+        "⚓ Booting KodeDock Universal Digital Marketplace Engine v{}...",
+        env!("CARGO_PKG_VERSION")
+    );
 
     // 3. Load strongly-typed AppConfig
     let config = match AppConfig::from_env() {
@@ -61,7 +64,10 @@ async fn main() -> std::io::Result<()> {
         .await
     {
         Ok(pool) => {
-            info!("✅ PostgreSQL connected successfully (Pool size: {})", config.database_max_connections);
+            info!(
+                "✅ PostgreSQL connected successfully (Pool size: {})",
+                config.database_max_connections
+            );
             pool
         }
         Err(e) => {

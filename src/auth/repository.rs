@@ -167,7 +167,7 @@ impl AuthRepository {
             VALUES ($1, $2, FALSE)
             ON CONFLICT (user_id) 
             DO UPDATE SET encrypted_secret = EXCLUDED.encrypted_secret, is_enabled = FALSE
-            "#
+            "#,
         )
         .bind(user_id)
         .bind(encrypted_secret)
@@ -186,7 +186,7 @@ impl AuthRepository {
             SELECT encrypted_secret, is_enabled
             FROM totp_secrets
             WHERE user_id = $1
-            "#
+            "#,
         )
         .bind(user_id)
         .fetch_optional(pool)
@@ -195,16 +195,13 @@ impl AuthRepository {
         Ok(record)
     }
 
-    pub async fn enable_totp(
-        pool: &PgPool,
-        user_id: Uuid,
-    ) -> Result<(), AppError> {
+    pub async fn enable_totp(pool: &PgPool, user_id: Uuid) -> Result<(), AppError> {
         sqlx::query(
             r#"
             UPDATE totp_secrets
             SET is_enabled = TRUE, verified_at = NOW()
             WHERE user_id = $1
-            "#
+            "#,
         )
         .bind(user_id)
         .execute(pool)
@@ -213,21 +210,18 @@ impl AuthRepository {
         Ok(())
     }
 
-    pub async fn mark_email_verified(
-        pool: &PgPool,
-        user_id: Uuid,
-    ) -> Result<(), AppError> {
+    pub async fn mark_email_verified(pool: &PgPool, user_id: Uuid) -> Result<(), AppError> {
         sqlx::query(
             r#"
             UPDATE users
             SET is_email_verified = TRUE
             WHERE id = $1
-            "#
+            "#,
         )
         .bind(user_id)
         .execute(pool)
         .await?;
-        
+
         Ok(())
     }
 
@@ -245,7 +239,7 @@ impl AuthRepository {
             r#"
             SELECT user_id FROM oauth_accounts
             WHERE provider = $1 AND provider_user_id = $2
-            "#
+            "#,
         )
         .bind(provider)
         .bind(provider_user_id)
@@ -258,26 +252,25 @@ impl AuthRepository {
                 SELECT id, email, password_hash, full_name, role, avatar_url, bio,
                        pan_number, gst_number, is_email_verified, is_banned, created_at, updated_at
                 FROM users WHERE id = $1
-                "#
+                "#,
             )
             .bind(user_id)
             .fetch_one(&mut *tx)
             .await?;
-            
+
             tx.commit().await?;
             return Ok(user);
         }
 
-        let email_to_use = email.unwrap_or_else(|| "");
-        
+        let email_to_use = email.unwrap_or("");
+
         // Let's check if the email already exists to link the account.
         let user_id = if !email_to_use.is_empty() {
-            let existing_user = sqlx::query_as::<_, (Uuid,)>(
-                "SELECT id FROM users WHERE email = $1"
-            )
-            .bind(email_to_use)
-            .fetch_optional(&mut *tx)
-            .await?;
+            let existing_user =
+                sqlx::query_as::<_, (Uuid,)>("SELECT id FROM users WHERE email = $1")
+                    .bind(email_to_use)
+                    .fetch_optional(&mut *tx)
+                    .await?;
 
             if let Some((uid,)) = existing_user {
                 uid
@@ -298,14 +291,16 @@ impl AuthRepository {
                 new_user.0
             }
         } else {
-            return Err(AppError::BadRequest("Email is required for OAuth".to_string()));
+            return Err(AppError::BadRequest(
+                "Email is required for OAuth".to_string(),
+            ));
         };
 
         sqlx::query(
             r#"
             INSERT INTO oauth_accounts (user_id, provider, provider_user_id)
             VALUES ($1, $2, $3)
-            "#
+            "#,
         )
         .bind(user_id)
         .bind(provider)
@@ -318,7 +313,7 @@ impl AuthRepository {
             SELECT id, email, password_hash, full_name, role, avatar_url, bio,
                    pan_number, gst_number, is_email_verified, is_banned, created_at, updated_at
             FROM users WHERE id = $1
-            "#
+            "#,
         )
         .bind(user_id)
         .fetch_one(&mut *tx)

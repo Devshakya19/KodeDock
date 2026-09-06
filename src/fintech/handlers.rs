@@ -1,15 +1,15 @@
+use actix_web::HttpRequest;
 use actix_web::{web, HttpResponse};
-use sqlx::PgPool;
+use hex;
 use hmac::{Hmac, Mac};
 use sha2::Sha256;
-use hex;
+use sqlx::PgPool;
 use uuid::Uuid;
-use actix_web::HttpRequest;
 
+use super::models::{CreateOrderRequest, RazorpayWebhookPayload};
+use super::service::FintechService;
 use crate::auth::middleware::AuthenticatedUser;
 use crate::errors::AppError;
-use super::service::FintechService;
-use super::models::{RazorpayWebhookPayload, CreateOrderRequest};
 
 pub async fn my_wallet(
     pool: web::Data<PgPool>,
@@ -40,17 +40,19 @@ pub async fn razorpay_webhook(
     body: web::Bytes,
 ) -> Result<HttpResponse, AppError> {
     // 1. Verify Signature
-    let signature = req.headers().get("X-Razorpay-Signature")
+    let signature = req
+        .headers()
+        .get("X-Razorpay-Signature")
         .and_then(|h| h.to_str().ok())
         .ok_or_else(|| AppError::Unauthorized("Missing signature".to_string()))?;
 
     // In a real app, this secret comes from config
-    let webhook_secret = std::env::var("RAZORPAY_WEBHOOK_SECRET")
-        .unwrap_or_else(|_| "dummy_secret".to_string());
+    let webhook_secret =
+        std::env::var("RAZORPAY_WEBHOOK_SECRET").unwrap_or_else(|_| "dummy_secret".to_string());
 
     let mut mac = Hmac::<Sha256>::new_from_slice(webhook_secret.as_bytes())
         .map_err(|_| AppError::InternalError("Invalid HMAC key".to_string()))?;
-    
+
     mac.update(&body);
     let expected_signature = hex::encode(mac.finalize().into_bytes());
 
@@ -64,16 +66,27 @@ pub async fn razorpay_webhook(
 
     // 3. Extract Order Info and Process Payment
     if payload.event == "payment.captured" {
-        let payment_intent_id = payload.payload["payment"]["entity"]["id"].as_str().unwrap_or("unknown");
-        let amount_paise = payload.payload["payment"]["entity"]["amount"].as_i64().unwrap_or(0);
-        
-        // Normally, you fetch the order from DB using notes/metadata. 
+        let payment_intent_id = payload.payload["payment"]["entity"]["id"]
+            .as_str()
+            .unwrap_or("unknown");
+        let amount_paise = payload.payload["payment"]["entity"]["amount"]
+            .as_i64()
+            .unwrap_or(0);
+
+        // Normally, you fetch the order from DB using notes/metadata.
         // Here we simulate fetching the order details.
         let buyer_id = Uuid::new_v4(); // Simulated
         let seller_id = Uuid::new_v4(); // Simulated
         let product_id = Uuid::new_v4(); // Simulated
         let version_id = Uuid::new_v4(); // Simulated
-        let order_number = format!("ORD-{}", Uuid::new_v4().to_string().chars().take(8).collect::<String>());
+        let order_number = format!(
+            "ORD-{}",
+            Uuid::new_v4()
+                .to_string()
+                .chars()
+                .take(8)
+                .collect::<String>()
+        );
 
         FintechService::process_successful_payment(
             &pool,
@@ -88,7 +101,8 @@ pub async fn razorpay_webhook(
             version_id,
             amount_paise,
             payment_intent_id,
-        ).await?;
+        )
+        .await?;
     }
 
     Ok(HttpResponse::Ok().json(serde_json::json!({"status": "ok"})))

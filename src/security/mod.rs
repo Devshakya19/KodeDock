@@ -1,11 +1,8 @@
-use actix_web::{web, HttpResponse};
 use crate::common::ApiResponse;
+use actix_web::{web, HttpResponse};
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
-    cfg.service(
-        web::scope("/security")
-            .route("/health", web::get().to(security_health)),
-    );
+    cfg.service(web::scope("/security").route("/health", web::get().to(security_health)));
 }
 
 async fn security_health() -> HttpResponse {

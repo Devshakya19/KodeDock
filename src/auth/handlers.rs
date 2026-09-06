@@ -1,5 +1,8 @@
 use crate::auth::middleware::AuthenticatedUser;
-use crate::auth::models::{LoginRequest, SignupRequest, TotpVerifyRequest, SendVerificationEmailRequest, VerifyEmailRequest, OAuthCallbackRequest};
+use crate::auth::models::{
+    LoginRequest, OAuthCallbackRequest, SendVerificationEmailRequest, SignupRequest,
+    TotpVerifyRequest, VerifyEmailRequest,
+};
 use crate::auth::service::AuthService;
 use crate::common::ApiResponse;
 use crate::config::AppConfig;
@@ -8,9 +11,8 @@ use actix_web::{
     cookie::{Cookie, SameSite},
     web, HttpRequest, HttpResponse,
 };
-use sqlx::PgPool;
 use redis::Client as RedisClient;
-
+use sqlx::PgPool;
 
 fn build_refresh_cookie(token: String, config: &AppConfig, max_age_secs: i64) -> Cookie<'static> {
     Cookie::build("kodedock_refresh_token", token)
@@ -33,7 +35,10 @@ pub async fn signup(
 
     Ok(HttpResponse::Created()
         .cookie(cookie)
-        .json(ApiResponse::success_with_message(auth_resp, "User registered successfully")))
+        .json(ApiResponse::success_with_message(
+            auth_resp,
+            "User registered successfully",
+        )))
 }
 
 pub async fn login(
@@ -41,13 +46,17 @@ pub async fn login(
     config: web::Data<AppConfig>,
     req: web::Json<LoginRequest>,
 ) -> Result<HttpResponse, AppError> {
-    let (auth_resp, refresh_token) = AuthService::login(&pool, &config, &req.email, &req.password).await?;
+    let (auth_resp, refresh_token) =
+        AuthService::login(&pool, &config, &req.email, &req.password).await?;
 
     let cookie = build_refresh_cookie(refresh_token, &config, config.jwt_refresh_expiry_secs);
 
     Ok(HttpResponse::Ok()
         .cookie(cookie)
-        .json(ApiResponse::success_with_message(auth_resp, "Login successful")))
+        .json(ApiResponse::success_with_message(
+            auth_resp,
+            "Login successful",
+        )))
 }
 
 pub async fn refresh_token(
@@ -70,11 +79,18 @@ pub async fn refresh_token(
 }
 
 pub async fn logout() -> Result<HttpResponse, AppError> {
-    let removal_cookie = Cookie::build("kodedock_refresh_token", "").path("/").http_only(true).max_age(actix_web::cookie::time::Duration::seconds(0)).finish();
+    let removal_cookie = Cookie::build("kodedock_refresh_token", "")
+        .path("/")
+        .http_only(true)
+        .max_age(actix_web::cookie::time::Duration::seconds(0))
+        .finish();
 
     Ok(HttpResponse::Ok()
         .cookie(removal_cookie)
-        .json(ApiResponse::success_with_message(true, "Logged out successfully")))
+        .json(ApiResponse::success_with_message(
+            true,
+            "Logged out successfully",
+        )))
 }
 
 pub async fn setup_2fa(
@@ -130,7 +146,9 @@ pub async fn verify_email(
             "Email verified successfully",
         )))
     } else {
-        Err(AppError::BadRequest("Invalid or expired verification code".to_string()))
+        Err(AppError::BadRequest(
+            "Invalid or expired verification code".to_string(),
+        ))
     }
 }
 
@@ -139,48 +157,54 @@ pub async fn github_callback(
     config: web::Data<AppConfig>,
     req: web::Query<OAuthCallbackRequest>,
 ) -> Result<HttpResponse, AppError> {
-    let (auth_resp, refresh_token) = AuthService::handle_github_callback(&pool, &config, &req.code).await?;
+    let (auth_resp, refresh_token) =
+        AuthService::handle_github_callback(&pool, &config, &req.code).await?;
 
     let cookie = build_refresh_cookie(refresh_token, &config, config.jwt_refresh_expiry_secs);
 
     Ok(HttpResponse::Ok()
         .cookie(cookie)
-        .json(ApiResponse::success_with_message(auth_resp, "GitHub OAuth login successful")))
+        .json(ApiResponse::success_with_message(
+            auth_resp,
+            "GitHub OAuth login successful",
+        )))
 }
 
-pub async fn github_login(
-    config: web::Data<AppConfig>,
-) -> Result<HttpResponse, AppError> {
+pub async fn github_login(config: web::Data<AppConfig>) -> Result<HttpResponse, AppError> {
     let url = format!(
         "https://github.com/login/oauth/authorize?client_id={}&redirect_uri={}&scope=user:email",
-        config.github_client_id,
-        config.github_redirect_uri
+        config.github_client_id, config.github_redirect_uri
     );
-    Ok(HttpResponse::Found().insert_header(("Location", url)).finish())
+    Ok(HttpResponse::Found()
+        .insert_header(("Location", url))
+        .finish())
 }
-
 
 pub async fn google_callback(
     pool: web::Data<PgPool>,
     config: web::Data<AppConfig>,
     req: web::Query<OAuthCallbackRequest>,
 ) -> Result<HttpResponse, AppError> {
-    let (auth_resp, refresh_token) = AuthService::handle_google_callback(&pool, &config, &req.code).await?;
+    let (auth_resp, refresh_token) =
+        AuthService::handle_google_callback(&pool, &config, &req.code).await?;
 
     let cookie = build_refresh_cookie(refresh_token, &config, config.jwt_refresh_expiry_secs);
 
     Ok(HttpResponse::Ok()
         .cookie(cookie)
-        .json(ApiResponse::success_with_message(auth_resp, "Google OAuth login successful")))
+        .json(ApiResponse::success_with_message(
+            auth_resp,
+            "Google OAuth login successful",
+        )))
 }
 
-pub async fn google_login(
-    config: web::Data<AppConfig>,
-) -> Result<HttpResponse, AppError> {
+pub async fn google_login(config: web::Data<AppConfig>) -> Result<HttpResponse, AppError> {
     let url = format!(
         "https://accounts.google.com/o/oauth2/v2/auth?client_id={}&redirect_uri={}&response_type=code&scope=email%20profile",
         config.google_client_id,
         config.google_redirect_uri
     );
-    Ok(HttpResponse::Found().insert_header(("Location", url)).finish())
+    Ok(HttpResponse::Found()
+        .insert_header(("Location", url))
+        .finish())
 }

@@ -1,10 +1,10 @@
+use slug::slugify;
 use sqlx::PgPool;
 use uuid::Uuid;
-use slug::slugify;
 
-use crate::errors::AppError;
 use super::models::{CatalogQuery, CatalogResponse, CreateProductRequest, Product};
 use super::repository::MarketplaceRepository;
+use crate::errors::AppError;
 
 pub struct MarketplaceService;
 
@@ -16,15 +16,19 @@ impl MarketplaceService {
     ) -> Result<Product, AppError> {
         // Enforce integer rules
         if req.base_price_paise < 0 {
-            return Err(AppError::ValidationError("Price cannot be negative".to_string()));
+            return Err(AppError::ValidationError(
+                "Price cannot be negative".to_string(),
+            ));
         }
 
         let product_id = Uuid::new_v4();
-        
+
         // Generate a unique slug by appending the first 8 chars of the UUID
         let base_slug = slugify(&req.title);
         let slug = format!("{}-{}", base_slug, &product_id.to_string()[..8]);
-        let asset_type = req.asset_type.unwrap_or_else(|| "code_boilerplate".to_string());
+        let asset_type = req
+            .asset_type
+            .unwrap_or_else(|| "code_boilerplate".to_string());
 
         // Insert into database
         let product = MarketplaceRepository::create_product(
@@ -39,7 +43,8 @@ impl MarketplaceService {
             req.base_price_paise,
             req.demo_url.as_deref(),
             req.github_repo_url.as_deref(),
-        ).await?;
+        )
+        .await?;
 
         Ok(product)
     }
@@ -67,7 +72,8 @@ impl MarketplaceService {
             query.sort.as_deref(),
             offset,
             limit,
-        ).await?;
+        )
+        .await?;
 
         Ok(CatalogResponse {
             products: items,

@@ -2,11 +2,11 @@ use actix_web::{web, HttpResponse};
 use sqlx::PgPool;
 use uuid::Uuid;
 
+use super::models::{CatalogQuery, CreateProductRequest};
+use super::service::MarketplaceService;
 use crate::auth::middleware::AuthenticatedUser;
 use crate::common::ApiResponse;
 use crate::errors::AppError;
-use super::models::{CatalogQuery, CreateProductRequest};
-use super::service::MarketplaceService;
 
 pub async fn list_catalog(
     pool: web::Data<PgPool>,
@@ -22,11 +22,13 @@ pub async fn create_product(
     req: web::Json<CreateProductRequest>,
 ) -> Result<HttpResponse, AppError> {
     let product = MarketplaceService::create_product(&pool, auth_user.id, req.into_inner()).await?;
-    
-    Ok(HttpResponse::Created().json(ApiResponse::success_with_message(
-        product,
-        "Product created successfully",
-    )))
+
+    Ok(
+        HttpResponse::Created().json(ApiResponse::success_with_message(
+            product,
+            "Product created successfully",
+        )),
+    )
 }
 
 pub async fn get_product(
@@ -35,7 +37,7 @@ pub async fn get_product(
 ) -> Result<HttpResponse, AppError> {
     let slug = path.into_inner();
     let product = MarketplaceService::get_product(&pool, &slug).await?;
-    
+
     Ok(HttpResponse::Ok().json(ApiResponse::success(product)))
 }
 
@@ -44,7 +46,7 @@ pub async fn my_products(
     auth_user: AuthenticatedUser,
 ) -> Result<HttpResponse, AppError> {
     let products = MarketplaceService::get_my_products(&pool, auth_user.id).await?;
-    
+
     Ok(HttpResponse::Ok().json(ApiResponse::success(products)))
 }
 
@@ -55,7 +57,7 @@ pub async fn publish_product(
 ) -> Result<HttpResponse, AppError> {
     let product_id = path.into_inner();
     let product = MarketplaceService::publish_product(&pool, product_id, auth_user.id).await?;
-    
+
     Ok(HttpResponse::Ok().json(ApiResponse::success_with_message(
         product,
         "Product published to live marketplace catalog",

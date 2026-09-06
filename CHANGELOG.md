@@ -10,6 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.5.0] - 2026-09-06
 
 ### Added
+- **GitHub Actions CI/CD Pipeline (`.github/workflows/ci.yml`):**
+  - Integrated complete automated verification workflow running on `main` push and pull requests.
+  - Job `backend`: Rust stable toolchain, rust-cache, `cargo fmt --check`, `cargo clippy -- -D warnings`, `cargo check`, and `cargo test`.
+  - Job `platform-ui`: Node 20, npm caching, TypeScript typechecking (`tsc --noEmit`), and Next.js standalone build validation.
+  - Job `marketing-ui`: Node 20, npm caching, TypeScript typechecking, and Next.js standalone build validation.
+  - Job `docker-validation`: Validates multi-service container orchestration config with `docker compose config --quiet`.
+- **Rust Backend Code Formatting & Clippy Hardening:**
+  - Formatted entire Rust codebase to official rustfmt standard.
+  - Resolved all clippy warnings (`unnecessary_lazy_evaluations`, `redundant_closure`, `too_many_arguments`).
 - **Unified Docker Architecture & Production Orchestration (`docker/docker-compose.yml`):**
   - Added `platform-ui` service running the Next.js platform web application on internal port 3000 (host port 3001) connected to `kodedock-net`.
   - Added `kodedock-ui` service running the Next.js marketing application on internal port 3000 (host port 3000) connected to `kodedock-net`.

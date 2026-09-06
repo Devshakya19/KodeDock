@@ -1,7 +1,7 @@
+use super::models::{EscrowTransaction, Order, UserAccount};
+use crate::errors::AppError;
 use sqlx::{PgPool, Postgres, Transaction};
 use uuid::Uuid;
-use crate::errors::AppError;
-use super::models::{UserAccount, Order, EscrowTransaction};
 
 pub struct FintechRepository;
 
@@ -47,7 +47,7 @@ impl FintechRepository {
             INSERT INTO user_accounts (user_id, available_balance_paise, pending_escrow_paise)
             VALUES ($1, 0, 0)
             ON CONFLICT (user_id) DO NOTHING
-            "#
+            "#,
         )
         .bind(user_id)
         .execute(&mut **tx)
@@ -79,7 +79,7 @@ impl FintechRepository {
             UPDATE user_accounts
             SET available_balance_paise = $1, pending_escrow_paise = $2, updated_at = NOW()
             WHERE user_id = $3
-            "#
+            "#,
         )
         .bind(new_available)
         .bind(new_pending)
@@ -90,6 +90,7 @@ impl FintechRepository {
         Ok(())
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub async fn insert_ledger_entry<'a>(
         tx: &mut Transaction<'a, Postgres>,
         id: Uuid,
@@ -132,7 +133,7 @@ impl FintechRepository {
             INSERT INTO webhook_events (provider, event_id, event_type, payload, is_processed)
             VALUES ($1, $2, $3, $4, TRUE)
             ON CONFLICT (provider, event_id) DO NOTHING
-            "#
+            "#,
         )
         .bind(provider)
         .bind(event_id)
@@ -148,7 +149,7 @@ impl FintechRepository {
         let value: Option<(i64,)> = sqlx::query_as(
             r#"
             SELECT config_value_int FROM platform_configs WHERE config_key = $1
-            "#
+            "#,
         )
         .bind(key)
         .fetch_optional(pool)
@@ -156,7 +157,10 @@ impl FintechRepository {
 
         match value {
             Some((val,)) => Ok(val),
-            None => Err(AppError::InternalError(format!("Missing platform config: {}", key)))
+            None => Err(AppError::InternalError(format!(
+                "Missing platform config: {}",
+                key
+            ))),
         }
     }
 

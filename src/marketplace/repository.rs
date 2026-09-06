@@ -1,12 +1,13 @@
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::errors::AppError;
 use super::models::{CatalogProductItem, Product};
+use crate::errors::AppError;
 
 pub struct MarketplaceRepository;
 
 impl MarketplaceRepository {
+    #[allow(clippy::too_many_arguments)]
     pub async fn create_product(
         pool: &PgPool,
         id: Uuid,
@@ -33,7 +34,7 @@ impl MarketplaceRepository {
                 id, seller_id, category_id, title, slug, summary, description,
                 asset_type, base_price_paise, currency, demo_url, github_repo_url,
                 status, is_verified, sales_count, created_at, updated_at
-            "#
+            "#,
         )
         .bind(id)
         .bind(seller_id)
@@ -46,8 +47,7 @@ impl MarketplaceRepository {
         .bind(demo_url)
         .bind(github_repo_url)
         .fetch_one(pool)
-        .await
-        ?;
+        .await?;
 
         Ok(product)
     }
@@ -61,12 +61,11 @@ impl MarketplaceRepository {
                 status, is_verified, sales_count, created_at, updated_at
             FROM products
             WHERE slug = $1
-            "#
+            "#,
         )
         .bind(slug)
         .fetch_optional(pool)
-        .await
-        ?;
+        .await?;
 
         match product {
             Some(p) => Ok(p),
@@ -74,7 +73,10 @@ impl MarketplaceRepository {
         }
     }
 
-    pub async fn list_seller_products(pool: &PgPool, seller_id: Uuid) -> Result<Vec<Product>, AppError> {
+    pub async fn list_seller_products(
+        pool: &PgPool,
+        seller_id: Uuid,
+    ) -> Result<Vec<Product>, AppError> {
         let products = sqlx::query_as::<_, Product>(
             r#"
             SELECT
@@ -84,12 +86,11 @@ impl MarketplaceRepository {
             FROM products
             WHERE seller_id = $1
             ORDER BY created_at DESC
-            "#
+            "#,
         )
         .bind(seller_id)
         .fetch_all(pool)
-        .await
-        ?;
+        .await?;
 
         Ok(products)
     }
@@ -120,7 +121,7 @@ impl MarketplaceRepository {
               CASE WHEN $3 = 'popular' THEN sales_count END DESC,
               created_at DESC
             LIMIT $4 OFFSET $5
-            "#
+            "#,
         )
         .bind(&search_pattern)
         .bind(asset_type)
@@ -128,8 +129,7 @@ impl MarketplaceRepository {
         .bind(limit)
         .bind(offset)
         .fetch_all(pool)
-        .await
-        ?;
+        .await?;
 
         let total_row: (i64,) = sqlx::query_as(
             r#"
@@ -138,13 +138,12 @@ impl MarketplaceRepository {
             WHERE (status = 'published' OR status = 'draft')
               AND ($1::TEXT IS NULL OR LOWER(title) LIKE $1 OR LOWER(summary) LIKE $1)
               AND ($2::TEXT IS NULL OR asset_type = $2)
-            "#
+            "#,
         )
         .bind(&search_pattern)
         .bind(asset_type)
         .fetch_one(pool)
-        .await
-        ?;
+        .await?;
 
         Ok((items, total_row.0))
     }
@@ -163,17 +162,18 @@ impl MarketplaceRepository {
                 id, seller_id, category_id, title, slug, summary, description,
                 asset_type, base_price_paise, currency, demo_url, github_repo_url,
                 status, is_verified, sales_count, created_at, updated_at
-            "#
+            "#,
         )
         .bind(product_id)
         .bind(seller_id)
         .fetch_optional(pool)
-        .await
-        ?;
+        .await?;
 
         match product {
             Some(p) => Ok(p),
-            None => Err(AppError::NotFound("Product not found or unauthorized".to_string())),
+            None => Err(AppError::NotFound(
+                "Product not found or unauthorized".to_string(),
+            )),
         }
     }
 }
