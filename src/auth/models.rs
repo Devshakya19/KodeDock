@@ -26,6 +26,9 @@ pub struct UserPublicProfile {
     pub full_name: String,
     pub role: String,
     pub avatar_url: Option<String>,
+    pub bio: Option<String>,
+    pub pan_number: Option<String>,
+    pub gst_number: Option<String>,
     pub is_email_verified: bool,
     pub created_at: DateTime<Utc>,
 }
@@ -38,6 +41,9 @@ impl From<User> for UserPublicProfile {
             full_name: u.full_name,
             role: u.role,
             avatar_url: u.avatar_url,
+            bio: u.bio,
+            pan_number: u.pan_number,
+            gst_number: u.gst_number,
             is_email_verified: u.is_email_verified,
             created_at: u.created_at,
         }
@@ -56,6 +62,12 @@ pub struct SignupRequest {
 pub struct LoginRequest {
     pub email: String,
     pub password: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ChangePasswordRequest {
+    pub current_password: String,
+    pub new_password: String,
 }
 
 #[derive(Debug, Serialize)]
@@ -101,3 +113,25 @@ pub struct VerifyEmailRequest {
 pub struct TotpSetupRequest {
     pub email: String,
 }
+
+#[derive(Debug, Deserialize)]
+pub struct UpdateProfileRequest {
+    pub full_name: Option<String>,
+    pub bio: Option<String>,
+    pub avatar_url: Option<String>,
+    pub pan_number: Option<String>,
+    pub gst_number: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
+pub struct UserSessionInfo {
+    pub id: Uuid,
+    pub user_id: Uuid,
+    pub ip_address: Option<String>,
+    pub user_agent: Option<String>,
+    pub is_active: bool,
+    pub last_seen_at: DateTime<Utc>,
+    pub expires_at: DateTime<Utc>,
+    pub created_at: DateTime<Utc>,
+}
+

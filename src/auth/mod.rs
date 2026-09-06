@@ -27,6 +27,11 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
             .route("/github/login", web::get().to(handlers::github_login))
             .route("/github/callback", web::get().to(handlers::github_callback))
             .route("/google/login", web::get().to(handlers::google_login))
-            .route("/google/callback", web::get().to(handlers::google_callback)),
+            .route("/google/callback", web::get().to(handlers::google_callback))
+            .route("/me", web::get().to(handlers::get_me))
+            .route("/profile", web::put().to(handlers::update_profile))
+            .route("/password", web::post().to(handlers::change_password))
+            .route("/sessions", web::get().to(handlers::get_sessions))
+            .route("/sessions/{id}", web::delete().to(handlers::revoke_session)),
     );
 }

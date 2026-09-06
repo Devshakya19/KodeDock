@@ -1,4 +1,4 @@
-use crate::auth::models::User;
+use crate::auth::models::{UpdateProfileRequest, User, UserSessionInfo};
 use crate::errors::AppError;
 use chrono::{DateTime, Utc};
 use sqlx::PgPool;
@@ -321,5 +321,77 @@ impl AuthRepository {
 
         tx.commit().await?;
         Ok(user)
+    }
+
+    pub async fn update_user_profile(
+        pool: &PgPool,
+        user_id: Uuid,
+        req: &UpdateProfileRequest,
+    ) -> Result<User, AppError> {
+        let user = sqlx::query_as::<_, User>(
+            r#"
+            UPDATE users
+            SET full_name = COALESCE($2, full_name),
+                bio = COALESCE($3, bio),
+                avatar_url = COALESCE($4, avatar_url),
+                pan_number = COALESCE($5, pan_number),
+                gst_number = COALESCE($6, gst_number),
+                updated_at = NOW()
+            WHERE id = $1
+            RETURNING id, email, password_hash, full_name, role, avatar_url, bio,
+                      pan_number, gst_number, is_email_verified, is_banned, created_at, updated_at
+            "#,
+        )
+        .bind(user_id)
+        .bind(req.full_name.as_deref())
+        .bind(req.bio.as_deref())
+        .bind(req.avatar_url.as_deref())
+        .bind(req.pan_number.as_deref())
+        .bind(req.gst_number.as_deref())
+        .fetch_one(pool)
+        .await?;
+
+        Ok(user)
+    }
+
+    pub async fn get_user_sessions(
+        pool: &PgPool,
+        user_id: Uuid,
+    ) -> Result<Vec<UserSessionInfo>, AppError> {
+        let sessions = sqlx::query_as::<_, UserSessionInfo>(
+            r#"
+            SELECT id, user_id, 
+                   ip_address::TEXT as ip_address, 
+                   user_agent, is_active, last_seen_at, expires_at, created_at
+            FROM sessions
+            WHERE user_id = $1 AND is_active = TRUE
+            ORDER BY last_seen_at DESC
+            "#,
+        )
+        .bind(user_id)
+        .fetch_all(pool)
+        .await?;
+
+        Ok(sessions)
+    }
+
+    pub async fn revoke_session(
+        pool: &PgPool,
+        user_id: Uuid,
+        session_id: Uuid,
+    ) -> Result<(), AppError> {
+        sqlx::query(
+            r#"
+            UPDATE sessions
+            SET is_active = FALSE
+            WHERE id = $1 AND user_id = $2
+            "#,
+        )
+        .bind(session_id)
+        .bind(user_id)
+        .execute(pool)
+        .await?;
+
+        Ok(())
     }
 }

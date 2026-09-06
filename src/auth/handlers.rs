@@ -1,8 +1,9 @@
 use crate::auth::middleware::AuthenticatedUser;
 use crate::auth::models::{
-    LoginRequest, OAuthCallbackRequest, SendVerificationEmailRequest, SignupRequest,
-    TotpVerifyRequest, VerifyEmailRequest,
+    ChangePasswordRequest, LoginRequest, OAuthCallbackRequest, SendVerificationEmailRequest,
+    SignupRequest, TotpVerifyRequest, UpdateProfileRequest, UserPublicProfile, VerifyEmailRequest,
 };
+use crate::auth::repository::AuthRepository;
 use crate::auth::service::AuthService;
 use crate::common::ApiResponse;
 use crate::config::AppConfig;
@@ -208,3 +209,78 @@ pub async fn google_login(config: web::Data<AppConfig>) -> Result<HttpResponse, 
         .insert_header(("Location", url))
         .finish())
 }
+
+pub async fn get_me(
+    pool: web::Data<PgPool>,
+    user: AuthenticatedUser,
+) -> Result<HttpResponse, AppError> {
+    let db_user = AuthRepository::find_by_id(&pool, user.id)
+        .await?
+        .ok_or_else(|| AppError::NotFound("User not found".to_string()))?;
+
+    Ok(HttpResponse::Ok().json(ApiResponse::success(UserPublicProfile::from(db_user))))
+}
+
+pub async fn update_profile(
+    pool: web::Data<PgPool>,
+    user: AuthenticatedUser,
+    req: web::Json<UpdateProfileRequest>,
+) -> Result<HttpResponse, AppError> {
+    let updated_user = AuthRepository::update_user_profile(&pool, user.id, &req.into_inner()).await?;
+    Ok(HttpResponse::Ok().json(ApiResponse::success_with_message(
+        UserPublicProfile::from(updated_user),
+        "Profile updated successfully",
+    )))
+}
+
+pub async fn get_sessions(
+    pool: web::Data<PgPool>,
+    user: AuthenticatedUser,
+) -> Result<HttpResponse, AppError> {
+    let sessions = AuthRepository::get_user_sessions(&pool, user.id).await?;
+    Ok(HttpResponse::Ok().json(ApiResponse::success(sessions)))
+}
+
+pub async fn revoke_session(
+    pool: web::Data<PgPool>,
+    user: AuthenticatedUser,
+    path: web::Path<uuid::Uuid>,
+) -> Result<HttpResponse, AppError> {
+    let session_id = path.into_inner();
+    AuthRepository::revoke_session(&pool, user.id, session_id).await?;
+    Ok(HttpResponse::Ok().json(ApiResponse::success_with_message(
+        true,
+        "Session revoked successfully",
+    )))
+}
+
+pub async fn change_password(
+    pool: web::Data<PgPool>,
+    user: AuthenticatedUser,
+    req: web::Json<ChangePasswordRequest>,
+) -> Result<HttpResponse, AppError> {
+    let db_user = AuthRepository::find_by_id(&pool, user.id)
+        .await?
+        .ok_or_else(|| AppError::NotFound("User not found".to_string()))?;
+
+    if !AuthService::verify_password(&req.current_password, &db_user.password_hash)? {
+        return Err(AppError::Unauthorized("Current password verification failed".to_string()));
+    }
+
+    if req.new_password.len() < 8 {
+        return Err(AppError::BadRequest("New password must be at least 8 characters long".to_string()));
+    }
+
+    let new_hash = AuthService::hash_password(&req.new_password)?;
+    sqlx::query("UPDATE users SET password_hash = $1, updated_at = NOW() WHERE id = $2")
+        .bind(new_hash)
+        .bind(user.id)
+        .execute(pool.get_ref())
+        .await?;
+
+    Ok(HttpResponse::Ok().json(ApiResponse::success_with_message(
+        true,
+        "Password changed successfully",
+    )))
+}
+
