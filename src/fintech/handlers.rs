@@ -6,7 +6,11 @@ use sha2::Sha256;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use super::models::{CreateOrderRequest, RazorpayWebhookPayload};
+use super::models::{
+    AddDisputeMessageRequest, CreateDisputeRequest, CreateOrderRequest,
+    RazorpayWebhookPayload, WalletTopupRequest,
+};
+use super::repository::FintechRepository;
 use super::service::FintechService;
 use crate::auth::middleware::AuthenticatedUser;
 use crate::errors::AppError;
@@ -20,17 +24,23 @@ pub async fn my_wallet(
 }
 
 pub async fn create_order(
-    _pool: web::Data<PgPool>,
-    _user: AuthenticatedUser,
-    _req: web::Json<CreateOrderRequest>,
+    pool: web::Data<PgPool>,
+    user: AuthenticatedUser,
+    req: web::Json<CreateOrderRequest>,
 ) -> Result<HttpResponse, AppError> {
-    // In a real application, we would call Razorpay/Stripe API here to create an intent
-    // and return the client secret to the frontend.
-    // For now, we return a mock order ID that the frontend can pretend to pay.
-    Ok(HttpResponse::Ok().json(serde_json::json!({
-        "order_id": Uuid::new_v4().to_string(),
-        "status": "pending",
-        "client_secret": "mock_client_secret_do_not_use_in_prod"
+    let payment_provider = req.payment_provider.as_deref().unwrap_or("razorpay");
+    let order = FintechRepository::create_buyer_order(
+        &pool,
+        user.id,
+        req.product_id,
+        req.version_id,
+        payment_provider,
+    )
+    .await?;
+
+    Ok(HttpResponse::Created().json(serde_json::json!({
+        "data": order,
+        "message": "Order created and held in secure escrow"
     })))
 }
 
@@ -109,9 +119,102 @@ pub async fn razorpay_webhook(
 }
 
 pub async fn get_disputes(
-    _pool: web::Data<PgPool>,
-    _user: AuthenticatedUser,
+    pool: web::Data<PgPool>,
+    user: AuthenticatedUser,
 ) -> Result<HttpResponse, AppError> {
-    // Stub
-    Ok(HttpResponse::Ok().json(serde_json::json!([])))
+    let disputes = FintechRepository::get_buyer_disputes(&pool, user.id).await?;
+    Ok(HttpResponse::Ok().json(serde_json::json!({
+        "data": disputes
+    })))
 }
+
+pub async fn create_dispute(
+    pool: web::Data<PgPool>,
+    user: AuthenticatedUser,
+    req: web::Json<CreateDisputeRequest>,
+) -> Result<HttpResponse, AppError> {
+    let dispute = FintechRepository::create_buyer_dispute(&pool, user.id, &req.into_inner()).await?;
+    Ok(HttpResponse::Created().json(serde_json::json!({
+        "data": dispute,
+        "message": "Dispute opened successfully. Escrow has been frozen."
+    })))
+}
+
+pub async fn get_dispute_messages(
+    pool: web::Data<PgPool>,
+    _user: AuthenticatedUser,
+    path: web::Path<Uuid>,
+) -> Result<HttpResponse, AppError> {
+    let dispute_id = path.into_inner();
+    let messages = FintechRepository::get_dispute_messages(&pool, dispute_id).await?;
+    Ok(HttpResponse::Ok().json(serde_json::json!({
+        "data": messages
+    })))
+}
+
+pub async fn add_dispute_message(
+    pool: web::Data<PgPool>,
+    user: AuthenticatedUser,
+    path: web::Path<Uuid>,
+    req: web::Json<AddDisputeMessageRequest>,
+) -> Result<HttpResponse, AppError> {
+    let dispute_id = path.into_inner();
+    let msg = FintechRepository::add_dispute_message(
+        &pool,
+        dispute_id,
+        user.id,
+        &req.message,
+        req.attachment_url.clone(),
+    )
+    .await?;
+    Ok(HttpResponse::Created().json(serde_json::json!({
+        "data": msg
+    })))
+}
+
+pub async fn get_wallet_transactions(
+    pool: web::Data<PgPool>,
+    user: AuthenticatedUser,
+) -> Result<HttpResponse, AppError> {
+    let transactions = FintechRepository::get_wallet_transactions(&pool, user.id).await?;
+    Ok(HttpResponse::Ok().json(serde_json::json!({
+        "data": transactions
+    })))
+}
+
+pub async fn topup_wallet(
+    pool: web::Data<PgPool>,
+    user: AuthenticatedUser,
+    req: web::Json<WalletTopupRequest>,
+) -> Result<HttpResponse, AppError> {
+    let account = FintechRepository::topup_wallet_balance(&pool, user.id, req.amount_paise).await?;
+    Ok(HttpResponse::Ok().json(serde_json::json!({
+        "data": account,
+        "message": "Funds added to wallet successfully"
+    })))
+}
+
+pub async fn get_my_orders(
+    pool: web::Data<PgPool>,
+    user: AuthenticatedUser,
+) -> Result<HttpResponse, AppError> {
+    let orders = FintechRepository::get_buyer_orders(&pool, user.id).await?;
+    Ok(HttpResponse::Ok().json(serde_json::json!({
+        "data": orders
+    })))
+}
+
+pub async fn approve_escrow(
+    pool: web::Data<PgPool>,
+    user: AuthenticatedUser,
+    path: web::Path<Uuid>,
+) -> Result<HttpResponse, AppError> {
+    let order_id = path.into_inner();
+    FintechRepository::approve_escrow(&pool, user.id, order_id).await?;
+    Ok(HttpResponse::Ok().json(serde_json::json!({
+        "status": "success",
+        "message": "Escrow released to seller account successfully"
+    })))
+}
+
+

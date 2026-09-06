@@ -12,6 +12,10 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
             .route(
                 "/download/{asset_id}",
                 web::get().to(handlers::download_intent),
+            )
+            .route(
+                "/download/order/{order_id}",
+                web::get().to(handlers::download_order_package),
             ),
     );
 }
