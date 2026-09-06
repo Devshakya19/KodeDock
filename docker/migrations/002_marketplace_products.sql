@@ -37,12 +37,12 @@ CREATE TABLE IF NOT EXISTS products (
     currency VARCHAR(3) NOT NULL DEFAULT 'INR',
     demo_url TEXT,
     github_repo_url TEXT,
-    is_published BOOLEAN NOT NULL DEFAULT FALSE,
+    status VARCHAR(32) NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'published', 'suspended', 'archived')),
     is_verified BOOLEAN NOT NULL DEFAULT FALSE,
     sales_count INT NOT NULL DEFAULT 0,
     rating_average NUMERIC(3, 2) NOT NULL DEFAULT 0.00,
     review_count INT NOT NULL DEFAULT 0,
-    embedding_1536 vector(1536), -- AI semantic vector for cosine similarity search
+    search_embedding vector(1536), -- AI semantic vector for cosine similarity search
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -51,13 +51,13 @@ CREATE INDEX IF NOT EXISTS idx_products_seller_id ON products(seller_id);
 CREATE INDEX IF NOT EXISTS idx_products_category_id ON products(category_id);
 CREATE INDEX IF NOT EXISTS idx_products_slug ON products(slug);
 CREATE INDEX IF NOT EXISTS idx_products_asset_type ON products(asset_type);
-CREATE INDEX IF NOT EXISTS idx_products_is_published ON products(is_published) WHERE is_published = TRUE;
+CREATE INDEX IF NOT EXISTS idx_products_status ON products(status) WHERE status = 'published';
 CREATE INDEX IF NOT EXISTS idx_products_price ON products(base_price_paise);
 
 -- HNSW Vector Index for Sub-3ms Semantic AI Code Search
 CREATE INDEX IF NOT EXISTS idx_products_embedding_hnsw 
 ON products 
-USING hnsw (embedding_1536 vector_cosine_ops)
+USING hnsw (search_embedding vector_cosine_ops)
 WITH (m = 16, ef_construction = 64);
 
 -- 3. Product Versions Table (Deliverable Releases & Archives)
