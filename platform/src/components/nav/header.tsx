@@ -26,9 +26,19 @@ export default function PlatformHeader({ onSearchChange, searchTerm = "" }: Head
   const [user, setUser] = useState<StoredUser | null>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [isMac, setIsMac] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // Scroll listener for dynamic floating navbar compression
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Sync external searchTerm prop
   useEffect(() => {
@@ -165,30 +175,38 @@ export default function PlatformHeader({ onSearchChange, searchTerm = "" }: Head
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[#414146] bg-[#1D1D21] transition-all">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4 sm:gap-6">
-        {/* 1. BRANDING (Minimalist Developer-First) */}
-        <div className="flex items-center gap-6 shrink-0">
-          <Link href="/explore" className="inline-flex items-center gap-2.5 group">
-            <Image
-              src="/icons/logo/kd.svg"
-              alt="KodeDock"
-              width={28}
-              height={28}
-              className="w-7 h-7 object-contain group-hover:scale-105 transition-transform"
-              priority
-            />
-            <span className="font-heading font-semibold text-lg sm:text-xl tracking-tight text-[#EDEDF0] flex items-center">
+    <header
+      className={`fixed top-2 sm:top-4 left-1/2 -translate-x-1/2 z-50 w-[96%] sm:w-[95%] max-w-5xl transition-all duration-300 ease-out ${
+        isScrolled
+          ? "bg-[#141417]/95 backdrop-blur-2xl py-1.5 px-2.5 sm:px-4 rounded-full border border-[#8535FC]/30 shadow-2xl shadow-black/80 scale-[0.99]"
+          : "bg-[#1D1D21]/90 backdrop-blur-xl py-2 px-2.5 sm:px-4 rounded-full border border-[#414146]/70 shadow-xl shadow-black/50 hover:border-[#8535FC]/40"
+      }`}
+    >
+      <div className="flex items-center justify-between gap-1.5 sm:gap-4">
+        {/* 1. BRANDING (Minimalist Developer-First with animated pulse dot) */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <Link href="/explore" className="inline-flex items-center gap-1.5 sm:gap-2 group">
+            <div className="relative w-6 h-6 sm:w-7 sm:h-7 group-hover:scale-105 transition-transform duration-200 shrink-0">
+              <Image
+                src="/icons/logo/kd.svg"
+                alt="KodeDock"
+                width={28}
+                height={28}
+                className="w-full h-full object-contain"
+                priority
+              />
+            </div>
+            <span className="font-heading font-semibold text-xs sm:text-base tracking-tight text-[#EDEDF0] hidden min-[380px]:inline-flex items-center">
               Kode<span className="text-[#8535FC]">Dock</span>
             </span>
           </Link>
         </div>
 
-        {/* 2. SEARCH BAR (Ctrl+P / ⌘P / Slash Shortcut) */}
-        <div className="flex-1 max-w-md mx-1 sm:mx-4">
+        {/* 2. COMPACT EXPANDING SEARCH BAR */}
+        <div className="flex-1 min-w-0 max-w-xs sm:max-w-md mx-1 sm:mx-3 transition-all duration-300 focus-within:max-w-lg">
           <form onSubmit={handleSearchSubmit} className="relative w-full">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#A1A1AA]">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-[#A1A1AA]">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
@@ -196,15 +214,15 @@ export default function PlatformHeader({ onSearchChange, searchTerm = "" }: Head
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Search codebases (Next.js, Rust, Go)..."
+              placeholder="Search codebases..."
               value={localSearch}
               onChange={(e) => handleSearchInput(e.target.value)}
-              className="w-full pl-9 pr-14 py-2 bg-[#141417] hover:bg-[#141417]/80 focus:bg-[#141417] border border-[#414146] focus:border-[#8535FC] rounded-lg text-xs sm:text-sm text-[#EDEDF0] placeholder-[#A1A1AA] outline-none transition-colors"
+              className="w-full h-8 pl-8 pr-3 sm:pr-12 bg-[#141417]/90 hover:bg-[#141417] focus:bg-[#141417] border border-[#414146]/70 focus:border-[#8535FC] rounded-full text-xs text-[#EDEDF0] placeholder-[#A1A1AA] outline-none transition-all duration-300 focus:shadow-[0_0_15px_rgba(133,53,252,0.25)] truncate"
             />
 
-            {/* Shortcut Badge */}
-            <div className="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none">
-              <kbd className="px-1.5 py-0.5 text-[10px] font-mono bg-[#27272A] border border-[#414146] text-[#A1A1AA] rounded">
+            {/* Shortcut Badge (Hidden on touch & mobile screens) */}
+            <div className="absolute inset-y-0 right-0 pr-2 hidden sm:flex items-center pointer-events-none">
+              <kbd className="px-1.5 py-0.5 text-[9px] font-mono bg-[#27272A] border border-[#414146] text-[#A1A1AA] rounded-md">
                 {isMac ? "⌘P" : "Ctrl+P"}
               </kbd>
             </div>
@@ -212,35 +230,35 @@ export default function PlatformHeader({ onSearchChange, searchTerm = "" }: Head
         </div>
 
         {/* 3. USER PROFILE / AUTH ACTIONS */}
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {isLoggedIn ? (
-            /* Logged In: Circular User Profile Chip & Dropdown */
+            /* Logged In: Circular Floating User Profile Chip & Dropdown */
             <div className="relative" ref={userMenuRef}>
               <button
                 type="button"
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full bg-[#27272A] hover:bg-[#323238] border border-[#414146] hover:border-[#8535FC] transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#8535FC]"
+                className="flex items-center gap-1.5 sm:gap-2 p-0.5 sm:pl-1 sm:pr-2.5 sm:py-0.5 rounded-full bg-[#27272A]/90 hover:bg-[#323238] border border-[#414146] hover:border-[#8535FC] transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#8535FC]"
                 aria-label="User profile menu"
               >
                 {/* Circular Avatar SVG */}
-                <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-[#8535FC]/60 bg-[#141417]">
+                <div className="relative w-6 h-6 sm:w-7 sm:h-7 rounded-full overflow-hidden shrink-0 border border-[#8535FC]/60 bg-[#141417]">
                   <Image
                     src={avatarUrl}
                     alt={firstName}
-                    width={32}
-                    height={32}
+                    width={28}
+                    height={28}
                     className="w-full h-full object-cover"
                     unoptimized
                   />
                 </div>
 
-                {/* User First Name */}
-                <span className="text-xs font-semibold text-[#EDEDF0] tracking-wide pr-0.5">
+                {/* User First Name (Visible from 420px up to preserve space on ultra-small screens) */}
+                <span className="text-xs font-semibold text-[#EDEDF0] tracking-wide max-w-[60px] sm:max-w-none truncate hidden min-[420px]:inline">
                   {firstName}
                 </span>
 
                 <svg
-                  className={`w-3.5 h-3.5 text-[#A1A1AA] transition-transform ${userMenuOpen ? "rotate-180" : ""}`}
+                  className={`w-3.5 h-3.5 text-[#A1A1AA] hidden min-[420px]:inline transition-transform duration-200 ${userMenuOpen ? "rotate-180 text-[#8535FC]" : ""}`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -251,9 +269,9 @@ export default function PlatformHeader({ onSearchChange, searchTerm = "" }: Head
 
               {/* Profile Dropdown Menu */}
               {userMenuOpen && (
-                <div className="absolute right-0 mt-2 w-64 rounded-xl bg-[#27272A] border border-[#414146] shadow-2xl py-1 z-50 animate-in fade-in slide-in-from-top-2 duration-100">
+                <div className="absolute right-0 mt-3 w-64 max-w-[calc(100vw-1.5rem)] rounded-2xl bg-[#27272A]/95 backdrop-blur-2xl border border-[#414146] shadow-2xl shadow-black/80 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
                   {/* Account Header */}
-                  <div className="px-4 py-3 bg-[#1D1D21] border-b border-[#414146] flex items-center gap-3 rounded-t-xl">
+                  <div className="px-4 py-3 bg-[#1D1D21]/90 border-b border-[#414146]/60 flex items-center gap-3 rounded-t-2xl">
                     <div className="w-10 h-10 rounded-full overflow-hidden border border-[#8535FC]/60 shrink-0 bg-[#141417]">
                       <Image
                         src={avatarUrl}
@@ -271,8 +289,8 @@ export default function PlatformHeader({ onSearchChange, searchTerm = "" }: Head
                       <p className="text-[11px] font-sans text-[#A1A1AA] truncate mt-0.5">
                         {user?.email || "buyer@kodedock.com"}
                       </p>
-                      <span className="inline-block px-1.5 py-0.5 text-[9px] font-mono text-[#10B981] bg-[#10B981]/10 rounded border border-[#10B981]/20 mt-1">
-                        Verified Buyer
+                      <span className="inline-block px-1.5 py-0.5 text-[9px] font-mono text-[#10B981] bg-[#10B981]/10 rounded-full border border-[#10B981]/20 mt-1">
+                        Verified
                       </span>
                     </div>
                   </div>
@@ -282,28 +300,51 @@ export default function PlatformHeader({ onSearchChange, searchTerm = "" }: Head
                     <Link
                       href="/dashboard"
                       onClick={() => setUserMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-[#EDEDF0] hover:bg-[#1D1D21] hover:text-white transition-colors"
+                      className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-[#EDEDF0] hover:bg-[#1D1D21] hover:text-white transition-colors"
                     >
                       <svg className="w-4 h-4 text-[#8535FC]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                       </svg>
-                      <span>My Purchases (Escrow Vault)</span>
+                      <span>My Purchases (Vault)</span>
                     </Link>
 
                     <Link
-                      href="/explore"
+                      href="/wallet"
                       onClick={() => setUserMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-[#EDEDF0] hover:bg-[#1D1D21] hover:text-white transition-colors"
+                      className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-[#EDEDF0] hover:bg-[#1D1D21] hover:text-white transition-colors"
                     >
-                      <svg className="w-4 h-4 text-[#06B6D4]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      <svg className="w-4 h-4 text-[#10B981]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                       </svg>
-                      <span>Explore Marketplace</span>
+                      <span>Wallet & Ledger</span>
+                    </Link>
+
+                    <Link
+                      href="/disputes"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-[#EDEDF0] hover:bg-[#1D1D21] hover:text-white transition-colors"
+                    >
+                      <svg className="w-4 h-4 text-[#EF4444]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                      </svg>
+                      <span>Dispute Desk</span>
+                    </Link>
+
+                    <Link
+                      href="/settings"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-[#EDEDF0] hover:bg-[#1D1D21] hover:text-white transition-colors"
+                    >
+                      <svg className="w-4 h-4 text-[#C084FC]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      <span>Account Settings</span>
                     </Link>
                   </div>
 
                   {/* Sign Out */}
-                  <div className="border-t border-[#414146] pt-1 pb-1">
+                  <div className="border-t border-[#414146]/60 pt-1 pb-0.5">
                     <button
                       type="button"
                       onClick={handleSignOut}
@@ -322,7 +363,7 @@ export default function PlatformHeader({ onSearchChange, searchTerm = "" }: Head
             /* Logged Out: Primary Sign In Button (Design System V2 compliant) */
             <Link
               href="/login"
-              className="px-4 py-2 rounded-full bg-[#8535FC] hover:bg-[#7822FA] text-xs font-medium text-white transition-colors focus:ring-2 focus:ring-[#8535FC]"
+              className="px-3.5 py-1.5 rounded-full bg-[#8535FC] hover:bg-[#7822FA] text-xs font-medium text-white transition-all shadow-md shadow-[#8535FC]/20 hover:scale-105 focus:ring-2 focus:ring-[#8535FC]"
             >
               Sign In
             </Link>
