@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.0] - 2026-09-06
+
+### Changed
+- **Architectural Separation (`platform` vs `kodedock`):**
+  - Renamed `www/` frontend directory to `platform/` using `git mv` to preserve git history.
+  - Designated `platform/` exclusively for the transactional application: Authentication suite (`/login`, `/register`, `/developer/register`, `/verify-2fa`), Buyer & Seller dashboards, Escrow checkout, and Marketplace shop.
+  - Configured `platform/` dev server to run on port `3001` (`"dev": "next dev -p 3001"`).
+
+### Added
+- **Marketing & Showcase Portal (`kodedock/`):**
+  - Bootstrapped modern Next.js 16 App Router application in `kodedock/` running on port `3000` dedicated to marketing, landing pages, protocol features, and docs.
+  - Implemented high-converting Cybernetic Hero landing page with:
+    - Sticky top marketing navigation with brand emblem and direct CTAs to Platform auth (`/login`, `/register`, `/developer/register`).
+    - High-trust invariants bar highlighting ₹0.00 float math, 48h escrow guarantee, Tree-Sitter AST audit, and RFC 6238 2FA.
+    - Two-sided ecosystem cards detailing buyer verification guarantees and seller 1.0% Section 194-O TDS automated compliance.
+  - Integrated brand assets (`icons/`, `images/`) and unified dark cybernetic design tokens (`#1D1D21`, `#8535FC`, `#06B6D4`, `#414146`).
+  - Added `.env.example` and `.env.local` linking marketing site to `NEXT_PUBLIC_PLATFORM_URL=http://localhost:3001`.
+
 ## [1.2.0] - 2026-09-06
 
 ### Added
