@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <rect width="100" height="100" rx="28" fill="#2E1065"/>
+  <!-- Face -->
+  <circle cx="50" cy="52" r="18" fill="#FDE047"/>
+  <!-- Glowing Beard -->
+  <path d="M34 56 C 34 82, 66 82, 66 56 Z" fill="#E9D5FF"/>
+  <!-- Wizard Hat -->
+  <polygon points="50,10 20,44 80,44" fill="#7C3AED"/>
+  <ellipse cx="50" cy="44" rx="34" ry="6" fill="#6D28D9"/>
+  <!-- Star on Hat -->
+  <circle cx="50" cy="28" r="3.5" fill="#FACC15"/>
+  <!-- Eyes -->
+  <circle cx="43" cy="52" r="2" fill="#581C87"/>
+  <circle cx="57" cy="52" r="2" fill="#581C87"/>
+</svg>

@@ -74,8 +74,12 @@ export default function RegisterPage() {
     setIsLoading(true);
     try {
       const res = await authApi.register({ email, password, full_name: fullName });
-      if (res?.data?.token) {
-        localStorage.setItem("kd_access_token", res.data.token);
+      const token = res?.data?.access_token || res?.data?.token;
+      if (token) {
+        localStorage.setItem("kd_access_token", token);
+        if (res?.data?.user) {
+          localStorage.setItem("kd_user", JSON.stringify(res.data.user));
+        }
         setIsSuccess(true);
       } else {
         setErrorMessage("Registration successful, but no token returned. Please login.");

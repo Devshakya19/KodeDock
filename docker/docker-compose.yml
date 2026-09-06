@@ -106,7 +106,48 @@ services:
       - kodedock-net
 
   # -------------------------------------------------------------
-  # 6. Caddy Automated HTTPS & Edge Reverse Proxy
+  # 6. KodeDock Marketing UI (Landing, Features, Public Showcase)
+  # -------------------------------------------------------------
+  kodedock-ui:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.kodedock
+      args:
+        NEXT_PUBLIC_PLATFORM_URL: ${NEXT_PUBLIC_PLATFORM_URL:-http://app.localhost}
+    container_name: kodedock-marketing-ui
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+    expose:
+      - "3000"
+    networks:
+      - kodedock-net
+
+  # -------------------------------------------------------------
+  # 7. KodeDock Platform UI (Buyer, Seller, Explore, Auth)
+  # -------------------------------------------------------------
+  platform-ui:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.platform
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080/api/v1}
+        NEXT_PUBLIC_MARKETING_URL: ${NEXT_PUBLIC_MARKETING_URL:-http://localhost}
+    container_name: kodedock-platform-ui
+    restart: always
+    depends_on:
+      - backend
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+    expose:
+      - "3000"
+    networks:
+      - kodedock-net
+
+  # -------------------------------------------------------------
+  # 8. Caddy Automated HTTPS & Edge Reverse Proxy
   # -------------------------------------------------------------
   proxy:
     image: caddy:alpine
@@ -121,6 +162,8 @@ services:
       - ./data/caddy_config:/config
     depends_on:
       - backend
+      - kodedock-ui
+      - platform-ui
     networks:
       - kodedock-net
 
@@ -128,3 +171,4 @@ networks:
   kodedock-net:
     name: kodedock-net
     driver: bridge
+

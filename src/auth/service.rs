@@ -1,4 +1,3 @@
-use redis::AsyncCommands;
 use crate::auth::models::{AuthResponse, SignupRequest, TokenClaims, User, UserPublicProfile};
 use crate::auth::repository::AuthRepository;
 use crate::config::AppConfig;

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <rect width="100" height="100" rx="28" fill="#111827"/>
+  <circle cx="50" cy="50" r="30" fill="#1F2937"/>
+  <!-- Metal Headband -->
+  <rect x="26" y="28" width="48" height="12" rx="3" fill="#9CA3AF"/>
+  <line x1="30" y1="34" x2="70" y2="34" stroke="#4B5563" stroke-width="2"/>
+  <!-- Mask Slot -->
+  <rect x="30" y="42" width="40" height="14" rx="2" fill="#FDE047" opacity="0.9"/>
+  <!-- Sharp Eyes -->
+  <path d="M34 49 Q 42 45 46 49" stroke="#111827" stroke-width="2.5" fill="none"/>
+  <path d="M66 49 Q 58 45 54 49" stroke="#111827" stroke-width="2.5" fill="none"/>
+  <circle cx="41" cy="48" r="1.5" fill="#111827"/>
+  <circle cx="59" cy="48" r="1.5" fill="#111827"/>
+  <!-- Lower Cloth -->
+  <path d="M26 56 C 26 80, 74 80, 74 56 Z" fill="#111827"/>
+</svg>

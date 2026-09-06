@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <rect width="100" height="100" rx="28" fill="#064E3B"/>
+  <!-- Alien Head Inverted Pear -->
+  <path d="M50 18 C 24 18, 20 40, 36 68 C 42 78, 58 78, 64 68 C 80 40, 76 18, 50 18 Z" fill="#10B981"/>
+  <!-- Large Glossy Black Eyes -->
+  <ellipse cx="38" cy="46" rx="8" ry="14" transform="rotate(-25 38 46)" fill="#022C22"/>
+  <ellipse cx="62" cy="46" rx="8" ry="14" transform="rotate(25 62 46)" fill="#022C22"/>
+  <circle cx="36" cy="42" r="3" fill="#A7F3D0"/>
+  <circle cx="60" cy="42" r="3" fill="#A7F3D0"/>
+  <!-- Small Mouth/Nostrils -->
+  <circle cx="48" cy="64" r="1" fill="#022C22"/>
+  <circle cx="52" cy="64" r="1" fill="#022C22"/>
+</svg>

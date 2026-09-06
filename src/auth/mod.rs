@@ -13,6 +13,7 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/auth")
             .route("/signup", web::post().to(handlers::signup))
+            .route("/register", web::post().to(handlers::signup))
             .route("/login", web::post().to(handlers::login))
             .route("/refresh", web::post().to(handlers::refresh_token))
             .route("/logout", web::post().to(handlers::logout))

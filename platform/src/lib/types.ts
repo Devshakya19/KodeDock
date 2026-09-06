@@ -76,11 +76,15 @@ export interface CreateProductInput {
 }
 
 export interface AuthResponse {
-  token: string;
+  access_token: string;
+  token?: string;
+  expires_in_seconds?: number;
   user: {
     id: string;
     email: string;
-    username: string;
+    full_name: string;
     role: string;
+    avatar_url?: string | null;
+    is_email_verified?: boolean;
   };
 }

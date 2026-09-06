@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.5.0] - 2026-09-06
+
+### Added
+- **Unified Docker Architecture & Production Orchestration (`docker/docker-compose.yml`):**
+  - Added `platform-ui` service running the Next.js platform web application on internal port 3000 (host port 3001) connected to `kodedock-net`.
+  - Added `kodedock-ui` service running the Next.js marketing application on internal port 3000 (host port 3000) connected to `kodedock-net`.
+  - Implemented multi-stage standalone Dockerfile for platform (`docker/Dockerfile.platform`) with Alpine Linux, non-root user execution, and build-time env inlining.
+  - Implemented multi-stage standalone Dockerfile for marketing (`docker/Dockerfile.kodedock`) with Alpine Linux and non-root security.
+  - Added `.dockerignore` at workspace root to exclude local `node_modules`, `.next`, `target`, `.git`, and sensitive logs from build contexts.
+- **Backend Container Hardening (`docker/Dockerfile.backend`):**
+  - Upgraded base builder and runner images to `rust:1.80-slim-bookworm` and `debian:bookworm-slim` with `libssl3`, eliminating Bullseye package mirror 404 issues during `apt-get install`.
+- **Edge Reverse Proxy Routing (`docker/Caddyfile`):**
+  - Configured Caddy to route `http://app.localhost` to `platform-ui:3000` for buyer/seller/auth flows.
+  - Configured Caddy to route `http://localhost` and default port 80 to `kodedock-ui:3000` for public marketing pages.
+  - Preserved transparent routing of `/api/*` and `/ws/*` to the Rust backend and `/s3/*` to SeaweedFS across all host domains.
+- **Real Auth Integration & JWT Token Alignment:**
+  - Resolved `access_token` mismatch in `platform/src/lib/types.ts` and `platform/src/app/(auth)/login/page.tsx` & `register/page.tsx` so JWT tokens persist into `localStorage`.
+  - Added URL normalizer in `platform/src/lib/api/client.ts` guaranteeing all frontend calls route through `/api/v1` without 404 endpoint mismatch.
+  - Added `/api/v1/auth/register` alias alongside `/api/v1/auth/signup` in `src/auth/mod.rs` for unified registration handling.
+- **Buyer Navigation & Design System V2 Alignment (`platform/src/components/nav/header.tsx`):**
+  - Fully realigned header to KodeDock Design System V2: `#1D1D21` charcoal background, `#27272A` surface, `#141417` input insets, `#414146` borders, `#8535FC` violet brand accents, and `rounded-lg` (8px) geometry.
+  - Replaced and pruned legacy avatar folders (`public/avatar` and `public/avtar`) with a unified, clean directory structure in `public/avatars`.
+  - Created 24 radically unique SVG vector avatars spanning distinct archetypes: Android Robot, Space Astronaut, 8-Bit Pixel Hacker, Oni Demon Mask, Shadow Ninja, Cyberpunk Cat, Bionic Skull, Code Wizard, Cosmic Alien, VR Gamer, Cyber Canine, Quantum AI Core, Female Dev with Bob Cut & Headphones, Bearded Hipster Coder, Afro-Punk Coder, Steampunk Deep-Sea Diver, Digital Pac-Man Ghost, Mecha Dragon, 3D Voxel Cube, Prismatic Crystal Entity, Arctic Cyber Bear, Cyber Falcon, Scanline Phantom Hologram, and Celestial Nebula Deity.
+  - Implemented deterministic avatar hashing: users automatically receive a consistent, distinct vector avatar based on their email/ID.
+  - Streamlined navbar by removing `[Explore Shop]` and `[My Purchases]` links, reserving them for the user profile dropdown and clean contextual actions.
+  - Upgraded user profile button to an ultra-modern circular pill geometry (`rounded-full`) displaying the user's first name (e.g. "Devraj") alongside their distinct vector avatar with a violet brand border.
+  - Implemented dynamic first name extraction with fallback to email handle.
+  - Persistent user profile dropdown menu with verified buyer status, quick Escrow Vault navigation, and sign out controls.
+  - Enhanced global `Ctrl+P` (and `⌘P` on macOS, `/`) search bar with 4px grid spacing and design system tokens.
+- **Next.js Standalone Mode:**
+  - Configured `output: "standalone"` in `platform/next.config.ts` and `kodedock/next.config.ts` to reduce production image footprint and speed up container startup.
+
 ## [1.4.0] - 2026-09-06
 
 ### Added

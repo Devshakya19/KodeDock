@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <rect width="100" height="100" rx="28" fill="#1E1B4B"/>
+  <!-- Polygon Gem Facets -->
+  <polygon points="50,14 74,32 50,50" fill="#C084FC"/>
+  <polygon points="50,14 26,32 50,50" fill="#A855F7"/>
+  <polygon points="26,32 50,50 36,82" fill="#7E22CE"/>
+  <polygon points="74,32 50,50 64,82" fill="#9333EA"/>
+  <polygon points="50,50 36,82 50,86 64,82" fill="#6B21A8"/>
+  <polygon points="50,14 26,32 50,30" fill="#E9D5FF" opacity="0.6"/>
+  <!-- Core Glow -->
+  <circle cx="50" cy="50" r="6" fill="#FFFFFF" opacity="0.9"/>
+</svg>

@@ -1,7 +1,7 @@
 # =============================================================
 # Stage 1: Build Optimized Rust Release Binary
 # =============================================================
-FROM rust:1.80-slim-bullseye AS builder
+FROM rust:1-slim-bookworm AS builder
 
 WORKDIR /app
 
@@ -23,14 +23,14 @@ RUN cargo build --release
 # =============================================================
 # Stage 2: Ultra-Lightweight Production Runtime (< 35MB)
 # =============================================================
-FROM debian:bullseye-slim AS runner
+FROM debian:bookworm-slim AS runner
 
 WORKDIR /app
 
-# Install runtime dependencies (OpenSSL, CA certificates, and Git for cloner worker)
+# Install runtime dependencies (OpenSSL 3, CA certificates, and Git for cloner worker)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
-    libssl1.1 \
+    libssl3 \
     git \
     curl \
     && rm -rf /var/lib/apt/lists/*

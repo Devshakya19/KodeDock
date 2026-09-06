@@ -42,8 +42,12 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       const res = await authApi.login({ email, password });
-      if (res?.data?.token) {
-        localStorage.setItem("kd_access_token", res.data.token);
+      const token = res?.data?.access_token || res?.data?.token;
+      if (token) {
+        localStorage.setItem("kd_access_token", token);
+        if (res?.data?.user) {
+          localStorage.setItem("kd_user", JSON.stringify(res.data.user));
+        }
         router.push("/dashboard");
       } else {
         setErrorMessage("Invalid credentials.");

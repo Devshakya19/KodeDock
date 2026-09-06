@@ -1,7 +1,7 @@
 use sqlx::{PgPool, Postgres, Transaction};
 use uuid::Uuid;
 use crate::errors::AppError;
-use super::models::{UserAccount, Order, EscrowTransaction, LedgerEntry};
+use super::models::{UserAccount, Order, EscrowTransaction};
 
 pub struct FintechRepository;
 

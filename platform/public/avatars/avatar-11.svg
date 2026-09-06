@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <rect width="100" height="100" rx="28" fill="#7C2D12"/>
+  <!-- Dog Ears -->
+  <polygon points="26,38 22,14 44,28" fill="#EA580C"/>
+  <polygon points="74,38 78,14 56,28" fill="#EA580C"/>
+  <!-- Head -->
+  <circle cx="50" cy="52" r="28" fill="#F97316"/>
+  <ellipse cx="50" cy="62" rx="16" ry="12" fill="#FED7AA"/>
+  <!-- Goggles On Forehead -->
+  <rect x="28" y="28" width="20" height="12" rx="4" fill="#0284C7" stroke="#0369A1" stroke-width="2"/>
+  <rect x="52" y="28" width="20" height="12" rx="4" fill="#0284C7" stroke="#0369A1" stroke-width="2"/>
+  <!-- Eyes -->
+  <circle cx="38" cy="48" r="3" fill="#431407"/>
+  <circle cx="62" cy="48" r="3" fill="#431407"/>
+  <!-- Nose -->
+  <polygon points="46,58 54,58 50,63" fill="#431407"/>
+</svg>

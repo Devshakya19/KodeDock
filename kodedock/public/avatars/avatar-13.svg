@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <rect width="100" height="100" rx="28" fill="#3B0764"/>
+  <!-- Bob Hair Back -->
+  <path d="M24 45 C 24 22, 76 22, 76 45 L 76 68 L 24 68 Z" fill="#831843"/>
+  <!-- Face -->
+  <circle cx="50" cy="50" r="20" fill="#FBCFE8"/>
+  <!-- Front Bangs -->
+  <path d="M28 42 Q 50 48 72 38 Q 60 26 50 26 Q 38 26 28 42 Z" fill="#9D174D"/>
+  <!-- Eyes -->
+  <circle cx="43" cy="50" r="2.5" fill="#831843"/>
+  <circle cx="57" cy="50" r="2.5" fill="#831843"/>
+  <path d="M47 58 Q 50 62 53 58" stroke="#BE185D" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- Cyan DJ Headphones -->
+  <path d="M22 48 C 22 24, 78 24, 78 48" fill="none" stroke="#06B6D4" stroke-width="4"/>
+  <rect x="18" y="44" width="7" height="14" rx="3" fill="#06B6D4"/>
+  <rect x="75" y="44" width="7" height="14" rx="3" fill="#06B6D4"/>
+</svg>

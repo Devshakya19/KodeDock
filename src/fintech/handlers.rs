@@ -20,9 +20,9 @@ pub async fn my_wallet(
 }
 
 pub async fn create_order(
-    pool: web::Data<PgPool>,
-    user: AuthenticatedUser,
-    req: web::Json<CreateOrderRequest>,
+    _pool: web::Data<PgPool>,
+    _user: AuthenticatedUser,
+    _req: web::Json<CreateOrderRequest>,
 ) -> Result<HttpResponse, AppError> {
     // In a real application, we would call Razorpay/Stripe API here to create an intent
     // and return the client secret to the frontend.
@@ -95,8 +95,8 @@ pub async fn razorpay_webhook(
 }
 
 pub async fn get_disputes(
-    pool: web::Data<PgPool>,
-    user: AuthenticatedUser,
+    _pool: web::Data<PgPool>,
+    _user: AuthenticatedUser,
 ) -> Result<HttpResponse, AppError> {
     // Stub
     Ok(HttpResponse::Ok().json(serde_json::json!([])))

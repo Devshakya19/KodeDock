@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <rect width="100" height="100" rx="28" fill="#451A03"/>
+  <!-- Brass Helmet Dome -->
+  <circle cx="50" cy="48" r="28" fill="#D97706" stroke="#B45309" stroke-width="3"/>
+  <!-- Center Round Porthole Glass -->
+  <circle cx="50" cy="48" r="14" fill="#06B6D4" stroke="#78350F" stroke-width="3"/>
+  <line x1="40" y1="48" x2="60" y2="48" stroke="#78350F" stroke-width="2"/>
+  <line x1="50" y1="38" x2="50" y2="58" stroke="#78350F" stroke-width="2"/>
+  <!-- Side Portholes -->
+  <ellipse cx="28" cy="48" rx="4" ry="8" fill="#0891B2" stroke="#78350F" stroke-width="2"/>
+  <ellipse cx="72" cy="48" rx="4" ry="8" fill="#0891B2" stroke="#78350F" stroke-width="2"/>
+  <!-- Top Vent/Valve -->
+  <rect x="46" y="14" width="8" height="6" fill="#78350F"/>
+</svg>

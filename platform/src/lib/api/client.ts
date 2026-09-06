@@ -1,7 +1,13 @@
 // KodeDock API Client Wrapper
 import { AuthResponse, CatalogProduct, CatalogResponse, CreateProductInput, OrderItem, ProductDetail } from '../types';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
+function getApiBaseUrl(): string {
+  let url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
+  if (!url.includes('/api/v1')) {
+    url = url.replace(/\/+$/, '') + '/api/v1';
+  }
+  return url;
+}
 
 export function formatPaiseToInr(paise: number): string {
   const rupees = Math.floor(paise / 100);
@@ -25,7 +31,7 @@ export async function fetchApi<T>(endpoint: string, options: RequestInit = {}): 
   const headers = new Headers(options.headers);
   headers.set('Content-Type', 'application/json');
 
-  // Attach credentials/authorization from localStorage or cookie if present
+  // Attach credentials/authorization from localStorage if present
   if (typeof window !== 'undefined') {
     const token = localStorage.getItem('kd_access_token');
     if (token) {
@@ -33,8 +39,12 @@ export async function fetchApi<T>(endpoint: string, options: RequestInit = {}): 
     }
   }
 
-  const response = await fetch(`${API_BASE}${endpoint}`, {
+  const base = getApiBaseUrl();
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+
+  const response = await fetch(`${base}${cleanEndpoint}`, {
     ...options,
+    credentials: 'include',
     headers,
   });
 
@@ -42,9 +52,9 @@ export async function fetchApi<T>(endpoint: string, options: RequestInit = {}): 
     let errorMessage = `API Error: ${response.status} ${response.statusText}`;
     try {
       const errorData = await response.json();
-      errorMessage = errorData.error?.message || errorMessage;
+      errorMessage = errorData.message || errorData.error?.message || errorMessage;
     } catch {
-      // JSON parse error fallback
+      // Fallback
     }
     throw new Error(errorMessage);
   }
@@ -54,13 +64,13 @@ export async function fetchApi<T>(endpoint: string, options: RequestInit = {}): 
 
 export const authApi = {
   login: (data: any) => {
-    return fetchApi<{ data: AuthResponse }>('/auth/login', {
+    return fetchApi<{ data: AuthResponse; message?: string }>('/auth/login', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   },
   register: (data: any) => {
-    return fetchApi<{ data: AuthResponse }>('/auth/register', {
+    return fetchApi<{ data: AuthResponse; message?: string }>('/auth/signup', {
       method: 'POST',
       body: JSON.stringify(data),
     });

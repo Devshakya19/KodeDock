@@ -3,7 +3,8 @@
     auto_https off
 }
 
-:80 {
+# Common reusable configuration snippet for APIs, WebSockets, Storage & Security
+(common_api) {
     # Security Headers
     header {
         X-Content-Type-Options "nosniff"
@@ -43,9 +44,28 @@
     handle /healthz {
         respond "OK" 200
     }
+}
 
-    # Fallback / Default Root Response
+# -------------------------------------------------------------
+# 1. Platform Application (Buyer, Seller, Explore, Auth)
+#    Accessible at: http://app.localhost
+# -------------------------------------------------------------
+http://app.localhost, app.localhost:80 {
+    import common_api
+
     handle {
-        respond "⚓ KodeDock High-Performance Engine Online" 200
+        reverse_proxy platform-ui:3000
+    }
+}
+
+# -------------------------------------------------------------
+# 2. Marketing Application & Default Gateway
+#    Accessible at: http://localhost or directly by IP
+# -------------------------------------------------------------
+http://localhost, :80 {
+    import common_api
+
+    handle {
+        reverse_proxy kodedock-ui:3000
     }
 }

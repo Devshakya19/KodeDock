@@ -3,7 +3,7 @@ use uuid::Uuid;
 use chrono::{Utc, Duration};
 
 use crate::errors::AppError;
-use super::models::{UserAccount, Order, EscrowTransaction, RazorpayWebhookPayload};
+use super::models::{UserAccount, Order, EscrowTransaction};
 use super::repository::FintechRepository;
 
 pub struct FintechService;
