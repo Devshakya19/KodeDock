@@ -5,7 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import PlatformHeader from "@/components/nav/header";
 import PlatformFooter from "@/components/nav/footer";
-import { INITIAL_CATALOG } from "@/lib/initial-catalog";
 import { formatPaiseToInr, marketplaceApi } from "@/lib/api/client";
 import { CatalogProduct } from "@/lib/types";
 
@@ -25,8 +24,8 @@ export default function PlatformMarketplacePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTech, setSelectedTech] = useState("All Frameworks");
   const [selectedSort, setSelectedSort] = useState("popular");
-  const [products, setProducts] = useState<CatalogProduct[]>(INITIAL_CATALOG);
-  const [loading, setLoading] = useState(false);
+  const [products, setProducts] = useState<CatalogProduct[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // Fetch live catalog from Rust API if available
   useEffect(() => {
@@ -34,16 +33,11 @@ export default function PlatformMarketplacePage() {
       try {
         setLoading(true);
         const res = await marketplaceApi.getCatalog();
-        if (res?.data?.products && res.data.products.length > 0) {
-          // Merge or set live products
-          setProducts((prev) => {
-            const liveSlugs = new Set(res.data.products.map((p) => p.slug));
-            const remainingInitial = prev.filter((p) => !liveSlugs.has(p.slug));
-            return [...res.data.products, ...remainingInitial];
-          });
+        if (res?.data?.products) {
+          setProducts(res.data.products);
         }
-      } catch {
-        // Backend offline or empty in dev; fallback to INITIAL_CATALOG
+      } catch (err) {
+        console.error("Failed to fetch catalog:", err);
       } finally {
         setLoading(false);
       }
@@ -157,7 +151,12 @@ export default function PlatformMarketplacePage() {
         </div>
 
         {/* PRODUCT GRID */}
-        {filteredProducts.length === 0 ? (
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="w-8 h-8 rounded-full border-2 border-t-[#8535FC] border-[#414146] animate-spin mb-4" />
+            <p className="text-xs font-mono text-[#A1A1AA]">Syncing Marketplace Ledger...</p>
+          </div>
+        ) : filteredProducts.length === 0 ? (
           <div className="text-center py-20 border border-dashed border-[#414146]/60 rounded-3xl bg-[#27272A]/20">
             <p className="text-base text-[#EDEDF0] font-medium">No codebases matched your filter.</p>
             <p className="text-xs text-[#71717A] mt-1">Try searching for &quot;Rust&quot;, &quot;Next.js&quot;, or reset your tags.</p>

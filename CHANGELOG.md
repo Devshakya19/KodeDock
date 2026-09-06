@@ -22,6 +22,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Restored the Marketplace Storefront (formerly `page.tsx`) and migrated it to `(shop)/explore/page.tsx` to serve as the product discovery catalog.
   - Migrated codebase product detail pages to `(shop)/product/[slug]/`.
   - Encapsulated the buyer's private Escrow Vault and purchases inside `(buyer)/dashboard/`.
+- **Zero-Mock API Integration (`platform/src/app/(buyer)/dashboard` & `(shop)/explore`):**
+  - Enforced the Zero-Mock Law by completely removing `SAMPLE_ORDERS` and `OrderMock` from the Buyer Dashboard.
+  - Integrated `fintechApi.getMyOrders()` to fetch real escrow transaction data from the PostgreSQL database.
+  - Rewrote dashboard mapping logic to natively consume the Rust API's `OrderItem` type (`gross_amount_paise`, `product_title`, etc.).
+  - Removed `INITIAL_CATALOG` fallback from the Marketplace Storefront (`explore/page.tsx`), ensuring buyers only see real, verified codebase listings.
+  - Implemented dynamic loading spinners ("Decrypting Escrow Ledger..." and "Syncing Marketplace Ledger...") to handle async API delays gracefully.
 - **Codebase Product Dossier & Escrow Purchase (`platform/src/app/product/[slug]/page.tsx`):**
   - Implemented comprehensive technical specification sheet with full architecture overview.
   - Live AST Security Audit Card detailing Tree-Sitter syntax verification, zero leaked secrets, Shannon entropy pass, and AES-256 deliverable packaging.
