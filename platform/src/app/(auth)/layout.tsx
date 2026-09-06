@@ -53,6 +53,7 @@ export default function AuthLayout({
               alt="KodeDock Emblem"
               width={34}
               height={34}
+              style={{ width: "auto", height: "34px" }}
               className="object-contain"
             />
             <Image
@@ -60,6 +61,7 @@ export default function AuthLayout({
               alt="KodeDock"
               width={125}
               height={26}
+              style={{ width: "auto", height: "26px" }}
               className="h-6 w-auto object-contain"
             />
           </Link>
@@ -188,6 +190,7 @@ export default function AuthLayout({
               alt="KodeDock"
               width={28}
               height={28}
+              style={{ width: "auto", height: "28px" }}
               className="object-contain"
             />
             <Image
@@ -195,6 +198,7 @@ export default function AuthLayout({
               alt="KodeDock"
               width={105}
               height={21}
+              style={{ width: "auto", height: "21px" }}
               className="h-5 w-auto object-contain"
             />
           </Link>
