@@ -193,7 +193,7 @@ export const auth = {
     nextUrl?: string;
   }): Promise<void> {
     const role = options?.role || "user";
-    const nextUrl = options?.nextUrl || (role === "developer" ? "/seller" : "/browse");
+    const nextUrl = options?.nextUrl || (role === "developer" ? "/seller" : "/explore");
     const res = await fetch("/api/auth/config", { cache: "no-store" });
     const data = await res.json();
     const clientId = data.github_client_id;

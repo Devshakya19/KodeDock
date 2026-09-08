@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
   // Decode state — format: "role|nextUrl" or "link|nextUrl"
   let action = "login";
   let role = "user";
-  let nextUrl = "/browse";
+  let nextUrl = "/explore";
 
   if (state) {
     try {
@@ -73,9 +73,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent(errorMsg)}`);
     }
 
-    // Smart redirect: if they are logging in from the generic login page (nextUrl === "/browse")
+    // Smart redirect: if they are logging in from the generic login page (nextUrl === "/explore")
     // but they actually have a "developer" role, redirect them to the seller dashboard instead.
-    if (nextUrl === "/browse" && data.data.user?.role === "developer") {
+    if (nextUrl === "/explore" && data.data.user?.role === "developer") {
       nextUrl = "/seller";
     }
 

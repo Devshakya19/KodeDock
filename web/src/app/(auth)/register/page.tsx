@@ -84,7 +84,7 @@ export default function RegisterPage() {
     setError("");
     setLoading(true);
     try {
-      await auth.initiateGithubOAuth({ role: "user", nextUrl: "/browse" });
+      await auth.initiateGithubOAuth({ role: "user", nextUrl: "/explore" });
     } catch (e: any) {
       setError(e.message || "Failed to connect to authentication server.");
       setLoading(false);
