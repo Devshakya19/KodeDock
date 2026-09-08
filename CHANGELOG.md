@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Implemented transparent 401 interceptor and retry mechanism in `/api/proxy/[...path]` and `/api/auth/me` so that any backend request made after access token expiry is silently refreshed and retried without user interruption or forced logouts.
   - Added in-flight mutex lock in `auth.refreshToken()` to prevent race condition replay alerts, plus active session heartbeats (refresh every 10 minutes when tab is active/visible).
   - Updated Next.js `updateSession` middleware to automatically rotate expired access tokens on protected routes when a valid refresh token exists.
+- **Navbar User Profile Interaction & Styling Refinement (`web/src/components/shop/navbar.tsx`)**:
+  - Removed harsh purple focus outline box (`focus:ring-2 focus:ring-[#8535FC]`) and purple avatar borders/gradients from the user profile trigger and dropdown header, aligning strictly with `#27272A` and `#414146` dark surface tokens.
+  - Upgraded user profile dropdown interaction to dual mode: supports both seamless **mouse hover** (`onMouseEnter` / `onMouseLeave` with 180ms buffer bridge) and **click** (`onClick`) toggle.
 - **Navbar Complete Redesign & Full-Width Layout (`web/src/components/shop/navbar.tsx`)**:
   - Implemented **Skeleton UI Theory (`ProfileSkeleton`)** for user profile trigger and mobile navigation drawer, reserving exact structural dimensions (avatar circle, text lines, chevron) during initial session data fetching to completely eliminate Cumulative Layout Shift (CLS) and UI jumps.
   - Converted navbar container to edge-to-edge full width (`w-full`) with balanced horizontal padding (`px-4 sm:px-6 lg:px-8`).

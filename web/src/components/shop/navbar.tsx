@@ -160,6 +160,7 @@ export default function ShopNavbar() {
   const pathname = usePathname();
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load user session
   useEffect(() => {
@@ -196,6 +197,9 @@ export default function ShopNavbar() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -204,6 +208,28 @@ export default function ShopNavbar() {
     setIsMobileMenuOpen(false);
     setIsDropdownOpen(false);
   }, [pathname]);
+
+  const handleMouseEnter = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    setIsDropdownOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    hoverTimeoutRef.current = setTimeout(() => {
+      setIsDropdownOpen(false);
+    }, 180);
+  };
+
+  const handleClick = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    setIsDropdownOpen((prev) => !prev);
+  };
 
   const handleLogout = async () => {
     try {
@@ -270,16 +296,21 @@ export default function ShopNavbar() {
             <ProfileSkeleton />
           ) : user ? (
             /* Logged-In User Profile Trigger */
-            <div className="relative" ref={dropdownRef}>
+            <div
+              className="relative"
+              ref={dropdownRef}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            >
               <button
                 type="button"
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="flex items-center gap-2.5 p-1 rounded-xl hover:bg-[#27272A] border border-transparent hover:border-[#414146] transition-all focus:outline-none focus:ring-2 focus:ring-[#8535FC]"
+                onClick={handleClick}
+                className="flex items-center gap-2.5 p-1.5 rounded-xl hover:bg-[#27272A] border border-transparent hover:border-[#414146] transition-all focus:outline-none"
                 aria-expanded={isDropdownOpen}
               >
-                {/* Avatar with Status Indicator */}
+                {/* Avatar with Status Indicator (Clean #27272A, No Purple Box) */}
                 <div className="relative">
-                  <div className="size-8 rounded-full bg-gradient-to-br from-[#8535FC]/30 to-[#27272A] border border-[#8535FC]/50 text-xs font-mono font-bold text-[#EDEDF0] flex items-center justify-center shadow-inner">
+                  <div className="size-8 rounded-full bg-[#27272A] border border-[#414146] text-xs font-mono font-bold text-[#EDEDF0] flex items-center justify-center shadow-sm">
                     {userInitials}
                   </div>
                   <span className="absolute bottom-0 right-0 size-2.5 rounded-full bg-[#10B981] border-2 border-[#1D1D21]" />
@@ -306,10 +337,13 @@ export default function ShopNavbar() {
               {/* Redesigned Floating User Profile Dropdown */}
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-72 rounded-xl bg-[#27272A]/95 backdrop-blur-md border border-[#414146] shadow-2xl py-2 z-50 animate-in fade-in zoom-in-95 duration-100 divide-y divide-[#414146]/50">
+                  {/* Invisible bridge to prevent mouse leaving hover target */}
+                  <div className="absolute -top-3 left-0 right-0 h-3" />
+
                   {/* Header info */}
                   <div className="px-3.5 py-3">
                     <div className="flex items-center gap-3">
-                      <div className="size-10 rounded-full bg-gradient-to-br from-[#8535FC]/40 to-[#141417] border border-[#8535FC]/60 text-sm font-mono font-bold text-[#EDEDF0] flex items-center justify-center shrink-0">
+                      <div className="size-10 rounded-full bg-[#141417] border border-[#414146] text-sm font-mono font-bold text-[#EDEDF0] flex items-center justify-center shrink-0">
                         {userInitials}
                       </div>
                       <div className="overflow-hidden flex-1">
