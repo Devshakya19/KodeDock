@@ -1,0 +1,22 @@
+{
+  "identities": [
+    {
+      "name": "kodedock",
+      "credentials": [
+        {
+          "accessKey": "kodedock_seaweed",
+          "secretKey": "kodedock_seaweed_secret"
+        }
+      ],
+      "actions": [
+        "Read",
+        "Write",
+        "List",
+        "Tagging",
+        "Admin",
+        "CreateBucket",
+        "DeleteBucket"
+      ]
+    }
+  ]
+}
