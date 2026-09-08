@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **User Profile Dropdown Refinements & Architecture (`web/src/components/shop/navbar.tsx`)**:
+  - Removed "Become a Verified Seller" CTA link from both desktop profile dropdown and mobile drawer.
+  - Removed default "user" role text and badge from profile trigger button, dropdown header, and mobile drawer when `user.role === 'user'`, eliminating unpolished role clutter while preserving styled badges for `DEVELOPER` and `ADMIN`.
+  - Decoupled combined "My Purchases & Licenses" item into two dedicated, developer-first navigation links:
+    - **My Purchases** (`/profile?tab=purchases`): Dedicated to purchased codebase assets, one-click ZIP downloads, automated GitHub transfer status, and GST/TDS tax receipts.
+    - **Licenses** (`/profile?tab=licenses`): Dedicated to legal license keys (`KD-LIC-XXXX`), domain activations, commercial/extended tier rights, and PDF license certificates.
+
 ### Fixed
 - **Routing: `/browse` → `/explore`**: Corrected all middleware redirect rules so that authenticated buyers are redirected to `/explore` after login. Also restored accidentally deleted files across `src/marketplace/` and `web/src/app/(shop)/`.
 - **Public Marketplace Access**: Fixed Next.js middleware so `/explore` and `/product` are publicly browsable without forced redirects to login, allowing guests and developers to explore products seamlessly.

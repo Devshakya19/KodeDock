@@ -17,7 +17,7 @@ import {
   ShieldCheck,
   Package,
   Layers,
-  Sparkles,
+  Key,
   Command,
 } from "lucide-react";
 
@@ -243,7 +243,6 @@ export default function ShopNavbar() {
 
   const isDeveloper = user?.role === "developer";
   const isAdmin = user?.role === "admin";
-  const isBuyer = user?.role === "user";
 
   const userDisplayName =
     user?.github_username ||
@@ -321,9 +320,11 @@ export default function ShopNavbar() {
                   <span className="text-xs font-semibold text-[#EDEDF0] truncate max-w-[120px]">
                     {userDisplayName}
                   </span>
-                  <span className="font-mono text-[9px] uppercase tracking-wider text-[#A1A1AA]">
-                    {user.role}
-                  </span>
+                  {user.role && user.role.toLowerCase() !== "user" && (
+                    <span className="font-mono text-[9px] uppercase tracking-wider text-[#8535FC]">
+                      {user.role}
+                    </span>
+                  )}
                 </div>
 
                 <ChevronDown
@@ -351,17 +352,19 @@ export default function ShopNavbar() {
                           <p className="text-xs font-semibold text-[#EDEDF0] truncate">
                             {userDisplayName}
                           </p>
-                          <span
-                            className={`font-mono text-[9px] uppercase font-semibold px-1.5 py-0.5 rounded border shrink-0 ${
-                              isDeveloper
-                                ? "text-[#8535FC] bg-[#8535FC]/10 border-[#8535FC]/30"
-                                : isAdmin
-                                ? "text-[#10B981] bg-[#10B981]/10 border-[#10B981]/30"
-                                : "text-[#A1A1AA] bg-[#141417] border-[#414146]"
-                            }`}
-                          >
-                            {user.role}
-                          </span>
+                          {user.role && user.role.toLowerCase() !== "user" && (
+                            <span
+                              className={`font-mono text-[9px] uppercase font-semibold px-1.5 py-0.5 rounded border shrink-0 ${
+                                isDeveloper
+                                  ? "text-[#8535FC] bg-[#8535FC]/10 border-[#8535FC]/30"
+                                  : isAdmin
+                                  ? "text-[#10B981] bg-[#10B981]/10 border-[#10B981]/30"
+                                  : "text-[#A1A1AA] bg-[#141417] border-[#414146]"
+                              }`}
+                            >
+                              {user.role}
+                            </span>
+                          )}
                         </div>
                         <p className="text-[11px] text-[#A1A1AA] font-mono truncate">
                           {user.email}
@@ -372,13 +375,20 @@ export default function ShopNavbar() {
 
                   {/* Navigation Section */}
                   <div className="py-1.5">
-                    {/* Common Purchases / Vault link */}
+                    {/* Purchases & Licenses Links */}
                     <Link
-                      href="/profile"
+                      href="/profile?tab=purchases"
                       className="flex items-center gap-2.5 px-3.5 py-2 text-xs text-[#EDEDF0] hover:bg-[#141417] hover:text-[#8535FC] transition-colors"
                     >
                       <Layers size={14} className="text-[#A1A1AA]" />
-                      <span>My Purchases & Licenses</span>
+                      <span>My Purchases</span>
+                    </Link>
+                    <Link
+                      href="/profile?tab=licenses"
+                      className="flex items-center gap-2.5 px-3.5 py-2 text-xs text-[#EDEDF0] hover:bg-[#141417] hover:text-[#8535FC] transition-colors"
+                    >
+                      <Key size={14} className="text-[#A1A1AA]" />
+                      <span>Licenses</span>
                     </Link>
 
                     {/* Developer Specific Links */}
@@ -416,17 +426,6 @@ export default function ShopNavbar() {
                       >
                         <ShieldCheck size={14} className="text-[#10B981]" />
                         <span>Admin Control HQ</span>
-                      </Link>
-                    )}
-
-                    {/* Buyer Specific Links */}
-                    {isBuyer && (
-                      <Link
-                        href="/developer-register"
-                        className="flex items-center gap-2.5 px-3.5 py-2 text-xs text-[#8535FC] hover:bg-[#141417] transition-colors font-medium"
-                      >
-                        <Sparkles size={14} />
-                        <span>Become a Verified Seller</span>
                       </Link>
                     )}
 
@@ -525,18 +524,27 @@ export default function ShopNavbar() {
                     </p>
                   </div>
                 </div>
-                <span className="font-mono text-[9px] uppercase font-semibold text-[#8535FC] bg-[#8535FC]/10 px-2 py-0.5 rounded border border-[#8535FC]/20">
-                  {user.role}
-                </span>
+                {user.role && user.role.toLowerCase() !== "user" && (
+                  <span className="font-mono text-[9px] uppercase font-semibold text-[#8535FC] bg-[#8535FC]/10 px-2 py-0.5 rounded border border-[#8535FC]/20">
+                    {user.role}
+                  </span>
+                )}
               </div>
 
               <div className="space-y-1">
                 <Link
-                  href="/profile"
+                  href="/profile?tab=purchases"
                   className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-[#EDEDF0] bg-[#27272A] border border-[#414146]"
                 >
                   <Layers size={14} />
-                  <span>My Purchases & Licenses</span>
+                  <span>My Purchases</span>
+                </Link>
+                <Link
+                  href="/profile?tab=licenses"
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-[#EDEDF0] bg-[#27272A] border border-[#414146]"
+                >
+                  <Key size={14} />
+                  <span>Licenses</span>
                 </Link>
 
                 {isDeveloper && (
@@ -556,15 +564,6 @@ export default function ShopNavbar() {
                       <span>Upload</span>
                     </Link>
                   </div>
-                )}
-
-                {isBuyer && (
-                  <Link
-                    href="/developer-register"
-                    className="block text-center px-3 py-2 rounded-lg text-xs font-medium text-[#8535FC] bg-[#8535FC]/10 border border-[#8535FC]/30"
-                  >
-                    Become a Verified Seller
-                  </Link>
                 )}
               </div>
 
