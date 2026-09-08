@@ -12,6 +12,7 @@
 
   /* Brand Colors & Aliases */
   --color-border: hsl(var(--border));
+  --color-border-hover: hsl(var(--border-hover));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
 
@@ -75,26 +76,27 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 0 0% 98%;
     --card: 0 0% 100%;
     --popover: 0 0% 100%;
-    --secondary: 240 10% 96%;
-    --muted: 240 14% 97%;
+    --secondary: 240 5% 96%;
+    --muted: 240 5% 96%;
     --border: 240 6% 90%;
+    --border-hover: 240 5% 80%;
     --input: 240 6% 90%;
-    --foreground: 0 0% 4%;
-    --card-foreground: 0 0% 4%;
-    --popover-foreground: 0 0% 4%;
-    --secondary-foreground: 0 0% 4%;
-    --muted-foreground: 240 5% 65%;
-    --primary: 262 81% 58%;
+    --foreground: 240 6% 10%;
+    --card-foreground: 240 6% 10%;
+    --popover-foreground: 240 6% 10%;
+    --secondary-foreground: 240 6% 10%;
+    --muted-foreground: 240 4% 46%;
+    --primary: 264 97% 60%;
     --primary-foreground: 0 0% 100%;
-    --accent: 262 81% 58%;
+    --accent: 264 97% 60%;
     --accent-foreground: 0 0% 100%;
-    --ring: 262 81% 58%;
+    --ring: 264 97% 60%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --success: 142 71% 45%;
+    --success: 160 84% 39%;
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
@@ -102,28 +104,30 @@
   }
 
   .dark {
-    --background: 0 0% 4%;
-    --card: 240 6% 10%;
-    --popover: 240 6% 10%;
-    --secondary: 240 4% 16%;
-    --muted: 240 4% 16%;
-    --border: 240 5% 26%;
-    --input: 240 5% 26%;
-    --foreground: 0 0% 98%;
-    --card-foreground: 0 0% 98%;
-    --popover-foreground: 0 0% 98%;
-    --secondary-foreground: 0 0% 98%;
-    --muted-foreground: 240 5% 65%;
-    --primary: 262 81% 58%;
-    --primary-foreground: 0 0% 100%;
-    --accent: 262 81% 58%;
+    /* KodeDock Design System Dark Mode (Default & Primary Focus) */
+    --background: 240 6.5% 12.2%;      /* #1D1D21 Premium Charcoal (Never pure black) */
+    --card: 240 3.7% 15.9%;            /* #27272A Elevated Surface */
+    --popover: 240 3.7% 15.9%;         /* #27272A Popover Surface */
+    --secondary: 240 3.7% 15.9%;       /* #27272A Secondary Surface */
+    --muted: 240 7% 8.4%;              /* #141417 Surface Inset (Input & Code) */
+    --border: 240 3.7% 26.5%;          /* #414146 Faint Separation */
+    --border-hover: 240 5.2% 33.9%;    /* #52525B Hovered Borders */
+    --input: 240 7% 8.4%;              /* #141417 Input Background */
+    --foreground: 240 8.8% 93.5%;      /* #EDEDF0 Off-white Legible Text */
+    --card-foreground: 240 8.8% 93.5%; /* #EDEDF0 */
+    --popover-foreground: 240 8.8% 93.5%;
+    --secondary-foreground: 240 8.8% 93.5%;
+    --muted-foreground: 240 5% 64.9%;  /* #A1A1AA Subtle Grays */
+    --primary: 264 97% 60%;            /* #8535FC KodeDock Violet Accent */
+    --primary-foreground: 0 0% 100%;   /* Pure White */
+    --accent: 264 97% 60%;             /* #8535FC */
     --accent-foreground: 0 0% 100%;
-    --ring: 262 81% 58%;
-    --destructive: 0 84% 60%;
+    --ring: 264 97% 60%;               /* #8535FC Focus Ring */
+    --destructive: 0 84% 60%;          /* #EF4444 Red */
     --destructive-foreground: 0 0% 100%;
-    --success: 142 71% 45%;
+    --success: 160 84% 39%;            /* #10B981 Emerald */
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
+    --warning: 38 92% 50%;             /* #F59E0B Amber */
     --warning-foreground: 0 0% 100%;
   }
 }

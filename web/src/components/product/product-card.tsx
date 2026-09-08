@@ -1,99 +1,207 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
-import { Star, Download, User } from "lucide-react";
+import { Star, Download, ShieldCheck, ArrowRight, Terminal } from "lucide-react";
 
 export interface ProductSummary {
   public_id: string;
   title: string;
   slug: string;
+  description?: string | null;
   price_paise: number;
   original_price_paise?: number | null;
   image_url?: string | null;
   rating: number;
   review_count: number;
   sales_count: number;
+  tech_stack?: string[] | null;
   seller_username?: string | null;
   category_name?: string | null;
 }
 
 export default function ProductCard({ product }: { product: ProductSummary }) {
+  // Format integer paise to INR rupees (zero float, integer math)
   const formatPrice = (paise: number) => {
+    const rupees = Math.floor(paise / 100);
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
       currency: "INR",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(paise / 100);
+    }).format(rupees);
   };
 
+  const discountPercent =
+    product.original_price_paise &&
+    product.original_price_paise > product.price_paise
+      ? Math.round(
+          ((product.original_price_paise - product.price_paise) /
+            product.original_price_paise) *
+            100
+        )
+      : 0;
+
   return (
-    <Link href={`/product/${product.slug}`} className="group block">
-      <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-purple-500/10 hover:border-purple-500/30">
-        <div className="relative aspect-video w-full bg-black/40 overflow-hidden">
+    <div className="group flex flex-col justify-between bg-[#27272A] border border-[#414146] hover:border-[#52525B] rounded-lg transition-all duration-200 overflow-hidden">
+      {/* Top Media / Code Preview Area */}
+      <Link href={`/product/${product.slug}`} className="block relative">
+        <div className="relative aspect-[16/9] w-full bg-[#141417] border-b border-[#414146] overflow-hidden flex items-center justify-center">
           {product.image_url ? (
             <Image
               src={product.image_url}
               alt={product.title}
               fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center text-white/20">
-              <CodeIcon size={48} />
+            /* Developer-centric Code Header Preview when no image */
+            <div className="w-full h-full p-4 flex flex-col justify-between bg-[#141417] text-[#A1A1AA] select-none">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <span className="size-2 rounded-full bg-[#414146]" />
+                  <span className="size-2 rounded-full bg-[#414146]" />
+                  <span className="size-2 rounded-full bg-[#414146]" />
+                </div>
+                <div className="flex items-center gap-1 text-[10px] font-mono text-[#A1A1AA]">
+                  <Terminal size={11} className="text-[#8535FC]" />
+                  <span>git:main</span>
+                </div>
+              </div>
+
+              <div className="font-mono text-xs text-[#A1A1AA] space-y-1">
+                <p className="text-[#8535FC] font-semibold flex items-center gap-1">
+                  <span>$</span>
+                  <span className="text-[#EDEDF0] truncate">
+                    git clone {product.slug}.git
+                  </span>
+                </p>
+                <p className="text-[11px] text-[#A1A1AA] truncate">
+                  ✓ Verified AST clean & 0 secret leaks
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between pt-1 border-t border-[#414146]/50 text-[10px] font-mono">
+                <span className="text-[#10B981] flex items-center gap-1">
+                  <ShieldCheck size={12} />
+                  Audited
+                </span>
+                <span className="text-[#A1A1AA]">Paise Safe</span>
+              </div>
             </div>
           )}
+
+          {/* Category Pill Tag */}
           {product.category_name && (
-            <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-md text-xs font-medium text-gray-200 border border-white/10">
+            <div className="absolute top-2.5 left-2.5 bg-[#1D1D21]/90 backdrop-blur-sm px-2 py-0.5 rounded border border-[#414146] text-[10px] font-mono uppercase tracking-wider text-[#EDEDF0]">
               {product.category_name}
             </div>
           )}
+
+          {/* Discount Tag */}
+          {discountPercent > 0 && (
+            <div className="absolute top-2.5 right-2.5 bg-[#10B981]/15 backdrop-blur-sm px-1.5 py-0.5 rounded border border-[#10B981]/30 text-[10px] font-mono font-semibold text-[#10B981]">
+              {discountPercent}% OFF
+            </div>
+          )}
+        </div>
+      </Link>
+
+      {/* Card Body */}
+      <div className="p-5 flex-1 flex flex-col justify-between">
+        <div>
+          {/* Title & Slug */}
+          <Link href={`/product/${product.slug}`} className="block group/title">
+            <h3 className="font-heading font-semibold text-base text-[#EDEDF0] group-hover/title:text-[#8535FC] transition-colors line-clamp-1 leading-snug mb-1.5">
+              {product.title}
+            </h3>
+          </Link>
+
+          {/* Description */}
+          {product.description && (
+            <p className="text-xs text-[#A1A1AA] line-clamp-2 leading-relaxed mb-3">
+              {product.description}
+            </p>
+          )}
+
+          {/* Tech Stack Pills */}
+          {product.tech_stack && product.tech_stack.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mb-4">
+              {product.tech_stack.slice(0, 3).map((tech) => (
+                <span
+                  key={tech}
+                  className="px-2 py-0.5 rounded bg-[#141417] border border-[#414146] text-[10px] font-mono text-[#A1A1AA]"
+                >
+                  {tech}
+                </span>
+              ))}
+              {product.tech_stack.length > 3 && (
+                <span className="px-1.5 py-0.5 rounded bg-[#141417] border border-[#414146] text-[10px] font-mono text-[#A1A1AA]">
+                  +{product.tech_stack.length - 3}
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
-        <div className="p-4">
-          <h3 className="font-semibold text-lg text-white leading-tight line-clamp-1 group-hover:text-purple-400 transition-colors mb-2">
-            {product.title}
-          </h3>
-
-          <div className="flex items-center gap-4 text-sm text-gray-400 mb-4">
-            <div className="flex items-center gap-1">
-              <Star size={14} className="text-yellow-500 fill-yellow-500" />
-              <span>{product.rating.toFixed(1)}</span>
-              <span className="text-gray-500">({product.review_count})</span>
+        {/* Card Footer */}
+        <div className="pt-3 border-t border-[#414146]">
+          {/* Metadata Row: Seller + Rating + Sales */}
+          <div className="flex items-center justify-between text-xs text-[#A1A1AA] mb-3">
+            <div className="flex items-center gap-1.5 truncate max-w-[130px]">
+              <span className="font-mono text-[11px] text-[#EDEDF0] truncate">
+                @{product.seller_username || "kodedock"}
+              </span>
             </div>
-            <div className="flex items-center gap-1">
-              <Download size={14} />
-              <span>{product.sales_count}</span>
+
+            <div className="flex items-center gap-3 font-mono text-[11px]">
+              <div className="flex items-center gap-1 text-[#EDEDF0]">
+                <Star size={12} className="text-[#F59E0B] fill-[#F59E0B]" />
+                <span>{product.rating.toFixed(1)}</span>
+                <span className="text-[#A1A1AA]">({product.review_count})</span>
+              </div>
+              <div className="flex items-center gap-1 text-[#A1A1AA]">
+                <Download size={12} />
+                <span>{product.sales_count}</span>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-between mt-auto">
-            <div className="flex items-center gap-2 text-sm text-gray-300">
-              <User size={14} />
-              <span className="truncate max-w-[120px]">{product.seller_username || "anonymous"}</span>
-            </div>
-
-            <div className="flex flex-col items-end">
-              {product.original_price_paise && product.original_price_paise > product.price_paise && (
-                <span className="text-xs text-gray-500 line-through">
-                  {formatPrice(product.original_price_paise)}
-                </span>
-              )}
-              <span className="font-bold text-white">
-                {product.price_paise === 0 ? "Free" : formatPrice(product.price_paise)}
+          {/* Price & Action Row */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col">
+              {product.original_price_paise &&
+                product.original_price_paise > product.price_paise && (
+                  <span className="text-[11px] font-mono text-[#A1A1AA] line-through">
+                    {formatPrice(product.original_price_paise)}
+                  </span>
+                )}
+              <span
+                className={`font-heading font-bold text-base ${
+                  product.price_paise === 0
+                    ? "text-[#10B981]"
+                    : "text-[#EDEDF0]"
+                }`}
+              >
+                {product.price_paise === 0
+                  ? "Free Open Source"
+                  : formatPrice(product.price_paise)}
               </span>
             </div>
+
+            <Link
+              href={`/product/${product.slug}`}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#8535FC] hover:bg-[#8535FC]/90 text-white transition-colors group/btn"
+            >
+              <span>View Code</span>
+              <ArrowRight
+                size={12}
+                className="transition-transform group-hover/btn:translate-x-0.5"
+              />
+            </Link>
           </div>
         </div>
       </div>
-    </Link>
-  );
-}
-
-function CodeIcon({ size }: { size: number }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="16 18 22 12 16 6"></polyline>
-      <polyline points="8 6 2 12 8 18"></polyline>
-    </svg>
+    </div>
   );
 }

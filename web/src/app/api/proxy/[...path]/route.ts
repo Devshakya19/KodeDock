@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { setAuthCookies, clearAuthCookies } from "@/shared/lib/auth/server";
 
 const RUST_BACKEND = process.env.CORE_ENGINE_URL || "http://localhost:4001";
 
@@ -6,6 +7,7 @@ const RUST_BACKEND = process.env.CORE_ENGINE_URL || "http://localhost:4001";
 // Only paths that exist on the Rust backend are allowed.
 const ALLOWED_PREFIXES = [
   "products",
+  "categories",
   "seller/",
   "orders",
   "reviews",
@@ -34,10 +36,13 @@ async function proxyRequest(request: NextRequest, method: string) {
   const searchParams = request.nextUrl.searchParams.toString();
   const url = searchParams ? `${backendUrl}?${searchParams}` : backendUrl;
 
-  // Read token from HttpOnly cookie
+  // Read tokens from HttpOnly cookie
   const cookieHeader = request.headers.get("cookie") || "";
   const tokenMatch = cookieHeader.match(/kodedock_token=([^;]+)/);
-  const token = tokenMatch?.[1];
+  const refreshTokenMatch = cookieHeader.match(/kodedock_refresh_token=([^;]+)/);
+
+  let token = tokenMatch?.[1];
+  const refreshToken = refreshTokenMatch?.[1];
 
   // Get client IP — trust only X-Forwarded-For from trusted reverse proxy
   const clientIp = request.headers.get("x-real-ip") || "direct";
@@ -55,16 +60,70 @@ async function proxyRequest(request: NextRequest, method: string) {
     headers["Content-Type"] = reqContentType;
   }
 
-  const init: RequestInit = { method, headers };
+  // Buffer request body if needed for potential retry
+  const reqBodyBuffer = ["POST", "PUT", "PATCH"].includes(method)
+    ? await request.arrayBuffer()
+    : undefined;
 
-  if (["POST", "PUT", "PATCH"].includes(method)) {
-    init.body = request.body;
-    // @ts-expect-error duplex is needed for streaming body in fetch
-    init.duplex = "half";
-  }
+  const init: RequestInit = {
+    method,
+    headers,
+    body: reqBodyBuffer,
+  };
 
   try {
-    const backendRes = await fetch(url, init);
+    let backendRes = await fetch(url, init);
+
+    // Auto-refresh token if 401 Unauthorized occurs and refresh token is available
+    if (backendRes.status === 401 && refreshToken) {
+      try {
+        const refreshRes = await fetch(`${RUST_BACKEND}/api/auth/refresh`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ refresh_token: refreshToken }),
+        });
+
+        const refreshData = await refreshRes.json();
+
+        if (refreshRes.ok && refreshData.success && refreshData.data) {
+          token = refreshData.data.token;
+          const newRefreshToken = refreshData.data.refresh_token;
+
+          // Retry the request with the new access token
+          headers["Authorization"] = `Bearer ${token}`;
+          const retryInit: RequestInit = {
+            method,
+            headers,
+            body: reqBodyBuffer,
+          };
+
+          backendRes = await fetch(url, retryInit);
+          const body = await backendRes.text();
+
+          const responseHeaders = new Headers();
+          const resContentType = backendRes.headers.get("content-type");
+          if (resContentType) {
+            responseHeaders.set("Content-Type", resContentType);
+          }
+
+          const response = new NextResponse(body, {
+            status: backendRes.status,
+            headers: responseHeaders,
+          });
+
+          // Attach the fresh rotated cookies to the response
+          setAuthCookies(response, request, {
+            accessToken: refreshData.data.token,
+            refreshToken: newRefreshToken,
+          });
+
+          return response;
+        }
+      } catch {
+        // Fall through if refresh failed
+      }
+    }
+
     const body = await backendRes.text();
 
     const responseHeaders = new Headers();
@@ -73,10 +132,16 @@ async function proxyRequest(request: NextRequest, method: string) {
       responseHeaders.set("Content-Type", resContentType);
     }
 
-    return new NextResponse(body, {
+    const response = new NextResponse(body, {
       status: backendRes.status,
       headers: responseHeaders,
     });
+
+    if (backendRes.status === 401 && !refreshToken) {
+      clearAuthCookies(response, request);
+    }
+
+    return response;
   } catch {
     return NextResponse.json(
       { success: false, error: "Backend connection failed" },
@@ -104,3 +169,4 @@ export async function DELETE(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   return proxyRequest(request, "PATCH");
 }
+

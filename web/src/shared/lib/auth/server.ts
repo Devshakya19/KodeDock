@@ -73,32 +73,59 @@ export async function verifyRequest(request: NextRequest): Promise<TokenClaims |
 }
 
 /**
- * Set the HttpOnly authentication cookie on a response.
+ * Set the HttpOnly authentication cookies on a response.
+ * Sets both the short-lived access token and the 7-day rotated refresh token.
  */
-export function setAuthCookie(
+export function setAuthCookies(
   response: NextResponse,
   request: Request | NextRequest,
-  token: string,
-  maxAge = 86400
+  tokens: {
+    accessToken: string;
+    refreshToken?: string | null;
+  },
+  accessMaxAge = 15 * 60, // 15 minutes
+  refreshMaxAge = 7 * 24 * 60 * 60 // 7 days
 ): void {
   const proto =
     request.headers.get("x-forwarded-proto") ||
     new URL(request.url).protocol.replace(":", "");
   const isSecure = proto === "https";
 
-  response.cookies.set("kodedock_token", token, {
+  response.cookies.set("kodedock_token", tokens.accessToken, {
     httpOnly: true,
     secure: isSecure,
     sameSite: "lax",
     path: "/",
-    maxAge,
+    maxAge: accessMaxAge,
   });
+
+  if (tokens.refreshToken) {
+    response.cookies.set("kodedock_refresh_token", tokens.refreshToken, {
+      httpOnly: true,
+      secure: isSecure,
+      sameSite: "lax",
+      path: "/",
+      maxAge: refreshMaxAge,
+    });
+  }
 }
 
 /**
- * Clear the HttpOnly authentication cookie on a response.
+ * Set single access token cookie (legacy wrapper).
  */
-export function clearAuthCookie(
+export function setAuthCookie(
+  response: NextResponse,
+  request: Request | NextRequest,
+  token: string,
+  maxAge = 15 * 60
+): void {
+  setAuthCookies(response, request, { accessToken: token }, maxAge);
+}
+
+/**
+ * Clear all HttpOnly authentication cookies on a response.
+ */
+export function clearAuthCookies(
   response: NextResponse,
   request: Request | NextRequest
 ): void {
@@ -114,5 +141,23 @@ export function clearAuthCookie(
     path: "/",
     maxAge: 0,
   });
+
+  response.cookies.set("kodedock_refresh_token", "", {
+    httpOnly: true,
+    secure: isSecure,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 0,
+  });
+}
+
+/**
+ * Legacy alias for clearAuthCookies.
+ */
+export function clearAuthCookie(
+  response: NextResponse,
+  request: Request | NextRequest
+): void {
+  clearAuthCookies(response, request);
 }
 

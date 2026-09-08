@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { setAuthCookie } from "@/shared/lib/auth/server";
+import { setAuthCookies } from "@/shared/lib/auth/server";
 
 const RUST_BACKEND = process.env.CORE_ENGINE_URL || "http://localhost:4001";
 
@@ -27,7 +27,10 @@ export async function POST(request: Request) {
       data: { user: data.data.user },
     });
 
-    setAuthCookie(response, request, data.data.token);
+    setAuthCookies(response, request, {
+      accessToken: data.data.token,
+      refreshToken: data.data.refresh_token,
+    });
     return response;
   } catch (error) {
     return NextResponse.json(
@@ -36,3 +39,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

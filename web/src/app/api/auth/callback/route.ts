@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-import { setAuthCookie } from "@/shared/lib/auth/server";
+import { setAuthCookies } from "@/shared/lib/auth/server";
 
 const RUST_BACKEND = process.env.CORE_ENGINE_URL || "http://localhost:4001";
 
@@ -79,9 +79,12 @@ export async function GET(request: NextRequest) {
       nextUrl = "/seller";
     }
 
-    // Redirect with the token set as a cookie
+    // Redirect with the tokens set as cookies
     const response = NextResponse.redirect(`${origin}${nextUrl}`);
-    setAuthCookie(response, request, data.data.token);
+    setAuthCookies(response, request, {
+      accessToken: data.data.token,
+      refreshToken: data.data.refresh_token,
+    });
     return response;
   } catch {
     return NextResponse.redirect(`${origin}/login?error=backend_unavailable`);

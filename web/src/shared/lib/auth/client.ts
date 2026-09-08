@@ -130,6 +130,9 @@ export async function serverApiPut<T>(
   }
 }
 
+// Mutex lock for in-flight refresh requests to prevent token rotation race conditions
+let inFlightRefresh: Promise<boolean> | null = null;
+
 export const auth = {
   async signUp(data: {
     email: string;
@@ -173,9 +176,39 @@ export const auth = {
     await fetch("/api/auth/logout", { method: "POST" });
   },
 
+  async refreshToken(): Promise<boolean> {
+    if (inFlightRefresh) {
+      return inFlightRefresh;
+    }
+
+    inFlightRefresh = (async () => {
+      try {
+        const res = await fetch("/api/auth/refresh", {
+          method: "POST",
+          credentials: "include",
+        });
+        const result = await res.json();
+        return Boolean(res.ok && result.success);
+      } catch {
+        return false;
+      } finally {
+        inFlightRefresh = null;
+      }
+    })();
+
+    return inFlightRefresh;
+  },
+
   async getUser(): Promise<User | null> {
     try {
-      const res = await fetch("/api/auth/me", { credentials: "include" });
+      let res = await fetch("/api/auth/me", { credentials: "include" });
+      if (res.status === 401) {
+        // Attempt silent token rotation
+        const refreshed = await this.refreshToken();
+        if (refreshed) {
+          res = await fetch("/api/auth/me", { credentials: "include" });
+        }
+      }
       if (!res.ok) return null;
       const result = await res.json();
       return result.data || null;
@@ -205,3 +238,27 @@ export const auth = {
     window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${window.location.origin}/api/auth/callback&state=${state}`;
   },
 };
+
+// Automatic silent session heartbeat: Refreshes token every 10 minutes while tab is active
+if (typeof window !== "undefined") {
+  let lastRefreshTime = Date.now();
+
+  setInterval(() => {
+    if (document.visibilityState === "visible") {
+      auth.refreshToken();
+      lastRefreshTime = Date.now();
+    }
+  }, 10 * 60 * 1000);
+
+  // Also refresh if user returns to tab after more than 10 minutes
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      const now = Date.now();
+      if (now - lastRefreshTime > 10 * 60 * 1000) {
+        auth.refreshToken();
+        lastRefreshTime = now;
+      }
+    }
+  });
+}
+
