@@ -3,83 +3,130 @@ use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use uuid::Uuid;
 
-#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
-pub struct Product {
-    pub id: Uuid,
-    pub seller_id: Uuid,
-    pub category_id: Option<Uuid>,
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ProductSummary {
+    pub public_id: String,
     pub title: String,
     pub slug: String,
-    pub summary: Option<String>,
+    pub price_paise: i64,
+    pub original_price_paise: Option<i64>,
+    pub image_url: Option<String>,
+    pub rating: f32,
+    pub review_count: i32,
+    pub sales_count: i32,
+    pub seller_username: Option<String>,
+    pub category_name: Option<String>,
+}
+
+#[derive(Debug, Clone, FromRow)]
+pub struct ProductSummaryRow {
+    pub id: Uuid,
+    pub title: String,
+    pub slug: String,
+    pub price_paise: i64,
+    pub original_price_paise: Option<i64>,
+    pub image_url: Option<String>,
+    pub rating: Option<f32>,
+    pub review_count: Option<i32>,
+    pub sales_count: Option<i32>,
+    pub seller_username: Option<String>,
+    pub category_name: Option<String>,
+}
+
+impl ProductSummaryRow {
+    pub fn into_summary(self) -> ProductSummary {
+        use crate::auth::crypto::encode_public_id;
+        ProductSummary {
+            public_id: encode_public_id("kd_prd", &self.id),
+            title: self.title,
+            slug: self.slug,
+            price_paise: self.price_paise,
+            original_price_paise: self.original_price_paise,
+            image_url: self.image_url,
+            rating: self.rating.unwrap_or(0.0),
+            review_count: self.review_count.unwrap_or(0),
+            sales_count: self.sales_count.unwrap_or(0),
+            seller_username: self.seller_username,
+            category_name: self.category_name,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ProductDetails {
+    pub public_id: String,
+    pub title: String,
+    pub slug: String,
     pub description: Option<String>,
-    pub asset_type: Option<String>,
-    pub base_price_paise: i64,
-    pub currency: Option<String>,
+    pub long_description: Option<String>,
+    pub price_paise: i64,
+    pub original_price_paise: Option<i64>,
+    pub tags: Vec<String>,
+    pub tech_stack: Vec<String>,
     pub demo_url: Option<String>,
     pub github_repo_url: Option<String>,
-    pub status: String,
-    pub is_verified: Option<bool>,
-    pub sales_count: Option<i32>,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
+    pub image_url: Option<String>,
+    pub rating: f32,
+    pub review_count: i32,
+    pub sales_count: i32,
+    pub seller_username: Option<String>,
+    pub seller_avatar: Option<String>,
+    pub category_name: Option<String>,
+    pub updated_at: Option<DateTime<Utc>>,
 }
 
-#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
-pub struct CatalogProductItem {
+#[derive(Debug, Clone, FromRow)]
+pub struct ProductDetailsRow {
     pub id: Uuid,
-    pub seller_id: Uuid,
     pub title: String,
     pub slug: String,
-    pub summary: Option<String>,
-    pub asset_type: Option<String>,
-    pub base_price_paise: i64,
-    pub status: String,
-    pub is_verified: Option<bool>,
+    pub description: Option<String>,
+    pub long_description: Option<String>,
+    pub price_paise: i64,
+    pub original_price_paise: Option<i64>,
+    pub tags: Option<Vec<String>>,
+    pub tech_stack: Option<Vec<String>>,
+    pub demo_url: Option<String>,
+    pub github_repo_url: Option<String>,
+    pub image_url: Option<String>,
+    pub rating: Option<f32>,
+    pub review_count: Option<i32>,
     pub sales_count: Option<i32>,
-    pub created_at: DateTime<Utc>,
+    pub seller_username: Option<String>,
+    pub seller_avatar: Option<String>,
+    pub category_name: Option<String>,
+    pub updated_at: Option<DateTime<Utc>>,
 }
 
-#[derive(Debug, Deserialize)]
-pub struct CatalogQuery {
-    pub q: Option<String>,
-    pub asset_type: Option<String>,
-    pub sort: Option<String>, // "newest", "price_asc", "price_desc", "popular"
-    pub page: Option<i64>,
-    pub limit: Option<i64>,
+impl ProductDetailsRow {
+    pub fn into_details(self) -> ProductDetails {
+        use crate::auth::crypto::encode_public_id;
+        ProductDetails {
+            public_id: encode_public_id("kd_prd", &self.id),
+            title: self.title,
+            slug: self.slug,
+            description: self.description,
+            long_description: self.long_description,
+            price_paise: self.price_paise,
+            original_price_paise: self.original_price_paise,
+            tags: self.tags.unwrap_or_default(),
+            tech_stack: self.tech_stack.unwrap_or_default(),
+            demo_url: self.demo_url,
+            github_repo_url: self.github_repo_url,
+            image_url: self.image_url,
+            rating: self.rating.unwrap_or(0.0),
+            review_count: self.review_count.unwrap_or(0),
+            sales_count: self.sales_count.unwrap_or(0),
+            seller_username: self.seller_username,
+            seller_avatar: self.seller_avatar,
+            category_name: self.category_name,
+            updated_at: self.updated_at,
+        }
+    }
 }
 
 #[derive(Debug, Serialize)]
-pub struct CatalogResponse {
-    pub products: Vec<CatalogProductItem>,
-    pub total: i64,
-    pub page: i64,
-    pub limit: i64,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct CreateProductRequest {
-    pub title: String,
-    pub summary: Option<String>,
-    pub description: Option<String>,
-    pub asset_type: Option<String>,
-    pub base_price_paise: i64,
-    pub demo_url: Option<String>,
-    pub github_repo_url: Option<String>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct UpdateProductRequest {
-    pub title: Option<String>,
-    pub summary: Option<String>,
-    pub description: Option<String>,
-    pub base_price_paise: Option<i64>,
-    pub status: Option<String>,
-}
-
-#[derive(Debug, Serialize)]
-pub struct Category {
-    pub id: Uuid,
-    pub name: String,
-    pub slug: String,
-    pub parent_id: Option<Uuid>,
+pub struct ApiResponse<T> {
+    pub success: bool,
+    pub data: T,
 }

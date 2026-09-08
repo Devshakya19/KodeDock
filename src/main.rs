@@ -1,129 +1,65 @@
-pub mod auth;
-pub mod common;
-pub mod config;
-pub mod errors;
-pub mod fintech;
-pub mod jobs;
-pub mod marketplace;
-pub mod realtime;
-pub mod security;
-pub mod storage;
-pub mod tax;
-
 use actix_cors::Cors;
-use actix_web::{web, App, HttpResponse, HttpServer, Responder};
-use common::ApiResponse;
-use config::AppConfig;
+use actix_web::{middleware::Logger, web, App, HttpResponse, HttpServer, Responder};
+use dotenvy::dotenv;
 use sqlx::postgres::PgPoolOptions;
-use std::time::Duration;
-use tracing::info;
-use tracing_actix_web::TracingLogger;
+use std::env;
+
+use kodedock_core::auth;
+use kodedock_core::marketplace;
 
 async fn health_check() -> impl Responder {
-    HttpResponse::Ok().json(ApiResponse::success(serde_json::json!({
-        "status": "healthy",
-        "service": "kodedock-core-engine",
+    HttpResponse::Ok().json(serde_json::json!({
+        "status": "ok",
+        "service": "kodedock-core",
         "version": env!("CARGO_PKG_VERSION"),
-        "uptime": "online"
-    })))
+    }))
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    // 1. Load environment variables from .env if present
-    dotenvy::dotenv().ok();
+    dotenv().ok();
+    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
 
-    // 2. Initialize structured tracing telemetry
-    tracing_subscriber::fmt()
-        .with_env_filter(
-            tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "info,kodedock=debug".into()),
-        )
-        .json()
-        .init();
+    let port: u16 = env::var("PORT")
+        .unwrap_or_else(|_| "4001".to_string())
+        .parse()
+        .expect("PORT must be a valid number");
 
-    info!(
-        "⚓ Booting KodeDock Universal Digital Marketplace Engine v{}...",
-        env!("CARGO_PKG_VERSION")
-    );
+    let database_url = env::var("DATABASE_URL")
+        .unwrap_or_else(|_| "postgres://kodedock:kodedock_secret@localhost:5432/kodedock".to_string());
 
-    // 3. Load strongly-typed AppConfig
-    let config = match AppConfig::from_env() {
-        Ok(cfg) => cfg,
-        Err(err) => {
-            eprintln!("❌ Fatal Configuration Error: {}", err);
-            std::process::exit(1);
-        }
-    };
+    let jwt_secret = env::var("JWT_SECRET")
+        .unwrap_or_else(|_| "kodedock-super-secret-jwt-key-change-in-production-2026".to_string());
 
-    info!("🔌 Connecting to PostgreSQL at {}...", config.database_url);
-    let db_pool = match PgPoolOptions::new()
-        .max_connections(config.database_max_connections)
-        .acquire_timeout(Duration::from_secs(5))
-        .connect(&config.database_url)
-        .await
-    {
-        Ok(pool) => {
-            info!(
-                "✅ PostgreSQL connected successfully (Pool size: {})",
-                config.database_max_connections
-            );
-            pool
-        }
-        Err(e) => {
-            eprintln!("❌ Failed to connect to PostgreSQL: {}", e);
-            std::process::exit(1);
-        }
-    };
+    log::info!("Connecting to PostgreSQL database...");
+    let pool = PgPoolOptions::new()
+        .min_connections(2)
+        .max_connections(20)
+        .idle_timeout(std::time::Duration::from_secs(300))
+        .acquire_timeout(std::time::Duration::from_secs(10))
+        .connect_lazy(&database_url)
+        .expect("Failed to initialize database connection pool");
 
-    info!("⚡ Connecting to Redis at {}...", config.redis_url);
-    let redis_client = match redis::Client::open(config.redis_url.clone()) {
-        Ok(client) => {
-            info!("✅ Redis client initialized successfully");
-            client
-        }
-        Err(e) => {
-            eprintln!("❌ Failed to initialize Redis client: {}", e);
-            std::process::exit(1);
-        }
-    };
-
-    let host = config.host.clone();
-    let port = config.port;
-    let config_data = web::Data::new(config);
-    let db_pool_data = web::Data::new(db_pool);
-    let redis_data = web::Data::new(redis_client);
-
-    info!("🚀 Starting HTTP server on http://{}:{}...", host, port);
+    log::info!("KodeDock Core Engine booting on port {}", port);
 
     HttpServer::new(move || {
         let cors = Cors::default()
             .allow_any_origin()
-            .allow_any_method()
+            .allowed_methods(vec!["GET", "POST", "PUT", "DELETE", "OPTIONS"])
             .allow_any_header()
             .supports_credentials()
             .max_age(3600);
 
         App::new()
-            .wrap(TracingLogger::default())
             .wrap(cors)
-            .app_data(config_data.clone())
-            .app_data(db_pool_data.clone())
-            .app_data(redis_data.clone())
+            .wrap(Logger::default())
+            .app_data(web::Data::new(pool.clone()))
+            .app_data(web::Data::new(jwt_secret.clone()))
             .route("/health", web::get().to(health_check))
-            .service(
-                web::scope("/api/v1")
-                    .configure(auth::configure)
-                    .configure(marketplace::configure)
-                    .configure(fintech::configure)
-                    .configure(tax::configure)
-                    .configure(storage::configure)
-                    .configure(security::configure)
-                    .configure(realtime::configure)
-                    .configure(jobs::configure),
-            )
+            .configure(auth::configure_auth_routes)
+            .configure(marketplace::configure_marketplace_routes)
     })
-    .bind((host.as_str(), port))?
+    .bind(("0.0.0.0", port))?
     .run()
     .await
 }
