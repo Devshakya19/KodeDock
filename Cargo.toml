@@ -1,79 +1,35 @@
 [package]
-name = "kodedock"
-version = "1.0.0"
+name = "kodedock-core"
+version = "0.1.0"
 edition = "2021"
-authors = ["KodeDock Engineering Team"]
-description = "Universal Digital Marketplace & Escrow Platform Core Engine"
-license = "MIT"
 
 [dependencies]
-# HTTP Web Framework & Networking
-actix-web = "4.9"
+actix-web = "4"
 actix-cors = "0.7"
-actix-governor = "0.6" # High-performance Leaky-Bucket Rate Limiting
-
-# Async Runtime & Concurrency
-tokio = { version = "1.39", features = ["full"] }
-futures-util = "0.3"
-
-# Database & SQLx
-sqlx = { version = "0.8", features = [
-    "runtime-tokio-rustls",
-    "postgres",
-    "uuid",
-    "chrono",
-    "json",
-    "migrate",
-    "bigdecimal"
-] }
-pgvector = { version = "0.4", features = ["sqlx", "serde"] }
-
-# In-Memory Cache & Redis
-redis = { version = "0.26", features = ["tokio-comp", "aio", "connection-manager"] }
-
-# Cryptography & Bank-Grade Security
-argon2 = { version = "0.5", features = ["std"] }
-jsonwebtoken = "9.3"
-totp-rs = { version = "5.6", features = ["gen_secret", "qr", "serde"] }
-aes-gcm = "0.10"
-ed25519-dalek = { version = "2.1", features = ["rand_core", "serde"] }
-sha2 = "0.10"
-hmac = "0.12"
-hex = "0.4"
-rand = "0.8"
-
-# S3-Compatible Object Storage (SeaweedFS / Cloudflare R2 / AWS S3)
-aws-config = "1.5"
-aws-sdk-s3 = "1.47"
-aws-credential-types = "1.2"
-
-# AST Code Security & Secret Scanner
-regex = "1.10"
-aho-corasick = "1.1"
-tree-sitter = "0.22"
-
-# Serialization & Data Structures
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-uuid = { version = "1.10", features = ["v4", "v7", "serde"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+uuid = { version = "1", features = ["v4", "serde"] }
 chrono = { version = "0.4", features = ["serde"] }
-
-# Observability, Structured Telemetry & Tracing
-tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
-tracing-actix-web = "0.7"
-
-# Error Handling & Environment
-thiserror = "1.0"
+reqwest = { version = "0.12", features = ["json"] }
 dotenvy = "0.15"
-lettre = { version = "0.11.23", features = ["tokio1", "tokio1-native-tls", "builder"] }
-reqwest = { version = "0.13.4", features = ["form", "json"] }
-base64 = "0.23.1"
-slug = "0.1.6"
+jsonwebtoken = "9"
+sqlx = { version = "0.8", features = ["runtime-tokio", "postgres", "uuid", "chrono"] }
+env_logger = "0.11"
+log = "0.4"
+argon2 = "0.5"
+rand = "0.8"
+hmac = "0.12"
+sha2 = "0.10"
+hex = "0.4"
+aes-gcm = "0.10"
+redis = { version = "1.6.0", features = ["tokio-comp"] }
+bs58 = "0.5"
 
-[profile.release]
-opt-level = 3
-lto = true
-codegen-units = 1
-panic = "abort"
-strip = true
+[lib]
+name = "kodedock_core"
+path = "src/lib.rs"
+
+[[bin]]
+name = "kodedock-core"
+path = "src/main.rs"

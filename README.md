@@ -1,7 +1,7 @@
 <h1 align="center">
-  <img src="assets/icons/kd.svg" alt="KD" height="60" align="absmiddle">
+  <img src="assets/icons/logo/kd.svg" alt="KD" height="60" align="absmiddle">
   &nbsp;
-  <img src="assets/icons/KodeDock-theme.svg" alt="KodeDock" height="40" align="absmiddle">
+  <img src="assets/icons/logo/KodeDock-theme.svg" alt="KodeDock" height="40" align="absmiddle">
 </h1>
 
 <p align="center">
@@ -64,40 +64,6 @@ graph TD
 | **Code Security** | Tree-Sitter AST parser + Aho-Corasick regex | Detects leaked AWS/Stripe keys in < 50ms per 500MB |
 | **Object Storage** | S3 Direct Presigned Multipart Streaming | Uploads up to 50 GB consume 0 MB server RAM |
 | **Tax Engine** | 1% Section 194-O TDS + GST (CGST/SGST/IGST) | Automated quarterly TDS ledger & PDF invoices |
-
----
-
-## 📁 Repository Structure
-
-```text
-kodedock/
-├── AGENT.md                         # 🤖 Binding Agent Directives (Zero-Mock Mandate)
-├── AGENTS.md                        # 🤖 Upgraded Agent Directives
-├── LICENSE                          # ⚖️ MIT License
-├── README.md                        # 📖 Project Overview & Quickstart
-├── CONTRIBUTING.md                  # 🤝 Contribution & Quality Guidelines
-├── CHANGELOG.md                     # 📝 Version History
-├── SECURITY.md                      # 🛡️ Vulnerability Disclosure Policy
-├── .agents/
-│   └── rules.md                     # 🤖 Strict Coding Standards
-├── docs/
-│   ├── PRD.md                       # 📑 Product Requirements Document
-│   ├── TRD.md                       # 🛠️ Technical Requirements Document
-│   ├── ARCHITECTURE.md              # 🏛️ System Architecture & Data Flows
-│   ├── RULES.md                     # 📜 Engineering & Invariant Rules
-│   └── MARKETING_AND_USER_PERSONAS.md# 🎯 User Personas & GTM Strategy
-├── docker/
-│   ├── docker-compose.yml           # 🐳 All-in-One 1-Command Stack
-│   ├── Dockerfile.backend           # 🦀 Multi-stage Rust build container
-│   ├── Caddyfile                    # 🛡️ Auto-SSL & Reverse Proxy
-│   └── migrations/                  # 🐘 5 Sequential PostgreSQL Migrations
-│       ├── 001_auth_security.sql
-│       ├── 002_marketplace_products.sql
-│       ├── 003_fintech_escrow_ledger.sql
-│       ├── 004_tax_tds_compliance.sql
-│       └── 005_storage_and_drm.sql
-└── src/                             # 🦀 Clean Modular Rust Core Engine
-```
 
 ---
 
