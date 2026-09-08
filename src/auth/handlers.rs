@@ -1,286 +1,326 @@
-use crate::auth::middleware::AuthenticatedUser;
-use crate::auth::models::{
-    ChangePasswordRequest, LoginRequest, OAuthCallbackRequest, SendVerificationEmailRequest,
-    SignupRequest, TotpVerifyRequest, UpdateProfileRequest, UserPublicProfile, VerifyEmailRequest,
-};
-use crate::auth::repository::AuthRepository;
-use crate::auth::service::AuthService;
-use crate::common::ApiResponse;
-use crate::config::AppConfig;
-use crate::errors::AppError;
-use actix_web::{
-    cookie::{Cookie, SameSite},
-    web, HttpRequest, HttpResponse,
-};
-use redis::Client as RedisClient;
+use actix_web::{web, HttpResponse, Responder};
 use sqlx::PgPool;
+use uuid::Uuid;
 
-fn build_refresh_cookie(token: String, config: &AppConfig, max_age_secs: i64) -> Cookie<'static> {
-    Cookie::build("kodedock_refresh_token", token)
-        .path("/")
-        .http_only(true)
-        .secure(config.environment == "production")
-        .same_site(SameSite::Strict)
-        .max_age(actix_web::cookie::time::Duration::seconds(max_age_secs))
-        .finish()
-}
+use crate::auth::errors::AuthError;
+use crate::auth::middleware::AuthClaims;
+use crate::auth::models::{
+    ApiResponse, AuthConfigResponse, ChangePasswordRequest, ForgotPasswordRequest,
+    LoginRequest, OAuthCallbackRequest, OAuthLinkRequest, RefreshTokenRequest, RegisterRequest,
+    ResetPasswordRequest,
+};
+use crate::auth::oauth;
+use crate::auth::repository;
+use crate::auth::service;
 
-pub async fn signup(
+// ─── REGISTRATION & LOGIN ────────────────────────────────────────────────
+
+pub async fn register(
+    secret: web::Data<String>,
     pool: web::Data<PgPool>,
-    config: web::Data<AppConfig>,
-    req: web::Json<SignupRequest>,
-) -> Result<HttpResponse, AppError> {
-    let (auth_resp, refresh_token) = AuthService::signup(&pool, &config, req.into_inner()).await?;
+    body: web::Json<RegisterRequest>,
+) -> Result<HttpResponse, AuthError> {
+    let role = match body.role.as_deref() {
+        Some("developer") => "developer",
+        _ => "user",
+    };
 
-    let cookie = build_refresh_cookie(refresh_token, &config, config.jwt_refresh_expiry_secs);
+    // Password strength validation
+    if body.password.len() < 8 {
+        return Err(AuthError::Validation("Password must be at least 8 characters long".to_string()));
+    }
+    if !body.password.chars().any(|c| c.is_uppercase()) {
+        return Err(AuthError::Validation("Password must contain at least one uppercase letter".to_string()));
+    }
+    if !body.password.chars().any(|c| c.is_lowercase()) {
+        return Err(AuthError::Validation("Password must contain at least one lowercase letter".to_string()));
+    }
+    if !body.password.chars().any(|c| c.is_numeric()) {
+        return Err(AuthError::Validation("Password must contain at least one number".to_string()));
+    }
 
-    Ok(HttpResponse::Created()
-        .cookie(cookie)
-        .json(ApiResponse::success_with_message(
-            auth_resp,
-            "User registered successfully",
-        )))
+    // Email structure validation
+    let email = body.email.trim().to_lowercase();
+    if email.len() < 5 || !email.contains('@') {
+        return Err(AuthError::Validation("Invalid email address format".to_string()));
+    }
+    let parts: Vec<&str> = email.split('@').collect();
+    if parts.len() != 2
+        || parts[0].is_empty()
+        || !parts[1].contains('.')
+        || parts[1].starts_with('.')
+        || parts[1].ends_with('.')
+    {
+        return Err(AuthError::Validation("Invalid email address format".to_string()));
+    }
+
+    // Full name validation
+    let full_name = body.full_name.trim();
+    if full_name.is_empty() || full_name.len() > 100 {
+        return Err(AuthError::Validation("Name must be between 1 and 100 characters".to_string()));
+    }
+
+    let auth_resp = service::register_user(
+        pool.get_ref(),
+        &email,
+        &body.password,
+        full_name,
+        role,
+        secret.as_str(),
+    )
+    .await?;
+
+    Ok(HttpResponse::Created().json(ApiResponse::success(auth_resp, "Registration successful")))
 }
 
 pub async fn login(
+    secret: web::Data<String>,
     pool: web::Data<PgPool>,
-    config: web::Data<AppConfig>,
-    req: web::Json<LoginRequest>,
-) -> Result<HttpResponse, AppError> {
-    let (auth_resp, refresh_token) =
-        AuthService::login(&pool, &config, &req.email, &req.password).await?;
+    body: web::Json<LoginRequest>,
+) -> Result<HttpResponse, AuthError> {
+    let auth_resp =
+        service::login_user(pool.get_ref(), &body.email, &body.password, secret.as_str()).await?;
 
-    let cookie = build_refresh_cookie(refresh_token, &config, config.jwt_refresh_expiry_secs);
-
-    Ok(HttpResponse::Ok()
-        .cookie(cookie)
-        .json(ApiResponse::success_with_message(
-            auth_resp,
-            "Login successful",
-        )))
+    Ok(HttpResponse::Ok().json(ApiResponse::success(auth_resp, "Login successful")))
 }
 
-pub async fn refresh_token(
+pub async fn refresh(
+    secret: web::Data<String>,
     pool: web::Data<PgPool>,
-    config: web::Data<AppConfig>,
-    http_req: HttpRequest,
-) -> Result<HttpResponse, AppError> {
-    let refresh_cookie = http_req
-        .cookie("kodedock_refresh_token")
-        .ok_or_else(|| AppError::Unauthorized("Missing refresh token cookie".to_string()))?;
+    body: web::Json<RefreshTokenRequest>,
+) -> Result<HttpResponse, AuthError> {
+    let auth_resp =
+        service::rotate_refresh_token(pool.get_ref(), &body.refresh_token, secret.as_str()).await?;
 
-    let (auth_resp, new_refresh_token) =
-        AuthService::refresh_access_token(&pool, &config, refresh_cookie.value()).await?;
-
-    let cookie = build_refresh_cookie(new_refresh_token, &config, config.jwt_refresh_expiry_secs);
-
-    Ok(HttpResponse::Ok()
-        .cookie(cookie)
-        .json(ApiResponse::success(auth_resp)))
+    Ok(HttpResponse::Ok().json(ApiResponse::success(auth_resp, "Token rotated successfully")))
 }
 
-pub async fn logout() -> Result<HttpResponse, AppError> {
-    let removal_cookie = Cookie::build("kodedock_refresh_token", "")
-        .path("/")
-        .http_only(true)
-        .max_age(actix_web::cookie::time::Duration::seconds(0))
-        .finish();
+pub async fn me(
+    pool: web::Data<PgPool>,
+    claims: AuthClaims,
+) -> Result<HttpResponse, AuthError> {
+    let user_id = Uuid::parse_str(&claims.user_id)
+        .map_err(|_| AuthError::Validation("Invalid user ID".to_string()))?;
 
-    Ok(HttpResponse::Ok()
-        .cookie(removal_cookie)
-        .json(ApiResponse::success_with_message(
-            true,
-            "Logged out successfully",
-        )))
+    let user = repository::find_user_by_id(pool.get_ref(), user_id)
+        .await?
+        .ok_or(AuthError::UserNotFound)?;
+
+    Ok(HttpResponse::Ok().json(ApiResponse::success(user, "User profile retrieved")))
 }
 
-pub async fn setup_2fa(
-    pool: web::Data<PgPool>,
-    config: web::Data<AppConfig>,
-    auth_user: AuthenticatedUser,
-) -> Result<HttpResponse, AppError> {
-    let result = AuthService::setup_totp(&pool, &config, &auth_user.email).await?;
-    Ok(HttpResponse::Ok().json(ApiResponse::success_with_message(
-        result,
-        "TOTP 2FA secret generated successfully",
-    )))
+pub async fn logout() -> HttpResponse {
+    HttpResponse::Ok().json(ApiResponse::<()>::ok("Logged out successfully"))
 }
 
-pub async fn verify_2fa(
+// ─── PASSWORD MANAGEMENT ─────────────────────────────────────────────────
+
+pub async fn forgot_password(
     pool: web::Data<PgPool>,
-    config: web::Data<AppConfig>,
-    auth_user: AuthenticatedUser,
-    req: web::Json<TotpVerifyRequest>,
-) -> Result<HttpResponse, AppError> {
-    let is_valid = AuthService::verify_totp(&pool, &config, &auth_user.email, &req.token).await?;
-    if is_valid {
-        Ok(HttpResponse::Ok().json(ApiResponse::success_with_message(
-            true,
-            "TOTP 2FA verified and enabled successfully",
-        )))
-    } else {
-        Err(AppError::Unauthorized("Invalid 2FA token".to_string()))
+    body: web::Json<ForgotPasswordRequest>,
+) -> Result<HttpResponse, AuthError> {
+    // Initiate reset
+    match service::initiate_password_reset(pool.get_ref(), &body.email).await {
+        Ok(_reset_token) => {
+            log::info!("Password reset link generated for {}", body.email);
+        }
+        Err(AuthError::UserNotFound) => {
+            // Keep silent to prevent account enumeration
+            log::info!("Password reset requested for nonexistent email: {}", body.email);
+        }
+        Err(e) => return Err(e),
     }
+
+    Ok(HttpResponse::Ok().json(ApiResponse::<()>::ok(
+        "If an account exists with that email, a password reset link has been dispatched",
+    )))
 }
 
-pub async fn send_verification_email(
-    redis: web::Data<RedisClient>,
-    config: web::Data<AppConfig>,
-    req: web::Json<SendVerificationEmailRequest>,
-) -> Result<HttpResponse, AppError> {
-    AuthService::send_email_verification(&redis, &config, &req.email).await?;
-    Ok(HttpResponse::Ok().json(ApiResponse::success_with_message(
-        true,
-        "Verification email sent successfully",
-    )))
+#[derive(Debug, serde::Deserialize)]
+pub struct VerifyEmailQuery {
+    pub token: Option<String>,
 }
 
 pub async fn verify_email(
     pool: web::Data<PgPool>,
-    redis: web::Data<RedisClient>,
-    req: web::Json<VerifyEmailRequest>,
-) -> Result<HttpResponse, AppError> {
-    let is_verified = AuthService::verify_email_otp(&pool, &redis, &req.email, &req.otp).await?;
-    if is_verified {
-        Ok(HttpResponse::Ok().json(ApiResponse::success_with_message(
-            true,
-            "Email verified successfully",
-        )))
-    } else {
-        Err(AppError::BadRequest(
-            "Invalid or expired verification code".to_string(),
-        ))
+    query: web::Query<VerifyEmailQuery>,
+) -> Result<HttpResponse, AuthError> {
+    let token = match query.token.as_deref() {
+        Some(t) if !t.trim().is_empty() => t.trim(),
+        _ => return Err(AuthError::Validation("Missing verification token".to_string())),
+    };
+
+    let record = match repository::find_valid_reset_token(pool.get_ref(), token).await? {
+        Some(r) => r,
+        None => return Err(AuthError::InvalidToken("Verification token is invalid or has expired".to_string())),
+    };
+
+    repository::verify_user_email(pool.get_ref(), record.user_id).await?;
+    repository::mark_reset_token_used(pool.get_ref(), token).await?;
+
+    Ok(HttpResponse::Ok().json(ApiResponse::<()>::ok("Email verified successfully")))
+}
+
+pub async fn reset_password(
+    pool: web::Data<PgPool>,
+    body: web::Json<ResetPasswordRequest>,
+) -> Result<HttpResponse, AuthError> {
+    if body.password.len() < 8 {
+        return Err(AuthError::Validation("Password must be at least 8 characters long".to_string()));
     }
-}
 
-pub async fn github_callback(
-    pool: web::Data<PgPool>,
-    config: web::Data<AppConfig>,
-    req: web::Query<OAuthCallbackRequest>,
-) -> Result<HttpResponse, AppError> {
-    let (auth_resp, refresh_token) =
-        AuthService::handle_github_callback(&pool, &config, &req.code).await?;
-
-    let cookie = build_refresh_cookie(refresh_token, &config, config.jwt_refresh_expiry_secs);
-
-    Ok(HttpResponse::Ok()
-        .cookie(cookie)
-        .json(ApiResponse::success_with_message(
-            auth_resp,
-            "GitHub OAuth login successful",
-        )))
-}
-
-pub async fn github_login(config: web::Data<AppConfig>) -> Result<HttpResponse, AppError> {
-    let url = format!(
-        "https://github.com/login/oauth/authorize?client_id={}&redirect_uri={}&scope=user:email",
-        config.github_client_id, config.github_redirect_uri
-    );
-    Ok(HttpResponse::Found()
-        .insert_header(("Location", url))
-        .finish())
-}
-
-pub async fn google_callback(
-    pool: web::Data<PgPool>,
-    config: web::Data<AppConfig>,
-    req: web::Query<OAuthCallbackRequest>,
-) -> Result<HttpResponse, AppError> {
-    let (auth_resp, refresh_token) =
-        AuthService::handle_google_callback(&pool, &config, &req.code).await?;
-
-    let cookie = build_refresh_cookie(refresh_token, &config, config.jwt_refresh_expiry_secs);
-
-    Ok(HttpResponse::Ok()
-        .cookie(cookie)
-        .json(ApiResponse::success_with_message(
-            auth_resp,
-            "Google OAuth login successful",
-        )))
-}
-
-pub async fn google_login(config: web::Data<AppConfig>) -> Result<HttpResponse, AppError> {
-    let url = format!(
-        "https://accounts.google.com/o/oauth2/v2/auth?client_id={}&redirect_uri={}&response_type=code&scope=email%20profile",
-        config.google_client_id,
-        config.google_redirect_uri
-    );
-    Ok(HttpResponse::Found()
-        .insert_header(("Location", url))
-        .finish())
-}
-
-pub async fn get_me(
-    pool: web::Data<PgPool>,
-    user: AuthenticatedUser,
-) -> Result<HttpResponse, AppError> {
-    let db_user = AuthRepository::find_by_id(&pool, user.id)
-        .await?
-        .ok_or_else(|| AppError::NotFound("User not found".to_string()))?;
-
-    Ok(HttpResponse::Ok().json(ApiResponse::success(UserPublicProfile::from(db_user))))
-}
-
-pub async fn update_profile(
-    pool: web::Data<PgPool>,
-    user: AuthenticatedUser,
-    req: web::Json<UpdateProfileRequest>,
-) -> Result<HttpResponse, AppError> {
-    let updated_user = AuthRepository::update_user_profile(&pool, user.id, &req.into_inner()).await?;
-    Ok(HttpResponse::Ok().json(ApiResponse::success_with_message(
-        UserPublicProfile::from(updated_user),
-        "Profile updated successfully",
-    )))
-}
-
-pub async fn get_sessions(
-    pool: web::Data<PgPool>,
-    user: AuthenticatedUser,
-) -> Result<HttpResponse, AppError> {
-    let sessions = AuthRepository::get_user_sessions(&pool, user.id).await?;
-    Ok(HttpResponse::Ok().json(ApiResponse::success(sessions)))
-}
-
-pub async fn revoke_session(
-    pool: web::Data<PgPool>,
-    user: AuthenticatedUser,
-    path: web::Path<uuid::Uuid>,
-) -> Result<HttpResponse, AppError> {
-    let session_id = path.into_inner();
-    AuthRepository::revoke_session(&pool, user.id, session_id).await?;
-    Ok(HttpResponse::Ok().json(ApiResponse::success_with_message(
-        true,
-        "Session revoked successfully",
-    )))
+    service::complete_password_reset(pool.get_ref(), &body.token, &body.password).await?;
+    Ok(HttpResponse::Ok().json(ApiResponse::<()>::ok("Password reset successfully")))
 }
 
 pub async fn change_password(
     pool: web::Data<PgPool>,
-    user: AuthenticatedUser,
-    req: web::Json<ChangePasswordRequest>,
-) -> Result<HttpResponse, AppError> {
-    let db_user = AuthRepository::find_by_id(&pool, user.id)
-        .await?
-        .ok_or_else(|| AppError::NotFound("User not found".to_string()))?;
+    claims: AuthClaims,
+    body: web::Json<ChangePasswordRequest>,
+) -> Result<HttpResponse, AuthError> {
+    let user_id = Uuid::parse_str(&claims.user_id)
+        .map_err(|_| AuthError::Validation("Invalid user ID".to_string()))?;
 
-    if !AuthService::verify_password(&req.current_password, &db_user.password_hash)? {
-        return Err(AppError::Unauthorized("Current password verification failed".to_string()));
+    if body.new_password.len() < 8 {
+        return Err(AuthError::Validation("New password must be at least 8 characters long".to_string()));
     }
 
-    if req.new_password.len() < 8 {
-        return Err(AppError::BadRequest("New password must be at least 8 characters long".to_string()));
-    }
+    service::change_user_password(
+        pool.get_ref(),
+        user_id,
+        &body.current_password,
+        &body.new_password,
+    )
+    .await?;
 
-    let new_hash = AuthService::hash_password(&req.new_password)?;
-    sqlx::query("UPDATE users SET password_hash = $1, updated_at = NOW() WHERE id = $2")
-        .bind(new_hash)
-        .bind(user.id)
-        .execute(pool.get_ref())
-        .await?;
+    Ok(HttpResponse::Ok().json(ApiResponse::<()>::ok("Password changed successfully")))
+}
 
-    Ok(HttpResponse::Ok().json(ApiResponse::success_with_message(
-        true,
-        "Password changed successfully",
+pub async fn delete_account(
+    pool: web::Data<PgPool>,
+    claims: AuthClaims,
+) -> Result<HttpResponse, AuthError> {
+    let user_id = Uuid::parse_str(&claims.user_id)
+        .map_err(|_| AuthError::Validation("Invalid user ID".to_string()))?;
+
+    repository::delete_user(pool.get_ref(), user_id).await?;
+    Ok(HttpResponse::Ok().json(ApiResponse::<()>::ok("Account deleted successfully")))
+}
+
+// ─── MODULAR OAUTH HANDLERS ──────────────────────────────────────────────
+
+pub async fn oauth_authenticate(
+    secret: web::Data<String>,
+    pool: web::Data<PgPool>,
+    path: web::Path<String>,
+    body: web::Json<OAuthCallbackRequest>,
+) -> Result<HttpResponse, AuthError> {
+    let provider_name = path.into_inner();
+    let provider = oauth::get_provider(&provider_name)?;
+
+    let auth_resp = service::handle_oauth_login_or_register(
+        pool.get_ref(),
+        provider.as_ref(),
+        &body.code,
+        body.role.as_deref(),
+        secret.as_str(),
+    )
+    .await?;
+
+    Ok(HttpResponse::Ok().json(ApiResponse::success(
+        auth_resp,
+        format!("{} authentication successful", provider_name),
     )))
 }
 
+pub async fn oauth_link(
+    secret: web::Data<String>,
+    pool: web::Data<PgPool>,
+    claims: AuthClaims,
+    path: web::Path<String>,
+    body: web::Json<OAuthLinkRequest>,
+) -> Result<HttpResponse, AuthError> {
+    let provider_name = path.into_inner();
+    let user_id = Uuid::parse_str(&claims.user_id)
+        .map_err(|_| AuthError::Validation("Invalid user ID in session".to_string()))?;
+
+    let provider = oauth::get_provider(&provider_name)?;
+    let token_resp = provider.exchange_code(&body.code).await?;
+    let profile = provider.fetch_user(&token_resp.access_token).await?;
+
+    match provider_name.to_lowercase().as_str() {
+        "github" => {
+            // Check if already linked to another account
+            if let Some(existing) = repository::find_user_by_github_id(pool.get_ref(), &profile.provider_user_id).await? {
+                if existing.id != user_id {
+                    return Err(AuthError::Forbidden(
+                        "This GitHub account is already linked to another user".to_string(),
+                    ));
+                }
+            }
+            let username = profile.username.as_deref().unwrap_or(&profile.provider_user_id);
+            repository::link_github_to_user(pool.get_ref(), user_id, &profile.provider_user_id, username).await?;
+            if let Ok(encrypted) = crate::auth::crypto::encrypt_token(&token_resp.access_token, secret.as_str()) {
+                let _ = repository::store_github_token(pool.get_ref(), user_id, &encrypted).await;
+            }
+        }
+        "google" => {
+            if let Some(existing) = repository::find_user_by_google_id(pool.get_ref(), &profile.provider_user_id).await? {
+                if existing.id != user_id {
+                    return Err(AuthError::Forbidden(
+                        "This Google account is already linked to another user".to_string(),
+                    ));
+                }
+            }
+            repository::link_google_to_user(pool.get_ref(), user_id, &profile.provider_user_id).await?;
+        }
+        _ => return Err(AuthError::OAuth("Unsupported link provider".to_string())),
+    }
+
+    Ok(HttpResponse::Ok().json(ApiResponse::<()>::ok(format!(
+        "{} linked successfully",
+        provider_name
+    ))))
+}
+
+pub async fn oauth_unlink(
+    pool: web::Data<PgPool>,
+    claims: AuthClaims,
+    path: web::Path<String>,
+) -> Result<HttpResponse, AuthError> {
+    let provider_name = path.into_inner();
+    let user_id = Uuid::parse_str(&claims.user_id)
+        .map_err(|_| AuthError::Validation("Invalid user ID in session".to_string()))?;
+
+    match provider_name.to_lowercase().as_str() {
+        "github" => {
+            repository::unlink_github_from_user(pool.get_ref(), user_id).await?;
+        }
+        "google" => {
+            repository::unlink_google_from_user(pool.get_ref(), user_id).await?;
+        }
+        _ => return Err(AuthError::OAuth("Unsupported unlink provider".to_string())),
+    }
+
+    Ok(HttpResponse::Ok().json(ApiResponse::<()>::ok(format!(
+        "{} unlinked successfully",
+        provider_name
+    ))))
+}
+
+// ─── CONFIGURATION ENDPOINT ──────────────────────────────────────────────
+
+pub async fn get_auth_config() -> impl Responder {
+    let github_client_id = std::env::var("NEXT_PUBLIC_GITHUB_CLIENT_ID")
+        .or_else(|_| std::env::var("GITHUB_CLIENT_ID"))
+        .unwrap_or_default();
+
+    let google_client_id = std::env::var("NEXT_PUBLIC_GOOGLE_CLIENT_ID")
+        .or_else(|_| std::env::var("GOOGLE_CLIENT_ID"))
+        .unwrap_or_default();
+
+    HttpResponse::Ok().json(AuthConfigResponse {
+        github_client_id,
+        google_client_id,
+    })
+}

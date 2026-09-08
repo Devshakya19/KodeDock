@@ -1,407 +1,383 @@
-use crate::auth::models::{AuthResponse, SignupRequest, TokenClaims, User, UserPublicProfile};
-use crate::auth::repository::AuthRepository;
-use crate::config::AppConfig;
-use crate::errors::AppError;
 use argon2::{
     password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
-    Argon2, Params,
+    Algorithm, Argon2, Params, Version,
 };
 use chrono::{Duration, Utc};
-use jsonwebtoken::{encode, EncodingKey, Header};
-use sha2::{Digest, Sha256};
+use jsonwebtoken::{encode as jwt_encode, EncodingKey, Header};
 use sqlx::PgPool;
 use uuid::Uuid;
 
-pub struct AuthService;
+use crate::auth::crypto::{encrypt_token, generate_secure_token, hash_token};
+use crate::auth::errors::AuthError;
+use crate::auth::models::{
+    AuthResponse, Claims, RefreshTokenRecord, UserSummary,
+};
+use crate::auth::oauth::OAuthProvider;
+use crate::auth::repository;
 
-impl AuthService {
-    /// Helper: Issues a new refresh token under a specified family.
-    /// Returns (plaintext_token, new_token_id)
-    async fn issue_refresh_token(
-        pool: &PgPool,
-        config: &AppConfig,
-        user_id: Uuid,
-        family_id: Uuid,
-    ) -> Result<(String, Uuid), AppError> {
-        let plaintext = format!("{}.{}", Uuid::new_v4(), Uuid::new_v4());
-        let token_hash = hex::encode(Sha256::digest(plaintext.as_bytes()));
-        let expires_at = Utc::now() + Duration::seconds(config.jwt_refresh_expiry_secs);
+// ─── ARGON2ID PASSWORD HASHING (64MB MEMORY COST, 3 ITERATIONS) ──────────
 
-        let token_id =
-            AuthRepository::insert_refresh_token(pool, user_id, &token_hash, family_id, expires_at)
-                .await?;
-        Ok((plaintext, token_id))
+/// Construct production-grade Argon2id instance:
+/// 64MB memory cost (65,536 KiB), 3 iterations, 1 lane.
+fn argon2_instance() -> Result<Argon2<'static>, AuthError> {
+    let params = Params::new(64 * 1024, 3, 1, None)
+        .map_err(|e| AuthError::Crypto(format!("Argon2 params initialization failed: {}", e)))?;
+    Ok(Argon2::new(Algorithm::Argon2id, Version::V0x13, params))
+}
+
+pub fn hash_password(password: &str) -> Result<String, AuthError> {
+    let salt = SaltString::generate(&mut OsRng);
+    let argon2 = argon2_instance()?;
+    let hash = argon2
+        .hash_password(password.as_bytes(), &salt)
+        .map_err(|e| AuthError::Crypto(format!("Argon2id hashing error: {}", e)))?;
+    Ok(hash.to_string())
+}
+
+pub fn verify_password(password: &str, password_hash: &str) -> Result<bool, AuthError> {
+    let parsed_hash = PasswordHash::new(password_hash)
+        .map_err(|e| AuthError::Crypto(format!("Argon2id hash parsing error: {}", e)))?;
+    let argon2 = argon2_instance()?;
+    Ok(argon2.verify_password(password.as_bytes(), &parsed_hash).is_ok())
+}
+
+// ─── JWT ACCESS TOKEN ISSUANCE (15-MINUTE EXPIRATION) ────────────────────
+
+pub fn generate_access_token(
+    user: &UserSummary,
+    family_id: Option<Uuid>,
+    secret: &str,
+) -> Result<String, AuthError> {
+    let now = Utc::now();
+    let expires = now + Duration::minutes(15); // 15-minute access token
+
+    let claims = Claims {
+        sub: user.id.to_string(),
+        email: user.email.clone(),
+        full_name: user.full_name.clone(),
+        role: user.role.clone(),
+        github_username: user.github_username.clone(),
+        family_id: family_id.map(|fid| fid.to_string()),
+        exp: expires.timestamp() as usize,
+        iat: now.timestamp() as usize,
+    };
+
+    jwt_encode(
+        &Header::default(),
+        &claims,
+        &EncodingKey::from_secret(secret.as_bytes()),
+    )
+    .map_err(|e| AuthError::Crypto(format!("JWT access token generation failed: {}", e)))
+}
+
+// ─── BANK-GRADE TOKEN FAMILY ROTATION ────────────────────────────────────
+
+/// Generates a new refresh token record stored as SHA-256 hash.
+pub async fn issue_refresh_token(
+    pool: &PgPool,
+    user_id: Uuid,
+    family_id: Option<Uuid>,
+) -> Result<(String, RefreshTokenRecord), AuthError> {
+    let raw_token = generate_secure_token(32);
+    let token_hash = hash_token(&raw_token);
+    let fam_id = family_id.unwrap_or_else(Uuid::new_v4);
+    let expires_at = Utc::now() + Duration::days(7); // 7-day refresh token
+
+    let record = repository::create_refresh_token(pool, user_id, &token_hash, fam_id, expires_at).await?;
+    Ok((raw_token, record))
+}
+
+/// Rotates refresh token with replay detection.
+/// If an already-revoked token is submitted, the entire token family is revoked immediately!
+pub async fn rotate_refresh_token(
+    pool: &PgPool,
+    raw_token: &str,
+    jwt_secret: &str,
+) -> Result<AuthResponse, AuthError> {
+    let presented_hash = hash_token(raw_token);
+
+    let token_record = match repository::find_refresh_token_by_hash(pool, &presented_hash).await? {
+        Some(record) => record,
+        None => return Err(AuthError::InvalidToken("Refresh token not found".to_string())),
+    };
+
+    // Replay / Reuse Detection:
+    // If this token was already revoked, someone is trying to reuse a consumed token.
+    if token_record.is_revoked {
+        log::warn!(
+            "SECURITY ALERT: Refresh token replay detected for user_id={}, family_id={}! Revoking entire family.",
+            token_record.user_id,
+            token_record.family_id
+        );
+        repository::revoke_family_tokens(pool, token_record.family_id).await?;
+        return Err(AuthError::ReplayDetected(
+            "Reused refresh token detected. All active sessions in this family have been terminated."
+                .to_string(),
+        ));
     }
 
-    /// Hashes password with Argon2id (64MB memory cost, 3 iterations)
-    pub fn hash_password(password: &str) -> Result<String, AppError> {
-        let salt = SaltString::generate(&mut OsRng);
-        // Custom params: 64MB memory cost (65536 KiB), 3 iterations, 4 parallelism
-        let params = Params::new(65536, 3, 4, None)
-            .map_err(|e| AppError::InternalError(format!("Argon2 params error: {}", e)))?;
-        let argon2 = Argon2::new(argon2::Algorithm::Argon2id, argon2::Version::V0x13, params);
-
-        let hash = argon2
-            .hash_password(password.as_bytes(), &salt)
-            .map_err(|e| AppError::InternalError(format!("Password hashing error: {}", e)))?
-            .to_string();
-
-        Ok(hash)
+    // Check expiration
+    if token_record.expires_at < Utc::now() {
+        return Err(AuthError::ExpiredToken);
     }
 
-    /// Verifies password against Argon2id hash
-    pub fn verify_password(password: &str, hash: &str) -> Result<bool, AppError> {
-        let parsed_hash = PasswordHash::new(hash)
-            .map_err(|e| AppError::InternalError(format!("Invalid password hash: {}", e)))?;
+    // Revoke the consumed token
+    repository::revoke_refresh_token(pool, token_record.id).await?;
 
-        Ok(Argon2::default()
-            .verify_password(password.as_bytes(), &parsed_hash)
-            .is_ok())
+    // Fetch user
+    let user = match repository::find_user_by_id(pool, token_record.user_id).await? {
+        Some(u) => u,
+        None => return Err(AuthError::UserNotFound),
+    };
+
+    // Issue new child refresh token within the same family_id
+    let (new_raw_token, _) = issue_refresh_token(pool, user.id, Some(token_record.family_id)).await?;
+    let access_token = generate_access_token(&user, Some(token_record.family_id), jwt_secret)?;
+
+    Ok(AuthResponse {
+        user,
+        token: access_token,
+        refresh_token: Some(new_raw_token),
+    })
+}
+
+// ─── AUTHENTICATION WORKFLOWS ────────────────────────────────────────────
+
+pub async fn register_user(
+    pool: &PgPool,
+    email: &str,
+    password: &str,
+    full_name: &str,
+    role: &str,
+    jwt_secret: &str,
+) -> Result<AuthResponse, AuthError> {
+    let cleaned_email = email.trim().to_lowercase();
+
+    // Check if user already exists
+    if repository::find_user_by_email(pool, &cleaned_email).await?.is_some() {
+        return Err(AuthError::UserAlreadyExists);
     }
 
-    /// Generates short-lived (15 min) JWT Access Token
-    pub fn generate_access_token(user: &User, config: &AppConfig) -> Result<String, AppError> {
-        let now = Utc::now();
-        let exp = now + Duration::seconds(config.jwt_access_expiry_secs);
+    let password_hash = hash_password(password)?;
+    let user = repository::create_user(pool, &cleaned_email, &password_hash, full_name, role).await?;
 
-        let claims = TokenClaims {
-            sub: user.id.to_string(),
-            email: user.email.clone(),
-            role: user.role.clone(),
-            jti: Uuid::new_v4().to_string(),
-            iat: now.timestamp() as usize,
-            exp: exp.timestamp() as usize,
-        };
+    let (raw_refresh_token, refresh_record) = issue_refresh_token(pool, user.id, None).await?;
+    let access_token = generate_access_token(&user, Some(refresh_record.family_id), jwt_secret)?;
 
-        encode(
-            &Header::default(),
-            &claims,
-            &EncodingKey::from_secret(config.jwt_secret.as_bytes()),
-        )
-        .map_err(|e| AppError::InternalError(format!("JWT generation error: {}", e)))
+    Ok(AuthResponse {
+        user,
+        token: access_token,
+        refresh_token: Some(raw_refresh_token),
+    })
+}
+
+pub async fn login_user(
+    pool: &PgPool,
+    email: &str,
+    password: &str,
+    jwt_secret: &str,
+) -> Result<AuthResponse, AuthError> {
+    let cleaned_email = email.trim().to_lowercase();
+
+    let user_with_hash = match repository::find_user_by_email(pool, &cleaned_email).await? {
+        Some(u) => u,
+        None => return Err(AuthError::InvalidCredentials),
+    };
+
+    if user_with_hash.is_active == Some(false) {
+        return Err(AuthError::Forbidden("Account has been deactivated".to_string()));
     }
 
-    /// Registers a new user with real Argon2id hash and issues initial tokens
-    pub async fn signup(
-        pool: &PgPool,
-        config: &AppConfig,
-        req: SignupRequest,
-    ) -> Result<(AuthResponse, String), AppError> {
-        if req.email.is_empty() || !req.email.contains('@') {
-            return Err(AppError::BadRequest("Invalid email address".to_string()));
+    let stored_hash = match user_with_hash.password_hash {
+        Some(ref h) => h.as_str(),
+        None => {
+            // OAuth-only account without password
+            return Err(AuthError::InvalidCredentials);
         }
+    };
 
-        if req.password.len() < 8 {
-            return Err(AppError::BadRequest(
-                "Password must be at least 8 characters long".to_string(),
-            ));
-        }
-
-        if let Some(existing) = AuthRepository::find_by_email(pool, &req.email).await? {
-            return Err(AppError::Conflict(format!(
-                "Email {} is already registered",
-                existing.email
-            )));
-        }
-
-        let password_hash = Self::hash_password(&req.password)?;
-        let role = req.role.unwrap_or_else(|| "buyer".to_string());
-        if role != "buyer" && role != "seller" {
-            return Err(AppError::BadRequest(
-                "Role must be 'buyer' or 'seller'".to_string(),
-            ));
-        }
-
-        let user =
-            AuthRepository::create_user(pool, &req.email, &password_hash, &req.full_name, &role)
-                .await?;
-        let access_token = Self::generate_access_token(&user, config)?;
-
-        // Generate initial Refresh Token with new Family ID
-        let (plaintext_refresh_token, _) =
-            Self::issue_refresh_token(pool, config, user.id, Uuid::new_v4()).await?;
-
-        let response = AuthResponse {
-            user: UserPublicProfile::from(user),
-            access_token,
-            expires_in_seconds: config.jwt_access_expiry_secs,
-        };
-
-        Ok((response, plaintext_refresh_token))
+    if !verify_password(password, stored_hash)? {
+        return Err(AuthError::InvalidCredentials);
     }
 
-    /// Authenticates user and issues access token + new refresh token family
-    pub async fn login(
-        pool: &PgPool,
-        config: &AppConfig,
-        email: &str,
-        password: &str,
-    ) -> Result<(AuthResponse, String), AppError> {
-        let user = AuthRepository::find_by_email(pool, email)
-            .await?
-            .ok_or_else(|| AppError::Unauthorized("Invalid email or password".to_string()))?;
+    let prefix = match user_with_hash.role.as_str() {
+        "seller" => "kd_sel",
+        _ => "kd_usr",
+    };
+    let user_summary = UserSummary {
+        public_id: crate::auth::crypto::encode_public_id(prefix, &user_with_hash.id),
+        id: user_with_hash.id,
+        email: user_with_hash.email,
+        full_name: user_with_hash.full_name,
+        role: user_with_hash.role,
+        github_username: user_with_hash.github_username,
+    };
 
-        if user.is_banned {
-            return Err(AppError::Forbidden(
-                "Account has been suspended".to_string(),
-            ));
-        }
+    let (raw_refresh_token, refresh_record) = issue_refresh_token(pool, user_summary.id, None).await?;
+    let access_token = generate_access_token(&user_summary, Some(refresh_record.family_id), jwt_secret)?;
 
-        if !Self::verify_password(password, &user.password_hash)? {
-            return Err(AppError::Unauthorized(
-                "Invalid email or password".to_string(),
-            ));
-        }
+    Ok(AuthResponse {
+        user: user_summary,
+        token: access_token,
+        refresh_token: Some(raw_refresh_token),
+    })
+}
 
-        let access_token = Self::generate_access_token(&user, config)?;
+// ─── PASSWORD RESET LOGIC ────────────────────────────────────────────────
 
-        let (plaintext_refresh_token, _) =
-            Self::issue_refresh_token(pool, config, user.id, Uuid::new_v4()).await?;
+pub async fn initiate_password_reset(pool: &PgPool, email: &str) -> Result<String, AuthError> {
+    let cleaned_email = email.trim().to_lowercase();
+    let user = match repository::find_user_by_email(pool, &cleaned_email).await? {
+        Some(u) => u,
+        None => return Err(AuthError::UserNotFound),
+    };
 
-        let response = AuthResponse {
-            user: UserPublicProfile::from(user),
-            access_token,
-            expires_in_seconds: config.jwt_access_expiry_secs,
-        };
+    let reset_token = generate_secure_token(32);
+    let expires_at = Utc::now() + Duration::hours(1);
 
-        Ok((response, plaintext_refresh_token))
+    repository::create_password_reset_token(pool, user.id, &reset_token, expires_at).await?;
+    Ok(reset_token)
+}
+
+pub async fn complete_password_reset(
+    pool: &PgPool,
+    token: &str,
+    new_password: &str,
+) -> Result<(), AuthError> {
+    let reset_record = match repository::find_valid_reset_token(pool, token).await? {
+        Some(r) => r,
+        None => return Err(AuthError::InvalidToken("Password reset link is invalid or has expired".to_string())),
+    };
+
+    let password_hash = hash_password(new_password)?;
+    repository::update_password(pool, reset_record.user_id, &password_hash).await?;
+    repository::mark_reset_token_used(pool, token).await?;
+
+    Ok(())
+}
+
+pub async fn change_user_password(
+    pool: &PgPool,
+    user_id: Uuid,
+    current_password: &str,
+    new_password: &str,
+) -> Result<(), AuthError> {
+    let user_with_hash = match repository::find_user_by_id_with_hash(pool, user_id).await? {
+        Some(u) => u,
+        None => return Err(AuthError::UserNotFound),
+    };
+
+    let stored_hash = match user_with_hash.password_hash {
+        Some(ref h) => h.as_str(),
+        None => return Err(AuthError::Validation("Account does not have a local password set".to_string())),
+    };
+
+    if !verify_password(current_password, stored_hash)? {
+        return Err(AuthError::InvalidCredentials);
     }
 
-    /// Bank-Grade Token Family Rotation with Replay Attack Revocation
-    pub async fn refresh_access_token(
-        pool: &PgPool,
-        config: &AppConfig,
-        plaintext_token: &str,
-    ) -> Result<(AuthResponse, String), AppError> {
-        let token_hash = hex::encode(Sha256::digest(plaintext_token.as_bytes()));
+    let new_hash = hash_password(new_password)?;
+    repository::update_password(pool, user_id, &new_hash).await?;
 
-        let (token_id, user_id, family_id, is_revoked, expires_at) =
-            AuthRepository::find_refresh_token_by_hash(pool, &token_hash)
-                .await?
-                .ok_or_else(|| AppError::Unauthorized("Invalid refresh token".to_string()))?;
+    Ok(())
+}
 
-        // Replay Attack Detection: If token is already revoked, purge entire token family!
-        if is_revoked {
-            AuthRepository::revoke_token_family(pool, family_id).await?;
-            return Err(AppError::Unauthorized(
-                "Security Alert: Replayed refresh token detected. All user sessions revoked."
-                    .to_string(),
-            ));
-        }
+// ─── MODULAR OAUTH INTEGRATION WORKFLOW ───────────────────────────────────
 
-        if expires_at < Utc::now() {
-            return Err(AppError::Unauthorized(
-                "Refresh token has expired".to_string(),
-            ));
-        }
+pub async fn handle_oauth_login_or_register(
+    pool: &PgPool,
+    provider: &dyn OAuthProvider,
+    code: &str,
+    role_override: Option<&str>,
+    jwt_secret: &str,
+) -> Result<AuthResponse, AuthError> {
+    // 1. Exchange authorization code with provider
+    let token_resp = provider.exchange_code(code).await?;
 
-        let user = AuthRepository::find_by_id(pool, user_id)
-            .await?
-            .ok_or_else(|| AppError::NotFound("User not found".to_string()))?;
+    // 2. Fetch authenticated user profile
+    let profile = provider.fetch_user(&token_resp.access_token).await?;
+    let provider_name = provider.name();
 
-        if user.is_banned {
-            return Err(AppError::Forbidden("Account is suspended".to_string()));
-        }
+    let role = match role_override {
+        Some("developer") => "developer",
+        _ => "user",
+    };
 
-        // Rotate: Generate new child token in the same family
-        let (new_plaintext_token, new_token_id) =
-            Self::issue_refresh_token(pool, config, user.id, family_id).await?;
+    // 3. Check if user already exists with this provider ID
+    let existing_by_oauth = match provider_name {
+        "github" => repository::find_user_by_github_id(pool, &profile.provider_user_id).await?,
+        "google" => repository::find_user_by_google_id(pool, &profile.provider_user_id).await?,
+        _ => None,
+    };
 
-        // Consume old token and mark replaced_by
-        AuthRepository::mark_token_revoked(pool, token_id, Some(new_token_id)).await?;
+    let user_summary = match existing_by_oauth {
+        Some(user) => user,
+        None => {
+            // 4. Try matching existing account by email
+            match repository::find_user_by_email(pool, &profile.email).await? {
+                Some(existing_user) => {
+                    // Link provider to existing user
+                    match provider_name {
+                        "github" => {
+                            let username = profile.username.as_deref().unwrap_or(&profile.provider_user_id);
+                            repository::link_github_to_user(pool, existing_user.id, &profile.provider_user_id, username).await?;
+                        }
+                        "google" => {
+                            repository::link_google_to_user(pool, existing_user.id, &profile.provider_user_id).await?;
+                        }
+                        _ => {}
+                    }
 
-        let access_token = Self::generate_access_token(&user, config)?;
-
-        let response = AuthResponse {
-            user: UserPublicProfile::from(user),
-            access_token,
-            expires_in_seconds: config.jwt_access_expiry_secs,
-        };
-
-        Ok((response, new_plaintext_token))
-    }
-
-    // --- Phase 2: Bank-Grade Auth Features ---
-
-    pub async fn setup_totp(
-        pool: &PgPool,
-        config: &AppConfig,
-        email: &str,
-    ) -> Result<serde_json::Value, AppError> {
-        let user = AuthRepository::find_by_email(pool, email)
-            .await?
-            .ok_or_else(|| AppError::NotFound("User not found".to_string()))?;
-
-        let (base32_secret, qr_code) = crate::auth::totp::generate_totp_secret(&user.email)?;
-        let encrypted_secret =
-            crate::auth::totp::encrypt_secret(&config.master_encryption_key_hex, &base32_secret)?;
-
-        AuthRepository::save_totp_secret(pool, user.id, &encrypted_secret).await?;
-
-        Ok(serde_json::json!({
-            "secret": base32_secret,
-            "qr_code_url": format!("data:image/png;base64,{}", qr_code)
-        }))
-    }
-
-    pub async fn verify_totp(
-        pool: &PgPool,
-        config: &AppConfig,
-        email: &str,
-        token: &str,
-    ) -> Result<bool, AppError> {
-        let user = AuthRepository::find_by_email(pool, email)
-            .await?
-            .ok_or_else(|| AppError::NotFound("User not found".to_string()))?;
-
-        let (encrypted_secret, _) = AuthRepository::get_totp_secret(pool, user.id)
-            .await?
-            .ok_or_else(|| AppError::BadRequest("2FA is not setup".to_string()))?;
-
-        let base32_secret = crate::auth::totp::decrypt_secret(
-            &config.master_encryption_key_hex,
-            &encrypted_secret,
-        )?;
-
-        let is_valid = crate::auth::totp::verify_totp(&base32_secret, token)?;
-        if is_valid {
-            AuthRepository::enable_totp(pool, user.id).await?;
-        }
-
-        Ok(is_valid)
-    }
-
-    pub async fn handle_github_callback(
-        pool: &PgPool,
-        config: &AppConfig,
-        code: &str,
-    ) -> Result<(AuthResponse, String), AppError> {
-        let access_token = crate::auth::oauth::github::exchange_code(
-            &config.github_client_id,
-            &config.github_client_secret,
-            &config.github_redirect_uri,
-            code,
-        )
-        .await?;
-
-        let profile = crate::auth::oauth::github::get_profile(&access_token).await?;
-
-        let user = AuthRepository::find_or_create_oauth_user(
-            pool,
-            "github",
-            &profile.provider_id,
-            profile.email.as_deref(),
-            &profile.name,
-            profile.avatar_url.as_deref(),
-        )
-        .await?;
-
-        let jwt_access_token = Self::generate_access_token(&user, config)?;
-
-        let (plaintext_refresh_token, _) =
-            Self::issue_refresh_token(pool, config, user.id, Uuid::new_v4()).await?;
-
-        let response = AuthResponse {
-            user: UserPublicProfile::from(user),
-            access_token: jwt_access_token,
-            expires_in_seconds: config.jwt_access_expiry_secs,
-        };
-
-        Ok((response, plaintext_refresh_token))
-    }
-
-    pub async fn handle_google_callback(
-        pool: &PgPool,
-        config: &AppConfig,
-        code: &str,
-    ) -> Result<(AuthResponse, String), AppError> {
-        let access_token = crate::auth::oauth::google::exchange_code(
-            &config.google_client_id,
-            &config.google_client_secret,
-            &config.google_redirect_uri,
-            code,
-        )
-        .await?;
-
-        let profile = crate::auth::oauth::google::get_profile(&access_token).await?;
-
-        let user = AuthRepository::find_or_create_oauth_user(
-            pool,
-            "google",
-            &profile.provider_id,
-            profile.email.as_deref(),
-            &profile.name,
-            profile.avatar_url.as_deref(),
-        )
-        .await?;
-
-        let jwt_access_token = Self::generate_access_token(&user, config)?;
-
-        let (plaintext_refresh_token, _) =
-            Self::issue_refresh_token(pool, config, user.id, Uuid::new_v4()).await?;
-
-        let response = AuthResponse {
-            user: UserPublicProfile::from(user),
-            access_token: jwt_access_token,
-            expires_in_seconds: config.jwt_access_expiry_secs,
-        };
-
-        Ok((response, plaintext_refresh_token))
-    }
-
-    pub async fn send_email_verification(
-        redis: &redis::Client,
-        config: &AppConfig,
-        email: &str,
-    ) -> Result<(), AppError> {
-        let otp = format!("{:06}", rand::random::<u32>() % 1000000);
-
-        let mut conn = redis
-            .get_multiplexed_async_connection()
-            .await
-            .map_err(|_| AppError::InternalError("Redis connection failed".to_string()))?;
-
-        let redis_key = format!("email_otp:{}", email.to_lowercase());
-
-        // 15 min expiration
-        redis::AsyncCommands::set_ex::<_, _, ()>(&mut conn, &redis_key, &otp, 900)
-            .await
-            .map_err(|_| AppError::InternalError("Failed to store OTP in Redis".to_string()))?;
-
-        crate::auth::email::send_verification_email(config, email, &otp).await?;
-
-        Ok(())
-    }
-
-    pub async fn verify_email_otp(
-        pool: &PgPool,
-        redis: &redis::Client,
-        email: &str,
-        otp: &str,
-    ) -> Result<bool, AppError> {
-        let mut conn = redis
-            .get_multiplexed_async_connection()
-            .await
-            .map_err(|_| AppError::InternalError("Redis connection failed".to_string()))?;
-
-        let redis_key = format!("email_otp:{}", email.to_lowercase());
-        let stored_otp: Option<String> = redis::AsyncCommands::get(&mut conn, &redis_key)
-            .await
-            .map_err(|_| AppError::InternalError("Failed to get OTP from Redis".to_string()))?;
-
-        if let Some(stored) = stored_otp {
-            if stored == otp {
-                // Verified. Update user in DB.
-                if let Some(user) = AuthRepository::find_by_email(pool, email).await? {
-                    AuthRepository::mark_email_verified(pool, user.id).await?;
+                    let prefix = match existing_user.role.as_str() {
+                        "seller" => "kd_sel",
+                        _ => "kd_usr",
+                    };
+                    UserSummary {
+                        public_id: crate::auth::crypto::encode_public_id(prefix, &existing_user.id),
+                        id: existing_user.id,
+                        email: existing_user.email,
+                        full_name: existing_user.full_name.or(profile.full_name),
+                        role: existing_user.role,
+                        github_username: existing_user.github_username.or(profile.username),
+                    }
                 }
-                let _: () = redis::AsyncCommands::del::<_, ()>(&mut conn, &redis_key)
-                    .await
-                    .unwrap_or_default();
-                return Ok(true);
+                None => {
+                    // 5. Create brand-new OAuth account
+                    let full_name = profile
+                        .full_name
+                        .as_deref()
+                        .or(profile.username.as_deref())
+                        .unwrap_or("KodeDock User");
+
+                    repository::create_oauth_user(
+                        pool,
+                        provider_name,
+                        &profile.provider_user_id,
+                        profile.username.as_deref(),
+                        &profile.email,
+                        full_name,
+                        role,
+                    )
+                    .await?
+                }
             }
         }
+    };
 
-        Ok(false)
+    // If GitHub, encrypt and store the access token securely in the profile
+    if provider_name == "github" {
+        if let Ok(encrypted) = encrypt_token(&token_resp.access_token, jwt_secret) {
+            let _ = repository::store_github_token(pool, user_summary.id, &encrypted).await;
+        }
     }
+
+    // Issue tokens
+    let (raw_refresh, refresh_rec) = issue_refresh_token(pool, user_summary.id, None).await?;
+    let access_token = generate_access_token(&user_summary, Some(refresh_rec.family_id), jwt_secret)?;
+
+    Ok(AuthResponse {
+        user: user_summary,
+        token: access_token,
+        refresh_token: Some(raw_refresh),
+    })
 }

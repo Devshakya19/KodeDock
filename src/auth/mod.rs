@@ -1,37 +1,69 @@
-pub mod email;
+pub mod crypto;
+pub mod errors;
 pub mod handlers;
 pub mod middleware;
 pub mod models;
 pub mod oauth;
 pub mod repository;
 pub mod service;
-pub mod totp;
 
 use actix_web::web;
 
-pub fn configure(cfg: &mut web::ServiceConfig) {
+/// Mounts all core authentication and OAuth routes to the Actix-web router.
+pub fn configure_auth_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("/auth")
-            .route("/signup", web::post().to(handlers::signup))
-            .route("/register", web::post().to(handlers::signup))
+        web::scope("/api/auth")
+            .route("/register", web::post().to(handlers::register))
             .route("/login", web::post().to(handlers::login))
-            .route("/refresh", web::post().to(handlers::refresh_token))
+            .route("/refresh", web::post().to(handlers::refresh))
+            .route("/me", web::get().to(handlers::me))
             .route("/logout", web::post().to(handlers::logout))
-            .route("/2fa/setup", web::post().to(handlers::setup_2fa))
-            .route("/2fa/verify", web::post().to(handlers::verify_2fa))
+            .route("/verify", web::get().to(handlers::verify_email))
+            .route("/forgot-password", web::post().to(handlers::forgot_password))
+            .route("/reset-password", web::post().to(handlers::reset_password))
+            .route("/change-password", web::post().to(handlers::change_password))
+            .route("/delete-account", web::delete().to(handlers::delete_account))
+            .route("/config", web::get().to(handlers::get_auth_config))
+            // Dynamic Modular OAuth endpoints
+            .route("/oauth/{provider}", web::post().to(handlers::oauth_authenticate))
+            .route("/oauth/{provider}/link", web::post().to(handlers::oauth_link))
+            .route("/oauth/{provider}/unlink", web::post().to(handlers::oauth_unlink))
+            // Direct Provider Aliases for backwards compatibility
             .route(
-                "/email/send-verification",
-                web::post().to(handlers::send_verification_email),
+                "/github",
+                web::post().to(|secret, pool, body| {
+                    handlers::oauth_authenticate(secret, pool, web::Path::from("github".to_string()), body)
+                }),
             )
-            .route("/email/verify", web::post().to(handlers::verify_email))
-            .route("/github/login", web::get().to(handlers::github_login))
-            .route("/github/callback", web::get().to(handlers::github_callback))
-            .route("/google/login", web::get().to(handlers::google_login))
-            .route("/google/callback", web::get().to(handlers::google_callback))
-            .route("/me", web::get().to(handlers::get_me))
-            .route("/profile", web::put().to(handlers::update_profile))
-            .route("/password", web::post().to(handlers::change_password))
-            .route("/sessions", web::get().to(handlers::get_sessions))
-            .route("/sessions/{id}", web::delete().to(handlers::revoke_session)),
+            .route(
+                "/github/link",
+                web::post().to(|secret, pool, claims, body| {
+                    handlers::oauth_link(secret, pool, claims, web::Path::from("github".to_string()), body)
+                }),
+            )
+            .route(
+                "/github/unlink",
+                web::post().to(|pool, claims| {
+                    handlers::oauth_unlink(pool, claims, web::Path::from("github".to_string()))
+                }),
+            )
+            .route(
+                "/google",
+                web::post().to(|secret, pool, body| {
+                    handlers::oauth_authenticate(secret, pool, web::Path::from("google".to_string()), body)
+                }),
+            )
+            .route(
+                "/google/link",
+                web::post().to(|secret, pool, claims, body| {
+                    handlers::oauth_link(secret, pool, claims, web::Path::from("google".to_string()), body)
+                }),
+            )
+            .route(
+                "/google/unlink",
+                web::post().to(|pool, claims| {
+                    handlers::oauth_unlink(pool, claims, web::Path::from("google".to_string()))
+                }),
+            ),
     );
 }
