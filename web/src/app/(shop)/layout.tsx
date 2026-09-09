@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import ShopNavbar from "@/components/shop/navbar";
+import ShopFooter from "@/components/shop/footer";
 
 export default function ShopLayout({ children }: { children: ReactNode }) {
   return (
@@ -8,6 +9,7 @@ export default function ShopLayout({ children }: { children: ReactNode }) {
       <main className="flex-grow pt-28 sm:pt-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
         {children}
       </main>
+      <ShopFooter />
     </div>
   );
 }

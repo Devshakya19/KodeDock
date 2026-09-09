@@ -167,29 +167,30 @@ export default function HeroCarousel() {
 
   return (
     <div
-      className="relative min-h-[300px] sm:min-h-0 sm:h-[250px] w-full rounded-lg bg-[#27272A] border border-[#414146] hover:border-[#52525B] transition-colors overflow-hidden select-none"
+      className="relative w-full rounded-xl bg-gradient-to-br from-[#27272A] via-[#27272A] to-[#1E1E22] border border-[#414146] hover:border-[#52525B] transition-all overflow-hidden select-none shadow-md"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       role="region"
       aria-roledescription="carousel"
       aria-label="Marketplace Featured Highlights"
     >
-      {/* Background terminal watermark accent */}
-      <div className="absolute top-0 right-0 p-6 text-[#141417]/80 select-none pointer-events-none hidden md:block">
-        <Terminal size={160} strokeWidth={1} />
+      {/* Background terminal watermark accent & subtle ambient glow */}
+      <div className="pointer-events-none absolute -top-12 -right-12 size-48 bg-[#8535FC]/10 rounded-full blur-2xl" />
+      <div className="absolute top-0 right-0 p-4 text-[#141417]/40 select-none pointer-events-none hidden md:block">
+        <Terminal size={120} strokeWidth={1} />
       </div>
 
-      {/* Main Slide Body with Responsive Spacing to Prevent Any Layout Shift */}
-      <div className="relative z-10 h-full p-4 sm:p-6 flex flex-col justify-between gap-2.5 sm:gap-0">
+      {/* Main Slide Body with Tight, Compact Spacing (Zero Unwanted Gaps) */}
+      <div className="relative z-10 p-4 sm:p-5 flex flex-col justify-between gap-3">
         {/* Top Controls & Meta Bar */}
-        <div className="flex items-center justify-between gap-2 sm:gap-4 h-7 shrink-0">
-          <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1 rounded bg-[#141417] border border-[#414146] text-[10px] sm:text-[11px] font-mono text-[#8535FC] font-medium tracking-wider truncate max-w-[190px] sm:max-w-none">
+        <div className="flex items-center justify-between gap-2 h-6 shrink-0">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#141417] border border-[#414146] text-[10px] sm:text-[11px] font-mono text-[#8535FC] font-medium tracking-wider">
             <Sparkles size={11} className="shrink-0" />
-            <span className="truncate">{currentSlide.badge}</span>
+            <span className="truncate max-w-[170px] sm:max-w-none">{currentSlide.badge}</span>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <span className="font-mono text-[11px] sm:text-xs text-[#A1A1AA]">
+          <div className="flex items-center gap-2.5 shrink-0">
+            <span className="font-mono text-[11px] text-[#A1A1AA]">
               <span className="text-[#EDEDF0] font-semibold">
                 0{currentIndex + 1}
               </span>{" "}
@@ -201,7 +202,7 @@ export default function HeroCarousel() {
               <button
                 type="button"
                 onClick={() => paginate(-1)}
-                className="size-6 sm:size-7 rounded-lg bg-[#141417] border border-[#414146] hover:border-[#52525B] text-[#A1A1AA] hover:text-[#EDEDF0] flex items-center justify-center transition-colors active:scale-95 focus:outline-none focus:ring-1 focus:ring-[#8535FC]"
+                className="size-6 rounded-md bg-[#141417] border border-[#414146] hover:border-[#52525B] text-[#A1A1AA] hover:text-[#EDEDF0] flex items-center justify-center transition-colors active:scale-95 focus:outline-none"
                 aria-label="Previous Slide"
               >
                 <ChevronLeft size={13} />
@@ -209,7 +210,7 @@ export default function HeroCarousel() {
               <button
                 type="button"
                 onClick={() => paginate(1)}
-                className="size-6 sm:size-7 rounded-lg bg-[#141417] border border-[#414146] hover:border-[#52525B] text-[#A1A1AA] hover:text-[#EDEDF0] flex items-center justify-center transition-colors active:scale-95 focus:outline-none focus:ring-1 focus:ring-[#8535FC]"
+                className="size-6 rounded-md bg-[#141417] border border-[#414146] hover:border-[#52525B] text-[#A1A1AA] hover:text-[#EDEDF0] flex items-center justify-center transition-colors active:scale-95 focus:outline-none"
                 aria-label="Next Slide"
               >
                 <ChevronRight size={13} />
@@ -218,8 +219,8 @@ export default function HeroCarousel() {
           </div>
         </div>
 
-        {/* Animated Slide Content Area (Fixed Height Container with Absolute Children) */}
-        <div className="relative h-[115px] sm:h-[92px] w-full overflow-hidden shrink-0">
+        {/* Animated Slide Content Area (Snug height without loose empty space) */}
+        <div className="relative h-[82px] sm:h-[78px] w-full overflow-hidden shrink-0">
           <AnimatePresence initial={false} custom={direction}>
             <motion.div
               key={currentSlide.id}
@@ -234,27 +235,27 @@ export default function HeroCarousel() {
                 href={`/product/${currentSlide.slug}`}
                 className="group/title block"
               >
-                <h2 className="font-heading font-bold text-base sm:text-2xl text-[#EDEDF0] group-hover/title:text-[#8535FC] transition-colors tracking-tight truncate leading-tight">
+                <h2 className="font-heading font-bold text-base sm:text-xl text-[#EDEDF0] group-hover/title:text-[#8535FC] transition-colors tracking-tight truncate leading-tight">
                   {currentSlide.title}
                 </h2>
               </Link>
 
-              <p className="text-xs sm:text-sm text-[#A1A1AA] line-clamp-2 leading-relaxed max-w-2xl">
+              <p className="text-xs sm:text-sm text-[#A1A1AA] line-clamp-1 sm:line-clamp-2 leading-relaxed max-w-2xl">
                 {currentSlide.description}
               </p>
 
               {/* Tech Stack Badges (Fixed Single Row) */}
-              <div className="flex items-center gap-1.5 h-6 overflow-hidden">
+              <div className="flex items-center gap-1.5 h-5 overflow-hidden">
                 {currentSlide.techStack.map((tech) => (
                   <span
                     key={tech}
-                    className="px-2 py-0.5 rounded bg-[#141417] border border-[#414146] text-[10px] sm:text-[11px] font-mono text-[#A1A1AA] shrink-0"
+                    className="px-2 py-0.5 rounded bg-[#141417] border border-[#414146] text-[10px] font-mono text-[#A1A1AA] shrink-0"
                   >
                     {tech}
                   </span>
                 ))}
-                <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-mono text-[#10B981] ml-1 shrink-0">
-                  <ShieldCheck size={12} />
+                <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-mono text-[#10B981] ml-1 shrink-0">
+                  <ShieldCheck size={11} />
                   <span>AST Clean</span>
                 </span>
               </div>
@@ -262,11 +263,11 @@ export default function HeroCarousel() {
           </AnimatePresence>
         </div>
 
-        {/* Bottom Row: Price & Action CTA */}
-        <div className="pt-2.5 sm:pt-3 border-t border-[#414146] flex items-center justify-between gap-2 sm:gap-3 shrink-0">
-          <div className="flex flex-wrap items-baseline gap-1.5 sm:gap-2.5 min-w-0">
+        {/* Bottom Row: Price, Progress Dots & Action CTA */}
+        <div className="pt-2.5 border-t border-[#414146]/70 flex items-center justify-between gap-2 shrink-0">
+          <div className="flex items-baseline gap-2 min-w-0">
             <span
-              className={`font-heading font-bold text-base sm:text-xl truncate ${
+              className={`font-heading font-bold text-base sm:text-lg truncate ${
                 currentSlide.pricePaise === 0
                   ? "text-[#10B981]"
                   : "text-[#EDEDF0]"
@@ -279,22 +280,55 @@ export default function HeroCarousel() {
 
             {currentSlide.originalPricePaise &&
               currentSlide.originalPricePaise > currentSlide.pricePaise && (
-                <span className="text-[11px] sm:text-xs font-mono text-[#A1A1AA] line-through">
+                <span className="text-[11px] font-mono text-[#A1A1AA] line-through hidden xs:inline">
                   {formatPrice(currentSlide.originalPricePaise)}
                 </span>
               )}
 
             {discountPercent > 0 && (
-              <span className="text-[9px] sm:text-[10px] font-mono font-semibold text-[#10B981] bg-[#10B981]/15 border border-[#10B981]/30 px-1.5 py-0.5 rounded shrink-0">
+              <span className="text-[9px] font-mono font-semibold text-[#10B981] bg-[#10B981]/15 border border-[#10B981]/30 px-1.5 py-0.5 rounded shrink-0">
                 {discountPercent}% OFF
               </span>
             )}
           </div>
 
+          {/* Centered Progress Indicator Bars */}
+          <div className="hidden sm:flex items-center justify-center gap-1.5">
+            {SLIDES.map((slide, idx) => {
+              const isActive = idx === currentIndex;
+              return (
+                <button
+                  key={slide.id}
+                  type="button"
+                  onClick={() => jumpToSlide(idx)}
+                  aria-label={`Jump to slide ${idx + 1}`}
+                  className={`relative h-1 rounded-full overflow-hidden transition-all duration-300 focus:outline-none ${
+                    isActive
+                      ? "w-8 bg-[#414146]"
+                      : "w-2 bg-[#414146] hover:bg-[#52525B]"
+                  }`}
+                >
+                  {isActive && (
+                    <motion.div
+                      key={`progress-${currentIndex}-${isPaused}`}
+                      className="absolute inset-0 bg-[#8535FC] rounded-full"
+                      initial={{ width: "0%" }}
+                      animate={{ width: isPaused ? undefined : "100%" }}
+                      transition={{
+                        duration: isPaused ? 0 : 4,
+                        ease: "linear",
+                      }}
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
           <div className="flex items-center shrink-0">
             <Link
               href={`/product/${currentSlide.slug}`}
-              className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-lg bg-[#8535FC] hover:bg-[#8535FC]/90 text-white text-xs sm:text-sm font-medium transition-colors group/btn active:scale-95 whitespace-nowrap"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#8535FC] hover:bg-[#9B51E0] text-white text-xs font-medium transition-all group/btn active:scale-95 whitespace-nowrap shadow-sm"
             >
               <span>{currentSlide.ctaText}</span>
               <ArrowRight
@@ -303,39 +337,6 @@ export default function HeroCarousel() {
               />
             </Link>
           </div>
-        </div>
-
-        {/* Bottom Animated Indicator Bars (Fixed Height: 12px) */}
-        <div className="pt-1.5 sm:pt-2 pb-0 flex items-center justify-center gap-1.5 sm:gap-2 h-3 shrink-0">
-          {SLIDES.map((slide, idx) => {
-            const isActive = idx === currentIndex;
-            return (
-              <button
-                key={slide.id}
-                type="button"
-                onClick={() => jumpToSlide(idx)}
-                aria-label={`Jump to slide ${idx + 1}`}
-                className={`relative h-1.5 rounded-full overflow-hidden transition-all duration-300 focus:outline-none ${
-                  isActive
-                    ? "w-10 sm:w-12 bg-[#414146]"
-                    : "w-2.5 bg-[#414146] hover:bg-[#52525B]"
-                }`}
-              >
-                {isActive && (
-                  <motion.div
-                    key={`progress-${currentIndex}-${isPaused}`}
-                    className="absolute inset-0 bg-[#8535FC] rounded-full"
-                    initial={{ width: "0%" }}
-                    animate={{ width: isPaused ? undefined : "100%" }}
-                    transition={{
-                      duration: isPaused ? 0 : 4,
-                      ease: "linear",
-                    }}
-                  />
-                )}
-              </button>
-            );
-          })}
         </div>
       </div>
     </div>

@@ -7,7 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Global Shop Footer (`web/src/components/shop/footer.tsx`, `web/src/app/(shop)/layout.tsx`)**:
+  - Implemented state-of-the-art developer-first `ShopFooter` featuring an upper trust micro-bar (Instant Transfer, AST Secret Scan, PostgreSQL Escrow, Production Ready).
+  - Added rich multi-column navigation covering Marketplace categories, Developer HQ links (Sell Code, Upload Codebase, Payouts & Ledger), Account & Keys (Purchases, Licenses, Settings), and GitHub repo link.
+  - Mounted globally in `ShopLayout` below `<main>` across all shop routes.
+
 ### Changed
+- **Hero Carousel Compact Redesign (`web/src/components/shop/hero-carousel.tsx`)**:
+  - Completely resolved excessive empty vertical gaps by tightening internal paddings (`p-4 sm:p-5`), reducing slide content height (`h-[82px] sm:h-[78px]`), and setting explicit compact spacing (`gap-3`).
+  - Integrated animated progress indicator bars directly into the bottom price & CTA row on desktop/tablet, eliminating a separate vertical indicator bar section and saving layout height.
+  - Added subtle ambient glow (`bg-[#8535FC]/10 blur-2xl`) and refined title/description text hierarchy.
+- **Explore Page Trust Section Removal (`web/src/app/(shop)/explore/page.tsx`)**:
+  - Removed outdated 3-pillar trust guarantee card section ("Instant GitHub Transfer", "Static Secret Auditing", "PostgreSQL Escrow") in favor of the unified global `ShopFooter`.
 - **Mobile Responsive Layout & Right Slide Drawer (`web/src/components/shop/navbar.tsx`, `hero-carousel.tsx`, `explore/page.tsx`, `layout.tsx`)**:
   - Removed duplicate 3-line hamburger menu button on mobile; user profile avatar is now the unified, single mobile trigger.
   - Implemented silky-smooth animated **Right Slide-over Drawer** powered by Framer Motion (`x: 100% -> 0` spring physics) with a blurred backdrop (`bg-black/65 backdrop-blur-sm`).

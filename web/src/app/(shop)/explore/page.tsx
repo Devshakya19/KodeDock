@@ -6,10 +6,6 @@ import {
   Search,
   SlidersHorizontal,
   X,
-  Code2,
-  ShieldCheck,
-  Zap,
-  Lock,
   ArrowUpDown,
   RefreshCw,
 } from "lucide-react";
@@ -424,47 +420,6 @@ function ExploreInner() {
             ))}
           </div>
         )}
-      </section>
-
-      {/* Trust & Architecture Guarantee Banner */}
-      <section className="pt-6 border-t border-[#414146]">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-5 rounded-lg bg-[#27272A] border border-[#414146] space-y-2">
-            <div className="size-8 rounded-lg bg-[#141417] border border-[#414146] text-[#8535FC] flex items-center justify-center">
-              <Zap size={16} />
-            </div>
-            <h4 className="font-heading font-semibold text-sm text-[#EDEDF0]">
-              Instant GitHub Transfer
-            </h4>
-            <p className="text-xs text-[#A1A1AA] leading-relaxed">
-              Upon purchase, repository invites or clones are automated directly to your authenticated GitHub account.
-            </p>
-          </div>
-
-          <div className="p-5 rounded-lg bg-[#27272A] border border-[#414146] space-y-2">
-            <div className="size-8 rounded-lg bg-[#141417] border border-[#414146] text-[#10B981] flex items-center justify-center">
-              <ShieldCheck size={16} />
-            </div>
-            <h4 className="font-heading font-semibold text-sm text-[#EDEDF0]">
-              Static Secret Auditing
-            </h4>
-            <p className="text-xs text-[#A1A1AA] leading-relaxed">
-              Every codebase undergoes AST regex checks ensuring zero API keys, private tokens, or vulnerable dependencies.
-            </p>
-          </div>
-
-          <div className="p-5 rounded-lg bg-[#27272A] border border-[#414146] space-y-2">
-            <div className="size-8 rounded-lg bg-[#141417] border border-[#414146] text-[#8535FC] flex items-center justify-center">
-              <Lock size={16} />
-            </div>
-            <h4 className="font-heading font-semibold text-sm text-[#EDEDF0]">
-              PostgreSQL Escrow
-            </h4>
-            <p className="text-xs text-[#A1A1AA] leading-relaxed">
-              Double-entry balanced ledger journaling with Section 194-O TDS tax compliance guarantees safe buyer checkout.
-            </p>
-          </div>
-        </div>
       </section>
     </div>
   );
