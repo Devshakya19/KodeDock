@@ -261,13 +261,13 @@ function ExploreInner() {
           </div>
 
           {/* Right Controls: Pricing & Sorting */}
-          <div className="flex items-center gap-2.5 shrink-0">
+          <div className="flex flex-row items-center justify-between gap-2.5 w-full md:w-auto shrink-0">
             {/* Pricing Selector (All / Free / Paid) */}
-            <div className="inline-flex p-1 rounded-lg bg-[#141417] border border-[#414146]">
+            <div className="inline-flex p-1 rounded-lg bg-[#141417] border border-[#414146] shrink-0">
               <button
                 type="button"
                 onClick={() => handlePriceTypeSelect("all")}
-                className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+                className={`px-2.5 sm:px-3 py-1 rounded-md text-xs font-medium transition-colors ${
                   selectedPriceType === "all"
                     ? "bg-[#8535FC] text-white"
                     : "text-[#A1A1AA] hover:text-[#EDEDF0]"
@@ -278,7 +278,7 @@ function ExploreInner() {
               <button
                 type="button"
                 onClick={() => handlePriceTypeSelect("paid")}
-                className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+                className={`px-2.5 sm:px-3 py-1 rounded-md text-xs font-medium transition-colors ${
                   selectedPriceType === "paid"
                     ? "bg-[#8535FC] text-white"
                     : "text-[#A1A1AA] hover:text-[#EDEDF0]"
@@ -289,7 +289,7 @@ function ExploreInner() {
               <button
                 type="button"
                 onClick={() => handlePriceTypeSelect("free")}
-                className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+                className={`px-2.5 sm:px-3 py-1 rounded-md text-xs font-medium transition-colors ${
                   selectedPriceType === "free"
                     ? "bg-[#8535FC] text-white"
                     : "text-[#A1A1AA] hover:text-[#EDEDF0]"
@@ -300,11 +300,11 @@ function ExploreInner() {
             </div>
 
             {/* Sort Dropdown */}
-            <div className="relative min-w-[160px]">
+            <div className="relative flex-1 sm:flex-initial min-w-[130px] sm:min-w-[160px]">
               <select
                 value={selectedSort}
                 onChange={(e) => handleSortSelect(e.target.value)}
-                className="w-full h-9 px-3 pr-8 rounded-lg bg-[#27272A] border border-[#414146] text-xs font-medium text-[#EDEDF0] focus:outline-none focus:border-[#8535FC] appearance-none cursor-pointer"
+                className="w-full h-9 px-3 pr-8 rounded-lg bg-[#27272A] border border-[#414146] text-xs font-medium text-[#EDEDF0] focus:outline-none focus:border-[#8535FC] appearance-none cursor-pointer truncate"
               >
                 <option value="featured">Sort: Featured</option>
                 <option value="top_rated">Sort: Top Rated</option>

@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Mobile Responsive Layout & Right Slide Drawer (`web/src/components/shop/navbar.tsx`, `hero-carousel.tsx`, `explore/page.tsx`, `layout.tsx`)**:
+  - Removed duplicate 3-line hamburger menu button on mobile; user profile avatar is now the unified, single mobile trigger.
+  - Implemented silky-smooth animated **Right Slide-over Drawer** powered by Framer Motion (`x: 100% -> 0` spring physics) with a blurred backdrop (`bg-black/65 backdrop-blur-sm`).
+  - Added a dedicated mobile search bar row in the navbar so mobile users can search immediately without digging through hidden drawers.
+  - Fixed Hero Carousel mobile layout shifts and overflow with flexible container heights (`min-h-[300px] sm:min-h-0 sm:h-[250px]`), single-row responsive controls, and unclipped pricing/CTA action buttons.
+  - Fixed explore page filter bar horizontal scrollbar and page jitter by making pricing selectors and sort dropdown adapt responsively across narrow viewports.
+  - Adjusted shop layout `<main>` top padding (`pt-28 sm:pt-16`) to guarantee zero sticky header overlap.
 - **User Profile Dropdown Refinements & Architecture (`web/src/components/shop/navbar.tsx`)**:
   - Removed "Become a Verified Seller" CTA link from both desktop profile dropdown and mobile drawer.
   - Removed default "user" role text and badge from profile trigger button, dropdown header, and mobile drawer when `user.role === 'user'`, eliminating unpolished role clutter while preserving styled badges for `DEVELOPER` and `ADMIN`.

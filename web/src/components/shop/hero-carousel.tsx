@@ -167,7 +167,7 @@ export default function HeroCarousel() {
 
   return (
     <div
-      className="relative h-[260px] sm:h-[250px] w-full rounded-lg bg-[#27272A] border border-[#414146] hover:border-[#52525B] transition-colors overflow-hidden select-none"
+      className="relative min-h-[300px] sm:min-h-0 sm:h-[250px] w-full rounded-lg bg-[#27272A] border border-[#414146] hover:border-[#52525B] transition-colors overflow-hidden select-none"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       role="region"
@@ -179,17 +179,17 @@ export default function HeroCarousel() {
         <Terminal size={160} strokeWidth={1} />
       </div>
 
-      {/* Main Slide Body with Fixed Dimensions to Prevent Any Layout Shift */}
-      <div className="relative z-10 h-full p-5 sm:p-6 flex flex-col justify-between">
-        {/* Top Controls & Meta Bar (Fixed Height: 28px) */}
-        <div className="flex items-center justify-between gap-4 h-7 shrink-0">
-          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-[#141417] border border-[#414146] text-[11px] font-mono text-[#8535FC] font-medium tracking-wider">
-            <Sparkles size={12} />
-            <span>{currentSlide.badge}</span>
+      {/* Main Slide Body with Responsive Spacing to Prevent Any Layout Shift */}
+      <div className="relative z-10 h-full p-4 sm:p-6 flex flex-col justify-between gap-2.5 sm:gap-0">
+        {/* Top Controls & Meta Bar */}
+        <div className="flex items-center justify-between gap-2 sm:gap-4 h-7 shrink-0">
+          <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1 rounded bg-[#141417] border border-[#414146] text-[10px] sm:text-[11px] font-mono text-[#8535FC] font-medium tracking-wider truncate max-w-[190px] sm:max-w-none">
+            <Sparkles size={11} className="shrink-0" />
+            <span className="truncate">{currentSlide.badge}</span>
           </div>
 
-          <div className="flex items-center gap-3">
-            <span className="font-mono text-xs text-[#A1A1AA]">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <span className="font-mono text-[11px] sm:text-xs text-[#A1A1AA]">
               <span className="text-[#EDEDF0] font-semibold">
                 0{currentIndex + 1}
               </span>{" "}
@@ -201,25 +201,25 @@ export default function HeroCarousel() {
               <button
                 type="button"
                 onClick={() => paginate(-1)}
-                className="size-7 rounded-lg bg-[#141417] border border-[#414146] hover:border-[#52525B] text-[#A1A1AA] hover:text-[#EDEDF0] flex items-center justify-center transition-colors active:scale-95 focus:outline-none focus:ring-1 focus:ring-[#8535FC]"
+                className="size-6 sm:size-7 rounded-lg bg-[#141417] border border-[#414146] hover:border-[#52525B] text-[#A1A1AA] hover:text-[#EDEDF0] flex items-center justify-center transition-colors active:scale-95 focus:outline-none focus:ring-1 focus:ring-[#8535FC]"
                 aria-label="Previous Slide"
               >
-                <ChevronLeft size={14} />
+                <ChevronLeft size={13} />
               </button>
               <button
                 type="button"
                 onClick={() => paginate(1)}
-                className="size-7 rounded-lg bg-[#141417] border border-[#414146] hover:border-[#52525B] text-[#A1A1AA] hover:text-[#EDEDF0] flex items-center justify-center transition-colors active:scale-95 focus:outline-none focus:ring-1 focus:ring-[#8535FC]"
+                className="size-6 sm:size-7 rounded-lg bg-[#141417] border border-[#414146] hover:border-[#52525B] text-[#A1A1AA] hover:text-[#EDEDF0] flex items-center justify-center transition-colors active:scale-95 focus:outline-none focus:ring-1 focus:ring-[#8535FC]"
                 aria-label="Next Slide"
               >
-                <ChevronRight size={14} />
+                <ChevronRight size={13} />
               </button>
             </div>
           </div>
         </div>
 
         {/* Animated Slide Content Area (Fixed Height Container with Absolute Children) */}
-        <div className="relative h-[96px] sm:h-[92px] w-full overflow-hidden shrink-0">
+        <div className="relative h-[115px] sm:h-[92px] w-full overflow-hidden shrink-0">
           <AnimatePresence initial={false} custom={direction}>
             <motion.div
               key={currentSlide.id}
@@ -234,7 +234,7 @@ export default function HeroCarousel() {
                 href={`/product/${currentSlide.slug}`}
                 className="group/title block"
               >
-                <h2 className="font-heading font-bold text-lg sm:text-2xl text-[#EDEDF0] group-hover/title:text-[#8535FC] transition-colors tracking-tight truncate leading-tight">
+                <h2 className="font-heading font-bold text-base sm:text-2xl text-[#EDEDF0] group-hover/title:text-[#8535FC] transition-colors tracking-tight truncate leading-tight">
                   {currentSlide.title}
                 </h2>
               </Link>
@@ -262,11 +262,11 @@ export default function HeroCarousel() {
           </AnimatePresence>
         </div>
 
-        {/* Bottom Row: Price & Action CTA (Fixed Height: 44px) */}
-        <div className="pt-3 border-t border-[#414146] flex items-center justify-between gap-3 h-11 shrink-0">
-          <div className="flex items-baseline gap-2.5">
+        {/* Bottom Row: Price & Action CTA */}
+        <div className="pt-2.5 sm:pt-3 border-t border-[#414146] flex items-center justify-between gap-2 sm:gap-3 shrink-0">
+          <div className="flex flex-wrap items-baseline gap-1.5 sm:gap-2.5 min-w-0">
             <span
-              className={`font-heading font-bold text-lg sm:text-xl ${
+              className={`font-heading font-bold text-base sm:text-xl truncate ${
                 currentSlide.pricePaise === 0
                   ? "text-[#10B981]"
                   : "text-[#EDEDF0]"
@@ -279,26 +279,26 @@ export default function HeroCarousel() {
 
             {currentSlide.originalPricePaise &&
               currentSlide.originalPricePaise > currentSlide.pricePaise && (
-                <span className="text-xs font-mono text-[#A1A1AA] line-through">
+                <span className="text-[11px] sm:text-xs font-mono text-[#A1A1AA] line-through">
                   {formatPrice(currentSlide.originalPricePaise)}
                 </span>
               )}
 
             {discountPercent > 0 && (
-              <span className="text-[10px] font-mono font-semibold text-[#10B981] bg-[#10B981]/15 border border-[#10B981]/30 px-2 py-0.5 rounded">
+              <span className="text-[9px] sm:text-[10px] font-mono font-semibold text-[#10B981] bg-[#10B981]/15 border border-[#10B981]/30 px-1.5 py-0.5 rounded shrink-0">
                 {discountPercent}% OFF
               </span>
             )}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center shrink-0">
             <Link
               href={`/product/${currentSlide.slug}`}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-[#8535FC] hover:bg-[#8535FC]/90 text-white text-xs sm:text-sm font-medium transition-colors group/btn active:scale-95"
+              className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-lg bg-[#8535FC] hover:bg-[#8535FC]/90 text-white text-xs sm:text-sm font-medium transition-colors group/btn active:scale-95 whitespace-nowrap"
             >
               <span>{currentSlide.ctaText}</span>
               <ArrowRight
-                size={13}
+                size={12}
                 className="transition-transform group-hover/btn:translate-x-1"
               />
             </Link>
@@ -306,7 +306,7 @@ export default function HeroCarousel() {
         </div>
 
         {/* Bottom Animated Indicator Bars (Fixed Height: 12px) */}
-        <div className="pt-2 pb-0 flex items-center justify-center gap-2 h-3 shrink-0">
+        <div className="pt-1.5 sm:pt-2 pb-0 flex items-center justify-center gap-1.5 sm:gap-2 h-3 shrink-0">
           {SLIDES.map((slide, idx) => {
             const isActive = idx === currentIndex;
             return (

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useRef, Suspense } from "react";
 import { auth, User } from "@/shared/lib/auth/client";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
   X,
@@ -13,7 +14,6 @@ import {
   LayoutDashboard,
   LogOut,
   ChevronDown,
-  Menu,
   ShieldCheck,
   Package,
   Layers,
@@ -228,7 +228,12 @@ export default function ShopNavbar() {
       clearTimeout(hoverTimeoutRef.current);
       hoverTimeoutRef.current = null;
     }
-    setIsDropdownOpen((prev) => !prev);
+    if (typeof window !== "undefined" && window.innerWidth < 640) {
+      setIsMobileMenuOpen((prev) => !prev);
+      setIsDropdownOpen(false);
+    } else {
+      setIsDropdownOpen((prev) => !prev);
+    }
   };
 
   const handleLogout = async () => {
@@ -255,8 +260,8 @@ export default function ShopNavbar() {
     .toUpperCase();
 
   return (
-    <header className="sticky top-0 left-0 right-0 w-full h-16 bg-[#1D1D21]/95 backdrop-blur-md border-b border-[#414146] z-50 transition-colors">
-      <div className="w-full h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+    <header className="sticky top-0 left-0 right-0 w-full bg-[#1D1D21]/95 backdrop-blur-md border-b border-[#414146] z-50 transition-colors">
+      <div className="w-full h-14 sm:h-16 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3 sm:gap-4">
         {/* Left: Clean Brand Identity (Wordmark Only, No Icon Box) */}
         <div className="flex items-center shrink-0">
           <Link
@@ -335,9 +340,9 @@ export default function ShopNavbar() {
                 />
               </button>
 
-              {/* Redesigned Floating User Profile Dropdown */}
+              {/* Redesigned Floating User Profile Dropdown (Desktop Only) */}
               {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-72 rounded-xl bg-[#27272A]/95 backdrop-blur-md border border-[#414146] shadow-2xl py-2 z-50 animate-in fade-in zoom-in-95 duration-100 divide-y divide-[#414146]/50">
+                <div className="hidden sm:block absolute right-0 mt-2 w-72 rounded-xl bg-[#27272A]/95 backdrop-blur-md border border-[#414146] shadow-2xl py-2 z-50 animate-in fade-in zoom-in-95 duration-100 divide-y divide-[#414146]/50">
                   {/* Invisible bridge to prevent mouse leaving hover target */}
                   <div className="absolute -top-3 left-0 right-0 h-3" />
 
@@ -470,138 +475,205 @@ export default function ShopNavbar() {
               </Link>
             </div>
           )}
-
-          {/* Mobile Menu Button */}
-          <button
-            type="button"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="sm:hidden p-2 rounded-lg text-[#A1A1AA] hover:text-[#EDEDF0] hover:bg-[#27272A] border border-[#414146] transition-colors focus:outline-none focus:ring-2 focus:ring-[#8535FC]"
-            aria-label="Toggle Navigation"
-          >
-            {isMobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
-          </button>
         </div>
       </div>
 
-      {/* Mobile Drawer (Visible on small screens) */}
-      {isMobileMenuOpen && (
-        <div className="sm:hidden border-b border-[#414146] bg-[#1D1D21] px-4 py-4 space-y-4 animate-in slide-in-from-top-2 duration-150">
-          {/* Mobile Search Input */}
-          <div>
-            <Suspense
-              fallback={
-                <div className="w-full h-10 rounded-lg bg-[#141417] border border-[#414146] animate-pulse" />
-              }
+      {/* Mobile Dedicated Search Row (Always visible & accessible on mobile) */}
+      <div className="sm:hidden px-4 pb-2.5 pt-0.5">
+        <Suspense
+          fallback={
+            <div className="w-full h-9 rounded-lg bg-[#141417] border border-[#414146] animate-pulse" />
+          }
+        >
+          <NavbarSearch />
+        </Suspense>
+      </div>
+
+      {/* Mobile Right Slide-Over Drawer with Blurred Backdrop */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <>
+            {/* Blurred Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="fixed inset-0 bg-black/65 backdrop-blur-sm z-50 sm:hidden"
+              aria-hidden="true"
+            />
+
+            {/* Right Slide-Over Drawer Panel */}
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 28, stiffness: 280 }}
+              className="fixed top-0 bottom-0 right-0 w-[84%] max-w-[320px] bg-[#1D1D21] border-l border-[#414146] shadow-2xl z-50 flex flex-col justify-between sm:hidden overflow-y-auto"
             >
-              <NavbarSearch />
-            </Suspense>
-          </div>
-
-          {loading ? (
-            <div className="pt-2 border-t border-[#414146] space-y-3 animate-pulse">
-              <div className="flex items-center gap-2.5 px-1">
-                <div className="size-8 rounded-full bg-[#27272A] border border-[#414146] shrink-0" />
-                <div className="space-y-1.5 flex-1">
-                  <div className="h-3 w-28 bg-[#27272A] rounded" />
-                  <div className="h-2.5 w-20 bg-[#27272A]/70 rounded" />
-                </div>
-              </div>
-              <div className="h-9 w-full bg-[#27272A] rounded-lg" />
-            </div>
-          ) : user ? (
-            <div className="pt-2 border-t border-[#414146] space-y-3">
-              <div className="flex items-center justify-between px-1">
-                <div className="flex items-center gap-2.5">
-                  <div className="size-8 rounded-full bg-[#8535FC]/20 border border-[#8535FC]/50 text-xs font-mono font-bold text-[#EDEDF0] flex items-center justify-center">
-                    {userInitials}
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-[#EDEDF0]">
-                      {userDisplayName}
-                    </p>
-                    <p className="text-[11px] font-mono text-[#A1A1AA]">
-                      {user.email}
-                    </p>
-                  </div>
-                </div>
-                {user.role && user.role.toLowerCase() !== "user" && (
-                  <span className="font-mono text-[9px] uppercase font-semibold text-[#8535FC] bg-[#8535FC]/10 px-2 py-0.5 rounded border border-[#8535FC]/20">
-                    {user.role}
-                  </span>
-                )}
-              </div>
-
-              <div className="space-y-1">
-                <Link
-                  href="/profile?tab=purchases"
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-[#EDEDF0] bg-[#27272A] border border-[#414146]"
-                >
-                  <Layers size={14} />
-                  <span>My Purchases</span>
-                </Link>
-                <Link
-                  href="/profile?tab=licenses"
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-[#EDEDF0] bg-[#27272A] border border-[#414146]"
-                >
-                  <Key size={14} />
-                  <span>Licenses</span>
-                </Link>
-
-                {isDeveloper && (
-                  <div className="grid grid-cols-2 gap-2 pt-1">
-                    <Link
-                      href="/seller/dashboard"
-                      className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium text-[#EDEDF0] bg-[#27272A] border border-[#414146]"
-                    >
-                      <LayoutDashboard size={14} />
-                      <span>Dashboard</span>
-                    </Link>
-                    <Link
-                      href="/seller/upload"
-                      className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium bg-[#8535FC] text-white"
-                    >
-                      <UploadCloud size={14} />
-                      <span>Upload</span>
-                    </Link>
-                  </div>
-                )}
-              </div>
-
-              <div className="pt-2 border-t border-[#414146] flex items-center justify-between">
-                <Link
-                  href="/profile"
-                  className="text-xs text-[#A1A1AA] hover:text-[#EDEDF0]"
-                >
-                  Account Profile
-                </Link>
+              {/* Drawer Top Header */}
+              <div className="p-4 border-b border-[#414146] flex items-center justify-between shrink-0">
+                <span className="text-xs font-mono uppercase tracking-wider text-[#A1A1AA]">
+                  Account Menu
+                </span>
                 <button
                   type="button"
-                  onClick={handleLogout}
-                  className="text-xs text-[#EF4444] hover:underline inline-flex items-center gap-1 font-medium"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="size-8 rounded-lg bg-[#27272A] border border-[#414146] hover:border-[#52525B] text-[#A1A1AA] hover:text-[#EDEDF0] flex items-center justify-center transition-colors focus:outline-none"
+                  aria-label="Close menu"
                 >
-                  <LogOut size={13} />
-                  <span>Sign out</span>
+                  <X size={16} />
                 </button>
               </div>
-            </div>
-          ) : (
-            <div className="pt-2 border-t border-[#414146] grid grid-cols-2 gap-2">
-              <Link
-                href="/login"
-                className="flex items-center justify-center px-3 py-2 rounded-lg text-sm font-medium text-[#EDEDF0] bg-[#27272A] border border-[#414146]"
-              >
-                Sign in
-              </Link>
-              <Link
-                href="/register"
-                className="flex items-center justify-center px-3 py-2 rounded-lg text-sm font-medium bg-[#8535FC] text-white"
-              >
-                Get Started
-              </Link>
-            </div>
-          )}
-        </div>
-      )}
+
+              {/* Drawer Content */}
+              <div className="p-4 flex-1 space-y-5 overflow-y-auto">
+                {user ? (
+                  <>
+                    {/* User Card */}
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-[#27272A] border border-[#414146]">
+                      <div className="size-10 rounded-full bg-[#141417] border border-[#414146] text-sm font-mono font-bold text-[#EDEDF0] flex items-center justify-center shrink-0">
+                        {userInitials}
+                      </div>
+                      <div className="overflow-hidden flex-1">
+                        <div className="flex items-center justify-between gap-1 mb-0.5">
+                          <p className="text-xs font-semibold text-[#EDEDF0] truncate">
+                            {userDisplayName}
+                          </p>
+                          {user.role && user.role.toLowerCase() !== "user" && (
+                            <span className="font-mono text-[9px] uppercase font-semibold text-[#8535FC] bg-[#8535FC]/10 px-1.5 py-0.5 rounded border border-[#8535FC]/20 shrink-0">
+                              {user.role}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[11px] font-mono text-[#A1A1AA] truncate">
+                          {user.email}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Navigation Items */}
+                    <div className="space-y-1">
+                      <Link
+                        href="/profile?tab=purchases"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-[#EDEDF0] hover:bg-[#27272A] border border-transparent hover:border-[#414146] transition-colors"
+                      >
+                        <Layers size={16} className="text-[#8535FC]" />
+                        <span>My Purchases</span>
+                      </Link>
+                      <Link
+                        href="/profile?tab=licenses"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-[#EDEDF0] hover:bg-[#27272A] border border-transparent hover:border-[#414146] transition-colors"
+                      >
+                        <Key size={16} className="text-[#10B981]" />
+                        <span>Licenses</span>
+                      </Link>
+
+                      {isDeveloper && (
+                        <div className="pt-2 border-t border-[#414146]/50 space-y-1">
+                          <p className="px-3 text-[10px] font-mono uppercase text-[#71717A] tracking-wider mb-1">
+                            Developer HQ
+                          </p>
+                          <Link
+                            href="/seller/dashboard"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-[#EDEDF0] hover:bg-[#27272A] border border-transparent hover:border-[#414146] transition-colors"
+                          >
+                            <LayoutDashboard size={16} className="text-[#A1A1AA]" />
+                            <span>Dashboard</span>
+                          </Link>
+                          <Link
+                            href="/seller/upload"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-[#EDEDF0] hover:bg-[#27272A] border border-transparent hover:border-[#414146] transition-colors"
+                          >
+                            <UploadCloud size={16} className="text-[#A1A1AA]" />
+                            <span>Upload Codebase</span>
+                          </Link>
+                          <Link
+                            href="/seller/payouts"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-[#EDEDF0] hover:bg-[#27272A] border border-transparent hover:border-[#414146] transition-colors"
+                          >
+                            <Package size={16} className="text-[#A1A1AA]" />
+                            <span>Ledger & Payouts</span>
+                          </Link>
+                        </div>
+                      )}
+
+                      {isAdmin && (
+                        <div className="pt-2 border-t border-[#414146]/50">
+                          <Link
+                            href="/admin"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-[#10B981] hover:bg-[#10B981]/10 border border-transparent hover:border-[#10B981]/30 transition-colors"
+                          >
+                            <ShieldCheck size={16} />
+                            <span>Admin HQ</span>
+                          </Link>
+                        </div>
+                      )}
+
+                      <div className="pt-2 border-t border-[#414146]/50">
+                        <Link
+                          href="/profile"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-[#EDEDF0] hover:bg-[#27272A] border border-transparent hover:border-[#414146] transition-colors"
+                        >
+                          <UserIcon size={16} className="text-[#A1A1AA]" />
+                          <span>Account Settings</span>
+                        </Link>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="space-y-4 pt-4">
+                    <p className="text-xs text-[#A1A1AA] leading-relaxed">
+                      Sign in to access your purchased codebases, licenses, and developer dashboard.
+                    </p>
+                    <div className="space-y-2">
+                      <Link
+                        href="/login"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="block w-full text-center py-2.5 rounded-lg text-xs font-medium text-[#EDEDF0] bg-[#27272A] border border-[#414146] hover:bg-[#323238] transition-colors"
+                      >
+                        Sign in
+                      </Link>
+                      <Link
+                        href="/register"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="block w-full text-center py-2.5 rounded-lg text-xs font-medium bg-[#8535FC] hover:bg-[#8535FC]/90 text-white shadow-sm transition-colors"
+                      >
+                        Get Started
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Drawer Footer with Sign Out */}
+              {user && (
+                <div className="p-4 border-t border-[#414146] shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      handleLogout();
+                    }}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-medium text-[#EF4444] bg-[#EF4444]/10 hover:bg-[#EF4444]/20 border border-[#EF4444]/20 transition-colors"
+                  >
+                    <LogOut size={14} />
+                    <span>Sign out</span>
+                  </button>
+                </div>
+              )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
