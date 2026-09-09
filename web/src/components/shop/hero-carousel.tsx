@@ -175,22 +175,22 @@ export default function HeroCarousel() {
       aria-label="Marketplace Featured Highlights"
     >
       {/* Background terminal watermark accent & subtle ambient glow */}
-      <div className="pointer-events-none absolute -top-12 -right-12 size-48 bg-[#8535FC]/10 rounded-full blur-2xl" />
-      <div className="absolute top-0 right-0 p-4 text-[#141417]/40 select-none pointer-events-none hidden md:block">
-        <Terminal size={120} strokeWidth={1} />
+      <div className="pointer-events-none absolute -top-16 -right-16 size-72 sm:size-96 bg-[#8535FC]/15 rounded-full blur-3xl" />
+      <div className="absolute top-2 right-4 p-4 text-[#141417]/40 select-none pointer-events-none hidden md:block">
+        <Terminal size={140} strokeWidth={1} />
       </div>
 
-      {/* Main Slide Body with Tight, Compact Spacing (Zero Unwanted Gaps) */}
-      <div className="relative z-10 p-4 sm:p-5 flex flex-col justify-between gap-3">
+      {/* Main Slide Body: Generous on Desktop, Clean & Proportional on Mobile */}
+      <div className="relative z-10 p-4 sm:p-7 md:p-8 flex flex-col justify-between gap-3 sm:gap-5">
         {/* Top Controls & Meta Bar */}
-        <div className="flex items-center justify-between gap-2 h-6 shrink-0">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#141417] border border-[#414146] text-[10px] sm:text-[11px] font-mono text-[#8535FC] font-medium tracking-wider">
-            <Sparkles size={11} className="shrink-0" />
+        <div className="flex items-center justify-between gap-2 h-7 shrink-0">
+          <div className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-[#141417] border border-[#414146] text-[10px] sm:text-xs font-mono text-[#8535FC] font-semibold tracking-wider">
+            <Sparkles size={12} className="shrink-0" />
             <span className="truncate max-w-[170px] sm:max-w-none">{currentSlide.badge}</span>
           </div>
 
-          <div className="flex items-center gap-2.5 shrink-0">
-            <span className="font-mono text-[11px] text-[#A1A1AA]">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <span className="font-mono text-[11px] sm:text-xs text-[#A1A1AA]">
               <span className="text-[#EDEDF0] font-semibold">
                 0{currentIndex + 1}
               </span>{" "}
@@ -198,29 +198,29 @@ export default function HeroCarousel() {
             </span>
 
             {/* Prev / Next controls */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 sm:gap-1.5">
               <button
                 type="button"
                 onClick={() => paginate(-1)}
-                className="size-6 rounded-md bg-[#141417] border border-[#414146] hover:border-[#52525B] text-[#A1A1AA] hover:text-[#EDEDF0] flex items-center justify-center transition-colors active:scale-95 focus:outline-none"
+                className="size-7 sm:size-8 rounded-lg bg-[#141417] border border-[#414146] hover:border-[#8535FC] text-[#A1A1AA] hover:text-[#EDEDF0] flex items-center justify-center transition-colors active:scale-95 focus:outline-none"
                 aria-label="Previous Slide"
               >
-                <ChevronLeft size={13} />
+                <ChevronLeft size={14} />
               </button>
               <button
                 type="button"
                 onClick={() => paginate(1)}
-                className="size-6 rounded-md bg-[#141417] border border-[#414146] hover:border-[#52525B] text-[#A1A1AA] hover:text-[#EDEDF0] flex items-center justify-center transition-colors active:scale-95 focus:outline-none"
+                className="size-7 sm:size-8 rounded-lg bg-[#141417] border border-[#414146] hover:border-[#8535FC] text-[#A1A1AA] hover:text-[#EDEDF0] flex items-center justify-center transition-colors active:scale-95 focus:outline-none"
                 aria-label="Next Slide"
               >
-                <ChevronRight size={13} />
+                <ChevronRight size={14} />
               </button>
             </div>
           </div>
         </div>
 
-        {/* Animated Slide Content Area (Snug height without loose empty space) */}
-        <div className="relative h-[82px] sm:h-[78px] w-full overflow-hidden shrink-0">
+        {/* Animated Slide Content Area: Expanded height for web, comfortable 2-line wrap on mobile */}
+        <div className="relative h-[135px] sm:h-[150px] md:h-[160px] w-full overflow-hidden shrink-0">
           <AnimatePresence initial={false} custom={direction}>
             <motion.div
               key={currentSlide.id}
@@ -229,33 +229,35 @@ export default function HeroCarousel() {
               initial="enter"
               animate="center"
               exit="exit"
-              className="absolute inset-0 flex flex-col justify-between max-w-3xl"
+              className="absolute inset-0 flex flex-col justify-between max-w-4xl"
             >
-              <Link
-                href={`/product/${currentSlide.slug}`}
-                className="group/title block"
-              >
-                <h2 className="font-heading font-bold text-base sm:text-xl text-[#EDEDF0] group-hover/title:text-[#8535FC] transition-colors tracking-tight truncate leading-tight">
-                  {currentSlide.title}
-                </h2>
-              </Link>
+              <div>
+                <Link
+                  href={`/product/${currentSlide.slug}`}
+                  className="group/title block"
+                >
+                  <h2 className="font-heading font-bold text-base sm:text-2xl md:text-3xl text-[#EDEDF0] group-hover/title:text-[#8535FC] transition-colors tracking-tight line-clamp-2 sm:line-clamp-1 leading-snug sm:leading-tight">
+                    {currentSlide.title}
+                  </h2>
+                </Link>
 
-              <p className="text-xs sm:text-sm text-[#A1A1AA] line-clamp-1 sm:line-clamp-2 leading-relaxed max-w-2xl">
-                {currentSlide.description}
-              </p>
+                <p className="text-xs sm:text-sm md:text-base text-[#A1A1AA] line-clamp-2 leading-relaxed max-w-3xl mt-1.5 sm:mt-2">
+                  {currentSlide.description}
+                </p>
+              </div>
 
-              {/* Tech Stack Badges (Fixed Single Row) */}
-              <div className="flex items-center gap-1.5 h-5 overflow-hidden">
+              {/* Tech Stack Badges */}
+              <div className="flex items-center gap-1.5 sm:gap-2 h-6 overflow-hidden mt-2">
                 {currentSlide.techStack.map((tech) => (
                   <span
                     key={tech}
-                    className="px-2 py-0.5 rounded bg-[#141417] border border-[#414146] text-[10px] font-mono text-[#A1A1AA] shrink-0"
+                    className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded bg-[#141417] border border-[#414146] text-[10px] sm:text-xs font-mono text-[#A1A1AA] shrink-0"
                   >
                     {tech}
                   </span>
                 ))}
-                <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-mono text-[#10B981] ml-1 shrink-0">
-                  <ShieldCheck size={11} />
+                <span className="hidden sm:inline-flex items-center gap-1 text-[11px] sm:text-xs font-mono text-[#10B981] ml-1 shrink-0">
+                  <ShieldCheck size={12} />
                   <span>AST Clean</span>
                 </span>
               </div>
@@ -263,11 +265,11 @@ export default function HeroCarousel() {
           </AnimatePresence>
         </div>
 
-        {/* Bottom Row: Price, Progress Dots & Action CTA */}
-        <div className="pt-2.5 border-t border-[#414146]/70 flex items-center justify-between gap-2 shrink-0">
-          <div className="flex items-baseline gap-2 min-w-0">
+        {/* Bottom Row: Price, Progress Indicators & Action CTA */}
+        <div className="pt-3 sm:pt-4 border-t border-[#414146]/70 flex items-center justify-between gap-3 shrink-0">
+          <div className="flex items-baseline gap-2 sm:gap-3 min-w-0">
             <span
-              className={`font-heading font-bold text-base sm:text-lg truncate ${
+              className={`font-heading font-bold text-base sm:text-2xl md:text-3xl truncate ${
                 currentSlide.pricePaise === 0
                   ? "text-[#10B981]"
                   : "text-[#EDEDF0]"
@@ -280,20 +282,20 @@ export default function HeroCarousel() {
 
             {currentSlide.originalPricePaise &&
               currentSlide.originalPricePaise > currentSlide.pricePaise && (
-                <span className="text-[11px] font-mono text-[#A1A1AA] line-through hidden xs:inline">
+                <span className="text-xs sm:text-sm font-mono text-[#71717A] line-through hidden xs:inline">
                   {formatPrice(currentSlide.originalPricePaise)}
                 </span>
               )}
 
             {discountPercent > 0 && (
-              <span className="text-[9px] font-mono font-semibold text-[#10B981] bg-[#10B981]/15 border border-[#10B981]/30 px-1.5 py-0.5 rounded shrink-0">
+              <span className="text-[10px] sm:text-xs font-mono font-bold text-[#10B981] bg-[#10B981]/15 border border-[#10B981]/30 px-1.5 sm:px-2 py-0.5 rounded shrink-0">
                 {discountPercent}% OFF
               </span>
             )}
           </div>
 
-          {/* Centered Progress Indicator Bars */}
-          <div className="hidden sm:flex items-center justify-center gap-1.5">
+          {/* Centered Progress Indicator Bars (Desktop & Tablet) */}
+          <div className="hidden sm:flex items-center justify-center gap-2">
             {SLIDES.map((slide, idx) => {
               const isActive = idx === currentIndex;
               return (
@@ -302,10 +304,10 @@ export default function HeroCarousel() {
                   type="button"
                   onClick={() => jumpToSlide(idx)}
                   aria-label={`Jump to slide ${idx + 1}`}
-                  className={`relative h-1 rounded-full overflow-hidden transition-all duration-300 focus:outline-none ${
+                  className={`relative h-1.5 rounded-full overflow-hidden transition-all duration-300 focus:outline-none ${
                     isActive
-                      ? "w-8 bg-[#414146]"
-                      : "w-2 bg-[#414146] hover:bg-[#52525B]"
+                      ? "w-10 sm:w-12 md:w-16 bg-[#414146]"
+                      : "w-2.5 sm:w-3 bg-[#414146] hover:bg-[#52525B]"
                   }`}
                 >
                   {isActive && (
@@ -325,14 +327,34 @@ export default function HeroCarousel() {
             })}
           </div>
 
+          {/* Mobile Dots Indicator */}
+          <div className="flex sm:hidden items-center gap-1.5">
+            {SLIDES.map((slide, idx) => {
+              const isActive = idx === currentIndex;
+              return (
+                <button
+                  key={slide.id}
+                  type="button"
+                  onClick={() => jumpToSlide(idx)}
+                  aria-label={`Slide ${idx + 1}`}
+                  className={`size-1.5 rounded-full transition-all ${
+                    isActive
+                      ? "bg-[#8535FC] w-4"
+                      : "bg-[#414146]"
+                  }`}
+                />
+              );
+            })}
+          </div>
+
           <div className="flex items-center shrink-0">
             <Link
               href={`/product/${currentSlide.slug}`}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#8535FC] hover:bg-[#9B51E0] text-white text-xs font-medium transition-all group/btn active:scale-95 whitespace-nowrap shadow-sm"
+              className="inline-flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-[#8535FC] hover:bg-[#9B51E0] text-white text-xs sm:text-sm font-semibold transition-all group/btn active:scale-95 whitespace-nowrap shadow-md"
             >
               <span>{currentSlide.ctaText}</span>
               <ArrowRight
-                size={12}
+                size={14}
                 className="transition-transform group-hover/btn:translate-x-1"
               />
             </Link>

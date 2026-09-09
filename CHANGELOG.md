@@ -14,10 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Mounted globally in `ShopLayout` below `<main>` across all shop routes.
 
 ### Changed
-- **Hero Carousel Compact Redesign (`web/src/components/shop/hero-carousel.tsx`)**:
-  - Completely resolved excessive empty vertical gaps by tightening internal paddings (`p-4 sm:p-5`), reducing slide content height (`h-[82px] sm:h-[78px]`), and setting explicit compact spacing (`gap-3`).
-  - Integrated animated progress indicator bars directly into the bottom price & CTA row on desktop/tablet, eliminating a separate vertical indicator bar section and saving layout height.
-  - Added subtle ambient glow (`bg-[#8535FC]/10 blur-2xl`) and refined title/description text hierarchy.
+- **Hero Carousel Desktop Scale & Mobile Optimization (`web/src/components/shop/hero-carousel.tsx`, `layout.tsx`, `explore/page.tsx`)**:
+  - Expanded Desktop (Web) presentation to be grander, bolder, and more prominent with generous typography (`sm:text-2xl md:text-3xl`), spacious slide height (`h-[135px] sm:h-[150px] md:h-[160px]`), and comfortable padding (`p-4 sm:p-7 md:p-8`).
+  - Fixed Mobile layout rendering: enabled 2-line title wrapping (`line-clamp-2 text-base font-bold`), clean 2-line description, properly aligned tech stack chips, mobile 5-dot slide indicators, and unclipped pricing/CTA row.
+  - Eliminated massive unwanted top void above the carousel by removing duplicate padding from `ShopLayout` (`pt-28 sm:pt-16` -> `pt-2 sm:pt-4`) and `explore/page.tsx` (`pt-3 md:pt-4` -> `pt-1 sm:pt-2`), allowing the carousel to sit cleanly right below the sticky navbar.
 - **Explore Page Trust Section Removal (`web/src/app/(shop)/explore/page.tsx`)**:
   - Removed outdated 3-pillar trust guarantee card section ("Instant GitHub Transfer", "Static Secret Auditing", "PostgreSQL Escrow") in favor of the unified global `ShopFooter`.
 - **Mobile Responsive Layout & Right Slide Drawer (`web/src/components/shop/navbar.tsx`, `hero-carousel.tsx`, `explore/page.tsx`, `layout.tsx`)**:

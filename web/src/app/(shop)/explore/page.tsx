@@ -211,7 +211,7 @@ function ExploreInner() {
     selectedSort !== "featured";
 
   return (
-    <div className="pt-3 md:pt-4 pb-12 space-y-6">
+    <div className="pt-1 sm:pt-2 pb-12 space-y-5 sm:space-y-6">
       {/* Hero Carousel Banner (5 Slides auto-advancing every 4 seconds) */}
       <section>
         <HeroCarousel />
