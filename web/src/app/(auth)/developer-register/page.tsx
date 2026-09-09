@@ -74,8 +74,8 @@ export default function DeveloperRegisterPage() {
       }
 
       setSuccess(true);
-    } catch (err: any) {
-      setError(err.message || "Developer registration failed");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Developer registration failed");
     } finally {
       setLoading(false);
     }
@@ -86,8 +86,8 @@ export default function DeveloperRegisterPage() {
     setLoading(true);
     try {
       await auth.initiateGithubOAuth({ role: "developer", nextUrl: "/seller" });
-    } catch (e: any) {
-      setError(e.message || "Failed to connect to authentication server.");
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to connect to authentication server.");
       setLoading(false);
     }
   }

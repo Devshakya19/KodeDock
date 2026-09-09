@@ -8,6 +8,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Product Details Page Complete Redesign & Image Gallery (`web/src/app/(shop)/product/[slug]/page.tsx`, `web/next.config.ts`)**:
+  - Implemented rich multi-image gallery system with 4 high-resolution preview screenshots per product and an interactive thumbnail strip.
+  - Added on-image previous/next navigation buttons (`ChevronLeft` / `ChevronRight`) and dynamic photo index badges (`1 / 4`, `2 / 4`, etc.).
+  - Configured Next.js `remotePatterns` in `next.config.ts` to support external image loading without host restriction errors.
+  - Hid breadcrumb navigation (`Explore > Category > Product Title`) on mobile viewports (`hidden md:flex`) so screen real estate is preserved on small devices, while keeping it cleanly positioned on desktop.
+  - Added modern tabbed content navigation (Overview, Tech Specs, Customer Reviews).
+  - Created a sticky buy box on desktop with live pricing, creator profile, GitHub repository delivery guarantee, and escrow trust badges.
+  - Ensured full cross-device responsiveness with touch-friendly navigation and horizontal thumbnail scrolling on mobile.
+
+### Fixed
+- **Turbopack Build & TypeScript Strictness Fixes**:
+  - Replaced missing `Github` lucide-react import with standardized `GithubIcon` component in `product/[slug]/page.tsx`.
+  - Replaced `any` types in catch blocks with `unknown` and `instanceof Error` across auth pages (`login/page.tsx`, `register/page.tsx`, `developer-register/page.tsx`).
+  - Cleaned up unused imports and variables across `product/[slug]/page.tsx`, `explore-filters.tsx`, `middleware.ts`, and `client.ts`.
+  - Escaped JSX quotes in active filter query chip in `explore/page.tsx`.
+  - Configured Next.js 16 / React 19 ESLint compiler effect rule for seamless client-side mounting checks.
+
+- **Explore Page Professional Modular Left-Sidebar Filters (`web/src/components/shop/explore-filters.tsx`, `web/src/app/(shop)/explore/page.tsx`)**:
+  - Extracted the entire filtering logic into a dedicated, reusable, and state-of-the-art `ExploreFilters` component.
+  - Implemented full-width (`w-full`) edge-to-edge layout across `ShopLayout`, `ShopFooter`, and `explore/page.tsx`, removing restrictive `max-w-7xl` containers.
+  - Upgraded product cards grid to responsive 4-column layout on wide monitors (`2xl:grid-cols-4`, `xl:grid-cols-3`, `sm:grid-cols-2`) and dual-column (`grid-cols-2`) layout on mobile viewports with tuned `ProductCard` padding, typography, and compact actions.
+  - Added multi-faceted filtering categories with custom collapsible sections:
+    - **Categories**: Dynamic counts with `+ View more` / `Show fewer` toggle for extended lists.
+    - **Languages & Tech Stacks**: Multi-select support for TypeScript, Rust, Python, Go, Next.js, FastAPI, Flutter, etc. with search filtering and view-more toggle.
+    - **Pricing & License**: Segmented `All` / `Paid` / `Free` switcher plus price range brackets.
+    - **Customer Ratings**: Minimum star thresholds (4.5★, 4.0★, 3.0★) with visual gold star ratings and counts.
+    - **Verification & Security**: KodeDock Verified sellers and AST Secret Audited clean filters.
+  - Added active filter chips with one-click individual dismissal pills and a global "Reset all" trigger.
+  - Integrated mobile slide-over filter drawer with blurred backdrop so mobile users have full filtering parity.
+  - Synchronized all filter states with URL query parameters (`?cat=...&tech=...&price=...&range=...&rating=...&verified=...`).
 - **Global Shop Footer (`web/src/components/shop/footer.tsx`, `web/src/app/(shop)/layout.tsx`)**:
   - Implemented state-of-the-art developer-first `ShopFooter` featuring an upper trust micro-bar (Instant Transfer, AST Secret Scan, PostgreSQL Escrow, Production Ready).
   - Added rich multi-column navigation covering Marketplace categories, Developer HQ links (Sell Code, Upload Codebase, Payouts & Ledger), Account & Keys (Purchases, Licenses, Settings), and GitHub repo link.

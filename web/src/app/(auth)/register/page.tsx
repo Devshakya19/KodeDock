@@ -73,8 +73,8 @@ export default function RegisterPage() {
         role: "user",
       });
       setSuccess(true);
-    } catch (err: any) {
-      setError(err.message || "Registration failed");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Registration failed");
     } finally {
       setLoading(false);
     }
@@ -85,8 +85,8 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await auth.initiateGithubOAuth({ role: "user", nextUrl: "/explore" });
-    } catch (e: any) {
-      setError(e.message || "Failed to connect to authentication server.");
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to connect to authentication server.");
       setLoading(false);
     }
   }

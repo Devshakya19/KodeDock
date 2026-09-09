@@ -46,7 +46,7 @@ export function useProfile() {
       }
 
       setUserId(user.public_id);
-      const result = await apiGet<any>(`/profile/me`);
+      const result = await apiGet<ProfileData>(`/profile/me`);
 
       if (result.success && result.data) {
         setFormData({
@@ -89,7 +89,7 @@ export function useProfile() {
     try {
       const result = await uploadFile(file, "avatar");
       updateField("avatar_url", result.public_url);
-    } catch (err) {
+    } catch {
       setError("Failed to upload avatar. Please try again.");
     } finally {
       setUploadingAvatar(false);
@@ -125,7 +125,7 @@ export function useProfile() {
               updateField("location", data.display_name.split(",").slice(0, 2).join(", "));
             }
           }
-        } catch (err) {
+        } catch {
           setError("Failed to resolve location automatically.");
         } finally {
           setFetchingLocation(false);

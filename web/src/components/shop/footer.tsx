@@ -17,7 +17,7 @@ export default function ShopFooter() {
     <footer className="w-full bg-[#141417] border-t border-[#414146] text-[#EDEDF0] transition-colors mt-12">
       {/* Upper Features / Trust Micro-Bar */}
       <div className="border-b border-[#414146]/60">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 py-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             <div className="flex items-center gap-3">
               <div className="size-9 rounded-lg bg-[#27272A] border border-[#414146] flex items-center justify-center text-[#8535FC] shrink-0">
@@ -63,7 +63,7 @@ export default function ShopFooter() {
       </div>
 
       {/* Main Footer Links & Brand Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 py-12">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12">
           {/* Brand Column (5 Cols) */}
           <div className="md:col-span-4 lg:col-span-5 space-y-4">

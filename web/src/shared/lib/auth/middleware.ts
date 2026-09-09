@@ -5,7 +5,7 @@ import { ROLES } from "@/shared/lib/auth/roles";
 export { ROLES };
 
 export async function updateSession(request: NextRequest) {
-  let response = NextResponse.next({ request });
+  const response = NextResponse.next({ request });
 
   // Verify token cryptographically — NOT a base64 decode.
   let claims: TokenClaims | null = await verifyRequest(request);
@@ -48,7 +48,6 @@ export async function updateSession(request: NextRequest) {
 
   const isBuyerDashboard = pathname.startsWith("/dashboard");
   const isSellerDashboard = pathname.startsWith("/seller");
-  const isCart = pathname.startsWith("/cart");
   const isCheckout = pathname.startsWith("/checkout");
   const isNotifications = pathname.startsWith("/notifications");
   const isOrders = pathname.startsWith("/orders");

@@ -25,7 +25,7 @@ export async function apiGet<T>(path: string): Promise<ApiResponse<T>> {
       credentials: "include",
     });
     return await response.json();
-  } catch (error) {
+  } catch {
     return { success: false, error: "Network error" };
   }
 }
@@ -39,7 +39,7 @@ export async function apiPost<T>(path: string, body: unknown): Promise<ApiRespon
       credentials: "include",
     });
     return await response.json();
-  } catch (error) {
+  } catch {
     return { success: false, error: "Network error" };
   }
 }
@@ -53,7 +53,7 @@ export async function apiPut<T>(path: string, body: unknown): Promise<ApiRespons
       credentials: "include",
     });
     return await response.json();
-  } catch (error) {
+  } catch {
     return { success: false, error: "Network error" };
   }
 }
@@ -65,7 +65,7 @@ export async function apiDelete<T>(path: string): Promise<ApiResponse<T>> {
       credentials: "include",
     });
     return await response.json();
-  } catch (error) {
+  } catch {
     return { success: false, error: "Network error" };
   }
 }

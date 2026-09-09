@@ -50,8 +50,8 @@ export default function LoginPage() {
       const { user } = await auth.signIn({ email, password });
       router.push(user.role === "developer" ? "/seller" : "/explore");
       router.refresh();
-    } catch (err: any) {
-      setError(err.message || "Login failed");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Login failed");
       setLoading(false);
     }
   }
@@ -61,8 +61,8 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await auth.initiateGithubOAuth({ role: "user", nextUrl: "/explore" });
-    } catch (e: any) {
-      setError(e.message || "Failed to connect to authentication server.");
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to connect to authentication server.");
       setLoading(false);
     }
   }
