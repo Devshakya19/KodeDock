@@ -20,10 +20,19 @@ async fn main() -> std::io::Result<()> {
     dotenv().ok();
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
 
-    let port: u16 = env::var("PORT")
+    let port: u16 = match env::var("PORT")
         .unwrap_or_else(|_| "4001".to_string())
         .parse()
-        .expect("PORT must be a valid number");
+    {
+        Ok(p) => p,
+        Err(e) => {
+            log::error!("Invalid PORT environment variable: {}", e);
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                format!("PORT must be a valid number: {}", e),
+            ));
+        }
+    };
 
     let database_url = env::var("DATABASE_URL")
         .unwrap_or_else(|_| "postgres://kodedock:kodedock_secret@localhost:5432/kodedock".to_string());
@@ -38,7 +47,10 @@ async fn main() -> std::io::Result<()> {
         .idle_timeout(std::time::Duration::from_secs(300))
         .acquire_timeout(std::time::Duration::from_secs(10))
         .connect_lazy(&database_url)
-        .expect("Failed to initialize database connection pool");
+        .map_err(|e| {
+            log::error!("Failed to initialize database connection pool: {}", e);
+            std::io::Error::new(std::io::ErrorKind::ConnectionRefused, e)
+        })?;
 
     log::info!("KodeDock Core Engine booting on port {}", port);
 

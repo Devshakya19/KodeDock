@@ -17,7 +17,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Created a sticky buy box on desktop with live pricing, creator profile, GitHub repository delivery guarantee, and escrow trust badges.
   - Ensured full cross-device responsiveness with touch-friendly navigation and horizontal thumbnail scrolling on mobile.
 
+- **Engineering Directives v2.2.0 Upgrade (`AGENTS.md`)**:
+  - Bound all agents to **The Zero-AI Watermark Law (Principle 13)**: strictly banning synthetic AI headers, bot comments, and watermarks across the codebase.
+  - Formalized **The First-Principles Pure Logic Law (Principle 12)**: outlawing guesswork, assumptions, and approximations. Every line of code must be strictly derived from verified schema invariants and production standards before authoring.
+
 ### Fixed
+- **100% Zero-unwrap() & Crash-Free Rust Law Compliance (`src/main.rs`, `src/auth/crypto.rs`)**:
+  - Replaced boot-time `.expect()` calls in `src/main.rs` (`PORT` parsing and `PgPoolOptions` lazy connection) with graceful `match` error handling, structured `log::error!` logging, and clean `std::io::Error` propagation via the `?` operator.
+  - Refactored `src/auth/crypto.rs` unit tests to return `Result<(), Box<dyn std::error::Error>>` with the `?` operator, completely eliminating all `.unwrap()` and `.expect()` occurrences across the entire Rust codebase.
 - **Turbopack Build & TypeScript Strictness Fixes**:
   - Replaced missing `Github` lucide-react import with standardized `GithubIcon` component in `product/[slug]/page.tsx`.
   - Replaced `any` types in catch blocks with `unknown` and `instanceof Error` across auth pages (`login/page.tsx`, `register/page.tsx`, `developer-register/page.tsx`).

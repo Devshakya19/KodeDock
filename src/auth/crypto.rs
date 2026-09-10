@@ -106,15 +106,16 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_aes_256_gcm_roundtrip() {
+    fn test_aes_256_gcm_roundtrip() -> Result<(), Box<dyn std::error::Error>> {
         let secret = "top-secret-signing-key-kodedock-production-2026";
         let plaintext = "gho_1234567890abcdefghijklmnopqrstuvwxyz_secret_oauth_token";
 
-        let encrypted = encrypt_token(plaintext, secret).expect("Encryption failed");
+        let encrypted = encrypt_token(plaintext, secret)?;
         assert_ne!(encrypted, plaintext);
 
-        let decrypted = decrypt_token(&encrypted, secret).expect("Decryption failed");
+        let decrypted = decrypt_token(&encrypted, secret)?;
         assert_eq!(decrypted, plaintext);
+        Ok(())
     }
 
     #[test]
@@ -135,16 +136,17 @@ mod tests {
     }
 
     #[test]
-    fn test_public_id_encoding_decoding() {
+    fn test_public_id_encoding_decoding() -> Result<(), Box<dyn std::error::Error>> {
         let original_uuid = Uuid::new_v4();
         let public_id = encode_public_id("kd_usr", &original_uuid);
         
         assert!(public_id.starts_with("kd_usr_"));
         
-        let decoded_uuid = decode_public_id("kd_usr", &public_id).unwrap();
+        let decoded_uuid = decode_public_id("kd_usr", &public_id)?;
         assert_eq!(original_uuid, decoded_uuid);
         
         let invalid_prefix = decode_public_id("kd_sel", &public_id);
         assert!(invalid_prefix.is_err());
+        Ok(())
     }
 }
