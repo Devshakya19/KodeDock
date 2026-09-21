@@ -1,0 +1,14 @@
+{
+  "name": "@kodedock/store",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "echo 'apps/store ready for dev'",
+    "build": "echo 'apps/store ready for build'"
+  },
+  "dependencies": {
+    "@kodedock/types": "workspace:*",
+    "@kodedock/ui": "workspace:*",
+    "@kodedock/auth": "workspace:*"
+  }
+}
