@@ -1,112 +1,43 @@
-# =============================================================================
-# KODEDOCK .gitignore
-# =============================================================================
+# Dependencies
+node_modules/
+.pnpm-store/
+.pnpm-debug.log*
 
-# =============================================================================
-# SECRETS & ENVIRONMENT — Never commit secrets
-# =============================================================================
+# Production & Build outputs
+dist/
+build/
+.next/
+out/
+.turbo/
+
+# Environment variables & secrets
 .env
 .env.local
-.env.*.local
-.env.production
-.env.staging
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
 
-# =============================================================================
-# RUST BACKEND
-# =============================================================================
-target/
-**/*.rs.bk
-Cargo.lock.bak
+# IDE & OS files
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.idea/
 
-# =============================================================================
-# NEXT.JS FRONTEND (web/)
-# =============================================================================
-web/.next/
-web/out/
-web/build/
-web/dist/
-web/.turbo/
+# Testing & Coverage
+coverage/
+.nyc_output/
+*.lcov
 
-# Next.js environment files
-web/.env
-web/.env.local
-web/.env.*.local
-web/.env.production
-
-# =============================================================================
-# NODE.JS
-# =============================================================================
-node_modules/
-web/node_modules/
+# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-.pnpm-store/
-
-# =============================================================================
-# DOCKER VOLUMES & DATA (local dev data, never commit)
-# =============================================================================
-docker/data/
-docker/volumes/
-*.sql.bak
-
-# =============================================================================
-# IDE & EDITOR
-# =============================================================================
-.vscode/settings.json
-.vscode/*.code-workspace
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
-Thumbs.db
-
-# =============================================================================
-# LOGS
-# =============================================================================
-*.log
-logs/
-crash.log
-lerna-debug.log*
-
-# =============================================================================
-# CERTIFICATES & KEYS — CRITICAL: Never commit private keys
-# =============================================================================
-*.pem
-*.key
-*.crt
-*.p12
-*.pfx
-*.jks
-id_rsa
-id_ed25519
-*.pub
-
-# =============================================================================
-# COVERAGE & TEST ARTIFACTS
-# =============================================================================
-coverage/
-*.lcov
-.nyc_output/
-tarpaulin-report.html
-
-# =============================================================================
-# BUILD ARTIFACTS
-# =============================================================================
-dist/
-*.wasm
-*.zip
-*.tar.gz
-
-# =============================================================================
-# OS FILES
-# =============================================================================
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Desktop.ini
