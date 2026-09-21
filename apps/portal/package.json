@@ -1,0 +1,14 @@
+{
+  "name": "@kodedock/portal",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "echo 'apps/portal ready for dev'",
+    "build": "echo 'apps/portal ready for build'"
+  },
+  "dependencies": {
+    "@kodedock/types": "workspace:*",
+    "@kodedock/ui": "workspace:*",
+    "@kodedock/auth": "workspace:*"
+  }
+}
