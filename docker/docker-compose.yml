@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: kodedock-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: kodedock
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - kodedock_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d kodedock"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  kodedock_pgdata:
+    driver: local
