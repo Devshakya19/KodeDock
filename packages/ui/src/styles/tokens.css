@@ -1,0 +1,85 @@
+/* ==========================================================================
+   KODEDOCK DESIGN SYSTEM TOKENS (60-30-10 Architecture)
+   ========================================================================== */
+
+:root {
+  /* LIGHT THEME (Ceramic Engine) */
+  --bg-canvas: #F8F9FC;
+  --bg-canvas-alt: #F1F5F9;
+  --bg-surface: #FFFFFF;
+  --bg-surface-elevated: #F8FAFC;
+
+  --border-subtle: #E2E8F0;
+  --border-highlight: #CBD5E1;
+  --border-focus: #6D28D9;
+
+  --text-primary: #0F172A;
+  --text-secondary: #64748B;
+  --text-muted: #94A3B8;
+
+  --accent-primary: #6D28D9;
+  --accent-hover: #5B21B6;
+  --accent-light: #EDE9FE;
+  --accent-glow: rgba(109, 40, 217, 0.15);
+
+  --accent-cyan: #0284C7;
+  --cyan-subtle: #E0F2FE;
+
+  --status-success: #059669;
+  --success-subtle: #D1FAE5;
+  --status-warning: #D97706;
+  --warning-subtle: #FEF3C7;
+  --status-danger: #DC2626;
+  --danger-subtle: #FEE2E2;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
+  --shadow-glow: 0 0 20px rgba(109, 40, 217, 0.2);
+
+  --font-display: 'Clash Display', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans: 'Satoshi', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'Azeret Mono', 'JetBrains Mono', Menlo, monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+}
+
+[data-theme="dark"],
+.dark {
+  /* DARK THEME (Rich Obsidian & Electric Purple Engine - Default) */
+  --bg-canvas: #090A0F;
+  --bg-canvas-alt: #0D0E15;
+  --bg-surface: #12131A;
+  --bg-surface-elevated: #181924;
+
+  --border-subtle: #1F212D;
+  --border-highlight: #2C2E3E;
+  --border-focus: #8B5CF6;
+
+  --text-primary: #F1F1F5;
+  --text-secondary: #9496A8;
+  --text-muted: #5C5E70;
+
+  --accent-primary: #8B5CF6;
+  --accent-hover: #7C3AED;
+  --accent-light: rgba(139, 92, 246, 0.15);
+  --accent-glow: 0 0 24px rgba(139, 92, 246, 0.35);
+
+  --accent-cyan: #38BDF8;
+  --cyan-subtle: rgba(56, 189, 248, 0.12);
+
+  --status-success: #10B981;
+  --success-subtle: rgba(16, 185, 129, 0.15);
+  --status-warning: #F59E0B;
+  --warning-subtle: rgba(245, 158, 11, 0.15);
+  --status-danger: #EF4444;
+  --danger-subtle: rgba(239, 68, 68, 0.15);
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px 0 rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 28px -4px rgba(0, 0, 0, 0.7);
+  --shadow-glow: 0 0 28px rgba(139, 92, 246, 0.35);
+}
