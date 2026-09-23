@@ -2,6 +2,8 @@ import http from "node:http";
 import { toNodeHandler } from "better-auth/node";
 import { auth, initAuthDatabase } from "@kodedock/backend";
 import { handleCustomAuthRoutes } from "./routes/oauth.routes";
+import { handleProductRoutes } from "./routes/product.routes";
+import { handlePortalRoutes } from "./routes/portal.routes";
 import { requireAuth, requireRole } from "./middlewares/auth.middleware";
 import type { ApiResponse } from "@kodedock/types";
 
@@ -53,8 +55,16 @@ export const server = http.createServer(async (req, res) => {
   }
 
   // 2. Custom OAuth, OTP, and API Key Routes
-  const handled = await handleCustomAuthRoutes(req, res, pathname, url.searchParams);
-  if (handled) return;
+  const authHandled = await handleCustomAuthRoutes(req, res, pathname, url.searchParams);
+  if (authHandled) return;
+
+  // 3. Product Catalog & Marketplace Routes (/api/products, /api/categories)
+  const productHandled = await handleProductRoutes(req, res, pathname, url.searchParams);
+  if (productHandled) return;
+
+  // 4. Buyer Developer Portal Routes (/api/portal/*)
+  const portalHandled = await handlePortalRoutes(req, res, pathname, url.searchParams);
+  if (portalHandled) return;
 
   // 3. Better Auth fallback routes (/api/auth/*)
   if (pathname.startsWith("/api/auth")) {
