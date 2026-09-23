@@ -68,3 +68,24 @@ This document establishes the **strict, non-negotiable engineering laws and beha
   - Headings & Hero: **`Clash Display`**
   - UI, Body & Forms: **`Satoshi`**
   - Code, Terminal & Licenses: **`Azeret Mono`**
+
+---
+
+## 5. UI/UX & Design Intelligence Skills Integration
+
+Every agent, frontend component, and page MUST strictly adhere to the installed UI/UX design intelligence and taste guidelines in `.agents/skills/`:
+
+1. **`ui-ux-pro-max` & `high-end-visual-design` (Anti-Generic Aesthetic)**:
+   - **Avoid AI Slop**: Absolutely NO generic Tailwind cards, centered empty white boxes, or repetitive card-inside-card patterns.
+   - **Visual Atmosphere**: Apply deep obsidian layered depths (`#090A0F` canvas, `#12131A` elevated surface, subtle 1px border `rgba(255,255,255,0.08)`).
+   - **Luminous Accents**: High-energy electric purple (`#8B5CF6`) and cyber cyan (`#38BDF8`) glows for interactive elements and badges.
+   - **Responsive Micro-Interactions**: Smooth hover transitions, scale feedback, and accessible keyboard focus states on all interactive elements.
+
+2. **`design-taste-frontend` & `gpt-taste` (Layout Variance & Bento Structure)**:
+   - **Editorial Hierarchy**: Use asymmetric bento grids, generous section spacing, and wide editorial typography rather than cramped narrow boxes.
+   - **Intentional Contrast**: Distinct typography pairing between **Clash Display** for commanding titles and **Satoshi** for clean, legible body text.
+   - **Terminal & Hash Precision**: All code blocks, hashes (SHA-256), license keys, and currency values MUST be set in **`Azeret Mono`**.
+
+3. **`full-output-enforcement` (Zero Truncation & Complete Code)**:
+   - Never use placeholder comments (`/* add more items here */` or `// TODO`).
+   - Every file must be complete, compilable, and production-ready from top to bottom.
