@@ -1,0 +1,103 @@
+/* ==========================================================================
+   KODEDOCK TYPOGRAPHY SUITE (Fontshare Curated Fonts)
+   1. Clash Display - Brand Headings & Hero
+   2. Satoshi       - Core Interface & Body
+   3. Azeret Mono   - Code, Terminal & Licenses
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. CLASH DISPLAY (Headings, Hero, Pricing)
+   -------------------------------------------------------------------------- */
+@font-face {
+  font-family: 'Clash Display';
+  src: url('./clash-display/ClashDisplay-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Clash Display';
+  src: url('./clash-display/ClashDisplay-Semibold.woff2') format('woff2');
+  font-weight: 600;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Clash Display';
+  src: url('./clash-display/ClashDisplay-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+  font-style: normal;
+}
+
+/* --------------------------------------------------------------------------
+   2. SATOSHI (UI, Body, Labels, Navigation)
+   -------------------------------------------------------------------------- */
+@font-face {
+  font-family: 'Satoshi';
+  src: url('./satoshi/Satoshi-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('./satoshi/Satoshi-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('./satoshi/Satoshi-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('./satoshi/Satoshi-Black.woff2') format('woff2');
+  font-weight: 900;
+  font-display: swap;
+  font-style: normal;
+}
+
+/* --------------------------------------------------------------------------
+   3. AZERET MONO (Code Snippets, Git Hashes, Terminal, License Keys)
+   -------------------------------------------------------------------------- */
+@font-face {
+  font-family: 'Azeret Mono';
+  src: url('./azeret-mono/AzeretMono-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Azeret Mono';
+  src: url('./azeret-mono/AzeretMono-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Azeret Mono';
+  src: url('./azeret-mono/AzeretMono-Semibold.woff2') format('woff2');
+  font-weight: 600;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Azeret Mono';
+  src: url('./azeret-mono/AzeretMono-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+  font-style: normal;
+}
