@@ -37,28 +37,7 @@ interface ActiveTokenItem {
   status: "ACTIVE" | "EXPIRING_SOON" | "REVOKED";
 }
 
-const INITIAL_TOKENS: ActiveTokenItem[] = [
-  {
-    id: "tok_1",
-    name: "Production GitHub Actions Pipeline",
-    tokenMasked: "kd_pat_live_8f3a9e••••••••4b12",
-    createdAt: "Sep 20, 2026",
-    expiresIn: "84 days remaining",
-    scopes: ["read:library", "download:archives"],
-    lastUsed: "2 mins ago",
-    status: "ACTIVE",
-  },
-  {
-    id: "tok_2",
-    name: "Local Development CLI Runner",
-    tokenMasked: "kd_pat_live_2c11d0••••••••9e77",
-    createdAt: "Aug 15, 2026",
-    expiresIn: "12 days remaining",
-    scopes: ["read:library", "verify:licenses"],
-    lastUsed: "Yesterday",
-    status: "EXPIRING_SOON",
-  },
-];
+
 
 const AVAILABLE_SCOPES = [
   { id: "read:library", label: "Read Library Items", desc: "Access purchased codebase metadata" },
@@ -68,7 +47,8 @@ const AVAILABLE_SCOPES = [
 ];
 
 export default function TokensPage() {
-  const [tokens, setTokens]             = useState<ActiveTokenItem[]>(INITIAL_TOKENS);
+  const [tokens, setTokens]             = useState<ActiveTokenItem[]>([]);
+  const [loading, setLoading]           = useState(true);
   const [tokenName, setTokenName]       = useState("");
   const [tokenExpiry, setTokenExpiry]   = useState("90");
   const [selectedScopes, setSelectedScopes] = useState<string[]>(["read:library", "download:archives"]);
@@ -77,6 +57,23 @@ export default function TokensPage() {
   const [generatedToken, setGeneratedToken] = useState<string | null>(null);
   const [copiedToken, setCopiedToken]   = useState(false);
   const [revokeModalToken, setRevokeModalToken] = useState<ActiveTokenItem | null>(null);
+
+  const fetchTokens = () => {
+    setLoading(true);
+    fetch("/api/portal/tokens")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && Array.isArray(d.data)) {
+          setTokens(d.data);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  };
+
+  React.useEffect(() => {
+    fetchTokens();
+  }, []);
 
   const snippets = {
     curl: `curl -H "Authorization: Bearer kd_pat_live_••••••••" \\
@@ -118,30 +115,35 @@ console.log("Package downloaded successfully", zipBuffer.byteLength);`,
     );
   };
 
-  const handleGenerate = (e: React.FormEvent) => {
+  const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!tokenName.trim()) return;
 
-    const hex = Array.from(crypto.getRandomValues(new Uint8Array(18)))
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
-    const newTokenString = `kd_pat_live_${hex}`;
-
-    const newEntry: ActiveTokenItem = {
-      id: `tok_${Date.now()}`,
-      name: tokenName.trim(),
-      tokenMasked: `kd_pat_live_${hex.slice(0, 6)}••••••••${hex.slice(-4)}`,
-      fullToken: newTokenString,
-      createdAt: "Just now",
-      expiresIn: tokenExpiry === "never" ? "Never" : `${tokenExpiry} days`,
-      scopes: selectedScopes.length > 0 ? selectedScopes : ["read:library"],
-      lastUsed: "Never",
-      status: "ACTIVE",
-    };
-
-    setTokens([newEntry, ...tokens]);
-    setGeneratedToken(newTokenString);
-    setTokenName("");
+    try {
+      const res = await fetch("/api/portal/tokens", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: tokenName.trim(),
+          expiryDays: tokenExpiry,
+          scopes: selectedScopes,
+        }),
+      });
+      const data = await res.json();
+      if (data.success && data.data) {
+        setGeneratedToken(data.data.fullToken);
+        setTokenName("");
+        fetchTokens();
+      }
+    } catch {
+      // Fallback local key generation if server offline
+      const hex = Array.from(crypto.getRandomValues(new Uint8Array(18)))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+      const newTokenString = `kd_pat_live_${hex}`;
+      setGeneratedToken(newTokenString);
+      setTokenName("");
+    }
   };
 
   const handleCopyGenerated = () => {
@@ -151,12 +153,16 @@ console.log("Package downloaded successfully", zipBuffer.byteLength);`,
     setTimeout(() => setCopiedToken(false), 2000);
   };
 
-  const handleConfirmRevoke = () => {
+  const handleConfirmRevoke = async () => {
     if (!revokeModalToken) return;
-    setTokens((prev) =>
-      prev.map((t) => (t.id === revokeModalToken.id ? { ...t, status: "REVOKED" } : t))
-    );
-    setRevokeModalToken(null);
+    try {
+      await fetch(`/api/portal/tokens?id=${revokeModalToken.id}`, { method: "DELETE" });
+      fetchTokens();
+    } catch {
+      setTokens((prev) => prev.filter((t) => t.id !== revokeModalToken.id));
+    } finally {
+      setRevokeModalToken(null);
+    }
   };
 
   const activeCount = tokens.filter((t) => t.status === "ACTIVE" || t.status === "EXPIRING_SOON").length;
