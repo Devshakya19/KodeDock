@@ -172,7 +172,7 @@ CREATE TABLE IF NOT EXISTS email_otps (
 CREATE INDEX IF NOT EXISTS idx_email_otps_lookup ON email_otps(email, purpose);
 
 -- ----------------------------------------------------------------------------
--- 5. USER SETTINGS & PREFERENCESPersisted PostgreSQL user options
+-- 5. USER SETTINGS & PREFERENCES (Persisted PostgreSQL user options)
 -- ----------------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS user_settings (

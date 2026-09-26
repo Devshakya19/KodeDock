@@ -1,0 +1,60 @@
+name: Docker Build & Infrastructure
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docker-compose-check:
+    name: Docker Compose / Configuration & Syntax Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate Docker Compose Configuration
+        run: |
+          docker compose -f docker/docker-compose.yml config
+
+  docker-postgres-build:
+    name: PostgreSQL 16 Container Build & Startup Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Start PostgreSQL via Docker Compose
+        run: |
+          docker compose -f docker/docker-compose.yml up -d postgres
+
+      - name: Wait for PostgreSQL Healthcheck
+        run: |
+          for i in {1..30}; do
+            if docker exec kodedock-postgres pg_isready -U kodedock -d kodedock_db; then
+              echo "PostgreSQL is healthy and operational!"
+              exit 0
+            fi
+            echo "Waiting for database container to report ready ($i/30)..."
+            sleep 2
+          done
+          echo "Database healthcheck timed out."
+          exit 1
+
+      - name: Test Schema Creation & Table Counts
+        run: |
+          docker exec kodedock-postgres psql -U kodedock -d kodedock_db -c "
+            SELECT COUNT(*) AS total_tables 
+            FROM information_schema.tables 
+            WHERE table_schema = 'public';
+          "
+
+      - name: Clean up Container
+        if: always()
+        run: |
+          docker compose -f docker/docker-compose.yml down -v
