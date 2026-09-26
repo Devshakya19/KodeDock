@@ -278,7 +278,7 @@ export async function handlePortalRoutes(
         body += chunk;
       }
       const data = JSON.parse(body || "{}");
-      const { name } = data;
+      const { name, image } = data;
 
       if (name && typeof name === "string") {
         await pgPool.query(
@@ -286,6 +286,14 @@ export async function handlePortalRoutes(
           [name.trim(), buyerId]
         );
       }
+
+      if (image && typeof image === "string") {
+        await pgPool.query(
+          `UPDATE "user" SET image = $1, "updatedAt" = NOW() WHERE id = $2`,
+          [image.trim(), buyerId]
+        );
+      }
+
 
       // Fetch updated user from PostgreSQL
       const userRes = await pgPool.query(

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg6" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#022C22"/>
+      <stop offset="100%" stop-color="#065F46"/>
+    </linearGradient>
+    <linearGradient id="accent6" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#34D399"/>
+      <stop offset="100%" stop-color="#10B981"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="400" height="400" rx="200" fill="url(#bg6)"/>
+
+  <!-- Body -->
+  <path d="M85,380 C85,280 135,240 200,240 C265,240 315,280 315,380 Z" fill="#064E3B"/>
+  <path d="M150,240 L200,310 L250,240" fill="#047857"/>
+
+  <!-- Face & Neck -->
+  <rect x="180" y="200" width="40" height="45" fill="#CD9B74" rx="6"/>
+  <path d="M140,140 C140,205 160,225 200,225 C240,225 260,205 260,140 C260,105 240,95 200,95 C160,95 140,105 140,140 Z" fill="#E8B58E"/>
+
+  <!-- Long Developer Hair -->
+  <path d="M125,140 C120,70 150,50 200,50 C250,50 280,70 275,140 C285,190 270,220 260,240 C250,210 270,160 260,120 C240,75 160,75 140,120 C130,160 150,210 140,240 C130,220 115,190 125,140 Z" fill="#18181B"/>
+
+  <!-- Thick Rimmed Glasses -->
+  <rect x="145" y="140" width="45" height="30" rx="4" fill="none" stroke="#F59E0B" stroke-width="4"/>
+  <rect x="210" y="140" width="45" height="30" rx="4" fill="none" stroke="#F59E0B" stroke-width="4"/>
+  <line x1="190" y1="152" x2="210" y2="152" stroke="#F59E0B" stroke-width="4"/>
+
+  <!-- Code Tag -->
+  <rect x="150" y="325" width="100" height="24" rx="12" fill="#022C22" stroke="#34D399" stroke-width="1.5"/>
+  <text x="200" y="341" font-family="monospace" font-size="11" font-weight="bold" fill="#34D399" text-anchor="middle">&lt;MAINTAINER&gt;</text>
+</svg>
