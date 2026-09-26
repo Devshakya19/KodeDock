@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import type { DeveloperProfile } from "../../types/portal";
 import { ShieldCheck, Copy, Check, Edit3, Sparkles } from "lucide-react";
+import { getAutoAvatar } from "@/lib/avatars";
 
 interface ProfileHeroProps {
   profile: DeveloperProfile;
@@ -41,17 +42,13 @@ export const ProfileHero: React.FC<ProfileHeroProps> = ({
           <div className="profile-avatar-row">
             {/* Avatar with glowing halo */}
             <div className="profile-avatar-halo">
-              <div className="profile-avatar-core">
-                {profile.image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={profile.image}
-                    alt={profile.name}
-                    className="profile-avatar-img"
-                  />
-                ) : (
-                  <span>{initial}</span>
-                )}
+              <div className="profile-avatar-core" style={{ borderRadius: "50%", overflow: "hidden" }}>
+                <img
+                  src={profile.image || getAutoAvatar(profile.id || profile.email || profile.name)}
+                  alt={profile.name}
+                  className="profile-avatar-img"
+                  style={{ borderRadius: "50%", objectFit: "cover", width: "100%", height: "100%" }}
+                />
               </div>
               <div className="profile-avatar-badge" title="Verified KodeDock Buyer">
                 <ShieldCheck size={14} aria-hidden="true" />

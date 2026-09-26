@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import type { DeveloperProfile } from "../../types/portal";
-import { X, Save, ShieldCheck, AlertCircle } from "lucide-react";
+import { X, Save, ShieldCheck, AlertCircle, Check } from "lucide-react";
+import { DEVELOPER_AVATARS } from "@/lib/avatars";
 
 interface ProfileEditModalProps {
   profile: DeveloperProfile;
@@ -19,16 +20,18 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
   onSave,
   onToast,
 }) => {
-  const [name, setName] = useState(profile.name);
-  const [bio, setBio] = useState(profile.bio || "");
-  const [githubHandle, setGithubHandle] = useState(profile.githubHandle || "");
+  const [name, setName]                   = useState(profile.name);
+  const [selectedAvatar, setSelectedAvatar] = useState<string>(profile.image || "");
+  const [bio, setBio]                     = useState(profile.bio || "");
+  const [githubHandle, setGithubHandle]   = useState(profile.githubHandle || "");
   const [twitterHandle, setTwitterHandle] = useState(profile.twitterHandle || "");
-  const [websiteUrl, setWebsiteUrl] = useState(profile.websiteUrl || "");
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [websiteUrl, setWebsiteUrl]       = useState(profile.websiteUrl || "");
+  const [saving, setSaving]               = useState(false);
+  const [error, setError]                 = useState<string | null>(null);
 
   useEffect(() => {
     setName(profile.name);
+    setSelectedAvatar(profile.image || "");
     setBio(profile.bio || "");
     setGithubHandle(profile.githubHandle || "");
     setTwitterHandle(profile.twitterHandle || "");
@@ -65,6 +68,7 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name.trim(),
+          image: selectedAvatar,
           bio: bio.trim(),
           githubHandle: githubHandle.trim(),
           twitterHandle: twitterHandle.trim(),
@@ -73,6 +77,7 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
       });
 
       const json = await res.json();
+
 
       if (json.success && json.data) {
         onSave(json.data);
@@ -168,6 +173,58 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
                     required
                   />
                 </div>
+
+                {/* Developer Avatar Selection Grid */}
+                <div className="form-group">
+                  <label className="form-label">Choose Developer Avatar</label>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "0.6rem", marginTop: "0.4rem" }}>
+                    {DEVELOPER_AVATARS.map((av) => {
+                      const isSelected = selectedAvatar === av.url;
+                      return (
+                        <button
+                          key={av.id}
+                          type="button"
+                          onClick={() => setSelectedAvatar(av.url)}
+                          title={av.name}
+                          style={{
+                            position: "relative",
+                            width: "48px",
+                            height: "48px",
+                            borderRadius: "50%",
+                            border: isSelected ? "2px solid var(--accent-cyan)" : "1px solid var(--border-subtle)",
+                            background: "var(--bg-surface-elevated)",
+                            padding: "2px",
+                            cursor: "pointer",
+                            boxShadow: isSelected ? "0 0 12px rgba(56, 189, 248, 0.4)" : "none",
+                            transition: "all 0.2s ease",
+                          }}
+                        >
+                          <img src={av.url} alt={av.name} style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
+                          {isSelected && (
+                            <span
+                              style={{
+                                position: "absolute",
+                                bottom: "-2px",
+                                right: "-2px",
+                                width: "16px",
+                                height: "16px",
+                                background: "var(--accent-cyan)",
+                                borderRadius: "50%",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                color: "#000",
+                              }}
+                            >
+                              <Check size={10} strokeWidth={3} />
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
 
                 {/* Bio */}
                 <div className="form-group">

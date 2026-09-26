@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#091E3A"/>
+      <stop offset="100%" stop-color="#2F0B3A"/>
+    </linearGradient>
+    <linearGradient id="beanie2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#EC4899"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="400" height="400" rx="200" fill="url(#bg2)"/>
+
+  <!-- Body -->
+  <path d="M90,380 C90,290 140,250 200,250 C260,250 310,290 310,380 Z" fill="#1E202E"/>
+  <path d="M160,250 L200,310 L240,250" fill="#2A2D40"/>
+
+  <!-- Neck & Face -->
+  <rect x="180" y="210" width="40" height="45" fill="#D9A07A" rx="6"/>
+  <path d="M145,150 C145,215 165,235 200,235 C235,235 255,215 255,150 C255,115 235,105 200,105 C165,105 145,115 145,150 Z" fill="#EEB48C"/>
+
+  <!-- Beanie -->
+  <path d="M135,130 C135,70 160,50 200,50 C240,50 265,70 265,130 Z" fill="url(#beanie2)"/>
+  <rect x="130" y="115" width="140" height="25" rx="6" fill="#7C3AED"/>
+
+  <!-- Developer Glasses -->
+  <rect x="150" y="145" width="42" height="30" rx="6" fill="none" stroke="#38BDF8" stroke-width="4"/>
+  <rect x="208" y="145" width="42" height="30" rx="6" fill="none" stroke="#38BDF8" stroke-width="4"/>
+  <line x1="192" y1="158" x2="208" y2="158" stroke="#38BDF8" stroke-width="4"/>
+
+  <!-- Beard -->
+  <path d="M150,180 C150,225 170,235 200,235 C230,235 250,225 250,180 C250,205 230,225 200,225 C170,225 150,205 150,180 Z" fill="#4A2E1B"/>
+
+  <!-- Code Tag -->
+  <rect x="150" y="325" width="100" height="24" rx="12" fill="#090A0F" stroke="#EC4899" stroke-width="1.5"/>
+  <text x="200" y="341" font-family="monospace" font-size="11" font-weight="bold" fill="#F472B6" text-anchor="middle">&lt;FULLSTACK/&gt;</text>
+</svg>

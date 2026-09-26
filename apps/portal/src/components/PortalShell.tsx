@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { getAutoAvatar } from "@/lib/avatars";
 import {
   Package,
   Key,
@@ -36,6 +37,7 @@ export const PortalShell: React.FC<PortalShellProps> = ({ children }) => {
   const [libraryCount, setLibraryCount] = useState<number>(0);
   const [notifCount, setNotifCount] = useState<number>(0);
   const [buyerName, setBuyerName] = useState<string>("Developer");
+  const [buyerAvatar, setBuyerAvatar] = useState<string>("");
   const lenisRef = useRef<any>(null);
 
   useEffect(() => {
@@ -92,7 +94,10 @@ export const PortalShell: React.FC<PortalShellProps> = ({ children }) => {
     fetch("/api/portal/profile")
       .then((r) => r.json())
       .then((d) => {
-        if (d.success && d.data) setBuyerName(d.data.name || "Developer");
+        if (d.success && d.data) {
+          setBuyerName(d.data.name || "Developer");
+          setBuyerAvatar(d.data.image || getAutoAvatar(d.data.id || d.data.email || d.data.name));
+        }
       })
       .catch(() => {});
   }, []);
@@ -200,7 +205,7 @@ export const PortalShell: React.FC<PortalShellProps> = ({ children }) => {
         <div className="sidebar-footer">
           <Link href="/profile" className="sidebar-user-row" style={{ textDecoration: "none" }}>
             <div className="user-avatar" aria-hidden="true">
-              {buyerName.charAt(0).toUpperCase()}
+              <img src={buyerAvatar || getAutoAvatar(buyerName)} alt={buyerName} />
             </div>
             <div className="user-info">
               <div className="user-name">{buyerName}</div>
