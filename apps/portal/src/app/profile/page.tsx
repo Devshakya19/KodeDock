@@ -63,26 +63,56 @@ export default function ProfilePage() {
       {/* Loaded Profile View matching Reference Image */}
       {!loading && profile && (
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] as any }}
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: {
+                staggerChildren: 0.08,
+                delayChildren: 0.04,
+              },
+            },
+          }}
           style={{ display: "flex", flexDirection: "column" }}
         >
           {/* 1. Full-Width Hero Header Banner */}
-          <ProfileHeaderBanner
-            profile={profile}
-            onOpenEditModal={() => setEditModalOpen(true)}
-            onToast={triggerToast}
-          />
+          <motion.div variants={{
+            hidden: { opacity: 0, y: 18, filter: "blur(4px)" },
+            visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] } as any }
+          }}>
+            <ProfileHeaderBanner
+              profile={profile}
+              onOpenEditModal={() => setEditModalOpen(true)}
+              onToast={triggerToast}
+            />
+          </motion.div>
 
           {/* 2. 4-Cell Metrics Strip */}
-          <ProfileMetricsStrip profile={profile} />
+          <motion.div variants={{
+            hidden: { opacity: 0, y: 18, filter: "blur(4px)" },
+            visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] } as any }
+          }}>
+            <ProfileMetricsStrip profile={profile} />
+          </motion.div>
 
           {/* 3. Sub-Navigation Tabs */}
-          <ProfileNavTabs />
+          <motion.div variants={{
+            hidden: { opacity: 0, y: 18, filter: "blur(4px)" },
+            visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] } as any }
+          }}>
+            <ProfileNavTabs />
+          </motion.div>
 
           {/* 4. Asymmetric 3-Column Main Grid */}
-          <div className="ref-main-grid">
+          <motion.div
+            className="ref-main-grid"
+            variants={{
+              hidden: { opacity: 0, y: 18, filter: "blur(4px)" },
+              visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] } as any }
+            }}
+          >
             {/* Column 1 (Left): About Buyer & Verification */}
             <div>
               <ProfileAboutCard
@@ -110,7 +140,7 @@ export default function ProfilePage() {
               <ProfileQuickStatsCard profile={profile} />
               <ProfileQuoteBanner />
             </div>
-          </div>
+          </motion.div>
 
           {/* 5. Live Profile Edit Modal */}
           <ProfileEditModal

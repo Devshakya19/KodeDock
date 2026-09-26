@@ -77,11 +77,11 @@ export async function initPostgresSchema(): Promise<void> {
         id VARCHAR(64) PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
-        "emailVerified" BOOLEAN DEFAULT FALSE,
+        "emailVerified" BOOLEAN NOT NULL DEFAULT FALSE,
         image TEXT,
         role VARCHAR(50) DEFAULT 'BUYER',
-        "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-        "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+        "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
       );
 
       CREATE TABLE IF NOT EXISTS session (
@@ -91,8 +91,8 @@ export async function initPostgresSchema(): Promise<void> {
         "expiresAt" TIMESTAMP WITH TIME ZONE NOT NULL,
         "ipAddress" VARCHAR(45),
         "userAgent" TEXT,
-        "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-        "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+        "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
       );
 
       CREATE TABLE IF NOT EXISTS account (
@@ -104,8 +104,8 @@ export async function initPostgresSchema(): Promise<void> {
         "refreshToken" TEXT,
         "expiresAt" TIMESTAMP WITH TIME ZONE,
         password TEXT,
-        "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-        "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+        "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
       );
 
       CREATE TABLE IF NOT EXISTS verification (
@@ -113,17 +113,49 @@ export async function initPostgresSchema(): Promise<void> {
         identifier TEXT NOT NULL,
         value TEXT NOT NULL,
         "expiresAt" TIMESTAMP WITH TIME ZONE NOT NULL,
-        "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-        "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+        "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
       );
 
       CREATE TABLE IF NOT EXISTS jwks (
         id VARCHAR(64) PRIMARY KEY,
         "publicKey" TEXT NOT NULL,
         "privateKey" TEXT NOT NULL,
-        "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
       );
     `);
+
+    // Ensure NOT NULL on existing Better Auth columns to remove schema drift warnings
+    try {
+      await client.query(`
+        UPDATE "user" SET "emailVerified" = FALSE WHERE "emailVerified" IS NULL;
+        UPDATE "user" SET "createdAt" = NOW() WHERE "createdAt" IS NULL;
+        UPDATE "user" SET "updatedAt" = NOW() WHERE "updatedAt" IS NULL;
+        ALTER TABLE "user" ALTER COLUMN "emailVerified" SET NOT NULL;
+        ALTER TABLE "user" ALTER COLUMN "createdAt" SET NOT NULL;
+        ALTER TABLE "user" ALTER COLUMN "updatedAt" SET NOT NULL;
+
+        UPDATE session SET "createdAt" = NOW() WHERE "createdAt" IS NULL;
+        UPDATE session SET "updatedAt" = NOW() WHERE "updatedAt" IS NULL;
+        ALTER TABLE session ALTER COLUMN "createdAt" SET NOT NULL;
+        ALTER TABLE session ALTER COLUMN "updatedAt" SET NOT NULL;
+
+        UPDATE account SET "createdAt" = NOW() WHERE "createdAt" IS NULL;
+        UPDATE account SET "updatedAt" = NOW() WHERE "updatedAt" IS NULL;
+        ALTER TABLE account ALTER COLUMN "createdAt" SET NOT NULL;
+        ALTER TABLE account ALTER COLUMN "updatedAt" SET NOT NULL;
+
+        UPDATE verification SET "createdAt" = NOW() WHERE "createdAt" IS NULL;
+        UPDATE verification SET "updatedAt" = NOW() WHERE "updatedAt" IS NULL;
+        ALTER TABLE verification ALTER COLUMN "createdAt" SET NOT NULL;
+        ALTER TABLE verification ALTER COLUMN "updatedAt" SET NOT NULL;
+
+        UPDATE jwks SET "createdAt" = NOW() WHERE "createdAt" IS NULL;
+        ALTER TABLE jwks ALTER COLUMN "createdAt" SET NOT NULL;
+      `);
+    } catch {
+      // Ignore if columns already NOT NULL
+    }
 
     // 2. Kodedock Marketplace Core Tables
     await client.query(`
