@@ -11,6 +11,7 @@ services:
       - "5432:5432"
     volumes:
       - kodedock_pgdata:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d kodedock"]
       interval: 5s
