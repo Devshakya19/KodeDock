@@ -172,9 +172,9 @@ console.log("Package downloaded successfully", zipBuffer.byteLength);`,
       {/* ── Page Header ────────────────────────────────────────── */}
       <motion.div
         className="page-header"
-        initial={{ opacity: 0, y: -14 }}
+        initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
       >
         <div className="page-eyebrow">Programmatic Identity &amp; Automation Vault</div>
         <h1 className="page-title">
@@ -189,9 +189,9 @@ console.log("Package downloaded successfully", zipBuffer.byteLength);`,
       {/* ── Stats Bento Strip ────────────────────────────────────── */}
       <motion.div
         className="stats-bento"
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.3, delay: 0.04, ease: [0.22, 1, 0.36, 1] }}
       >
         <div className="stat-cell purple">
           <div className="stat-cell-icon">
@@ -233,9 +233,9 @@ console.log("Package downloaded successfully", zipBuffer.byteLength);`,
       {/* ── Multi-Protocol Code Terminal Guide ──────────────────── */}
       <motion.section
         className="section-card"
-        initial={{ opacity: 0, y: 18 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.16, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.3, delay: 0.06, ease: [0.22, 1, 0.36, 1] }}
       >
         <div className="section-card-header">
           <div>
@@ -318,9 +318,9 @@ console.log("Package downloaded successfully", zipBuffer.byteLength);`,
       {/* ── Create Token Section ─────────────────────────────────── */}
       <motion.section
         className="section-card"
-        initial={{ opacity: 0, y: 18 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.22, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.3, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
       >
         <div className="section-card-header">
           <div>
@@ -479,9 +479,9 @@ console.log("Package downloaded successfully", zipBuffer.byteLength);`,
       {/* ── Active Tokens Vault Inventory ───────────────────────── */}
       <motion.section
         className="section-card"
-        initial={{ opacity: 0, y: 18 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.28, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.3, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
       >
         <div className="section-card-header">
           <div>

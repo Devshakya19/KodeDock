@@ -42,16 +42,16 @@ const TABS: { id: SettingsTab; label: string; icon: any; danger?: boolean }[] = 
   { id: "notifications",      label: "Notification Rules",  icon: Bell },
   { id: "billing-tax",        label: "Billing & GSTIN",     icon: Receipt },
   { id: "api-tokens",         label: "API Tokens",          icon: Key },
-  { id: "domain-allowlist",   label: "Domain Allowlist",    icon: Globe },
+  { id: "domain-allowlist",   label: "Domain Allow List",   icon: Globe },
   { id: "connected-accounts", label: "Connected Accounts",  icon: Link2 },
   { id: "privacy-data",       label: "Privacy & Export",    icon: Lock },
   { id: "danger-zone",        label: "Danger Zone",         icon: AlertTriangle, danger: true },
 ];
 
 const panelVariants = {
-  hidden:  { opacity: 0, x: 8 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.3, ease: [0.16, 1, 0.3, 1] } as any },
-  exit:    { opacity: 0, x: -8, transition: { duration: 0.2 } },
+  hidden:  { opacity: 0, y: 6 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] } as any },
+  exit:    { opacity: 0, y: -4, transition: { duration: 0.15 } },
 };
 
 export default function SettingsPage() {
@@ -62,9 +62,9 @@ export default function SettingsPage() {
       {/* Header */}
       <motion.div
         className="page-header"
-        initial={{ opacity: 0, y: -12 }}
+        initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
       >
         <div className="page-eyebrow">Settings Suite</div>
         <h1 className="page-title">
@@ -80,11 +80,12 @@ export default function SettingsPage() {
         {/* Settings Nav Panel */}
         <motion.nav
           className="settings-nav-panel"
-          initial={{ opacity: 0, x: -12 }}
+          initial={{ opacity: 0, x: -8 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.3, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
           aria-label="Settings navigation"
         >
+
           {TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;

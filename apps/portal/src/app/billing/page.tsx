@@ -6,10 +6,10 @@ import type { OrderInvoice } from "../../types/portal";
 import { Receipt, Download, IndianRupee, ShieldCheck } from "lucide-react";
 
 const statVariants = {
-  hidden: { opacity: 0, y: 16 },
+  hidden: { opacity: 0, y: 8 },
   visible: (i: number) => ({
     opacity: 1, y: 0,
-    transition: { duration: 0.5, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] } as any,
+    transition: { duration: 0.3, delay: i * 0.04, ease: [0.22, 1, 0.36, 1] } as any,
   }),
 };
 
@@ -33,9 +33,9 @@ export default function BillingPage() {
       {/* Header */}
       <motion.div
         className="page-header"
-        initial={{ opacity: 0, y: -12 }}
+        initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
       >
         <div className="page-eyebrow">Billing & Order Invoices</div>
         <h1 className="page-title">
@@ -116,9 +116,9 @@ export default function BillingPage() {
 
       {!loading && orders.length > 0 && (
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.32, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
           className="data-table-wrap"
         >
           <table className="data-table" aria-label="Billing and orders">
