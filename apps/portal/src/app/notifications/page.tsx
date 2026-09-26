@@ -1,40 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bell, ShieldAlert, Sparkles, ArrowRight } from "lucide-react";
 
 type FilterType = "ALL" | "SECURITY" | "RELEASES";
-
-const NOTIFICATIONS = [
-  {
-    id: "notif_1",
-    type: "SECURITY" as const,
-    title: "Security Advisory: Fastify Engine v1.2.1 Dependency Patch",
-    desc: "An updated release addressing an upstream HTTP/2 header parsing vulnerability. Your download package has been refreshed with the patched build.",
-    date: "Today, 11:20 AM",
-    slug: "fastify-typescript-microservice-engine",
-    unread: true,
-  },
-  {
-    id: "notif_2",
-    type: "RELEASES" as const,
-    title: "Major Release: Next.js 15 SaaS Boilerplate v2.4.0 Live",
-    desc: "Added parallel route dashboard layouts and Turbopack 16 support. Available for immediate signed download from your library.",
-    date: "Yesterday",
-    slug: "nextjs-15-saas-rocket-boilerplate",
-    unread: true,
-  },
-  {
-    id: "notif_3",
-    type: "RELEASES" as const,
-    title: "MCP Agent Hub v1.1.0 — LangChain v0.3 Compatible",
-    desc: "Includes multi-agent streaming memory buffers and the full LangChain v0.3 compatibility matrix. Download the refreshed archive.",
-    date: "3 days ago",
-    slug: "autonomous-mcp-agent-hub",
-    unread: false,
-  },
-];
 
 const containerVariants = {
   hidden: {},
@@ -46,15 +16,38 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } as any },
 };
 
-export default function NotificationsPage() {
-  const [filter, setFilter] = useState<FilterType>("ALL");
+interface NotificationItem {
+  id: string;
+  type: "SECURITY" | "RELEASES" | "SUCCESS";
+  title: string;
+  message: string;
+  timestamp: string;
+  read: boolean;
+}
 
-  const filtered = NOTIFICATIONS.filter((n) => filter === "ALL" || n.type === filter);
-  const secCount = NOTIFICATIONS.filter((n) => n.type === "SECURITY").length;
-  const relCount = NOTIFICATIONS.filter((n) => n.type === "RELEASES").length;
+export default function NotificationsPage() {
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [loading, setLoading]             = useState(true);
+  const [filter, setFilter]               = useState<FilterType>("ALL");
+
+  useEffect(() => {
+    fetch("/api/portal/notifications")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && Array.isArray(d.data)) {
+          setNotifications(d.data);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const filtered = notifications.filter((n) => filter === "ALL" || n.type === filter);
+  const secCount = notifications.filter((n) => n.type === "SECURITY").length;
+  const relCount = notifications.filter((n) => n.type === "RELEASES" || n.type === "SUCCESS").length;
 
   const TABS: { id: FilterType; label: string; count: number }[] = [
-    { id: "ALL",      label: "All Alerts",         count: NOTIFICATIONS.length },
+    { id: "ALL",      label: "All Alerts",         count: notifications.length },
     { id: "SECURITY", label: "Security Patches",   count: secCount },
     { id: "RELEASES", label: "Version Releases",   count: relCount },
   ];
@@ -151,18 +144,18 @@ export default function NotificationsPage() {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "1rem", marginBottom: "0.4rem" }}>
                       <h3
-                        className={`notif-title${item.unread ? " notif-unread" : ""}`}
+                        className={`notif-title${!item.read ? " notif-unread" : ""}`}
                         style={{ fontSize: "0.92rem" }}
                       >
                         {item.title}
                       </h3>
                       <span className="font-mono text-muted" style={{ fontSize: "0.65rem", flexShrink: 0 }}>
-                        {item.date}
+                        {new Date(item.timestamp).toLocaleDateString()}
                       </span>
                     </div>
 
                     <p style={{ fontSize: "0.83rem", color: "var(--text-secondary)", lineHeight: 1.6, marginBottom: "0.85rem" }}>
-                      {item.desc}
+                      {item.message}
                     </p>
 
                     <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
@@ -178,7 +171,7 @@ export default function NotificationsPage() {
                           textDecoration: "none",
                         }}
                       >
-                        <span>Download in Library</span>
+                        <span>View Vault</span>
                         <ArrowRight size={13} aria-hidden="true" />
                       </a>
                       <span

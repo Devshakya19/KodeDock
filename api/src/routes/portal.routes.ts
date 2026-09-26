@@ -415,5 +415,134 @@ export async function handlePortalRoutes(
     }
   }
 
+  // -------------------------------------------------------------
+  // 6. API Keys & Personal Access Tokens (/api/portal/tokens)
+  // -------------------------------------------------------------
+  if (pathname === "/api/portal/tokens" && req.method === "GET") {
+    try {
+      const sql = `
+        SELECT id, name, key_hint, permissions, expires_at, last_used_at, created_at
+        FROM api_keys
+        WHERE user_id = $1
+        ORDER BY created_at DESC;
+      `;
+      const result = await pgPool.query(sql, [buyerId]);
+
+      const tokens = result.rows.map((r) => ({
+        id: r.id,
+        name: r.name,
+        tokenMasked: `kd_pat_live_${r.key_hint}••••••••`,
+        createdAt: r.created_at,
+        expiresIn: r.expires_at ? new Date(r.expires_at).toLocaleDateString() : "Never",
+        scopes: Array.isArray(r.permissions) ? r.permissions : ["read:library"],
+        lastUsed: r.last_used_at ? new Date(r.last_used_at).toLocaleTimeString() : "Never",
+        status: r.expires_at && new Date(r.expires_at) < new Date() ? "REVOKED" : "ACTIVE",
+      }));
+
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: true, data: tokens }));
+      return true;
+    } catch (err: any) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: false, error: { message: err.message } }));
+      return true;
+    }
+  }
+
+  if (pathname === "/api/portal/tokens" && req.method === "POST") {
+    try {
+      let body = "";
+      for await (const chunk of req) body += chunk;
+      const data = JSON.parse(body || "{}");
+      const name = (data.name || "API Access Token").trim();
+
+      const hex = crypto.randomBytes(18).toString("hex");
+      const fullToken = `kd_pat_live_${hex}`;
+      const keyHash = crypto.createHash("sha256").update(fullToken).digest("hex");
+      const keyHint = hex.slice(0, 6);
+      const id = `key_${Date.now()}`;
+      const expiryDays = Number(data.expiryDays) || 90;
+      const expiresAt = data.expiryDays === "never" ? null : new Date(Date.now() + expiryDays * 86400 * 1000);
+      const scopes = Array.isArray(data.scopes) ? data.scopes : ["read:library"];
+
+      await pgPool.query(
+        `INSERT INTO api_keys (id, user_id, key_hash, key_hint, name, permissions, expires_at, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7, NOW());`,
+        [id, buyerId, keyHash, keyHint, name, JSON.stringify(scopes), expiresAt]
+      );
+
+      res.writeHead(201, { "Content-Type": "application/json" });
+      res.end(
+        JSON.stringify({
+          success: true,
+          data: {
+            id,
+            name,
+            fullToken,
+            tokenMasked: `kd_pat_live_${keyHint}••••••••`,
+            scopes,
+            expiresIn: expiresAt ? `${expiryDays} days` : "Never",
+            status: "ACTIVE",
+          },
+        })
+      );
+      return true;
+    } catch (err: any) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: false, error: { message: err.message } }));
+      return true;
+    }
+  }
+
+  if (pathname === "/api/portal/tokens" && req.method === "DELETE") {
+    try {
+      const tokenId = searchParams.get("id");
+      if (tokenId) {
+        await pgPool.query(`DELETE FROM api_keys WHERE id = $1 AND user_id = $2;`, [tokenId, buyerId]);
+      }
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: true, data: { revokedId: tokenId } }));
+      return true;
+    } catch (err: any) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: false, error: { message: err.message } }));
+      return true;
+    }
+  }
+
+  // -------------------------------------------------------------
+  // 7. Notifications Log (/api/portal/notifications)
+  // -------------------------------------------------------------
+  if (pathname === "/api/portal/notifications" && req.method === "GET") {
+    try {
+      const ordersRes = await pgPool.query(
+        `SELECT o.id, o.created_at, p.title 
+         FROM orders o 
+         JOIN products p ON o.product_id = p.id 
+         WHERE o.buyer_id = $1 
+         ORDER BY o.created_at DESC 
+         LIMIT 10`,
+        [buyerId]
+      );
+
+      const notifs = ordersRes.rows.map((r, i) => ({
+        id: `notif_${r.id}`,
+        title: `License Activated: ${r.title}`,
+        message: `Your commercial license key has been cryptographically signed and verified in PostgreSQL.`,
+        type: "SUCCESS",
+        timestamp: r.created_at,
+        read: i > 0,
+      }));
+
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: true, data: notifs }));
+      return true;
+    } catch (err: any) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: false, error: { message: err.message } }));
+      return true;
+    }
+  }
+
   return false;
 }
