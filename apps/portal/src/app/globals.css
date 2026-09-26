@@ -212,13 +212,6 @@ body {
   height: 32px;
   object-fit: contain;
   flex-shrink: 0;
-  filter: drop-shadow(0 0 10px rgba(132, 44, 249, 0.45));
-  transition: transform 0.25s ease, filter 0.25s ease;
-}
-
-.sidebar-logo-link:hover .sidebar-logo-img {
-  transform: scale(1.08) rotate(-2deg);
-  filter: drop-shadow(0 0 16px rgba(132, 44, 249, 0.8));
 }
 
 .sidebar-logo-name {
