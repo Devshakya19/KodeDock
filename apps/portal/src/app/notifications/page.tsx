@@ -8,12 +8,12 @@ type FilterType = "ALL" | "SECURITY" | "RELEASES";
 
 const containerVariants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.08, delayChildren: 0.15 } },
+  visible: { transition: { staggerChildren: 0.04, delayChildren: 0.05 } },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } as any },
+  hidden: { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.28, ease: [0.22, 1, 0.36, 1] } as any },
 };
 
 interface NotificationItem {
@@ -57,9 +57,9 @@ export default function NotificationsPage() {
       {/* Header */}
       <motion.div
         className="page-header"
-        initial={{ opacity: 0, y: -12 }}
+        initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
       >
         <div className="page-eyebrow">Notification Center</div>
         <h1 className="page-title">
@@ -73,6 +73,7 @@ export default function NotificationsPage() {
 
       {/* Filter Tabs */}
       <motion.div
+
         style={{ display: "flex", gap: "0.5rem", marginBottom: "1.75rem", flexWrap: "wrap" }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

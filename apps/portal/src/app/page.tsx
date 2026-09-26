@@ -16,32 +16,32 @@ import {
   Zap,
 } from "lucide-react";
 
-// Framer Motion stagger variants
+// Framer Motion smooth stagger variants
 const containerVariants = {
   hidden: {},
   visible: {
-    transition: { staggerChildren: 0.07, delayChildren: 0.1 },
+    transition: { staggerChildren: 0.04, delayChildren: 0.05 },
   },
 };
 
 const cardVariants = {
-  hidden: { opacity: 0, y: 20, scale: 0.98 },
+  hidden: { opacity: 0, y: 10 },
   visible: {
     opacity: 1,
     y: 0,
-    scale: 1,
-    transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] } as any,
+    transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] } as any,
   },
 };
 
 const statVariants = {
-  hidden: { opacity: 0, y: 16 },
+  hidden: { opacity: 0, y: 8 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] } as any,
+    transition: { duration: 0.3, delay: i * 0.04, ease: [0.22, 1, 0.36, 1] } as any,
   }),
 };
+
 
 export default function LibraryPage() {
   const [products, setProducts] = useState<PurchasedProduct[]>([]);

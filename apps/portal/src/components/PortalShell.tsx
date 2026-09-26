@@ -41,17 +41,20 @@ export const PortalShell: React.FC<PortalShellProps> = ({ children }) => {
   const lenisRef = useRef<any>(null);
 
   useEffect(() => {
-    // Init Lenis smooth scroll with liquid physics
+    // Init Lenis ultra-smooth scroll with liquid exponential physics
     let rafId: number;
+    let resizeObserver: ResizeObserver | null = null;
+
     const initLenis = async () => {
       try {
         const Lenis = (await import("lenis")).default;
         const lenis = new Lenis({
-          lerp: 0.08,
-          duration: 1.4,
-          easing: (t: number) => 1 - Math.pow(1 - t, 4),
+          duration: 1.1,
+          easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+          orientation: "vertical",
+          gestureOrientation: "vertical",
           smoothWheel: true,
-          wheelMultiplier: 0.85,
+          wheelMultiplier: 1.0,
           touchMultiplier: 1.6,
           infinite: false,
         });
@@ -62,6 +65,14 @@ export const PortalShell: React.FC<PortalShellProps> = ({ children }) => {
           rafId = requestAnimationFrame(raf);
         }
         rafId = requestAnimationFrame(raf);
+
+        // Auto-recalculate scroll limits when async data or DOM heights change
+        if (typeof ResizeObserver !== "undefined") {
+          resizeObserver = new ResizeObserver(() => {
+            lenis.resize();
+          });
+          resizeObserver.observe(document.body);
+        }
       } catch {
         // Lenis optional; page still works without it
       }
@@ -71,6 +82,7 @@ export const PortalShell: React.FC<PortalShellProps> = ({ children }) => {
 
     return () => {
       if (rafId) cancelAnimationFrame(rafId);
+      if (resizeObserver) resizeObserver.disconnect();
       lenisRef.current?.destroy();
     };
   }, []);
@@ -78,8 +90,12 @@ export const PortalShell: React.FC<PortalShellProps> = ({ children }) => {
   useEffect(() => {
     if (lenisRef.current) {
       lenisRef.current.scrollTo(0, { immediate: true });
+      requestAnimationFrame(() => {
+        lenisRef.current?.resize();
+      });
     }
   }, [pathname]);
+
 
   useEffect(() => {
     // Fetch live library count
@@ -244,17 +260,19 @@ export const PortalShell: React.FC<PortalShellProps> = ({ children }) => {
         </header>
 
         {/* Page content with ultra-smooth entry animation */}
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="wait" initial={false}>
           <motion.main
             key={pathname}
-            initial={{ opacity: 0, y: 14, filter: "blur(4px)" }}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
-            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] as any }}
+            className="page-transition-wrapper"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] as any }}
           >
             {children}
           </motion.main>
         </AnimatePresence>
+
       </div>
     </div>
   );

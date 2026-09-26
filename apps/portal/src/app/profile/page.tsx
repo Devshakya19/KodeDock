@@ -79,8 +79,8 @@ export default function ProfilePage() {
         >
           {/* 1. Full-Width Hero Header Banner */}
           <motion.div variants={{
-            hidden: { opacity: 0, y: 18, filter: "blur(4px)" },
-            visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] } as any }
+            hidden: { opacity: 0, y: 10 },
+            visible: { opacity: 1, y: 0, transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] } as any }
           }}>
             <ProfileHeaderBanner
               profile={profile}
@@ -91,16 +91,16 @@ export default function ProfilePage() {
 
           {/* 2. 4-Cell Metrics Strip */}
           <motion.div variants={{
-            hidden: { opacity: 0, y: 18, filter: "blur(4px)" },
-            visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] } as any }
+            hidden: { opacity: 0, y: 10 },
+            visible: { opacity: 1, y: 0, transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] } as any }
           }}>
             <ProfileMetricsStrip profile={profile} />
           </motion.div>
 
           {/* 3. Sub-Navigation Tabs */}
           <motion.div variants={{
-            hidden: { opacity: 0, y: 18, filter: "blur(4px)" },
-            visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] } as any }
+            hidden: { opacity: 0, y: 10 },
+            visible: { opacity: 1, y: 0, transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] } as any }
           }}>
             <ProfileNavTabs />
           </motion.div>
@@ -109,8 +109,8 @@ export default function ProfilePage() {
           <motion.div
             className="ref-main-grid"
             variants={{
-              hidden: { opacity: 0, y: 18, filter: "blur(4px)" },
-              visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] } as any }
+              hidden: { opacity: 0, y: 10 },
+              visible: { opacity: 1, y: 0, transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] } as any }
             }}
           >
             {/* Column 1 (Left): About Buyer & Verification */}
