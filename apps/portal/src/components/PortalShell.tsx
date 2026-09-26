@@ -8,7 +8,7 @@ import {
   Package,
   Key,
   Receipt,
-  Terminal,
+  KeyRound,
   Bell,
   User,
   Settings,
@@ -25,9 +25,9 @@ const NAV_ITEMS = [
   { href: "/",             label: "My Library",        icon: Package,         section: "main" },
   { href: "/licenses",     label: "License Vault",     icon: Key,             section: "main" },
   { href: "/billing",      label: "Billing & Orders",  icon: Receipt,         section: "main" },
-  { href: "/tokens",       label: "API Tokens",         icon: Terminal,        section: "main" },
+  { href: "/tokens",       label: "API Keys & Access", icon: KeyRound,        section: "main" },
   { href: "/notifications",label: "Notifications",     icon: Bell,            section: "account" },
-  { href: "/profile",      label: "Profile",       icon: User,            section: "account" },
+  { href: "/profile",      label: "Profile",           icon: User,            section: "account" },
   { href: "/settings",     label: "Settings",          icon: Settings,        section: "account" },
 ];
 
@@ -134,13 +134,27 @@ export const PortalShell: React.FC<PortalShellProps> = ({ children }) => {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`nav-item${isActive ? " active" : ""}`}
+                style={{ textDecoration: "none" }}
               >
-                <Icon size={16} className="nav-item-icon" aria-hidden="true" />
-                <span>{item.label}</span>
-                {badge !== undefined && badge > 0 && (
-                  <span className="nav-badge">{badge}</span>
-                )}
+                <motion.div
+                  className={`nav-item${isActive ? " active" : ""}`}
+                  whileHover={{ x: 4 }}
+                  whileTap={{ scale: 0.96 }}
+                  transition={{ duration: 0.18, ease: "easeOut" }}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="sidebarActivePill"
+                      className="nav-active-pill"
+                      transition={{ type: "spring", stiffness: 420, damping: 32 }}
+                    />
+                  )}
+                  <Icon size={16} className="nav-item-icon" aria-hidden="true" />
+                  <span>{item.label}</span>
+                  {badge !== undefined && badge > 0 && (
+                    <span className="nav-badge">{badge}</span>
+                  )}
+                </motion.div>
               </Link>
             );
           })}
@@ -156,13 +170,27 @@ export const PortalShell: React.FC<PortalShellProps> = ({ children }) => {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`nav-item${isActive ? " active" : ""}`}
+                style={{ textDecoration: "none" }}
               >
-                <Icon size={16} className="nav-item-icon" aria-hidden="true" />
-                <span>{item.label}</span>
-                {badge !== undefined && badge > 0 && (
-                  <span className="nav-badge">{badge}</span>
-                )}
+                <motion.div
+                  className={`nav-item${isActive ? " active" : ""}`}
+                  whileHover={{ x: 4 }}
+                  whileTap={{ scale: 0.96 }}
+                  transition={{ duration: 0.18, ease: "easeOut" }}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="sidebarActivePill"
+                      className="nav-active-pill"
+                      transition={{ type: "spring", stiffness: 420, damping: 32 }}
+                    />
+                  )}
+                  <Icon size={16} className="nav-item-icon" aria-hidden="true" />
+                  <span>{item.label}</span>
+                  {badge !== undefined && badge > 0 && (
+                    <span className="nav-badge">{badge}</span>
+                  )}
+                </motion.div>
               </Link>
             );
           })}
