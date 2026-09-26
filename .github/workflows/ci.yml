@@ -42,15 +42,11 @@ jobs:
         run: |
           docker compose -f docker/docker-compose.yml config
 
-  # ── 2. Typecheck Across Node Versions ────────────────────────────────────
+  # ── 2. Typecheck Across All Monorepo Packages ────────────────────────────
   typecheck:
-    name: Typecheck Matrix (Node ${{ matrix.node-version }})
+    name: Monorepo Typecheck (Node ${{ env.NODE_VERSION }})
     needs: [preflight]
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        node-version: ['20', '22']
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -58,10 +54,10 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
 
-      - name: Setup Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
 
       - name: Restore Turborepo cache
