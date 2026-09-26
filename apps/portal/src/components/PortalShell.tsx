@@ -113,7 +113,7 @@ export const PortalShell: React.FC<PortalShellProps> = ({ children }) => {
         {/* Brand */}
         <div className="sidebar-brand">
           <Link href="/" className="sidebar-logo-link">
-            <div className="sidebar-logo-mark">K</div>
+            <img src="/kd.svg" alt="KodeDock Logo" className="sidebar-logo-img" />
             <span className="sidebar-logo-name">KodeDock</span>
           </Link>
           <span className="sidebar-portal-chip">Portal</span>
