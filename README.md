@@ -181,37 +181,20 @@ Visit **`http://localhost:3003`** to access the Explore Marketplace!
 
 ## 7. CI/CD & Automated Pipeline
 
-All pull requests and commits are automatically verified through an enterprise-grade GitHub Actions matrix:
+All pull requests and commits are automatically verified through our focused GitHub Actions suite:
 
 - **`.github/workflows/ci.yml` (Master Monorepo CI)**:
-  - `check-typos`: Fast typo and spellcheck via `crate-ci/typos`.
-  - `pr-title-check`: Conventional Commits PR title validation (`feat`, `fix`, `perf`, `chore`).
+  - `preflight`: Automated typo checks (`crate-ci/typos`), database DDL parity verification (`docker/schema.sql` vs `src/db/schema.sql`), and Docker Compose configuration syntax checks.
   - `typecheck`: Matrix typecheck across Node.js `20` and `22` (`pnpm run typecheck`).
-  - `build-store`: Next.js 16 production build verification for `@kodedock/store`.
-  - `build-portal`: Next.js 16 production build verification for `@kodedock/portal`.
-  - `build-api-and-packages`: Compilation checks for `@kodedock/api`, `@kodedock/types`, `@kodedock/ui`, `@kodedock/auth`.
-  - `e2e-tests`: Monorepo E2E test matrix (`store`, `portal`) across parallel shards `(1, 2)`.
-  - `database-schema-validation`: PostgreSQL 16 container, DDL execution, constraint integrity checks.
-  - `ci-status-gate`: Master required status rollup gate.
-- **`.github/workflows/codeql.yml` (Advanced Security)**:
-  - `CodeQL / Analyze (actions)`: GitHub Actions security analysis.
-  - `CodeQL / Analyze (javascript-typescript)`: Deep static code security analysis.
-- **`.github/workflows/docker-build.yml` (Container Infrastructure)**:
-  - `Docker Compose / Configuration & Syntax Validation`.
-  - `PostgreSQL 16 Container Build & Startup Test`.
-- **`.github/workflows/preview-deploy.yml` (Deployment Previews)**:
-  - `Vercel – store (apps/store)`.
-  - `Vercel – portal (apps/portal)`.
-  - `Vercel – ui-library (@kodedock/ui)`.
-  - `KodeDock Gateway – api (api/)`.
-- **`.github/workflows/db-drift-detection.yml` (Database Parity)**:
-  - `Schema Parity`: Absolute zero-drift diff verification between `docker/schema.sql` and `src/db/schema.sql`.
-  - `PostgreSQL Syntax & Constraint Validation`.
-- **`.github/workflows/security.yml` (Secrets & Dependencies)**:
-  - `Secret & Credential Leak Scanning (Gitleaks)`.
-  - `Dependency Vulnerability Audit (pnpm audit)`.
-- **`.github/workflows/pr-triage.yml` (PR Management)**:
-  - `Auto-Label / Monorepo Area Triage` (`area: store`, `area: portal`, `area: db`, `area: api`).
+  - `build-apps`: Production build matrix for `@kodedock/store`, `@kodedock/portal`, and `@kodedock/api`.
+  - `database-validation`: PostgreSQL 16 container, DDL execution, constraint integrity checks.
+  - `ci-status-gate`: Master required rollup gate for branch protection.
+- **`.github/workflows/security.yml` (Security, Secrets & CodeQL)**:
+  - `secret-scan`: Gitleaks scanner preventing exposed Ed25519 private keys, JWT secrets, or DB credentials.
+  - `dependency-audit`: Automated check for high/critical security advisories via `pnpm audit`.
+  - `codeql-analysis`: Matrix CodeQL static analysis for `javascript-typescript` and `actions`.
+- **`.github/workflows/pr-triage.yml` (PR Management & Labeling)**:
+  - Automated area labeling based on monorepo paths (`area: store`, `area: portal`, `area: db`, `area: api`, `area: documentation`).
 - **`.github/workflows/release.yml` (Release Automation)**:
   - Automated changelog generation and GitHub Release publishing on git tag `v*.*.*`.
 
