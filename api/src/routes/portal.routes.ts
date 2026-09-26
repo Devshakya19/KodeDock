@@ -544,5 +544,239 @@ export async function handlePortalRoutes(
     }
   }
 
+  // -------------------------------------------------------------
+  // 8. User Settings Persistence (/api/portal/settings)
+  // -------------------------------------------------------------
+  if (pathname === "/api/portal/settings" && req.method === "GET") {
+    try {
+      await pgPool.query(`
+        CREATE TABLE IF NOT EXISTS user_settings (
+          user_id VARCHAR(64) PRIMARY KEY REFERENCES "user"(id) ON DELETE CASCADE,
+          gstin VARCHAR(50),
+          pan VARCHAR(50),
+          billing_address TEXT,
+          city VARCHAR(100),
+          state VARCHAR(100),
+          notification_rules JSONB DEFAULT '{"new-release": true, "security-patch": true, "download-ready": true, "payment-confirm": true, "license-expiry": true, "newsletter": false}'::jsonb,
+          domain_allowlist JSONB DEFAULT '[]'::jsonb,
+          public_profile BOOLEAN DEFAULT TRUE,
+          purchase_history_public BOOLEAN DEFAULT FALSE,
+          analytics_sharing BOOLEAN DEFAULT TRUE,
+          two_factor_enabled BOOLEAN DEFAULT FALSE,
+          updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        );
+      `);
+
+      await pgPool.query(
+        `INSERT INTO user_settings (user_id) VALUES ($1) ON CONFLICT (user_id) DO NOTHING;`,
+        [buyerId]
+      );
+
+      const resDb = await pgPool.query(`SELECT * FROM user_settings WHERE user_id = $1 LIMIT 1;`, [buyerId]);
+      const s = resDb.rows[0] || {};
+
+      const settings = {
+        gstin: s.gstin || "",
+        pan: s.pan || "",
+        billingAddress: s.billing_address || "",
+        city: s.city || "",
+        state: s.state || "",
+        notificationRules: s.notification_rules || {
+          "new-release": true,
+          "security-patch": true,
+          "download-ready": true,
+          "payment-confirm": true,
+          "license-expiry": true,
+          "newsletter": false,
+        },
+        domainAllowlist: Array.isArray(s.domain_allowlist) ? s.domain_allowlist : [],
+        publicProfile: s.public_profile ?? true,
+        purchaseHistoryPublic: s.purchase_history_public ?? false,
+        analyticsSharing: s.analytics_sharing ?? true,
+        twoFactorEnabled: s.two_factor_enabled ?? false,
+      };
+
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: true, data: settings }));
+      return true;
+    } catch (err: any) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: false, error: { message: err.message } }));
+      return true;
+    }
+  }
+
+  if (pathname === "/api/portal/settings" && req.method === "PATCH") {
+    try {
+      let body = "";
+      for await (const chunk of req) body += chunk;
+      const data = JSON.parse(body || "{}");
+
+      await pgPool.query(`
+        CREATE TABLE IF NOT EXISTS user_settings (
+          user_id VARCHAR(64) PRIMARY KEY REFERENCES "user"(id) ON DELETE CASCADE,
+          gstin VARCHAR(50),
+          pan VARCHAR(50),
+          billing_address TEXT,
+          city VARCHAR(100),
+          state VARCHAR(100),
+          notification_rules JSONB DEFAULT '{"new-release": true, "security-patch": true, "download-ready": true, "payment-confirm": true, "license-expiry": true, "newsletter": false}'::jsonb,
+          domain_allowlist JSONB DEFAULT '[]'::jsonb,
+          public_profile BOOLEAN DEFAULT TRUE,
+          purchase_history_public BOOLEAN DEFAULT FALSE,
+          analytics_sharing BOOLEAN DEFAULT TRUE,
+          two_factor_enabled BOOLEAN DEFAULT FALSE,
+          updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        );
+      `);
+
+      await pgPool.query(
+        `INSERT INTO user_settings (user_id) VALUES ($1) ON CONFLICT (user_id) DO NOTHING;`,
+        [buyerId]
+      );
+
+      // Fetch current row first to merge updates
+      const currRes = await pgPool.query(`SELECT * FROM user_settings WHERE user_id = $1;`, [buyerId]);
+      const curr = currRes.rows[0] || {};
+
+      const gstin = data.gstin !== undefined ? data.gstin : curr.gstin;
+      const pan = data.pan !== undefined ? data.pan : curr.pan;
+      const billingAddress = data.billingAddress !== undefined ? data.billingAddress : curr.billing_address;
+      const city = data.city !== undefined ? data.city : curr.city;
+      const state = data.state !== undefined ? data.state : curr.state;
+      const notificationRules = data.notificationRules !== undefined ? JSON.stringify(data.notificationRules) : JSON.stringify(curr.notification_rules || {});
+      const domainAllowlist = data.domainAllowlist !== undefined ? JSON.stringify(data.domainAllowlist) : JSON.stringify(curr.domain_allowlist || []);
+      const publicProfile = data.publicProfile !== undefined ? data.publicProfile : curr.public_profile;
+      const purchaseHistoryPublic = data.purchaseHistoryPublic !== undefined ? data.purchaseHistoryPublic : curr.purchase_history_public;
+      const analyticsSharing = data.analyticsSharing !== undefined ? data.analyticsSharing : curr.analytics_sharing;
+      const twoFactorEnabled = data.twoFactorEnabled !== undefined ? data.twoFactorEnabled : curr.two_factor_enabled;
+
+      await pgPool.query(
+        `UPDATE user_settings
+         SET gstin = $1, pan = $2, billing_address = $3, city = $4, state = $5,
+             notification_rules = $6::jsonb, domain_allowlist = $7::jsonb,
+             public_profile = $8, purchase_history_public = $9, analytics_sharing = $10,
+             two_factor_enabled = $11, updated_at = NOW()
+         WHERE user_id = $12;`,
+        [
+          gstin,
+          pan,
+          billingAddress,
+          city,
+          state,
+          notificationRules,
+          domainAllowlist,
+          publicProfile,
+          purchaseHistoryPublic,
+          analyticsSharing,
+          twoFactorEnabled,
+          buyerId,
+        ]
+      );
+
+      const resDb = await pgPool.query(`SELECT * FROM user_settings WHERE user_id = $1 LIMIT 1;`, [buyerId]);
+      const s = resDb.rows[0] || {};
+
+      const settings = {
+        gstin: s.gstin || "",
+        pan: s.pan || "",
+        billingAddress: s.billing_address || "",
+        city: s.city || "",
+        state: s.state || "",
+        notificationRules: s.notification_rules || {},
+        domainAllowlist: Array.isArray(s.domain_allowlist) ? s.domain_allowlist : [],
+        publicProfile: s.public_profile ?? true,
+        purchaseHistoryPublic: s.purchase_history_public ?? false,
+        analyticsSharing: s.analytics_sharing ?? true,
+        twoFactorEnabled: s.two_factor_enabled ?? false,
+      };
+
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: true, data: settings }));
+      return true;
+    } catch (err: any) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: false, error: { message: err.message } }));
+      return true;
+    }
+  }
+
+  // -------------------------------------------------------------
+  // 9. Export User Data (/api/portal/export-data)
+  // -------------------------------------------------------------
+  if (pathname === "/api/portal/export-data" && req.method === "GET") {
+    try {
+      const uRes = await pgPool.query(`SELECT id, name, email, role, "createdAt" FROM "user" WHERE id = $1`, [buyerId]);
+      const oRes = await pgPool.query(`SELECT * FROM orders WHERE buyer_id = $1`, [buyerId]);
+      const lRes = await pgPool.query(`SELECT * FROM licenses WHERE buyer_id = $1`, [buyerId]);
+      const kRes = await pgPool.query(`SELECT id, name, key_hint, created_at FROM api_keys WHERE user_id = $1`, [buyerId]);
+      const sRes = await pgPool.query(`SELECT * FROM user_settings WHERE user_id = $1`, [buyerId]);
+
+      const exportPackage = {
+        exportedAt: new Date().toISOString(),
+        userProfile: uRes.rows[0] || null,
+        orders: oRes.rows,
+        licenses: lRes.rows,
+        apiKeys: kRes.rows,
+        settings: sRes.rows[0] || null,
+      };
+
+      res.writeHead(200, {
+        "Content-Type": "application/json",
+        "Content-Disposition": `attachment; filename="kodedock_user_export_${buyerId}.json"`,
+      });
+      res.end(JSON.stringify(exportPackage, null, 2));
+      return true;
+    } catch (err: any) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: false, error: { message: err.message } }));
+      return true;
+    }
+  }
+
+  // -------------------------------------------------------------
+  // 10. Danger Zone Operations
+  // -------------------------------------------------------------
+  if (pathname === "/api/portal/danger/revoke-all" && req.method === "POST") {
+    try {
+      await pgPool.query(`UPDATE licenses SET status = 'REVOKED' WHERE buyer_id = $1`, [buyerId]);
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: true, message: "All licenses revoked in PostgreSQL" }));
+      return true;
+    } catch (err: any) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: false, error: { message: err.message } }));
+      return true;
+    }
+  }
+
+  if (pathname === "/api/portal/danger/purge-logs" && req.method === "POST") {
+    try {
+      // Purge sessions or auxiliary log state
+      await pgPool.query(`DELETE FROM session WHERE "userId" = $1`, [buyerId]);
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: true, message: "Session audit logs purged from PostgreSQL" }));
+      return true;
+    } catch (err: any) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: false, error: { message: err.message } }));
+      return true;
+    }
+  }
+
+  if (pathname === "/api/portal/danger/delete-account" && req.method === "DELETE") {
+    try {
+      await pgPool.query(`DELETE FROM "user" WHERE id = $1`, [buyerId]);
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: true, message: "Account deleted permanently from PostgreSQL" }));
+      return true;
+    } catch (err: any) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: false, error: { message: err.message } }));
+      return true;
+    }
+  }
+
   return false;
 }
+
