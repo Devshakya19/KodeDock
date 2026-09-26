@@ -39,21 +39,27 @@ export const PortalShell: React.FC<PortalShellProps> = ({ children }) => {
   const lenisRef = useRef<any>(null);
 
   useEffect(() => {
-    // Init Lenis smooth scroll
+    // Init Lenis smooth scroll with liquid physics
+    let rafId: number;
     const initLenis = async () => {
       try {
         const Lenis = (await import("lenis")).default;
-        lenisRef.current = new Lenis({
-          duration: 1.2,
-          easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        const lenis = new Lenis({
+          lerp: 0.08,
+          duration: 1.4,
+          easing: (t: number) => 1 - Math.pow(1 - t, 4),
           smoothWheel: true,
+          wheelMultiplier: 0.85,
+          touchMultiplier: 1.6,
+          infinite: false,
         });
+        lenisRef.current = lenis;
 
         function raf(time: number) {
-          lenisRef.current?.raf(time);
-          requestAnimationFrame(raf);
+          lenis.raf(time);
+          rafId = requestAnimationFrame(raf);
         }
-        requestAnimationFrame(raf);
+        rafId = requestAnimationFrame(raf);
       } catch {
         // Lenis optional; page still works without it
       }
@@ -62,9 +68,16 @@ export const PortalShell: React.FC<PortalShellProps> = ({ children }) => {
     initLenis();
 
     return () => {
+      if (rafId) cancelAnimationFrame(rafId);
       lenisRef.current?.destroy();
     };
   }, []);
+
+  useEffect(() => {
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0, { immediate: true });
+    }
+  }, [pathname]);
 
   useEffect(() => {
     // Fetch live library count
