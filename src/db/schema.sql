@@ -170,3 +170,24 @@ CREATE TABLE IF NOT EXISTS email_otps (
 );
 
 CREATE INDEX IF NOT EXISTS idx_email_otps_lookup ON email_otps(email, purpose);
+
+-- ----------------------------------------------------------------------------
+-- 5. USER SETTINGS & PREFERENCES (Persisted PostgreSQL user options)
+-- ----------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS user_settings (
+  user_id VARCHAR(64) PRIMARY KEY REFERENCES "user"(id) ON DELETE CASCADE,
+  gstin VARCHAR(50),
+  pan VARCHAR(50),
+  billing_address TEXT,
+  city VARCHAR(100),
+  state VARCHAR(100),
+  notification_rules JSONB DEFAULT '{"new-release": true, "security-patch": true, "download-ready": true, "payment-confirm": true, "license-expiry": true, "newsletter": false}'::jsonb,
+  domain_allowlist JSONB DEFAULT '[]'::jsonb,
+  public_profile BOOLEAN DEFAULT TRUE,
+  purchase_history_public BOOLEAN DEFAULT FALSE,
+  analytics_sharing BOOLEAN DEFAULT TRUE,
+  two_factor_enabled BOOLEAN DEFAULT FALSE,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+

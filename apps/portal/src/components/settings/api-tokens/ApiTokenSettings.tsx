@@ -1,59 +1,95 @@
 "use client";
 
-import React, { useState } from "react";
-import { Key, Plus, Trash2 } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Key, Plus, Trash2, Check } from "lucide-react";
 
 interface Token {
   id: string;
   name: string;
-  prefix: string;
+  tokenMasked: string;
   createdAt: string;
-  expiresAt: string;
+  expiresIn: string;
 }
 
-const MOCK_TOKENS: Token[] = [
-  { id: "t1", name: "Production CI Pipeline", prefix: "kd_pat_live_a8f1", createdAt: "2026-09-01", expiresAt: "2026-12-01" },
-  { id: "t2", name: "GitHub Actions Deploy",   prefix: "kd_pat_live_c3e9", createdAt: "2026-08-15", expiresAt: "2027-08-15" },
-];
-
 export const ApiTokenSettings: React.FC = () => {
-  const [tokens, setTokens] = useState<Token[]>(MOCK_TOKENS);
-  const [newName, setNewName] = useState("");
+  const [tokens, setTokens]     = useState<Token[]>([]);
+  const [loading, setLoading]   = useState(true);
+  const [newName, setNewName]   = useState("");
+  const [creating, setCreating] = useState(false);
 
-  const handleCreate = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newName.trim()) return;
-    const hex = Array.from(crypto.getRandomValues(new Uint8Array(6)))
-      .map((b) => b.toString(16).padStart(2, "0")).join("");
-    setTokens((prev) => [
-      ...prev,
-      {
-        id: hex,
-        name: newName.trim(),
-        prefix: `kd_pat_live_${hex}`,
-        createdAt: new Date().toISOString().slice(0, 10),
-        expiresAt: new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 10),
-      },
-    ]);
-    setNewName("");
+  const fetchTokens = () => {
+    setLoading(true);
+    fetch("/api/portal/tokens")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && Array.isArray(d.data)) {
+          setTokens(d.data);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
   };
 
-  const revoke = (id: string) =>
-    setTokens((prev) => prev.filter((t) => t.id !== id));
+  useEffect(() => {
+    fetchTokens();
+  }, []);
+
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newName.trim()) return;
+    setCreating(true);
+    try {
+      const res = await fetch("/api/portal/tokens", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newName.trim(), expiryDays: 90 }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setNewName("");
+        fetchTokens();
+      }
+    } catch {
+      // Fallback
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const revoke = async (id: string) => {
+    try {
+      await fetch(`/api/portal/tokens?id=${id}`, { method: "DELETE" });
+      fetchTokens();
+    } catch {
+      setTokens((prev) => prev.filter((t) => t.id !== id));
+    }
+  };
 
   return (
     <section className="section-card" id="settings-api-tokens">
       <div className="section-card-header">
         <div>
-          <div className="card-title">API & CLI Tokens</div>
-          <div className="card-desc">Personal access tokens for automated CI/CD downloads and API access.</div>
+          <div className="card-title">API &amp; CLI Access Keys</div>
+          <div className="card-desc">Personal access tokens stored in PostgreSQL for automated CI/CD downloads and API access.</div>
         </div>
         <Key size={18} color="var(--accent-primary)" aria-hidden="true" />
       </div>
 
       <div className="section-card-body">
+        {loading && (
+          <div className="font-mono text-muted" style={{ fontSize: "0.78rem", padding: "1rem 0" }}>
+            Fetching PostgreSQL API Keys...
+          </div>
+        )}
+
+        {!loading && tokens.length === 0 && (
+          <div className="text-muted" style={{ fontSize: "0.82rem", padding: "0.5rem 0 1.5rem" }}>
+            No personal access tokens generated in PostgreSQL yet.
+          </div>
+        )}
+
         {/* Existing tokens */}
-        {tokens.length > 0 && (
+        {!loading && tokens.length > 0 && (
           <div style={{ marginBottom: "1.5rem" }}>
             {tokens.map((tok, i) => (
               <div
@@ -64,7 +100,7 @@ export const ApiTokenSettings: React.FC = () => {
                 <div>
                   <div className="toggle-name">{tok.name}</div>
                   <div className="toggle-desc font-mono" style={{ fontSize: "0.68rem" }}>
-                    {tok.prefix}•••• · Expires {tok.expiresAt}
+                    {tok.tokenMasked} · Expires {tok.expiresIn}
                   </div>
                 </div>
                 <button
@@ -102,9 +138,9 @@ export const ApiTokenSettings: React.FC = () => {
               />
             </div>
             <div style={{ display: "flex", alignItems: "flex-end" }}>
-              <button type="submit" className="btn btn-primary btn-md w-full">
+              <button type="submit" disabled={creating} className="btn btn-primary btn-md w-full">
                 <Plus size={15} aria-hidden="true" />
-                <span>Generate Token</span>
+                <span>{creating ? "Generating..." : "Generate Token"}</span>
               </button>
             </div>
           </div>
