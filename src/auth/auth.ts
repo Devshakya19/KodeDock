@@ -47,6 +47,9 @@ if (dbUrl.startsWith("postgres://") || dbUrl.startsWith("postgresql://")) {
  */
 export const auth = betterAuth({
   database: dbInstance as any,
+  logger: {
+    level: "error",
+  },
   secret:
     process.env.BETTER_AUTH_SECRET ||
     "kodedock_dev_secret_key_32_characters_long_min!",
@@ -96,10 +99,7 @@ export const auth = betterAuth({
  * Helper to ensure database tables are migrated on server startup
  */
 export async function initAuthDatabase(): Promise<void> {
-  const ctx = await auth.$context;
-  if (typeof ctx.runMigrations === "function") {
-    await ctx.runMigrations();
-  }
+  // Database tables & migrations are handled in src/db/index.ts
 }
 
 export type Auth = typeof auth;
