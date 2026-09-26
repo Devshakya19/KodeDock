@@ -89,3 +89,25 @@ Every agent, frontend component, and page MUST strictly adhere to the installed 
 3. **`full-output-enforcement` (Zero Truncation & Complete Code)**:
    - Never use placeholder comments (`/* add more items here */` or `// TODO`).
    - Every file must be complete, compilable, and production-ready from top to bottom.
+
+---
+
+## 6. CI/CD & GitHub Actions Pipeline Laws
+
+Every AI agent, contributor, and automated process MUST adhere to the automated quality gate:
+
+1. **Local Pre-Commit Verification Gate**:
+   - Before executing `git commit`, run:
+     1. `pnpm run typecheck` — MUST pass with 0 errors across all monorepo packages.
+     2. `pnpm run build` — MUST complete clean production builds for all apps.
+   - Any commit that fails GitHub Actions CI (`.github/workflows/ci.yml`) is considered a severe violation.
+
+2. **Database DDL Parity**:
+   - Whenever any schema, table, column, index, or constraint is added or modified, update both `docker/schema.sql` and `src/db/schema.sql` simultaneously.
+   - Ensure the `database-schema-validation` CI job can spin up a clean `postgres:16-alpine` container and execute the DDL script without syntax errors or broken foreign keys.
+
+3. **Zero Leaked Secrets & Cryptographic Integrity**:
+   - Never commit `.env` files containing live secrets, Ed25519 private keys, Better Auth secret keys, or cloud storage credentials.
+   - All tests and scripts must use mock/sandbox environment variables (e.g. `.env.example`).
+   - Automated secret scanners (`gitleaks`, `CodeQL`) in `.github/workflows/security.yml` must always remain green.
+

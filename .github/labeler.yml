@@ -1,0 +1,29 @@
+area:store:
+  - apps/store/**/*
+
+area:portal:
+  - apps/portal/**/*
+
+area:studio:
+  - apps/studio/**/*
+
+area:www:
+  - apps/www/**/*
+
+area:api:
+  - api/**/*
+  - src/auth/**/*
+
+area:database:
+  - docker/schema.sql
+  - src/db/**/*
+
+area:packages:
+  - packages/**/*
+
+area:documentation:
+  - '**/*.md'
+  - docs/**/*
+
+area:ci:
+  - .github/**/*
