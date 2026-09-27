@@ -5,6 +5,7 @@ import { handleCustomAuthRoutes } from "./routes/oauth.routes";
 import { handleProductRoutes } from "./routes/product.routes";
 import { handlePortalRoutes } from "./routes/portal.routes";
 import { handleCheckoutRoutes } from "./routes/checkout.routes";
+import { handleStudioRoutes } from "./routes/studio.routes";
 import { requireAuth, requireRole } from "./middlewares/auth.middleware";
 import type { ApiResponse } from "@kodedock/types";
 
@@ -70,6 +71,10 @@ export const server = http.createServer(async (req, res) => {
   // 5. Checkout & Order Creation Routes (/api/checkout/*)
   const checkoutHandled = await handleCheckoutRoutes(req, res, pathname, url.searchParams);
   if (checkoutHandled) return;
+
+  // 6. Creator Studio Routes (/api/studio/*)
+  const studioHandled = await handleStudioRoutes(req, res, pathname, url.searchParams);
+  if (studioHandled) return;
 
   // 3. Better Auth fallback routes (/api/auth/*)
   if (pathname.startsWith("/api/auth")) {

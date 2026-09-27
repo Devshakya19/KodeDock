@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg9" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4C1D95"/>
+      <stop offset="100%" stop-color="#831843"/>
+    </linearGradient>
+    <linearGradient id="glow9" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F472B6"/>
+      <stop offset="100%" stop-color="#FB7185"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="400" height="400" rx="200" fill="url(#bg9)"/>
+
+  <!-- Body (Zip Hoodie) -->
+  <path d="M85,380 C85,280 135,240 200,240 C265,240 315,280 315,380 Z" fill="#3B0764"/>
+  <line x1="200" y1="240" x2="200" y2="380" stroke="#F472B6" stroke-width="3"/>
+
+  <!-- Neck & Face -->
+  <rect x="180" y="200" width="40" height="45" fill="#E2A682" rx="6"/>
+  <path d="M140,145 C140,210 160,230 200,230 C240,230 260,210 260,145 C260,110 240,100 200,100 C160,100 140,110 140,145 Z" fill="#F3BF9E"/>
+
+  <!-- Developer Beanie Hood -->
+  <path d="M125,150 C120,80 150,55 200,55 C250,55 280,80 275,150 Z" fill="#581C87"/>
+
+  <!-- Glasses -->
+  <rect x="145" y="145" width="44" height="28" rx="14" fill="none" stroke="#F472B6" stroke-width="3.5"/>
+  <rect x="211" y="145" width="44" height="28" rx="14" fill="none" stroke="#F472B6" stroke-width="3.5"/>
+  <line x1="189" y1="159" x2="211" y2="159" stroke="#F472B6" stroke-width="3.5"/>
+
+  <!-- Headphones over Hood -->
+  <path d="M105,150 C105,90 145,65 200,65 C255,65 295,90 295,150" fill="none" stroke="#FB7185" stroke-width="6"/>
+  <rect x="90" y="135" width="22" height="38" rx="8" fill="#FB7185"/>
+  <rect x="288" y="135" width="22" height="38" rx="8" fill="#FB7185"/>
+
+  <!-- Code Tag -->
+  <rect x="150" y="325" width="100" height="24" rx="12" fill="#4C1D95" stroke="#F472B6" stroke-width="1.5"/>
+  <text x="200" y="341" font-family="monospace" font-size="11" font-weight="bold" fill="#F472B6" text-anchor="middle">&lt;MOBILE_DEV&gt;</text>
+</svg>

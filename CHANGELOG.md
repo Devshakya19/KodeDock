@@ -6,10 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
-
 ## [Unreleased]
 
 ### Added
+- Created `@kodedock/studio` application package (`apps/studio`) running on port 3001 with Turbopack, Fontshare Suite, and high-end obsidian bento grid theme.
+- Created Studio Shell layout (`StudioShell.tsx`) with fixed navigation sidebar, active route indicators, breadcrumbs, and Lenis smooth scrolling.
+- Created Creator Dashboard (`/`) featuring real-time gross revenue, 95% creator net split, active listing counts, copies sold, SVG trajectory graph, and live order feed.
+- Created Product Inventory & Catalog Manager (`/products`) with status badges, direct links to releases, and search filters.
+- Created 4-Step Architecture Publishing Wizard (`/products/new`) supporting metadata, paise-denominated dual licensing (Standard & Extended), Cloudflare R2 storage key setup, and SHA-256 checksums.
+- Created Release Management Center (`/releases`) supporting semver tags (`v1.0.0`, `v1.1.0`), R2 artifact keys, cryptographic checksum integrity verification, and markdown changelogs.
+- Created Creator Payouts & Monetization Engine (`/payouts`) with available balance ledgers, instant UPI ID / NEFT withdrawal modal, and 95/5 platform revenue audit trail.
+- Created Traffic & Conversion Radar (`/analytics`) featuring 4-tier funnel analysis (Impressions -> Views -> Carts -> Orders) and channel distribution charts.
+- Created Creator Settings & Profile Editor (`/settings`) for verified creator profile configuration and notification triggers.
+- Implemented backend API router `api/src/routes/studio.routes.ts` providing endpoints for stats, product submissions, release publishing, and payout transactions.
+- Updated `.github/workflows/ci.yml` build matrix to incorporate `studio` alongside `store`, `portal`, and `api`.
 - Created `PLANNED.md` specifying the master engineering roadmap, architectural deliverables, and progress tracking across all monorepo apps.
 - Created `StoreStateProvider` client context in `apps/store` for reactive, `localStorage`-persisted shopping cart and developer wishlist state.
 - Created dedicated Shopping Cart page (`/cart`) with live license tier switching (Standard vs Extended), paise-to-INR pricing summary, promo code engine, and double-bezel aesthetic.

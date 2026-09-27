@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg10" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090A0F"/>
+      <stop offset="50%" stop-color="#12131A"/>
+      <stop offset="100%" stop-color="#1F212D"/>
+    </linearGradient>
+    <linearGradient id="glow10" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="50%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#EC4899"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="400" height="400" rx="200" fill="url(#bg10)"/>
+
+  <!-- Glowing Outer Edge -->
+  <circle cx="200" cy="200" r="195" fill="none" stroke="url(#glow10)" stroke-width="3" opacity="0.8"/>
+
+  <!-- Body -->
+  <path d="M85,380 C85,280 135,240 200,240 C265,240 315,280 315,380 Z" fill="#181A26"/>
+  <path d="M150,240 L200,310 L250,240" fill="#242738"/>
+
+  <!-- Face & Neck -->
+  <rect x="180" y="200" width="40" height="45" fill="#D29E7D" rx="6"/>
+  <path d="M140,140 C140,205 160,225 200,225 C240,225 260,205 260,140 C260,105 240,95 200,95 C160,95 140,105 140,140 Z" fill="#EAB899"/>
+
+  <!-- Cybernetic Eyewear & Hair -->
+  <path d="M135,125 C135,70 160,50 200,50 C240,50 265,70 265,125 C250,85 230,70 200,70 C170,70 150,85 135,125 Z" fill="#0F172A"/>
+
+  <rect x="135" y="138" width="130" height="30" rx="6" fill="#090A0F" stroke="url(#glow10)" stroke-width="2.5"/>
+  <line x1="145" y1="153" x2="255" y2="153" stroke="#38BDF8" stroke-width="3" stroke-dasharray="10 5"/>
+
+  <!-- Code Tag -->
+  <rect x="140" y="325" width="120" height="24" rx="12" fill="#090A0F" stroke="url(#glow10)" stroke-width="1.5"/>
+  <text x="200" y="341" font-family="monospace" font-size="11" font-weight="bold" fill="#38BDF8" text-anchor="middle">&lt;PRINCIPAL_ARCH/&gt;</text>
+</svg>

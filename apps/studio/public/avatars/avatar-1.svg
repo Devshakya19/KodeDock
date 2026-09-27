@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F0C20"/>
+      <stop offset="100%" stop-color="#1A103C"/>
+    </linearGradient>
+    <linearGradient id="visor1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#8B5CF6"/>
+    </linearGradient>
+    <linearGradient id="hood1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1F2133"/>
+      <stop offset="100%" stop-color="#12131F"/>
+    </linearGradient>
+    <filter id="glow1" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background Circle -->
+  <rect width="400" height="400" rx="200" fill="url(#bg1)"/>
+
+  <!-- Subtle grid lines -->
+  <path d="M0,100 L400,100 M0,200 L400,200 M0,300 L400,300 M100,0 L100,400 M200,0 L200,400 M300,0 L300,400" stroke="rgba(139,92,246,0.08)" stroke-width="1"/>
+
+  <!-- Glowing aura -->
+  <circle cx="200" cy="180" r="110" fill="none" stroke="url(#visor1)" stroke-width="2" opacity="0.4" filter="url(#glow1)"/>
+
+  <!-- Shoulders / Hoodie Body -->
+  <path d="M80,380 C80,280 130,240 200,240 C270,240 320,280 320,380 Z" fill="url(#hood1)"/>
+  <path d="M140,240 L200,310 L260,240" fill="none" stroke="#2D3048" stroke-width="4"/>
+
+  <!-- Neck -->
+  <rect x="180" y="200" width="40" height="45" fill="#D2A888" rx="8"/>
+
+  <!-- Face Base -->
+  <path d="M140,150 C140,210 160,230 200,230 C240,230 260,210 260,150 C260,110 240,100 200,100 C160,100 140,110 140,150 Z" fill="#E6BA95"/>
+
+  <!-- Cyber Eyewear / Tech Visor -->
+  <rect x="145" y="140" width="110" height="32" rx="6" fill="#090A0F" stroke="url(#visor1)" stroke-width="3" filter="url(#glow1)"/>
+  <line x1="155" y1="156" x2="245" y2="156" stroke="#38BDF8" stroke-width="3" stroke-dasharray="8 4"/>
+
+  <!-- Hood Overlay -->
+  <path d="M125,160 C120,90 150,60 200,60 C250,60 280,90 275,160 C285,130 290,80 200,50 C110,80 115,130 125,160 Z" fill="#292B40"/>
+  <path d="M120,160 C125,90 155,60 200,60 C245,60 275,90 280,160 C270,95 240,72 200,72 C160,72 130,95 120,160 Z" fill="#181926"/>
+
+  <!-- Developer Headphone band -->
+  <path d="M110,160 C110,100 150,75 200,75 C250,75 290,100 290,160" fill="none" stroke="#38BDF8" stroke-width="5" stroke-linecap="round"/>
+  <rect x="100" y="145" width="20" height="35" rx="6" fill="#8B5CF6"/>
+  <rect x="280" y="145" width="20" height="35" rx="6" fill="#8B5CF6"/>
+
+  <!-- Code Tag Badge -->
+  <rect x="160" y="320" width="80" height="24" rx="12" fill="#090A0F" stroke="#8B5CF6" stroke-width="1.5"/>
+  <text x="200" y="336" font-family="monospace" font-size="11" font-weight="bold" fill="#38BDF8" text-anchor="middle">&lt;DEV/01&gt;</text>
+</svg>

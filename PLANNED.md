@@ -25,7 +25,7 @@
 | **`packages/`** | Shared types, design tokens & frontend auth client | TypeScript, `@kodedock/types`, `@kodedock/ui` | **Operational** |
 | **`apps/store`** | Public Marketplace Frontend | Next.js 16, Turbopack, Fontshare Typography | **Active Development** |
 | **`apps/portal`** | Buyer Developer Dashboard (Licenses, Downloads, Keys) | Next.js 16, Turbopack, PostgreSQL API | **Operational** |
-| **`apps/studio`** | Creator & Seller Dashboard (Uploads, Releases, Payouts) | Next.js 16, Turbopack, `/api/studio/*` | **Planned (Milestone 5)** |
+| **`apps/studio`** | Creator & Seller Dashboard (Uploads, Releases, Payouts) | Next.js 16, Turbopack, `/api/studio/*` | **Operational & Validated** |
 | **`apps/www`** | Marketing & Central Auth Hub | Next.js 16, Turbopack, Better Auth Gateway | **Planned (Milestone 6)** |
 
 ---
@@ -45,7 +45,7 @@
 - [x] Local Fontshare Suite font integration (*Clash Display*, *Satoshi*, *Azeret Mono*).
 - [x] Product detail pages (`/product/[slug]`) with technical specs, version history, and interactive purchase panel.
 
-### Milestone 3: E-Commerce Experience — Wishlist, Cart & Checkout (Active)
+### Milestone 3: E-Commerce Experience — Wishlist, Cart & Checkout (Completed)
 - [x] Client-side state persistence (`StoreStateProvider`) with `localStorage` sync and cross-page reactivity.
 - [x] **Wishlist Page (`/wishlist`)**:
   - Saved codebases list with double-bezel cards.
@@ -63,7 +63,7 @@
   - Cryptographic Ed25519 license key generation and instant link to `apps/portal`.
 - [x] Dynamic counter badges on navbar icons (Cart `<ShoppingCart />` and Wishlist `<Heart />`).
 
-### Milestone 4: Developer Radar / Ecosystem Updates (Active)
+### Milestone 4: Developer Radar / Ecosystem Updates (Completed)
 - [x] Transition legacy `/news` route into **KodeDock Dev Radar** (`/news`).
 - [x] Modernize navigation tab with developer-centric iconography (`<Radio />` / `<Sparkles />`).
 - [x] Categorized feed for:
@@ -71,16 +71,42 @@
   - *Security Advisories* (dependencies, checksum verifications).
   - *Architecture Standards* (PostgreSQL 17, Turbopack, Next.js 16 updates).
 
-### Milestone 5: Creator Studio (`apps/studio`) (Next Up)
-- [ ] Initialize Next.js 16 app at `apps/studio`.
-- [ ] Product listing submission flow:
-  - Metadata, categories, tech stack tags, demo URLs.
-  - Source code archive (.zip) upload with SHA-256 checksum calculation.
-  - Pricing configuration in paise (Standard vs Extended commercial licenses).
-- [ ] Version Release Manager (`v1.0.0`, `v1.1.0`) with markdown changelog editor.
-- [ ] Creator Sales & Analytics dashboard (Total revenue, order volume, net payouts).
-- [ ] Creator Payout Request module (UPI ID / NEFT bank transfer) linking to `seller_payouts` table.
-- [ ] Backend controller `api/src/routes/studio.routes.ts`.
+### Milestone 5: Creator Studio (`apps/studio`) (Completed)
+- [x] Initialize Next.js 16 app at `apps/studio` running on port 3001 with Turbopack.
+- [x] Implement Creator Shell with fixed sidebar navigation, breadcrumbs, status indicators, and Lenis smooth scrolling.
+- [x] **Creator Command Center Dashboard (`/`)**:
+  - Gross sales, 95% net creator earnings, active listings, and copies sold metrics computed from real SQL.
+  - Revenue velocity trajectory chart (SVG path visualization).
+  - Live recent order feed with license tier badges and customer timestamps.
+- [x] **Product Inventory & Management (`/products`)**:
+  - Interactive inventory table with search, category filtering, and status badges (Published, Draft, Archived).
+  - Direct deep links to version release managers and public storefront listings.
+- [x] **4-Step Architecture Publishing Wizard (`/products/new`)**:
+  - Step 1: Identity & Architecture Metadata (Name, slug, short description, category, tags).
+  - Step 2: Commercial Pricing Engine (Standard license and Extended commercial license in INR paise, live 95% creator split calculation).
+  - Step 3: Technical Delivery Asset (R2 Cloudflare bucket storage key, initial semver `v1.0.0`, SHA-256 integrity checksum verification).
+  - Step 4: Developer Documentation (Markdown README & setup guide, live demo URL, GitHub repository link).
+- [x] **Version Release Manager (`/releases`)**:
+  - Dynamic product selector dropdown with automatic URL query sync.
+  - Cryptographic artifact registration modal (`version`, `r2_key`, `checksum_sha256`, `changelog`).
+  - Release timeline with download links and SHA-256 verification hashes.
+- [x] **Monetization & Payouts Engine (`/payouts`)**:
+  - Real-time balance ledger: Available balance, pending settlement, lifetime earnings (95/5 platform commission model).
+  - Instant UPI ID / NEFT payout request modal with client-side balance validation.
+  - Transparent payout audit trail linked to `seller_payouts` table.
+- [x] **Creator Traffic & Conversion Radar (`/analytics`)**:
+  - 4-tier funnel visualization: Impressions -> Product Views -> Cart Adds -> Purchased.
+  - Traffic source distribution breakdown (Marketplace search, direct links, GitHub stars, Twitter/X).
+  - Top performing architectures comparison table.
+- [x] **Verified Creator Settings (`/settings`)**:
+  - Profile identity management (Creator handle, verified badge, bio, website).
+  - Webhook notification configuration for sale notifications, release downloads, and payout settlements.
+- [x] **Backend API Gateway Controller (`api/src/routes/studio.routes.ts`)**:
+  - `GET /api/studio/stats` — aggregated metrics from `orders` and `products`.
+  - `GET /api/studio/products` & `POST /api/studio/products` — inventory and creation.
+  - `GET /api/studio/releases` & `POST /api/studio/releases` — release artifacts and semver versions.
+  - `GET /api/studio/payouts` & `POST /api/studio/payouts/request` — balance calculations and withdrawal requests.
+- [x] Integrated `apps/studio` into GitHub Actions CI matrix (`.github/workflows/ci.yml`).
 
 ### Milestone 6: Marketing Hub & Central Auth (`apps/www`)
 - [ ] High-energy landing page introducing KodeDock's core developer value proposition.
