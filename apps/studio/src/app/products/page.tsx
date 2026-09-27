@@ -2,18 +2,18 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import {
   Package,
   Sparkles,
   ExternalLink,
   GitBranch,
   ArrowRight,
-  ShieldCheck,
   Search,
-  Filter,
-  CheckCircle2,
-  AlertCircle,
   Clock,
+  Layers,
+  CheckCircle2,
+  TrendingUp,
 } from "lucide-react";
 import type { CreatorProduct } from "@/types/studio";
 
@@ -46,32 +46,51 @@ export default function StudioProductsPage() {
   });
 
   return (
-    <div style={{ maxWidth: "1280px", margin: "0 auto", paddingBottom: "4rem" }}>
-      {/* ── Header & Action ───────────────────────────────────────────────── */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "1rem", marginBottom: "2rem" }}>
-        <div>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: "0.45rem", background: "rgba(56, 189, 248, 0.1)", border: "1px solid rgba(56, 189, 248, 0.25)", padding: "0.25rem 0.65rem", borderRadius: "9999px", fontSize: "0.72rem", fontFamily: "var(--font-mono)", color: "var(--accent-cyan)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.75rem" }}>
-            <Package size={13} />
-            <span>Inventory &amp; Listings</span>
+    <div className="page-container">
+      {/* ── Page Header ─────────────────────────────────────────────────── */}
+      <motion.div
+        className="page-header"
+        initial={{ opacity: 0, y: -12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "1rem" }}>
+          <div>
+            <div className="page-eyebrow">
+              <Package size={12} color="var(--accent-cyan)" />
+              <span>Catalog &amp; Package Inventory</span>
+            </div>
+            <h1 className="page-title">
+              My Listed <span style={{ color: "var(--accent-primary)" }}>Boilerplates</span>
+            </h1>
+            <p className="page-subtitle">
+              Manage software architectures, inspect sales adoption, deploy SemVer version updates, and view live store listings.
+            </p>
           </div>
-          <h1 style={{ fontFamily: "var(--font-display)", fontSize: "2.25rem", fontWeight: 700, color: "#ffffff", letterSpacing: "-0.02em" }}>
-            My Boilerplates &amp; Templates
-          </h1>
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem" }}>
-            Manage software packages, monitor buyer adoption, and push version updates.
-          </p>
-        </div>
 
-        <Link href="/products/new" className="btn btn-primary" style={{ padding: "0.6rem 1.25rem", fontSize: "0.82rem" }}>
-          <Sparkles size={15} />
-          <span>Publish New Boilerplate</span>
-          <ArrowRight size={14} />
-        </Link>
-      </div>
+          <Link
+            href="/products/new"
+            className="btn btn-primary"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              padding: "0.6rem 1.25rem",
+              fontSize: "0.82rem",
+              fontWeight: 600,
+              borderRadius: "var(--radius-md)",
+            }}
+          >
+            <Sparkles size={15} />
+            <span>Publish New Boilerplate</span>
+            <ArrowRight size={14} />
+          </Link>
+        </div>
+      </motion.div>
 
       {/* ── Search & Status Filters ───────────────────────────────────────── */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem", marginBottom: "1.5rem" }}>
-        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem", marginBottom: "1.75rem" }}>
+        <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap", background: "var(--bg-surface)", padding: "0.25rem", borderRadius: "var(--radius-lg)", border: "1px solid var(--border-subtle)" }}>
           {[
             { id: "ALL", label: "All Packages" },
             { id: "PUBLISHED", label: "Published" },
@@ -82,8 +101,8 @@ export default function StudioProductsPage() {
               key={tab.id}
               type="button"
               onClick={() => setStatusFilter(tab.id)}
-              className={`filter-category-btn${statusFilter === tab.id ? " active" : ""}`}
-              style={{ fontSize: "0.78rem", padding: "0.4rem 0.85rem" }}
+              className={`studio-chart-time-pill ${statusFilter === tab.id ? "active" : ""}`}
+              style={{ padding: "0.4rem 0.85rem", fontSize: "0.78rem" }}
             >
               <span>{tab.label}</span>
             </button>
@@ -95,17 +114,25 @@ export default function StudioProductsPage() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Filter by title, stack..."
-            className="form-input-custom"
-            style={{ paddingLeft: "2.2rem", fontSize: "0.82rem" }}
+            placeholder="Search by title, stack..."
+            style={{
+              width: "100%",
+              padding: "0.55rem 0.85rem 0.55rem 2.2rem",
+              fontSize: "0.82rem",
+              background: "var(--bg-surface)",
+              border: "1px solid var(--border-subtle)",
+              borderRadius: "var(--radius-md)",
+              color: "var(--text-primary)",
+              outline: "none",
+            }}
           />
           <Search size={14} style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
         </div>
       </div>
 
-      {/* ── Listings Table / Grid ─────────────────────────────────────────── */}
+      {/* ── Listings Container ────────────────────────────────────────────── */}
       {filteredProducts.length === 0 ? (
-        <div className="portal-card" style={{ textAlign: "center", padding: "4rem 2rem" }}>
+        <div className="studio-bezel-card" style={{ textAlign: "center", padding: "4rem 2rem" }}>
           <Package size={36} color="var(--text-muted)" style={{ margin: "0 auto 1rem" }} />
           <h2 style={{ fontFamily: "var(--font-display)", color: "#ffffff", fontSize: "1.35rem", marginBottom: "0.5rem" }}>
             No Software Packages Found
@@ -123,7 +150,7 @@ export default function StudioProductsPage() {
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           {filteredProducts.map((p) => (
-            <div key={p.id} className="portal-card" style={{ padding: "1.25rem", display: "flex", alignItems: "center", gap: "1.25rem", flexWrap: "wrap" }}>
+            <div key={p.id} className="studio-bezel-card" style={{ padding: "1.25rem", display: "flex", alignItems: "center", gap: "1.25rem", flexWrap: "wrap" }}>
               {/* Media Thumbnail */}
               <div style={{ width: "120px", height: "80px", borderRadius: "var(--radius-md)", overflow: "hidden", border: "1px solid var(--border-subtle)", background: "var(--bg-surface-elevated)", flexShrink: 0 }}>
                 <img src={p.thumbnail_url || "/kd.svg"} alt={p.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -171,7 +198,7 @@ export default function StudioProductsPage() {
                 </p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "0.35rem" }}>
                   {Array.isArray(p.tech_stack) && p.tech_stack.slice(0, 4).map((tech) => (
-                    <span key={tech} className="tech-pill">
+                    <span key={tech} className="hash-pill" style={{ color: "var(--text-secondary)" }}>
                       {tech}
                     </span>
                   ))}
@@ -180,13 +207,13 @@ export default function StudioProductsPage() {
 
               {/* Version & Price */}
               <div style={{ minWidth: "140px" }}>
-                <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontFamily: "var(--font-mono)", textTransform: "uppercase" }}>
+                <div style={{ fontSize: "0.7rem", color: "var(--text-muted)", fontFamily: "var(--font-mono)", textTransform: "uppercase" }}>
                   Active Version
                 </div>
                 <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.95rem", fontWeight: 700, color: "var(--accent-primary)", marginBottom: "0.35rem" }}>
                   {p.active_version || "v1.0.0"}
                 </div>
-                <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontFamily: "var(--font-mono)", textTransform: "uppercase" }}>
+                <div style={{ fontSize: "0.7rem", color: "var(--text-muted)", fontFamily: "var(--font-mono)", textTransform: "uppercase" }}>
                   Standard Price
                 </div>
                 <div style={{ fontFamily: "var(--font-mono)", fontSize: "1.1rem", fontWeight: 700, color: "var(--accent-cyan)" }}>
@@ -196,13 +223,13 @@ export default function StudioProductsPage() {
 
               {/* Sales & Revenue */}
               <div style={{ minWidth: "120px" }}>
-                <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontFamily: "var(--font-mono)", textTransform: "uppercase" }}>
+                <div style={{ fontSize: "0.7rem", color: "var(--text-muted)", fontFamily: "var(--font-mono)", textTransform: "uppercase" }}>
                   Sales Volume
                 </div>
                 <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.95rem", fontWeight: 700, color: "#ffffff", marginBottom: "0.35rem" }}>
                   {p.total_sales || 0} units
                 </div>
-                <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontFamily: "var(--font-mono)", textTransform: "uppercase" }}>
+                <div style={{ fontSize: "0.7rem", color: "var(--text-muted)", fontFamily: "var(--font-mono)", textTransform: "uppercase" }}>
                   Gross Revenue
                 </div>
                 <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.95rem", fontWeight: 700, color: "var(--status-success)" }}>

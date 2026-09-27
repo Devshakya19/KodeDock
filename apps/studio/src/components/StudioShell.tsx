@@ -16,7 +16,6 @@ import {
   ExternalLink,
   ChevronRight,
   ShieldCheck,
-  Zap,
   Store,
 } from "lucide-react";
 
@@ -121,173 +120,230 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
       .catch(() => {});
   }, []);
 
-  const renderNavGroup = (section: string, title?: string) => {
-    const items = NAV_ITEMS.filter((item) => item.section === section);
-    return (
-      <div className="nav-group" key={section}>
-        {title && <span className="nav-group-title">{title}</span>}
-        <ul className="nav-list">
-          {items.map((item) => {
-            const Icon = item.icon;
-            const isActive =
-              item.href === "/"
-                ? pathname === "/"
-                : pathname.startsWith(item.href);
+  const activeItem = NAV_ITEMS.find((item) =>
+    item.href === "/" ? pathname === "/" : pathname.startsWith(item.href)
+  ) ?? NAV_ITEMS[0];
 
-            return (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className={`nav-item ${isActive ? "active" : ""}`}
-                >
-                  <Icon size={18} className="nav-icon" />
-                  <span className="nav-label">{item.label}</span>
-
-                  {item.href === "/products" && activeProductsCount > 0 && (
-                    <span className="nav-badge">{activeProductsCount}</span>
-                  )}
-                  {item.href === "/products/new" && (
-                    <span className="nav-badge" style={{ background: "rgba(139, 92, 246, 0.2)", color: "var(--accent-primary)" }}>
-                      NEW
-                    </span>
-                  )}
-
-                  {isActive && (
-                    <motion.div
-                      layoutId="active-indicator"
-                      className="nav-active-pip"
-                      transition={{ type: "spring", stiffness: 450, damping: 35 }}
-                    />
-                  )}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-    );
-  };
+  const mainItems    = NAV_ITEMS.filter((item) => item.section === "main");
+  const financeItems = NAV_ITEMS.filter((item) => item.section === "finance");
+  const accountItems = NAV_ITEMS.filter((item) => item.section === "account");
 
   return (
-    <div className="portal-layout">
+    <div className="portal-root">
+      {/* Atmospheric depth glows */}
+      <div className="portal-glow-1" aria-hidden="true" />
+      <div className="portal-glow-2" aria-hidden="true" />
+
       {/* ── Fixed Sidebar ─────────────────────────────────────────────────── */}
       <aside className="portal-sidebar">
         {/* Brand & Studio Chip */}
         <div className="sidebar-brand">
-          <Link href="/" className="brand-logo-link">
-            <img src="/kd.svg" alt="KodeDock" className="brand-icon" />
-            <span className="brand-name">KodeDock</span>
+          <Link href="/" className="sidebar-logo-link">
+            <img src="/kd.svg" alt="KodeDock Logo" className="sidebar-logo-img" />
+            <span className="sidebar-logo-name">KodeDock</span>
           </Link>
-          <span className="studio-pill-badge" style={{
-            fontSize: "0.68rem",
-            fontFamily: "var(--font-mono)",
-            background: "rgba(139, 92, 246, 0.15)",
-            color: "var(--accent-primary)",
-            padding: "0.15rem 0.5rem",
-            borderRadius: "4px",
-            border: "1px solid rgba(139, 92, 246, 0.3)",
-            fontWeight: 700,
-            textTransform: "uppercase"
-          }}>
+          <span
+            className="sidebar-portal-chip"
+            style={{
+              color: "var(--accent-primary)",
+              background: "rgba(139, 92, 246, 0.15)",
+              border: "1px solid rgba(139, 92, 246, 0.35)",
+            }}
+          >
             Studio
           </span>
         </div>
 
         {/* Navigation Sections */}
-        <nav className="sidebar-nav">
-          {renderNavGroup("main", "MANAGEMENT")}
-          {renderNavGroup("finance", "FINANCIALS (95% SHARE)")}
-          {renderNavGroup("account", "CREATOR IDENTITY")}
+        <nav className="sidebar-nav" aria-label="Studio navigation">
+          <span className="sidebar-nav-section-label">Management</span>
+          {mainItems.map((item) => {
+            const Icon = item.icon;
+            const isActive =
+              item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+            const badge =
+              item.href === "/products"
+                ? activeProductsCount || undefined
+                : undefined;
+
+            return (
+              <Link key={item.href} href={item.href} style={{ textDecoration: "none" }}>
+                <motion.div
+                  className={`nav-item${isActive ? " active" : ""}`}
+                  whileHover={{ x: 4 }}
+                  whileTap={{ scale: 0.96 }}
+                  transition={{ duration: 0.18, ease: "easeOut" }}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="sidebarActivePill"
+                      className="nav-active-pill"
+                      transition={{ type: "spring", stiffness: 420, damping: 32 }}
+                    />
+                  )}
+                  <Icon size={16} className="nav-item-icon" aria-hidden="true" />
+                  <span>{item.label}</span>
+                  {badge !== undefined && badge > 0 && (
+                    <span className="nav-badge">{badge}</span>
+                  )}
+                  {item.href === "/products/new" && (
+                    <span
+                      className="nav-badge"
+                      style={{
+                        background: "rgba(139, 92, 246, 0.2)",
+                        color: "var(--accent-primary)",
+                      }}
+                    >
+                      NEW
+                    </span>
+                  )}
+                </motion.div>
+              </Link>
+            );
+          })}
+
+          <span className="sidebar-nav-section-label" style={{ marginTop: "0.75rem" }}>
+            Financials (95% Share)
+          </span>
+          {financeItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname.startsWith(item.href);
+
+            return (
+              <Link key={item.href} href={item.href} style={{ textDecoration: "none" }}>
+                <motion.div
+                  className={`nav-item${isActive ? " active" : ""}`}
+                  whileHover={{ x: 4 }}
+                  whileTap={{ scale: 0.96 }}
+                  transition={{ duration: 0.18, ease: "easeOut" }}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="sidebarActivePill"
+                      className="nav-active-pill"
+                      transition={{ type: "spring", stiffness: 420, damping: 32 }}
+                    />
+                  )}
+                  <Icon size={16} className="nav-item-icon" aria-hidden="true" />
+                  <span>{item.label}</span>
+                </motion.div>
+              </Link>
+            );
+          })}
+
+          <span className="sidebar-nav-section-label" style={{ marginTop: "0.75rem" }}>
+            Creator Identity
+          </span>
+          {accountItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname.startsWith(item.href);
+
+            return (
+              <Link key={item.href} href={item.href} style={{ textDecoration: "none" }}>
+                <motion.div
+                  className={`nav-item${isActive ? " active" : ""}`}
+                  whileHover={{ x: 4 }}
+                  whileTap={{ scale: 0.96 }}
+                  transition={{ duration: 0.18, ease: "easeOut" }}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="sidebarActivePill"
+                      className="nav-active-pill"
+                      transition={{ type: "spring", stiffness: 420, damping: 32 }}
+                    />
+                  )}
+                  <Icon size={16} className="nav-item-icon" aria-hidden="true" />
+                  <span>{item.label}</span>
+                </motion.div>
+              </Link>
+            );
+          })}
         </nav>
 
-        {/* Marketplace Cross-link & Creator User Bar */}
+        {/* Sidebar Footer with Storefront link and Creator Profile */}
         <div className="sidebar-footer">
           <a
             href="http://localhost:3003"
             target="_blank"
             rel="noopener noreferrer"
-            className="store-switch-btn"
+            className="sidebar-user-row"
             style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-              padding: "0.65rem 0.85rem",
-              background: "var(--bg-surface)",
-              border: "1px solid var(--border-subtle)",
-              borderRadius: "var(--radius-md)",
-              color: "var(--text-secondary)",
-              fontSize: "0.78rem",
               textDecoration: "none",
-              marginBottom: "1rem",
-              transition: "all 0.15s ease",
+              marginBottom: "0.75rem",
+              border: "1px solid var(--border-subtle)",
+              background: "var(--bg-canvas-alt)",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <Store size={15} color="var(--accent-cyan)" />
-              <span style={{ color: "#ffffff", fontWeight: 600 }}>Buyer Storefront</span>
+            <Store size={15} color="var(--accent-cyan)" />
+            <div style={{ flex: 1, minWidth: 0, fontSize: "0.8rem", fontWeight: 600, color: "#ffffff" }}>
+              Buyer Storefront
             </div>
-            <ExternalLink size={13} />
+            <ExternalLink size={12} color="var(--text-muted)" />
           </a>
 
-          <div className="user-profile-bar">
-            <div className="user-avatar-wrap">
-              <img
-                src={creatorAvatar || "/kd.svg"}
-                alt={creatorName}
-                className="user-avatar-img"
-              />
-              <span className="status-dot-online" />
+          <Link href="/settings" className="sidebar-user-row" style={{ textDecoration: "none" }}>
+            <div className="user-avatar" aria-hidden="true">
+              <img src={creatorAvatar || getAutoAvatar(creatorName)} alt={creatorName} />
             </div>
             <div className="user-info">
-              <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
-                <span className="user-display-name">{creatorName}</span>
-                <ShieldCheck size={13} color="var(--accent-cyan)" />
+              <div className="user-name">{creatorName}</div>
+              <div
+                className="user-badge"
+                style={{
+                  color: "var(--accent-cyan)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.25rem",
+                }}
+              >
+                <ShieldCheck size={11} />
+                <span>Verified Creator</span>
               </div>
-              <span className="user-role-badge">Verified Creator</span>
             </div>
-          </div>
+          </Link>
         </div>
       </aside>
 
       {/* ── Main Viewport Content ─────────────────────────────────────────── */}
-      <div className="portal-content-wrap">
+      <div className="portal-main">
         <header className="portal-topbar">
-          <div className="topbar-breadcrumbs">
-            <span className="breadcrumb-root">Creator Studio</span>
-            <ChevronRight size={14} className="breadcrumb-sep" />
-            <span className="breadcrumb-current">
-              {NAV_ITEMS.find((item) =>
-                item.href === "/"
-                  ? pathname === "/"
-                  : pathname.startsWith(item.href)
-              )?.label || "Dashboard"}
-            </span>
+          <div className="topbar-breadcrumb" aria-label="Breadcrumb">
+            <span className="crumb-root">Creator Studio</span>
+            <ChevronRight size={13} className="crumb-sep" aria-hidden="true" />
+            <span className="crumb-current">{activeItem.label}</span>
           </div>
 
-          <div className="topbar-actions">
-            <Link href="/products/new" className="btn btn-primary" style={{ padding: "0.45rem 0.95rem", fontSize: "0.78rem" }}>
-              <Sparkles size={14} />
+          <div className="topbar-right">
+            <div className="db-status" aria-label="Database status: connected">
+              <div className="db-dot" aria-hidden="true" />
+              <span>PG16 SYNCED</span>
+            </div>
+            <Link
+              href="/products/new"
+              className="btn btn-primary"
+              style={{ padding: "0.45rem 0.95rem", fontSize: "0.78rem" }}
+            >
+              <Sparkles size={13} />
               <span>Publish Template</span>
             </Link>
           </div>
         </header>
 
-        <main className="portal-main-stage">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={pathname}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
-              style={{ width: "100%", height: "100%" }}
-            >
-              {children}
-            </motion.div>
-          </AnimatePresence>
-        </main>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.main
+            key={pathname}
+            className="page-transition-wrapper"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] as any }}
+          >
+            {children}
+          </motion.main>
+        </AnimatePresence>
       </div>
     </div>
   );
 };
+

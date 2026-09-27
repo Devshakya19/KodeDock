@@ -87,34 +87,36 @@ export default function PayoutsPage() {
   };
 
   return (
-    <div style={{ maxWidth: "1280px", margin: "0 auto", paddingBottom: "5rem" }}>
+    <div className="page-container">
       {/* ── Header ────────────────────────────────────────────────────────── */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "1rem", marginBottom: "2rem" }}>
-        <div>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: "0.45rem", background: "rgba(16, 185, 129, 0.1)", border: "1px solid rgba(16, 185, 129, 0.25)", padding: "0.25rem 0.65rem", borderRadius: "9999px", fontSize: "0.72rem", fontFamily: "var(--font-mono)", color: "var(--status-success)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.75rem" }}>
-            <Wallet size={13} />
-            <span>Monetization &amp; Banking</span>
+      <div className="page-header">
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "1rem" }}>
+          <div>
+            <div className="page-eyebrow">
+              <Wallet size={12} color="var(--status-success)" />
+              <span>Monetization &amp; Banking</span>
+            </div>
+            <h1 className="page-title">
+              Creator <span style={{ color: "var(--accent-primary)" }}>Payouts</span>
+            </h1>
+            <p className="page-subtitle">
+              You keep 95% of every codebase sale. Fast disbursement to your UPI ID or Bank Account with automated ledger auditing.
+            </p>
           </div>
-          <h1 style={{ fontFamily: "var(--font-display)", fontSize: "2.25rem", fontWeight: 700, color: "#ffffff", letterSpacing: "-0.02em" }}>
-            Creator Payouts
-          </h1>
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem" }}>
-            You keep 95% of every codebase sale. Fast disbursement to your UPI ID or Bank Account.
-          </p>
-        </div>
 
-        <button
-          type="button"
-          onClick={() => {
-            setRequestAmountINR(Math.floor(pendingBalancePaise / 100).toString());
-            setShowRequestModal(true);
-          }}
-          className="btn btn-primary"
-          style={{ padding: "0.6rem 1.25rem", fontSize: "0.82rem" }}
-        >
-          <Wallet size={15} />
-          <span>Request Payout</span>
-        </button>
+          <button
+            type="button"
+            onClick={() => {
+              setRequestAmountINR(Math.floor(pendingBalancePaise / 100).toString());
+              setShowRequestModal(true);
+            }}
+            className="btn btn-primary"
+            style={{ padding: "0.6rem 1.25rem", fontSize: "0.82rem" }}
+          >
+            <Wallet size={15} />
+            <span>Request Payout</span>
+          </button>
+        </div>
       </div>
 
       {statusMessage && (

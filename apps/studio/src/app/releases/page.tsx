@@ -99,31 +99,33 @@ function ReleasesContent() {
   };
 
   return (
-    <div style={{ maxWidth: "1280px", margin: "0 auto", paddingBottom: "5rem" }}>
+    <div className="page-container">
       {/* ── Header ────────────────────────────────────────────────────────── */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "1rem", marginBottom: "2rem" }}>
-        <div>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: "0.45rem", background: "rgba(139, 92, 246, 0.12)", border: "1px solid rgba(139, 92, 246, 0.25)", padding: "0.25rem 0.65rem", borderRadius: "9999px", fontSize: "0.72rem", fontFamily: "var(--font-mono)", color: "var(--accent-primary)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.75rem" }}>
-            <GitBranch size={13} />
-            <span>Version Control &amp; Changelogs</span>
+      <div className="page-header">
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "1rem" }}>
+          <div>
+            <div className="page-eyebrow">
+              <GitBranch size={12} color="var(--accent-primary)" />
+              <span>Version Control &amp; Changelogs</span>
+            </div>
+            <h1 className="page-title">
+              Software <span style={{ color: "var(--accent-primary)" }}>Releases</span>
+            </h1>
+            <p className="page-subtitle">
+              Push updates to your codebases. Verified buyers automatically receive update notifications and new download links in their portal.
+            </p>
           </div>
-          <h1 style={{ fontFamily: "var(--font-display)", fontSize: "2.25rem", fontWeight: 700, color: "#ffffff", letterSpacing: "-0.02em" }}>
-            Software Releases
-          </h1>
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem" }}>
-            Push updates to your codebases. Verified buyers automatically receive update notifications and new download links in their portal.
-          </p>
-        </div>
 
-        <button
-          type="button"
-          onClick={() => setShowNewModal(true)}
-          className="btn btn-primary"
-          style={{ padding: "0.6rem 1.25rem", fontSize: "0.82rem" }}
-        >
-          <Plus size={15} />
-          <span>New Version Release</span>
-        </button>
+          <button
+            type="button"
+            onClick={() => setShowNewModal(true)}
+            className="btn btn-primary"
+            style={{ padding: "0.6rem 1.25rem", fontSize: "0.82rem" }}
+          >
+            <Plus size={15} />
+            <span>New Version Release</span>
+          </button>
+        </div>
       </div>
 
       {/* ── Releases Timeline List ────────────────────────────────────────── */}

@@ -144,17 +144,21 @@ export default function PublishProductWizardPage() {
   ];
 
   return (
-    <div style={{ maxWidth: "960px", margin: "0 auto", paddingBottom: "5rem" }}>
+    <div className="page-container" style={{ maxWidth: "980px" }}>
       {/* ── Header ────────────────────────────────────────────────────────── */}
-      <div style={{ marginBottom: "2rem" }}>
+      <div className="page-header" style={{ marginBottom: "2rem" }}>
         <Link href="/products" style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", fontSize: "0.78rem", color: "var(--text-muted)", textDecoration: "none", marginBottom: "0.75rem" }}>
           <ArrowLeft size={13} />
           <span>Back to My Boilerplates</span>
         </Link>
-        <h1 style={{ fontFamily: "var(--font-display)", fontSize: "2.25rem", fontWeight: 700, color: "#ffffff", letterSpacing: "-0.02em" }}>
-          Publish New Boilerplate
+        <div className="page-eyebrow">
+          <Sparkles size={12} color="var(--accent-primary)" />
+          <span>Architect Publishing Wizard</span>
+        </div>
+        <h1 className="page-title">
+          Publish New <span style={{ color: "var(--accent-primary)" }}>Boilerplate</span>
         </h1>
-        <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem" }}>
+        <p className="page-subtitle">
           List your production template on KodeDock with cryptographic licensing and automated 95% payouts.
         </p>
       </div>

@@ -33,7 +33,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Elevated `apps/store` navigation tab from generic "News" to "Radar" with developer-centric `<Radio />` icon.
 - Enhanced `PurchasePanel` and `ProductCard` to bind directly to reactive `useCart` and `useWishlist` hooks with instant visual feedback.
 
-### Fixed
+- Fixed Studio layout collapse by aligning `StudioShell.tsx` with design system classes (`portal-root`, `portal-main`, `portal-topbar`, `page-transition-wrapper`), resolving sidebar occlusion.
+- Fixed typography rendering across `apps/studio` by embedding complete Fontshare `@font-face` definitions (`Clash Display`, `Satoshi`, `Azeret Mono`) directly into `apps/studio/src/app/globals.css`.
+- Upgraded financial velocity chart on `apps/studio/src/app/page.tsx` with high-end interactive SVG bezier curves, multi-point coordinate gradients, Y-axis INR currency markers, and animated hover tooltips.
+- Standardized all Studio pages (`/products`, `/products/new`, `/releases`, `/payouts`, `/analytics`, `/settings`) with unified `.page-container`, `.page-header`, `.page-eyebrow`, and `.stats-bento` architectures.
 - Fixed Node 20 runtime mismatch in CI matrix by standardizing on Node 22+ for native `node:sqlite` compatibility required by `pnpm@11.26.0`.
 - Fixed post-job cache failure in `dependency-audit` job of `security.yml` by removing redundant pnpm store cache step when dependencies are not installed.
 - Fixed `pnpm/action-setup@v4` version conflict (`ERR_PNPM_BAD_PM_VERSION`) across all GitHub Actions workflows by deferring to `package.json`'s `packageManager`.

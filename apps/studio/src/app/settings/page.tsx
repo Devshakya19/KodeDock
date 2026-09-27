@@ -1,16 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import {
   Settings,
   ShieldCheck,
-  User,
   Globe,
   Code2,
-  Bell,
   Check,
   Save,
-  Lock,
 } from "lucide-react";
 
 export default function StudioSettingsPage() {
@@ -42,24 +40,29 @@ export default function StudioSettingsPage() {
   };
 
   return (
-    <div style={{ maxWidth: "860px", margin: "0 auto", paddingBottom: "5rem" }}>
-      {/* ── Header ────────────────────────────────────────────────────────── */}
-      <div style={{ marginBottom: "2rem" }}>
-        <div style={{ display: "inline-flex", alignItems: "center", gap: "0.45rem", background: "rgba(139, 92, 246, 0.12)", border: "1px solid rgba(139, 92, 246, 0.25)", padding: "0.25rem 0.65rem", borderRadius: "9999px", fontSize: "0.72rem", fontFamily: "var(--font-mono)", color: "var(--accent-primary)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.75rem" }}>
-          <Settings size={13} />
+    <div className="page-container" style={{ maxWidth: "880px" }}>
+      {/* ── Page Header ─────────────────────────────────────────────────── */}
+      <motion.div
+        className="page-header"
+        initial={{ opacity: 0, y: -12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <div className="page-eyebrow">
+          <Settings size={12} color="var(--accent-primary)" />
           <span>Creator Preferences</span>
         </div>
-        <h1 style={{ fontFamily: "var(--font-display)", fontSize: "2.25rem", fontWeight: 700, color: "#ffffff", letterSpacing: "-0.02em" }}>
-          Studio Settings
+        <h1 className="page-title">
+          Studio <span style={{ color: "var(--accent-primary)" }}>Settings</span>
         </h1>
-        <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem" }}>
+        <p className="page-subtitle">
           Configure your public seller identity, verified creator credentials, and notification thresholds.
         </p>
-      </div>
+      </motion.div>
 
       <form onSubmit={handleSave}>
         {/* ── Verified Creator Badge Status ─────────────────────────────────── */}
-        <div className="portal-card" style={{ padding: "1.5rem", marginBottom: "1.5rem", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
+        <div className="studio-bezel-card" style={{ padding: "1.5rem", marginBottom: "1.5rem", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
             <div style={{ width: "44px", height: "44px", borderRadius: "50%", background: "rgba(56, 189, 248, 0.12)", border: "1px solid rgba(56, 189, 248, 0.3)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent-cyan)" }}>
               <ShieldCheck size={24} />
@@ -79,7 +82,7 @@ export default function StudioSettingsPage() {
         </div>
 
         {/* ── Public Seller Profile ─────────────────────────────────────────── */}
-        <div className="portal-card" style={{ padding: "1.75rem", marginBottom: "1.5rem" }}>
+        <div className="studio-bezel-card" style={{ padding: "1.75rem", marginBottom: "1.5rem" }}>
           <h2 style={{ fontFamily: "var(--font-display)", fontSize: "1.2rem", fontWeight: 700, color: "#ffffff", marginBottom: "1.25rem" }}>
             Public Seller Profile
           </h2>
@@ -108,7 +111,7 @@ export default function StudioSettingsPage() {
             </div>
           </div>
 
-          <div className="form-group-custom">
+          <div className="form-group-custom" style={{ marginTop: "1rem" }}>
             <label className="form-label-custom">Public Bio</label>
             <textarea
               rows={3}
@@ -119,7 +122,7 @@ export default function StudioSettingsPage() {
             />
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginTop: "1rem" }}>
             <div className="form-group-custom">
               <label className="form-label-custom">GitHub Username</label>
               <div style={{ position: "relative" }}>
@@ -151,7 +154,7 @@ export default function StudioSettingsPage() {
         </div>
 
         {/* ── Notification Preferences ──────────────────────────────────────── */}
-        <div className="portal-card" style={{ padding: "1.75rem", marginBottom: "2rem" }}>
+        <div className="studio-bezel-card" style={{ padding: "1.75rem", marginBottom: "2rem" }}>
           <h2 style={{ fontFamily: "var(--font-display)", fontSize: "1.2rem", fontWeight: 700, color: "#ffffff", marginBottom: "1.25rem" }}>
             Notification Triggers
           </h2>
