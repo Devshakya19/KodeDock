@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
-  Package,
+  Boxes,
   UploadCloud,
   ExternalLink,
   GitBranch,
@@ -57,11 +57,11 @@ export default function StudioProductsPage() {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "1rem" }}>
           <div>
             <div className="page-eyebrow">
-              <Package size={12} color="var(--accent-cyan)" />
+              <Boxes size={13} color="var(--accent-cyan)" />
               <span>Catalog &amp; Package Inventory</span>
             </div>
             <h1 className="page-title">
-              My Listed <span style={{ color: "var(--accent-primary)" }}>Boilerplates</span>
+              Architecture <span style={{ color: "var(--accent-primary)" }}>Catalog</span>
             </h1>
             <p className="page-subtitle">
               Manage software architectures, inspect sales adoption, deploy SemVer version updates, and view live store listings.
@@ -126,9 +126,9 @@ export default function StudioProductsPage() {
       {/* ── Listings Container ────────────────────────────────────────────── */}
       {filteredProducts.length === 0 ? (
         <div className="studio-bezel-card" style={{ textAlign: "center", padding: "4rem 2rem" }}>
-          <Package size={36} color="var(--text-muted)" style={{ margin: "0 auto 1rem" }} />
+          <Boxes size={36} color="var(--text-muted)" style={{ margin: "0 auto 1rem" }} />
           <h2 style={{ fontFamily: "var(--font-display)", color: "#ffffff", fontSize: "1.35rem", marginBottom: "0.5rem" }}>
-            No Software Packages Found
+            No Architectures Found
           </h2>
           <p style={{ color: "var(--text-secondary)", fontSize: "0.88rem", maxWidth: "460px", margin: "0 auto 1.5rem" }}>
             {searchQuery || statusFilter !== "ALL"

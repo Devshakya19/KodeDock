@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
   GitBranch,
-  Sparkles,
   Package,
   CheckCircle2,
   Clock,
@@ -109,7 +108,7 @@ function ReleasesContent() {
               <span>Version Control &amp; Changelogs</span>
             </div>
             <h1 className="page-title">
-              Software <span style={{ color: "var(--accent-primary)" }}>Releases</span>
+              Release <span style={{ color: "var(--accent-primary)" }}>Control</span>
             </h1>
             <p className="page-subtitle">
               Push updates to your codebases. Verified buyers automatically receive update notifications and new download links in their portal.
@@ -119,11 +118,13 @@ function ReleasesContent() {
           <button
             type="button"
             onClick={() => setShowNewModal(true)}
-            className="btn btn-primary"
-            style={{ padding: "0.6rem 1.25rem", fontSize: "0.82rem" }}
+            className="island-cta-btn"
+            style={{ padding: "0.45rem 0.65rem 0.45rem 1.15rem", fontSize: "0.82rem" }}
           >
-            <Plus size={15} />
             <span>New Version Release</span>
+            <div className="island-icon-pod">
+              <Plus size={14} strokeWidth={2} />
+            </div>
           </button>
         </div>
       </div>
@@ -141,11 +142,13 @@ function ReleasesContent() {
           <button
             type="button"
             onClick={() => setShowNewModal(true)}
-            className="btn btn-primary"
-            style={{ display: "inline-flex", padding: "0.6rem 1.25rem" }}
+            className="island-cta-btn"
+            style={{ display: "inline-flex", margin: "0 auto", padding: "0.45rem 0.65rem 0.45rem 1.15rem" }}
           >
-            <Plus size={15} />
             <span>Draft First Release</span>
+            <div className="island-icon-pod">
+              <Plus size={14} strokeWidth={2} />
+            </div>
           </button>
         </div>
       ) : (

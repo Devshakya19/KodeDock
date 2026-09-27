@@ -8,7 +8,7 @@ import {
   TrendingUp,
   Package,
   ShoppingBag,
-  Sparkles,
+  LayoutDashboard,
   ArrowUpRight,
   ShieldCheck,
   Zap,
@@ -195,11 +195,11 @@ export default function StudioDashboardPage() {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "1.25rem" }}>
           <div>
             <div className="page-eyebrow" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
-              <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: "var(--accent-primary)", boxShadow: "0 0 8px var(--accent-primary)" }} />
+              <LayoutDashboard size={13} color="var(--accent-primary)" />
               <span>Architect Command Center • 95% Platform Share</span>
             </div>
             <h1 className="page-title" style={{ fontSize: "2.5rem", letterSpacing: "-0.03em" }}>
-              Creator <span style={{ color: "var(--accent-primary)" }}>Studio</span>
+              Live <span style={{ color: "var(--accent-primary)" }}>Telemetry</span>
             </h1>
             <p className="page-subtitle" style={{ fontSize: "0.95rem" }}>
               Monitor codebase sales telemetry, inspect cryptographic Ed25519 license issuances, and manage payouts.

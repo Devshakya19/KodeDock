@@ -45,6 +45,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Replaced hardcoded "Alex Dev" persona in `/settings` with clean empty states synced to `/api/portal/profile`.
   - Cleared prefilled mock checksum hashes and demo URLs in `/products/new` and `/releases`, providing contextual placeholder guidance.
   - Eradicated dummy `creator@okhdfcbank` UPI string from `/payouts`, establishing authentic verified account workflows.
+- Harmonized Studio sidebar navigation into 3 logical groupings: *Engineering & Blueprints*, *Commerce & Settlements*, and *Preferences*.
+- Removed the redundant "Studio" badge chip next to the KodeDock brand in the sidebar header and simplified breadcrumb root to "KodeDock".
+- Standardized all navigation item labels and matched thin-stroke geometric Lucide icons (`<LayoutDashboard />`, `<Boxes />`, `<UploadCloud />`, `<GitBranch />`, `<Coins />`, `<TrendingUp />`, `<Sliders />`) across both sidebar and page headers, eradicating all AI-slop symbols (`Sparkles`).
+- Rebranded "Publish Codebase" wizard to "Deploy Architecture" with a centered 1040px console, full-width Permlink card, custom form styles, and responsive non-wrapping layout in Step 1 (Blueprint & Software Identity).
+- Redesigned Creator Settings (`/settings`) console into a 1040px double-bezel architecture with real backend synchronization (`PATCH /api/portal/profile`), verified creator standing card, dark luxury toggles, and cryptographic engine status.
 - Fixed Node 20 runtime mismatch in CI matrix by standardizing on Node 22+ for native `node:sqlite` compatibility required by `pnpm@11.26.0`.
 - Fixed post-job cache failure in `dependency-audit` job of `security.yml` by removing redundant pnpm store cache step when dependencies are not installed.
 - Fixed `pnpm/action-setup@v4` version conflict (`ERR_PNPM_BAD_PM_VERSION`) across all GitHub Actions workflows by deferring to `package.json`'s `packageManager`.

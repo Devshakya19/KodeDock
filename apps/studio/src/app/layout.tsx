@@ -3,7 +3,7 @@ import "./globals.css";
 import { StudioShell } from "@/components/StudioShell";
 
 export const metadata: Metadata = {
-  title: "Creator Studio | KodeDock Architecture & Boilerplate Marketplace",
+  title: "KodeDock | Architecture & Marketplace Studio Console",
   description: "Monetize your codebases, publish software boilerplates, manage version releases, and request payouts with 95% creator revenue share.",
   icons: {
     icon: "/favicon.svg",

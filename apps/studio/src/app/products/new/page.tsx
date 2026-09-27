@@ -26,7 +26,6 @@ import {
   Tag,
   AlertCircle,
   Eye,
-  Sparkles,
 } from "lucide-react";
 
 const SUGGESTED_STACKS = [
@@ -225,7 +224,7 @@ export default function DeployArchitecturePage() {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "1rem" }}>
           <div>
             <div className="page-eyebrow" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
-              <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: "var(--accent-cyan)", boxShadow: "0 0 8px var(--accent-cyan)" }} />
+              <UploadCloud size={13} color="var(--accent-cyan)" />
               <span>DEPLOYMENT PIPELINE // SPEC v2.4</span>
             </div>
             <h1 className="page-title" style={{ fontSize: "2.35rem", letterSpacing: "-0.03em" }}>

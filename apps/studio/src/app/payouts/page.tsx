@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import {
   Wallet,
+  Coins,
   ArrowUpRight,
   TrendingUp,
   ShieldCheck,
@@ -97,11 +98,11 @@ export default function PayoutsPage() {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "1rem" }}>
           <div>
             <div className="page-eyebrow">
-              <Wallet size={12} color="var(--status-success)" />
+              <Coins size={13} color="var(--status-success)" />
               <span>Monetization &amp; Banking</span>
             </div>
             <h1 className="page-title">
-              Creator <span style={{ color: "var(--accent-primary)" }}>Payouts</span>
+              Payouts &amp; <span style={{ color: "var(--accent-primary)" }}>Ledger</span>
             </h1>
             <p className="page-subtitle">
               You keep 95% of every codebase sale. Fast disbursement to your UPI ID or Bank Account with automated ledger auditing.
@@ -114,11 +115,13 @@ export default function PayoutsPage() {
               setRequestAmountINR(Math.floor(pendingBalancePaise / 100).toString());
               setShowRequestModal(true);
             }}
-            className="btn btn-primary"
-            style={{ padding: "0.6rem 1.25rem", fontSize: "0.82rem" }}
+            className="island-cta-btn"
+            style={{ padding: "0.45rem 0.65rem 0.45rem 1.15rem", fontSize: "0.82rem" }}
           >
-            <Wallet size={15} />
             <span>Request Payout</span>
+            <div className="island-icon-pod">
+              <Coins size={14} strokeWidth={1.8} />
+            </div>
           </button>
         </div>
       </div>

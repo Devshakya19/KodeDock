@@ -14,7 +14,6 @@ import {
   Package,
   Activity,
   ArrowRight,
-  Sparkles,
 } from "lucide-react";
 import type { CreatorStats, CreatorProduct, CreatorSale } from "@/types/studio";
 
@@ -73,11 +72,11 @@ export default function StudioAnalyticsPage() {
         style={{ marginBottom: "2.25rem" }}
       >
         <div className="page-eyebrow" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
-          <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: "var(--accent-cyan)", boxShadow: "0 0 8px var(--accent-cyan)" }} />
+          <TrendingUp size={13} color="var(--accent-cyan)" />
           <span>Marketplace Discovery &amp; Telemetry</span>
         </div>
         <h1 className="page-title" style={{ fontSize: "2.5rem", letterSpacing: "-0.03em" }}>
-          Conversion &amp; <span style={{ color: "var(--accent-primary)" }}>Traffic Radar</span>
+          Marketplace <span style={{ color: "var(--accent-primary)" }}>Radar</span>
         </h1>
         <p className="page-subtitle" style={{ fontSize: "0.95rem" }}>
           Measure real discovery telemetry, conversion ratios, and developer engagement across your listed architectures.

@@ -96,7 +96,7 @@ export default function StudioSettingsPage() {
         style={{ marginBottom: "2rem" }}
       >
         <div className="page-eyebrow" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
-          <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: "var(--accent-primary)", boxShadow: "0 0 8px var(--accent-primary)" }} />
+          <Sliders size={13} color="var(--accent-primary)" />
           <span>CREATOR PREFERENCES // ACCOUNT CONTROLS</span>
         </div>
         <h1 className="page-title" style={{ fontSize: "2.35rem", letterSpacing: "-0.03em" }}>
