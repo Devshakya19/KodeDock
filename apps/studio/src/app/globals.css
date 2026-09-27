@@ -163,13 +163,14 @@
 
 /* ── Base HTML & Lenis Ultra-Smooth Scroll Architecture ───────────────────── */
 html {
-  scroll-behavior: auto !important;
+  scroll-behavior: smooth;
   text-rendering: optimizeLegibility;
 }
 
 html.lenis,
 html.lenis body {
   height: auto;
+  scroll-behavior: auto !important;
 }
 
 .lenis.lenis-smooth {
@@ -932,6 +933,73 @@ body {
   font-size: 0.75rem;
   color: var(--text-muted);
 }
+
+/* ── Custom Studio Form System (High-End Obsidian Precision) ────────── */
+.form-group-custom {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.35rem;
+  width: 100%;
+}
+
+.form-label-custom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  letter-spacing: 0.01em;
+}
+
+.form-input-custom,
+.form-select-custom,
+select.form-input-custom,
+textarea.form-input-custom {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: rgba(13, 14, 21, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.45);
+}
+
+.form-input-custom:focus,
+select.form-input-custom:focus,
+textarea.form-input-custom:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25), inset 0 2px 4px rgba(0, 0, 0, 0.45);
+  background: rgba(18, 19, 28, 0.98);
+}
+
+.form-input-custom::placeholder,
+textarea.form-input-custom::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+select.form-input-custom {
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238b5cf6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.75rem;
+}
+
+select.form-input-custom option {
+  background: #12131a;
+  color: #ffffff;
+  padding: 0.5rem;
+}
+
 
 /* ── MONO CODE BOX ──────────────────────────────────────────────────────── */
 .mono-box {
@@ -3012,6 +3080,190 @@ body {
   border-radius: var(--radius-xs);
   letter-spacing: 0.02em;
 }
+
+/* ── Agency Hardware Double-Bezel Architecture ──────────────────────────── */
+.double-bezel-chassis {
+  background: rgba(18, 19, 26, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 20px;
+  padding: 6px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65), 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.double-bezel-chassis:hover {
+  border-color: rgba(139, 92, 246, 0.35);
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.75), 0 0 24px rgba(139, 92, 246, 0.12);
+}
+
+.double-bezel-core {
+  background: var(--bg-surface);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* ── Nested Island Button with Circular Icon Pod ───────────────────────── */
+.island-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: linear-gradient(180deg, #9333EA 0%, #7E22CE 100%);
+  color: #ffffff;
+  padding: 0.5rem 0.6rem 0.5rem 1.25rem;
+  border-radius: 9999px;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 16px rgba(147, 51, 234, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.island-cta-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(147, 51, 234, 0.45), 0 0 20px rgba(168, 85, 247, 0.4);
+}
+
+.island-cta-btn:active {
+  transform: scale(0.98);
+}
+
+.island-icon-pod {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.island-cta-btn:hover .island-icon-pod {
+  transform: translateX(2px) translateY(-1px);
+}
+
+/* ── Deploy Architecture Wizard Layout & Live Console ─────────────────── */
+.deploy-wizard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(340px, 1fr);
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 1080px) {
+  .deploy-wizard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.deploy-step-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  background: rgba(18, 19, 26, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.deploy-step-indicator.active {
+  background: rgba(139, 92, 246, 0.12);
+  border-color: rgba(139, 92, 246, 0.45);
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.deploy-step-indicator.completed {
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.05);
+}
+
+.step-number-pod {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.deploy-step-indicator.active .step-number-pod {
+  background: var(--accent-primary);
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.5);
+}
+
+.deploy-step-indicator.completed .step-number-pod {
+  background: var(--status-success);
+  color: #ffffff;
+}
+
+.deploy-step-indicator:not(.active):not(.completed) .step-number-pod {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.live-preview-sticky {
+  position: sticky;
+  top: calc(var(--topbar-height) + 1.5rem);
+  z-index: 10;
+}
+
+.storefront-preview-card {
+  background: #0d0e15;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.7), 0 0 32px rgba(139, 92, 246, 0.08);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.storefront-preview-thumb {
+  width: 100%;
+  height: 180px;
+  background: linear-gradient(135deg, #13141f 0%, #1f1b2e 50%, #0d0e15 100%);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.suggested-tag-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.suggested-tag-btn:hover {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: rgba(139, 92, 246, 0.35);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+
 
 
 

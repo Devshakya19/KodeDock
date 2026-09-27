@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   Package,
-  Sparkles,
+  UploadCloud,
   ExternalLink,
   GitBranch,
   ArrowRight,
@@ -70,20 +70,13 @@ export default function StudioProductsPage() {
 
           <Link
             href="/products/new"
-            className="btn btn-primary"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.5rem",
-              padding: "0.6rem 1.25rem",
-              fontSize: "0.82rem",
-              fontWeight: 600,
-              borderRadius: "var(--radius-md)",
-            }}
+            className="island-cta-btn"
+            style={{ textDecoration: "none" }}
           >
-            <Sparkles size={15} />
-            <span>Publish New Boilerplate</span>
-            <ArrowRight size={14} />
+            <span>Deploy Architecture</span>
+            <div className="island-icon-pod">
+              <UploadCloud size={14} strokeWidth={1.8} />
+            </div>
           </Link>
         </div>
       </motion.div>
@@ -142,9 +135,11 @@ export default function StudioProductsPage() {
               ? "No packages match your current search and filter criteria. Try resetting the filters."
               : "You haven't listed any software boilerplates yet. Monetize your architectures with 95% revenue share."}
           </p>
-          <Link href="/products/new" className="btn btn-primary" style={{ display: "inline-flex", padding: "0.6rem 1.25rem" }}>
-            <Sparkles size={15} />
-            <span>Publish Your First Boilerplate</span>
+          <Link href="/products/new" className="island-cta-btn" style={{ textDecoration: "none" }}>
+            <span>Deploy Your First Architecture</span>
+            <div className="island-icon-pod">
+              <UploadCloud size={14} strokeWidth={1.8} />
+            </div>
           </Link>
         </div>
       ) : (

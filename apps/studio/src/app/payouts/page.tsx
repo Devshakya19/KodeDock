@@ -20,7 +20,7 @@ export default function PayoutsPage() {
   const [payouts, setPayouts] = useState<CreatorPayout[]>([]);
   const [pendingBalancePaise, setPendingBalancePaise] = useState<number>(0);
   const [totalWithdrawnPaise, setTotalWithdrawnPaise] = useState<number>(0);
-  const [upiId, setUpiId] = useState<string>("creator@okhdfcbank");
+  const [upiId, setUpiId] = useState<string>("");
   const [isEditingUpi, setIsEditingUpi] = useState<boolean>(false);
   const [showRequestModal, setShowRequestModal] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -43,6 +43,10 @@ export default function PayoutsPage() {
 
   const handleRequestPayout = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!upiId.trim()) {
+      setStatusMessage({ text: "Please enter and configure your destination UPI ID first.", success: false });
+      return;
+    }
     const amountINR = parseInt(requestAmountINR, 10);
     if (isNaN(amountINR) || amountINR <= 0) {
       setStatusMessage({ text: "Please enter a valid payout amount.", success: false });
@@ -212,17 +216,32 @@ export default function PayoutsPage() {
                 className="form-input-custom"
                 style={{ marginTop: "0.35rem", maxWidth: "320px", fontSize: "0.85rem" }}
               />
-            ) : (
+            ) : upiId ? (
               <div style={{ fontFamily: "var(--font-mono)", fontSize: "1.05rem", fontWeight: 700, color: "#ffffff", marginTop: "0.25rem" }}>
                 {upiId}
+              </div>
+            ) : (
+              <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginTop: "0.25rem" }}>
+                No payout destination linked. Click &quot;Update Account&quot; to set your UPI address.
               </div>
             )}
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", fontSize: "0.75rem", color: "var(--status-success)" }}>
-            <CheckCircle2 size={15} />
-            <span>Verified</span>
-          </div>
+          {upiId ? (
+            <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", fontSize: "0.75rem", color: "var(--status-success)" }}>
+              <CheckCircle2 size={15} />
+              <span>Verified</span>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setIsEditingUpi(true)}
+              className="btn btn-secondary"
+              style={{ padding: "0.35rem 0.75rem", fontSize: "0.75rem" }}
+            >
+              Add UPI
+            </button>
+          )}
         </div>
       </div>
 

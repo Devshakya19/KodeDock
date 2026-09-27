@@ -12,11 +12,11 @@ import {
 } from "lucide-react";
 
 export default function StudioSettingsPage() {
-  const [displayName, setDisplayName] = useState("Alex Dev");
-  const [creatorEmail, setCreatorEmail] = useState("creator@kodedock.local");
-  const [bio, setBio] = useState("Full-stack systems architect building production-ready Next.js and Go microservices.");
-  const [githubHandle, setGithubHandle] = useState("alexdev");
-  const [twitterHandle, setTwitterHandle] = useState("alex_dev");
+  const [displayName, setDisplayName] = useState("");
+  const [creatorEmail, setCreatorEmail] = useState("");
+  const [bio, setBio] = useState("");
+  const [githubHandle, setGithubHandle] = useState("");
+  const [twitterHandle, setTwitterHandle] = useState("");
   const [notifyOnSale, setNotifyOnSale] = useState(true);
   const [notifyOnPayout, setNotifyOnPayout] = useState(true);
   const [isSaved, setIsSaved] = useState(false);
@@ -28,6 +28,9 @@ export default function StudioSettingsPage() {
         if (d.success && d.data) {
           if (d.data.name) setDisplayName(d.data.name);
           if (d.data.email) setCreatorEmail(d.data.email);
+          if (d.data.bio) setBio(d.data.bio);
+          if (d.data.githubHandle) setGithubHandle(d.data.githubHandle);
+          if (d.data.twitterHandle) setTwitterHandle(d.data.twitterHandle);
         }
       })
       .catch(() => {});
@@ -95,6 +98,7 @@ export default function StudioSettingsPage() {
                 required
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
+                placeholder="e.g. Acme Systems or Jane Developer"
                 className="form-input-custom"
               />
             </div>
@@ -106,6 +110,7 @@ export default function StudioSettingsPage() {
                 required
                 value={creatorEmail}
                 onChange={(e) => setCreatorEmail(e.target.value)}
+                placeholder="creator@yourdomain.com"
                 className="form-input-custom"
               />
             </div>
@@ -117,6 +122,7 @@ export default function StudioSettingsPage() {
               rows={3}
               value={bio}
               onChange={(e) => setBio(e.target.value)}
+              placeholder="Describe your engineering stack, design standards, microservices, and technical expertise..."
               className="form-input-custom"
               style={{ resize: "vertical" }}
             />
@@ -130,6 +136,7 @@ export default function StudioSettingsPage() {
                   type="text"
                   value={githubHandle}
                   onChange={(e) => setGithubHandle(e.target.value)}
+                  placeholder="github-username"
                   className="form-input-custom"
                   style={{ paddingLeft: "2.2rem" }}
                 />
@@ -144,6 +151,7 @@ export default function StudioSettingsPage() {
                   type="text"
                   value={twitterHandle}
                   onChange={(e) => setTwitterHandle(e.target.value)}
+                  placeholder="https://yourportfolio.dev"
                   className="form-input-custom"
                   style={{ paddingLeft: "2.2rem" }}
                 />

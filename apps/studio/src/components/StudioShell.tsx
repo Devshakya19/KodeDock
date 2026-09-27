@@ -17,6 +17,7 @@ import {
   ChevronRight,
   ShieldCheck,
   Store,
+  UploadCloud,
 } from "lucide-react";
 
 interface StudioShellProps {
@@ -26,7 +27,7 @@ interface StudioShellProps {
 const NAV_ITEMS = [
   { href: "/",             label: "Overview",            icon: LayoutDashboard, section: "main" },
   { href: "/products",     label: "My Boilerplates",     icon: Package,         section: "main" },
-  { href: "/products/new", label: "Publish Codebase",    icon: Sparkles,        section: "main" },
+  { href: "/products/new", label: "Deploy Architecture", icon: UploadCloud,     section: "main" },
   { href: "/releases",     label: "Version Releases",    icon: GitBranch,       section: "main" },
   { href: "/payouts",      label: "Payouts & Revenue",   icon: Wallet,          section: "finance" },
   { href: "/analytics",    label: "Sales Analytics",     icon: TrendingUp,      section: "finance" },
@@ -48,13 +49,13 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
       try {
         const Lenis = (await import("lenis")).default;
         const lenis = new Lenis({
-          duration: 1.1,
-          easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+          duration: 0.85,
+          easing: (t: number) => 1 - Math.pow(1 - t, 3),
           orientation: "vertical",
           gestureOrientation: "vertical",
           smoothWheel: true,
-          wheelMultiplier: 1.0,
-          touchMultiplier: 1.6,
+          wheelMultiplier: 1.15,
+          touchMultiplier: 1.0,
           infinite: false,
         });
         lenisRef.current = lenis;
@@ -192,9 +193,11 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
                       style={{
                         background: "rgba(139, 92, 246, 0.2)",
                         color: "var(--accent-primary)",
+                        letterSpacing: "0.05em",
+                        fontWeight: 700,
                       }}
                     >
-                      NEW
+                      SHIP
                     </span>
                   )}
                 </motion.div>
@@ -321,11 +324,13 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
             </div>
             <Link
               href="/products/new"
-              className="btn btn-primary"
-              style={{ padding: "0.45rem 0.95rem", fontSize: "0.78rem" }}
+              className="island-cta-btn"
+              style={{ padding: "0.35rem 0.5rem 0.35rem 0.95rem", fontSize: "0.78rem" }}
             >
-              <Sparkles size={13} />
-              <span>Publish Template</span>
+              <span>Deploy Architecture</span>
+              <div className="island-icon-pod" style={{ width: "22px", height: "22px" }}>
+                <UploadCloud size={12} strokeWidth={1.8} />
+              </div>
             </Link>
           </div>
         </header>

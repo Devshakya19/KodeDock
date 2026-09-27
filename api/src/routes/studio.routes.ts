@@ -71,7 +71,7 @@ export async function handleStudioRoutes(
           activeListingsCount: activeListings,
           pendingPayoutPaise: pendingPayout,
           formattedPendingPayout: `₹${(pendingPayout / 100).toLocaleString("en-IN")}`,
-          viewsCount: Math.max(activeListings * 120, 240),
+          viewsCount: 0,
         },
       };
       res.end(JSON.stringify(response));

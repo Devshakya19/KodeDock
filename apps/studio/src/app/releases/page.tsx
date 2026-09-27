@@ -29,7 +29,7 @@ function ReleasesContent() {
 
   // Form State
   const [selectedProductId, setSelectedProductId] = useState<string>(preselectedProductId);
-  const [newVersion, setNewVersion] = useState("v1.1.0");
+  const [newVersion, setNewVersion] = useState("");
   const [storageKey, setStorageKey] = useState("");
   const [checksumSha256, setChecksumSha256] = useState("");
   const [changelog, setChangelog] = useState("");
