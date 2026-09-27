@@ -7,17 +7,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { getAutoAvatar } from "@/lib/avatars";
 import {
   LayoutDashboard,
-  Package,
-  Sparkles,
+  Boxes,
+  UploadCloud,
   GitBranch,
-  Wallet,
+  Coins,
   TrendingUp,
-  Settings,
+  Sliders,
   ExternalLink,
   ChevronRight,
   ShieldCheck,
   Store,
-  UploadCloud,
 } from "lucide-react";
 
 interface StudioShellProps {
@@ -25,13 +24,13 @@ interface StudioShellProps {
 }
 
 const NAV_ITEMS = [
-  { href: "/",             label: "Overview",            icon: LayoutDashboard, section: "main" },
-  { href: "/products",     label: "My Boilerplates",     icon: Package,         section: "main" },
-  { href: "/products/new", label: "Deploy Architecture", icon: UploadCloud,     section: "main" },
-  { href: "/releases",     label: "Version Releases",    icon: GitBranch,       section: "main" },
-  { href: "/payouts",      label: "Payouts & Revenue",   icon: Wallet,          section: "finance" },
-  { href: "/analytics",    label: "Sales Analytics",     icon: TrendingUp,      section: "finance" },
-  { href: "/settings",     label: "Studio Settings",     icon: Settings,        section: "account" },
+  { href: "/",             label: "Live Telemetry",       icon: LayoutDashboard, section: "engineering" },
+  { href: "/products",     label: "Architecture Catalog", icon: Boxes,           section: "engineering" },
+  { href: "/products/new", label: "Deploy Architecture",  icon: UploadCloud,     section: "engineering" },
+  { href: "/releases",     label: "Release Control",      icon: GitBranch,       section: "engineering" },
+  { href: "/payouts",      label: "Payouts & Ledger",     icon: Coins,           section: "financials" },
+  { href: "/analytics",    label: "Marketplace Radar",    icon: TrendingUp,      section: "financials" },
+  { href: "/settings",     label: "Studio Settings",      icon: Sliders,         section: "preferences" },
 ];
 
 export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
@@ -125,9 +124,9 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
     item.href === "/" ? pathname === "/" : pathname.startsWith(item.href)
   ) ?? NAV_ITEMS[0];
 
-  const mainItems    = NAV_ITEMS.filter((item) => item.section === "main");
-  const financeItems = NAV_ITEMS.filter((item) => item.section === "finance");
-  const accountItems = NAV_ITEMS.filter((item) => item.section === "account");
+  const engineeringItems = NAV_ITEMS.filter((item) => item.section === "engineering");
+  const financialItems   = NAV_ITEMS.filter((item) => item.section === "financials");
+  const preferenceItems  = NAV_ITEMS.filter((item) => item.section === "preferences");
 
   return (
     <div className="portal-root">
@@ -137,28 +136,18 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
 
       {/* ── Fixed Sidebar ─────────────────────────────────────────────────── */}
       <aside className="portal-sidebar">
-        {/* Brand & Studio Chip */}
+        {/* Brand Header (Clean Logo without Studio chip) */}
         <div className="sidebar-brand">
           <Link href="/" className="sidebar-logo-link">
             <img src="/kd.svg" alt="KodeDock Logo" className="sidebar-logo-img" />
             <span className="sidebar-logo-name">KodeDock</span>
           </Link>
-          <span
-            className="sidebar-portal-chip"
-            style={{
-              color: "var(--accent-primary)",
-              background: "rgba(139, 92, 246, 0.15)",
-              border: "1px solid rgba(139, 92, 246, 0.35)",
-            }}
-          >
-            Studio
-          </span>
         </div>
 
         {/* Navigation Sections */}
         <nav className="sidebar-nav" aria-label="Studio navigation">
-          <span className="sidebar-nav-section-label">Management</span>
-          {mainItems.map((item) => {
+          <span className="sidebar-nav-section-label">Engineering &amp; Blueprints</span>
+          {engineeringItems.map((item) => {
             const Icon = item.icon;
             const isActive =
               item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
@@ -206,9 +195,9 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
           })}
 
           <span className="sidebar-nav-section-label" style={{ marginTop: "0.75rem" }}>
-            Financials (95% Share)
+            Commerce &amp; Settlements
           </span>
-          {financeItems.map((item) => {
+          {financialItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname.startsWith(item.href);
 
@@ -235,9 +224,9 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
           })}
 
           <span className="sidebar-nav-section-label" style={{ marginTop: "0.75rem" }}>
-            Creator Identity
+            Preferences
           </span>
-          {accountItems.map((item) => {
+          {preferenceItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname.startsWith(item.href);
 
@@ -312,7 +301,7 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
       <div className="portal-main">
         <header className="portal-topbar">
           <div className="topbar-breadcrumb" aria-label="Breadcrumb">
-            <span className="crumb-root">Creator Studio</span>
+            <span className="crumb-root">KodeDock</span>
             <ChevronRight size={13} className="crumb-sep" aria-hidden="true" />
             <span className="crumb-current">{activeItem.label}</span>
           </div>
