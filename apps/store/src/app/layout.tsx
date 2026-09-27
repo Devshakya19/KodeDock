@@ -3,6 +3,7 @@ import React from "react";
 import "./globals.css";
 import { StoreNavbar } from "../components/layout/StoreNavbar";
 import { StoreFooter } from "../components/layout/StoreFooter";
+import { StoreProvider } from "../context/StoreContext";
 
 export const metadata: Metadata = {
   title: "KodeDock Store | The Verified Codebase & Architecture Marketplace",
@@ -25,9 +26,11 @@ export default function RootLayout({
         <link rel="stylesheet" href="/fonts/fonts.css" />
       </head>
       <body>
-        <StoreNavbar />
-        <main style={{ flex: 1 }}>{children}</main>
-        <StoreFooter />
+        <StoreProvider>
+          <StoreNavbar />
+          <main style={{ flex: 1 }}>{children}</main>
+          <StoreFooter />
+        </StoreProvider>
       </body>
     </html>
   );

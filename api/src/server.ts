@@ -4,6 +4,7 @@ import { auth, initAuthDatabase } from "@kodedock/backend";
 import { handleCustomAuthRoutes } from "./routes/oauth.routes";
 import { handleProductRoutes } from "./routes/product.routes";
 import { handlePortalRoutes } from "./routes/portal.routes";
+import { handleCheckoutRoutes } from "./routes/checkout.routes";
 import { requireAuth, requireRole } from "./middlewares/auth.middleware";
 import type { ApiResponse } from "@kodedock/types";
 
@@ -65,6 +66,10 @@ export const server = http.createServer(async (req, res) => {
   // 4. Buyer Developer Portal Routes (/api/portal/*)
   const portalHandled = await handlePortalRoutes(req, res, pathname, url.searchParams);
   if (portalHandled) return;
+
+  // 5. Checkout & Order Creation Routes (/api/checkout/*)
+  const checkoutHandled = await handleCheckoutRoutes(req, res, pathname, url.searchParams);
+  if (checkoutHandled) return;
 
   // 3. Better Auth fallback routes (/api/auth/*)
   if (pathname.startsWith("/api/auth")) {

@@ -15,6 +15,7 @@ import {
   Check,
   FileCode,
 } from "lucide-react";
+import { useStore } from "../../context/StoreContext";
 
 interface PurchasePanelProps {
   product: ProductDetail;
@@ -24,7 +25,10 @@ export const PurchasePanel: React.FC<PurchasePanelProps> = ({ product }) => {
   const [selectedLicense, setSelectedLicense] = useState<"STANDARD" | "EXTENDED">(
     "STANDARD"
   );
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const { addToCart, toggleWishlist, isInWishlist, isInCart } = useStore();
+  const isWishlisted = isInWishlist(product.id);
+  const inCart = isInCart(product.id);
+  const [justAddedCart, setJustAddedCart] = useState(false);
 
   const standardPriceText =
     product.formatted_price ||
@@ -157,7 +161,7 @@ export const PurchasePanel: React.FC<PurchasePanelProps> = ({ product }) => {
         <div style={{ display: "flex", gap: "0.5rem" }}>
           <button
             type="button"
-            onClick={() => setIsWishlisted(!isWishlisted)}
+            onClick={() => toggleWishlist(product)}
             className="btn btn-secondary"
             style={{ flex: 1, padding: "0.65rem", fontSize: "0.82rem" }}
           >
@@ -169,13 +173,23 @@ export const PurchasePanel: React.FC<PurchasePanelProps> = ({ product }) => {
             <span>{isWishlisted ? "Wishlisted" : "Add to Wishlist"}</span>
           </button>
 
-          <Link
-            href={`/cart?add=${product.id}`}
+          <button
+            type="button"
+            onClick={() => {
+              addToCart(product, selectedLicense);
+              setJustAddedCart(true);
+              setTimeout(() => setJustAddedCart(false), 2000);
+            }}
             className="btn btn-secondary btn-icon"
-            title="Add to shopping cart"
+            style={{
+              borderColor: inCart || justAddedCart ? "rgba(56, 189, 248, 0.4)" : undefined,
+              color: inCart || justAddedCart ? "var(--accent-cyan)" : undefined,
+            }}
+            title={justAddedCart ? "Added to Cart!" : inCart ? "Already in Cart" : "Add to shopping cart"}
+            aria-label="Add to shopping cart"
           >
-            <ShoppingCart size={16} />
-          </Link>
+            {justAddedCart ? <Check size={16} color="var(--accent-cyan)" /> : <ShoppingCart size={16} />}
+          </button>
         </div>
       </div>
 

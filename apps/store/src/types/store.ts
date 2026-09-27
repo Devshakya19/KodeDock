@@ -49,3 +49,31 @@ export interface ProductDetail extends StoreProduct {
     } | null;
   };
 }
+
+export interface CartItem {
+  id: string; // unique item id in cart (e.g. cart_xxx)
+  productId: string;
+  slug: string;
+  title: string;
+  tagline: string;
+  category: string;
+  thumbnail_url: string;
+  license_type: "STANDARD" | "EXTENDED";
+  unit_price: number; // in paise
+  formatted_price: string;
+  standard_price: number;
+  extended_price?: number | null;
+}
+
+export interface WishlistItem {
+  productId: string;
+  slug: string;
+  title: string;
+  tagline: string;
+  category: string;
+  thumbnail_url: string;
+  standard_price: number; // in paise
+  formatted_price: string;
+  tech_stack: string[];
+  added_at: string;
+}

@@ -3,13 +3,23 @@
 import React from "react";
 import Link from "next/link";
 import type { StoreProduct } from "../../types/store";
-import { ShieldCheck, ArrowUpRight } from "lucide-react";
+import { ShieldCheck, ArrowUpRight, Heart } from "lucide-react";
+import { useStore } from "../../context/StoreContext";
 
 interface ProductCardProps {
   product: StoreProduct;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+  const { toggleWishlist, isInWishlist } = useStore();
+  const wishlisted = isInWishlist(product.id);
+
+  const handleWishlistClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleWishlist(product);
+  };
+
   return (
     <Link href={`/product/${product.slug}`} className="store-product-card">
       {/* 16:9 Thumbnail Preview */}
@@ -23,6 +33,21 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <span className="card-category-badge">
           {product.category || "Software"}
         </span>
+
+        {/* Quick Wishlist Action */}
+        <button
+          type="button"
+          onClick={handleWishlistClick}
+          className="card-quick-wishlist-btn"
+          aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
+          title={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
+        >
+          <Heart
+            size={14}
+            color={wishlisted ? "var(--status-danger)" : "#ffffff"}
+            fill={wishlisted ? "var(--status-danger)" : "none"}
+          />
+        </button>
       </div>
 
       {/* Card Content Body */}

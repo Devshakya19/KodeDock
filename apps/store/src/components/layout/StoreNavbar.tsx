@@ -9,7 +9,7 @@ import {
   ShoppingCart,
   Heart,
   Boxes,
-  Newspaper,
+  Radio,
   ChevronDown,
   Package,
   Key,
@@ -18,12 +18,14 @@ import {
   User,
   LogOut,
 } from "lucide-react";
+import { useStore } from "../../context/StoreContext";
 
 export const StoreNavbar: React.FC = () => {
   const pathname = usePathname();
   const [searchQuery, setSearchQuery] = useState("");
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { cartCount, wishlistCount, isHydrated } = useStore();
 
   const [user, setUser] = useState<{
     id?: string;
@@ -79,7 +81,7 @@ export const StoreNavbar: React.FC = () => {
               <span className="store-chip">Store</span>
             </Link>
 
-            {/* Store Navigation Tabs with updated developer icons */}
+            {/* Store Navigation Tabs with developer Radar icon */}
             <nav className="store-nav-tabs" aria-label="Store navigation">
               <Link
                 href="/"
@@ -92,8 +94,8 @@ export const StoreNavbar: React.FC = () => {
                 href="/news"
                 className={`store-nav-tab${pathname === "/news" ? " active" : ""}`}
               >
-                <Newspaper size={16} aria-hidden="true" />
-                <span>News</span>
+                <Radio size={15} aria-hidden="true" />
+                <span>Radar</span>
               </Link>
             </nav>
           </div>
@@ -116,24 +118,36 @@ export const StoreNavbar: React.FC = () => {
               </div>
             </form>
 
-            {/* Wishlist Link */}
+            {/* Wishlist Link with Live Badge */}
             <Link
               href="/wishlist"
-              className="btn btn-ghost btn-icon"
+              className={`btn btn-ghost btn-icon${pathname === "/wishlist" ? " active-nav-tab" : ""}`}
+              style={{ position: "relative" }}
               title="View Wishlist"
               aria-label="Wishlist"
             >
-              <Heart size={18} />
+              <Heart
+                size={18}
+                color={isHydrated && wishlistCount > 0 ? "var(--status-danger)" : "currentColor"}
+                fill={isHydrated && wishlistCount > 0 ? "var(--status-danger)" : "none"}
+              />
+              {isHydrated && wishlistCount > 0 && (
+                <span className="nav-badge-counter badge-danger">{wishlistCount}</span>
+              )}
             </Link>
 
-            {/* Cart Link */}
+            {/* Cart Link with Live Badge */}
             <Link
               href="/cart"
-              className="btn btn-ghost btn-icon"
+              className={`btn btn-ghost btn-icon${pathname === "/cart" ? " active-nav-tab" : ""}`}
+              style={{ position: "relative" }}
               title="Shopping Cart"
               aria-label="Shopping Cart"
             >
               <ShoppingCart size={18} />
+              {isHydrated && cartCount > 0 && (
+                <span className="nav-badge-counter badge-cyan">{cartCount}</span>
+              )}
             </Link>
 
             {/* User Profile Component (Replaces Portal & Studio buttons) */}
