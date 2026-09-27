@@ -3082,7 +3082,8 @@ select.form-input-custom option {
 }
 
 /* ── Agency Hardware Double-Bezel Architecture ──────────────────────────── */
-.double-bezel-chassis {
+.double-bezel-chassis,
+.double-bezel-card {
   background: rgba(18, 19, 26, 0.45);
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 20px;
@@ -3091,12 +3092,14 @@ select.form-input-custom option {
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.double-bezel-chassis:hover {
+.double-bezel-chassis:hover,
+.double-bezel-card:hover {
   border-color: rgba(139, 92, 246, 0.35);
   box-shadow: 0 16px 44px rgba(0, 0, 0, 0.75), 0 0 24px rgba(139, 92, 246, 0.12);
 }
 
-.double-bezel-core {
+.double-bezel-core,
+.double-bezel-inner {
   background: var(--bg-surface);
   border: 1px solid rgba(255, 255, 255, 0.04);
   border-radius: 14px;
