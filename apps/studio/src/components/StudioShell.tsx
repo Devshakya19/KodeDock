@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { getAutoAvatar } from "@/lib/avatars";
 import {
   LayoutDashboard,
@@ -120,9 +120,17 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
       .catch(() => {});
   }, []);
 
-  const activeItem = NAV_ITEMS.find((item) =>
-    item.href === "/" ? pathname === "/" : pathname.startsWith(item.href)
-  ) ?? NAV_ITEMS[0];
+  const isRouteActive = (itemHref: string, currentPath: string): boolean => {
+    if (itemHref === "/") {
+      return currentPath === "/";
+    }
+    if (itemHref === "/products") {
+      return currentPath === "/products" || (currentPath.startsWith("/products/") && !currentPath.startsWith("/products/new"));
+    }
+    return currentPath === itemHref || currentPath.startsWith(itemHref + "/");
+  };
+
+  const activeItem = NAV_ITEMS.find((item) => isRouteActive(item.href, pathname)) ?? NAV_ITEMS[0];
 
   const engineeringItems = NAV_ITEMS.filter((item) => item.section === "engineering");
   const financialItems   = NAV_ITEMS.filter((item) => item.section === "financials");
@@ -149,8 +157,7 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
           <span className="sidebar-nav-section-label">Engineering &amp; Blueprints</span>
           {engineeringItems.map((item) => {
             const Icon = item.icon;
-            const isActive =
-              item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+            const isActive = isRouteActive(item.href, pathname);
             const badge =
               item.href === "/products"
                 ? activeProductsCount || undefined
@@ -158,17 +165,12 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
 
             return (
               <Link key={item.href} href={item.href} style={{ textDecoration: "none" }}>
-                <motion.div
-                  className={`nav-item${isActive ? " active" : ""}`}
-                  whileHover={{ x: 4 }}
-                  whileTap={{ scale: 0.96 }}
-                  transition={{ duration: 0.18, ease: "easeOut" }}
-                >
+                <div className={`nav-item${isActive ? " active" : ""}`}>
                   {isActive && (
                     <motion.div
                       layoutId="sidebarActivePill"
                       className="nav-active-pill"
-                      transition={{ type: "spring", stiffness: 420, damping: 32 }}
+                      transition={{ type: "spring", stiffness: 460, damping: 35 }}
                     />
                   )}
                   <Icon size={16} className="nav-item-icon" aria-hidden="true" />
@@ -189,7 +191,7 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
                       SHIP
                     </span>
                   )}
-                </motion.div>
+                </div>
               </Link>
             );
           })}
@@ -199,26 +201,21 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
           </span>
           {financialItems.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname.startsWith(item.href);
+            const isActive = isRouteActive(item.href, pathname);
 
             return (
               <Link key={item.href} href={item.href} style={{ textDecoration: "none" }}>
-                <motion.div
-                  className={`nav-item${isActive ? " active" : ""}`}
-                  whileHover={{ x: 4 }}
-                  whileTap={{ scale: 0.96 }}
-                  transition={{ duration: 0.18, ease: "easeOut" }}
-                >
+                <div className={`nav-item${isActive ? " active" : ""}`}>
                   {isActive && (
                     <motion.div
                       layoutId="sidebarActivePill"
                       className="nav-active-pill"
-                      transition={{ type: "spring", stiffness: 420, damping: 32 }}
+                      transition={{ type: "spring", stiffness: 460, damping: 35 }}
                     />
                   )}
                   <Icon size={16} className="nav-item-icon" aria-hidden="true" />
                   <span>{item.label}</span>
-                </motion.div>
+                </div>
               </Link>
             );
           })}
@@ -228,26 +225,21 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
           </span>
           {preferenceItems.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname.startsWith(item.href);
+            const isActive = isRouteActive(item.href, pathname);
 
             return (
               <Link key={item.href} href={item.href} style={{ textDecoration: "none" }}>
-                <motion.div
-                  className={`nav-item${isActive ? " active" : ""}`}
-                  whileHover={{ x: 4 }}
-                  whileTap={{ scale: 0.96 }}
-                  transition={{ duration: 0.18, ease: "easeOut" }}
-                >
+                <div className={`nav-item${isActive ? " active" : ""}`}>
                   {isActive && (
                     <motion.div
                       layoutId="sidebarActivePill"
                       className="nav-active-pill"
-                      transition={{ type: "spring", stiffness: 420, damping: 32 }}
+                      transition={{ type: "spring", stiffness: 460, damping: 35 }}
                     />
                   )}
                   <Icon size={16} className="nav-item-icon" aria-hidden="true" />
                   <span>{item.label}</span>
-                </motion.div>
+                </div>
               </Link>
             );
           })}
@@ -324,18 +316,17 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
           </div>
         </header>
 
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.main
+        <main className="page-transition-wrapper">
+          <motion.div
             key={pathname}
-            className="page-transition-wrapper"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] as any }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.16, ease: "easeOut" }}
+            style={{ width: "100%", flex: 1, display: "flex", flexDirection: "column" }}
           >
             {children}
-          </motion.main>
-        </AnimatePresence>
+          </motion.div>
+        </main>
       </div>
     </div>
   );

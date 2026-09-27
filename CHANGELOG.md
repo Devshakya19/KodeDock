@@ -46,9 +46,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Cleared prefilled mock checksum hashes and demo URLs in `/products/new` and `/releases`, providing contextual placeholder guidance.
   - Eradicated dummy `creator@okhdfcbank` UPI string from `/payouts`, establishing authentic verified account workflows.
 - Harmonized Studio sidebar navigation into 3 logical groupings: *Engineering & Blueprints*, *Commerce & Settlements*, and *Preferences*.
+- Fixed sidebar route matching logic (`isRouteActive`), preventing `/products` from falsely matching `/products/new` and resolving duplicate active indicators and Framer Motion `layoutId="sidebarActivePill"` collisions.
+- Eliminated layout shifting and content jumps on sidebar navigation clicks by replacing `<AnimatePresence mode="wait">` with instant DOM mounting and enforcing `html { scrollbar-gutter: stable; overflow-y: scroll; }`.
+- Restructured Deploy Architecture (`/products/new`) into an agency-tier 1380px side-by-side workspace: 4-step configuration chassis on the left and sticky live storefront comp preview on the right.
+- Replaced generic icon in Architecture Preview card with official `/kd.svg` brand logo with ambient purple drop-shadow.
 - Removed the redundant "Studio" badge chip next to the KodeDock brand in the sidebar header and simplified breadcrumb root to "KodeDock".
 - Standardized all navigation item labels and matched thin-stroke geometric Lucide icons (`<LayoutDashboard />`, `<Boxes />`, `<UploadCloud />`, `<GitBranch />`, `<Coins />`, `<TrendingUp />`, `<Sliders />`) across both sidebar and page headers, eradicating all AI-slop symbols (`Sparkles`).
-- Rebranded "Publish Codebase" wizard to "Deploy Architecture" with a centered 1040px console, full-width Permlink card, custom form styles, and responsive non-wrapping layout in Step 1 (Blueprint & Software Identity).
+- Rebranded "Publish Codebase" wizard to "Deploy Architecture" with full-width Permlink card, custom form styles, and responsive non-wrapping layout in Step 1 (Blueprint & Software Identity).
 - Redesigned Creator Settings (`/settings`) console into a 1040px double-bezel architecture with real backend synchronization (`PATCH /api/portal/profile`), verified creator standing card, dark luxury toggles, and cryptographic engine status.
 - Fixed Node 20 runtime mismatch in CI matrix by standardizing on Node 22+ for native `node:sqlite` compatibility required by `pnpm@11.26.0`.
 - Fixed post-job cache failure in `dependency-audit` job of `security.yml` by removing redundant pnpm store cache step when dependencies are not installed.

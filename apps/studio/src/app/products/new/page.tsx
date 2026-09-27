@@ -199,7 +199,7 @@ export default function DeployArchitecturePage() {
   const extPriceNum = parseInt(extendedPriceINR || "0", 10);
 
   return (
-    <div className="page-container" style={{ maxWidth: "1040px", margin: "0 auto", paddingBottom: "6rem" }}>
+    <div className="page-container" style={{ maxWidth: "1380px", margin: "0 auto", paddingBottom: "6rem" }}>
       {/* ── Top Navigation & Eyebrow ───────────────────────────────────────── */}
       <div style={{ marginBottom: "2rem" }}>
         <Link
@@ -318,9 +318,12 @@ export default function DeployArchitecturePage() {
         })}
       </div>
 
-      {/* ── Main Hardware Chassis ─────────────────────────────────────────── */}
-      <div className="double-bezel-chassis" style={{ marginBottom: "2rem" }}>
-        <div className="double-bezel-core" style={{ padding: "2.25rem 2.5rem" }}>
+      {/* ── Main Workspace Grid (Side by Side) ─────────────────────────── */}
+      <div className="deploy-workspace-grid">
+        {/* ── Left Column: Form & Step Chassis ────────────────────────── */}
+        <div className="deploy-form-column">
+          <div className="double-bezel-chassis">
+            <div className="double-bezel-core" style={{ padding: "2.25rem 2.5rem" }}>
           {errorMessage && (
             <div style={{ background: "rgba(239, 68, 68, 0.12)", border: "1px solid rgba(239, 68, 68, 0.3)", color: "var(--status-danger)", padding: "0.85rem 1rem", borderRadius: "10px", fontSize: "0.82rem", marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.65rem" }}>
               <AlertCircle size={16} style={{ flexShrink: 0 }} />
@@ -851,22 +854,25 @@ export default function DeployArchitecturePage() {
           </div>
         </div>
       </div>
+    </div>
 
-      {/* ── Live Marketplace Storefront Comp Preview ───────────────────────── */}
-      <div style={{ background: "rgba(18, 19, 26, 0.6)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "16px", padding: "1.75rem", overflow: "hidden" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: "var(--status-success)" }} />
-            <span style={{ fontSize: "0.78rem", color: "var(--text-muted)", fontFamily: "var(--font-mono)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-              Live Storefront Card Telemetry
+    {/* ── Right Column: Sticky Live Storefront Comp Preview & Audit Checklist ── */}
+    <div className="deploy-preview-column">
+      <div className="sticky-preview-wrapper">
+        {/* Live Marketplace Storefront Comp Preview */}
+        <div style={{ background: "rgba(18, 19, 26, 0.75)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "16px", padding: "1.5rem" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.1rem" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: "var(--status-success)", boxShadow: "0 0 8px var(--status-success)" }} />
+              <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontFamily: "var(--font-mono)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                Live Storefront Telemetry
+              </span>
+            </div>
+            <span style={{ fontSize: "0.68rem", color: "var(--accent-cyan)", fontFamily: "var(--font-mono)", fontWeight: 700 }}>
+              REAL-TIME PREVIEW
             </span>
           </div>
-          <span style={{ fontSize: "0.72rem", color: "var(--accent-cyan)", fontFamily: "var(--font-mono)" }}>
-            REAL-TIME PREVIEW
-          </span>
-        </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1.5rem", alignItems: "center" }}>
           {/* Card Preview Component */}
           <div
             style={{
@@ -874,13 +880,13 @@ export default function DeployArchitecturePage() {
               border: "1px solid rgba(255, 255, 255, 0.12)",
               borderRadius: "14px",
               overflow: "hidden",
-              boxShadow: "0 12px 32px rgba(0, 0, 0, 0.6)",
-              maxWidth: "420px",
+              boxShadow: "0 14px 36px rgba(0, 0, 0, 0.6)",
+              width: "100%",
             }}
           >
             {/* Thumbnail */}
-            <div style={{ width: "100%", height: "160px", background: "linear-gradient(135deg, #13141f 0%, #1f1b2e 50%, #0d0e15 100%)", position: "relative", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              {thumbnailUrl ? (
+            <div style={{ width: "100%", height: "170px", background: "linear-gradient(135deg, #13141f 0%, #1f1b2e 50%, #0d0e15 100%)", position: "relative", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              {thumbnailUrl && thumbnailUrl !== "/kd.svg" ? (
                 <img
                   src={thumbnailUrl}
                   alt="Architecture Thumbnail Preview"
@@ -890,9 +896,13 @@ export default function DeployArchitecturePage() {
                   }}
                 />
               ) : (
-                <div style={{ textAlign: "center" }}>
-                  <Boxes size={32} color="var(--accent-primary)" style={{ margin: "0 auto 0.35rem", opacity: 0.8 }} />
-                  <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.7rem", color: "var(--text-muted)", textTransform: "uppercase" }}>
+                <div style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                  <img
+                    src="/kd.svg"
+                    alt="KodeDock Architecture"
+                    style={{ width: "44px", height: "44px", objectFit: "contain", marginBottom: "0.5rem", filter: "drop-shadow(0 0 12px rgba(139, 92, 246, 0.45))" }}
+                  />
+                  <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.72rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
                     Architecture Preview
                   </div>
                 </div>
@@ -968,33 +978,35 @@ export default function DeployArchitecturePage() {
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Checklist Spec */}
-          <div>
-            <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#ffffff", marginBottom: "0.65rem", fontFamily: "var(--font-mono)" }}>
-              DEPLOYMENT READINESS AUDIT
+        {/* Checklist Spec */}
+        <div style={{ background: "rgba(18, 19, 26, 0.75)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "16px", padding: "1.25rem 1.5rem" }}>
+          <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#ffffff", marginBottom: "0.85rem", fontFamily: "var(--font-mono)", letterSpacing: "0.04em" }}>
+            DEPLOYMENT READINESS AUDIT
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.65rem", fontSize: "0.78rem" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", color: title && tagline ? "var(--status-success)" : "var(--text-muted)" }}>
+              {title && tagline ? <CheckCircle2 size={15} /> : <div style={{ width: "15px", height: "15px", borderRadius: "50%", border: "1px solid var(--border-subtle)" }} />}
+              <span>Blueprint Identity (Title &amp; Tagline)</span>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.8rem" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", color: title && tagline ? "var(--status-success)" : "var(--text-muted)" }}>
-                {title && tagline ? <CheckCircle2 size={15} /> : <div style={{ width: "15px", height: "15px", borderRadius: "50%", border: "1px solid var(--border-subtle)" }} />}
-                <span>Architecture Blueprint (Title &amp; Elevator Pitch)</span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", color: stdPriceNum > 0 ? "var(--status-success)" : "var(--text-muted)" }}>
-                {stdPriceNum > 0 ? <CheckCircle2 size={15} /> : <div style={{ width: "15px", height: "15px", borderRadius: "50%", border: "1px solid var(--border-subtle)" }} />}
-                <span>Commercial Pricing &amp; 95% Creator Split</span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", color: version && storageKey ? "var(--status-success)" : "var(--text-muted)" }}>
-                {version && storageKey ? <CheckCircle2 size={15} /> : <div style={{ width: "15px", height: "15px", borderRadius: "50%", border: "1px solid var(--border-subtle)" }} />}
-                <span>Cloudflare R2 Storage Artifact Key</span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", color: checksumSha256.length === 64 ? "var(--status-success)" : "var(--text-muted)" }}>
-                {checksumSha256.length === 64 ? <CheckCircle2 size={15} /> : <div style={{ width: "15px", height: "15px", borderRadius: "50%", border: "1px solid var(--border-subtle)" }} />}
-                <span>64-Character SHA-256 Checksum Signature</span>
-              </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", color: stdPriceNum > 0 ? "var(--status-success)" : "var(--text-muted)" }}>
+              {stdPriceNum > 0 ? <CheckCircle2 size={15} /> : <div style={{ width: "15px", height: "15px", borderRadius: "50%", border: "1px solid var(--border-subtle)" }} />}
+              <span>Commercial Pricing (95% Split)</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", color: version && storageKey ? "var(--status-success)" : "var(--text-muted)" }}>
+              {version && storageKey ? <CheckCircle2 size={15} /> : <div style={{ width: "15px", height: "15px", borderRadius: "50%", border: "1px solid var(--border-subtle)" }} />}
+              <span>R2 Cloud Storage Key Registered</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", color: checksumSha256.length === 64 ? "var(--status-success)" : "var(--text-muted)" }}>
+              {checksumSha256.length === 64 ? <CheckCircle2 size={15} /> : <div style={{ width: "15px", height: "15px", borderRadius: "50%", border: "1px solid var(--border-subtle)" }} />}
+              <span>64-Char SHA-256 Checksum Signature</span>
             </div>
           </div>
         </div>
       </div>
     </div>
-  );
+  </div>
+</div>
+);
 }

@@ -193,6 +193,11 @@ html.lenis body {
   pointer-events: none;
 }
 
+html {
+  scrollbar-gutter: stable;
+  overflow-y: scroll;
+}
+
 body {
   font-family: var(--font-sans);
   background-color: var(--bg-canvas);
@@ -370,10 +375,12 @@ body {
   cursor: pointer;
   user-select: none;
   z-index: 1;
+  transition: color 0.15s ease, transform 0.15s ease;
 }
 
 .nav-item:hover {
   color: var(--text-primary);
+  transform: translateX(3px);
 }
 
 .nav-item.active {
@@ -3264,6 +3271,39 @@ select.form-input-custom option {
   border-color: rgba(139, 92, 246, 0.35);
   color: #ffffff;
   transform: translateY(-1px);
+}
+
+/* ── Deploy Architecture Side-by-Side Workspace Layout ───────────────────── */
+.deploy-workspace-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 390px;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 1140px) {
+  .deploy-workspace-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.deploy-form-column {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.deploy-preview-column {
+  min-width: 0;
+}
+
+.sticky-preview-wrapper {
+  position: sticky;
+  top: calc(var(--topbar-height) + 1.25rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
 
