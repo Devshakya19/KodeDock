@@ -8,7 +8,7 @@ FROM base AS builder
 RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ && rm -rf /var/lib/apt/lists/*
 COPY . .
 RUN pnpm install --frozen-lockfile
-RUN pnpm --filter @kodedock/api run build
+RUN pnpm --filter @kodedock/backend run build
 
 # ── Production Runtime Stage ────────────────────────────────────────────────
 FROM node:22-slim AS runner
@@ -19,4 +19,4 @@ ENV PORT=4000
 COPY --from=builder /app /app
 
 EXPOSE 4000
-CMD ["./node_modules/.bin/tsx", "api/src/server.ts"]
+CMD ["./node_modules/.bin/tsx", "src/api/server.ts"]

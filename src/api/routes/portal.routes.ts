@@ -1,6 +1,6 @@
 import type http from "node:http";
 import crypto from "node:crypto";
-import { pgPool } from "@kodedock/backend";
+import { pgPool } from "../../db";
 import type { ApiResponse } from "@kodedock/types";
 import { requireAuth } from "../middlewares/auth.middleware";
 

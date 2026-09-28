@@ -75,7 +75,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        app: ['store', 'portal', 'studio', 'api']
+        app: ['store', 'portal', 'studio', 'backend']
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

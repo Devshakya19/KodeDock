@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 ## [Unreleased]
 
+### Refactored
+- **Unified Backend Architecture (`api/` consolidated into `src/api`)**:
+  - Moved the HTTP gateway and route handlers from standalone `api/` into `src/api`, establishing a clean monolithic backend layer (`@kodedock/backend`).
+  - `src/` now serves as the single source of truth for all backend concerns: transport routes (`src/api/`), PostgreSQL data models (`src/db/`), and cryptographic security (`src/auth/`).
+  - Simplified monorepo workspace dependencies: removed root `api` from `pnpm-workspace.yaml`, updated `docker/Dockerfile.api`, updated GitHub Actions CI matrix, and ensured all 51 automated unit, integration, and E2E test suites pass with 0 errors.
+
 ### Added
 - **Universal User Profile Menu & Prominent Sign Out Controls**:
   - Implemented topbar user profile dropdowns with obsidian dark styling across both **Developer Portal** (`apps/portal`) and **Creator Studio** (`apps/studio`), matching the UX of **Marketplace Store** (`apps/store`).

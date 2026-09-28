@@ -12,7 +12,7 @@ import {
   createEmailOtp,
   verifyEmailOtp,
   KodedockAuthService,
-} from "@kodedock/backend";
+} from "../../auth";
 import { requireAuth } from "../middlewares/auth.middleware";
 import type { ApiResponse } from "@kodedock/types";
 

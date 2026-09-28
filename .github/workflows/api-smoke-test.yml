@@ -65,7 +65,7 @@ jobs:
           NODE_ENV: 'test'
         run: |
           echo "Starting API Gateway in background..."
-          pnpm --filter @kodedock/api dev &
+          pnpm --filter @kodedock/backend dev &
           API_PID=$!
 
           echo "Waiting for API Gateway to become responsive on http://localhost:4000/api/health..."

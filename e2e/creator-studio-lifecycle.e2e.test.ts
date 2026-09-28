@@ -1,6 +1,6 @@
 import { describe, it, before, after } from "node:test";
 import assert from "node:assert/strict";
-import { server } from "../api/src/server";
+import { server } from "../src/api/server";
 import { pgPool } from "@kodedock/backend";
 import { signJwt } from "../src/auth/JWT/jwt.service";
 
@@ -59,11 +59,6 @@ describe("E2E: Creator Studio Management Lifecycle", () => {
   after(async () => {
     if (startedLocalServer) {
       server.close();
-    }
-    try {
-      await pgPool.end();
-    } catch {
-      // Pool closed
     }
   });
 

@@ -1,5 +1,5 @@
 import type http from "node:http";
-import { pgPool } from "@kodedock/backend";
+import { pgPool } from "../../db";
 import type { ApiResponse } from "@kodedock/types";
 
 /**

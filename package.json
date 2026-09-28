@@ -15,7 +15,7 @@
     "test": "tsx --test test/unit/*.test.ts",
     "test:integration": "tsx --test test/integration/*.test.ts",
     "test:e2e": "tsx --test e2e/*.test.ts",
-    "test:all": "tsx --test test/unit/*.test.ts test/integration/*.test.ts e2e/*.test.ts",
+    "test:all": "tsx --test --test-concurrency=1 test/unit/*.test.ts test/integration/*.test.ts e2e/*.test.ts",
     "graphify": "uvx --from graphifyy graphify extract . --code-only",
     "db:up": "docker compose -f docker/docker-compose.dev.yml up -d",
     "db:down": "docker compose -f docker/docker-compose.dev.yml down",

@@ -1,6 +1,6 @@
 import http from "node:http";
 import { toNodeHandler } from "better-auth/node";
-import { auth, initAuthDatabase, pgPool } from "@kodedock/backend";
+import { auth, initAuthDatabase, pgPool } from "../index";
 import { handleCustomAuthRoutes } from "./routes/oauth.routes";
 import { handleProductRoutes } from "./routes/product.routes";
 import { handlePortalRoutes } from "./routes/portal.routes";

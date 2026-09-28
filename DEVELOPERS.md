@@ -15,7 +15,7 @@ pnpm --filter @kodedock/store run dev
 pnpm --filter @kodedock/portal run dev
 pnpm --filter @kodedock/studio run dev
 pnpm --filter @kodedock/www run dev
-pnpm --filter @kodedock/api run dev
+pnpm --filter @kodedock/backend run dev
 
 # Run TypeScript checks across all packages
 pnpm run typecheck

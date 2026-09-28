@@ -21,40 +21,6 @@ importers:
         specifier: ^5.7.3
         version: 5.9.3
 
-  api:
-    dependencies:
-      '@kodedock/backend':
-        specifier: workspace:*
-        version: link:../src
-      '@kodedock/types':
-        specifier: workspace:*
-        version: link:../packages/types
-      better-auth:
-        specifier: ^1.1.21
-        version: 1.7.5(next@16.3.5(@babel/core@7.29.7(supports-color@7.2.0))(@types/node@26.6.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(pg@8.23.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      better-sqlite3:
-        specifier: ^13.0.3
-        version: 13.0.3
-      dotenv:
-        specifier: ^18.0.1
-        version: 18.0.1
-      pg:
-        specifier: ^8.23.0
-        version: 8.23.0
-    devDependencies:
-      '@types/better-sqlite3':
-        specifier: ^9.6.0
-        version: 9.6.0
-      '@types/pg':
-        specifier: ^8.23.1
-        version: 8.23.1
-      tsx:
-        specifier: ^4.19.3
-        version: 4.23.14
-      typescript:
-        specifier: ^5.7.3
-        version: 5.9.3
-
   apps/portal:
     dependencies:
       '@kodedock/auth':
@@ -303,6 +269,9 @@ importers:
       '@types/pg':
         specifier: ^8.23.1
         version: 8.23.1
+      tsx:
+        specifier: ^4.19.3
+        version: 4.23.14
       typescript:
         specifier: ^5.7.3
         version: 5.9.3
@@ -1003,9 +972,6 @@ packages:
   '@types/better-sqlite3@7.6.13':
     resolution: {integrity: sha512-NMv9ASNARoKksWtsq/SHakpYAYnhBrQgGD8zkLYk/jaK8jUGn08CfEdTRgYhMypUQAfzSP8W6gNLe0q19/t4VA==}
 
-  '@types/better-sqlite3@9.6.0':
-    resolution: {integrity: sha512-ZEEwBSgMu7GYJOynoagg5X9JbxfL6dTJDsgViJIqh67jV44kyOr9RXfmFjLK5rzC4MWssP06t9hu/JwGDnUbCg==}
-
   '@types/estree@1.0.9':
     resolution: {integrity: sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==}
 
@@ -1488,11 +1454,6 @@ packages:
   dotenv@17.4.2:
     resolution: {integrity: sha512-nI4U3TottKAcAD9LLud4Cb7b2QztQMUEfHbvhTH09bqXTxnSie8WnjPALV/WMCrJZ6UV/qHJ6L03OqO3LcdYZw==}
     engines: {node: '>=12'}
-
-  dotenv@18.0.1:
-    resolution: {integrity: sha512-0eR4m4D/jH5eaI3evo2ZqqMii5mrTCR12v12VChdie6O1gPHs7XAjzTep0CWc1Bd+oNx3vVfbi734dK4zghigw==}
-    engines: {node: '>=12'}
-    hasBin: true
 
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
@@ -3152,10 +3113,6 @@ snapshots:
     dependencies:
       '@types/node': 26.6.2
 
-  '@types/better-sqlite3@9.6.0':
-    dependencies:
-      '@types/node': 26.6.2
-
   '@types/estree@1.0.9': {}
 
   '@types/json-schema@7.0.15': {}
@@ -3614,8 +3571,6 @@ snapshots:
       esutils: 2.0.3
 
   dotenv@17.4.2: {}
-
-  dotenv@18.0.1: {}
 
   dunder-proto@1.0.1:
     dependencies:

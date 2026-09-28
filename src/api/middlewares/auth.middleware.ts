@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { auth, type SessionUser, type SessionData, verifyJwt, pgPool } from "@kodedock/backend";
+import { auth, type SessionUser, type SessionData, verifyJwt, pgPool } from "../../index";
 import type { UserRole } from "@kodedock/types";
 
 /**

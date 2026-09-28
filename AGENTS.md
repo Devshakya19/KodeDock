@@ -38,8 +38,7 @@ This document establishes the **strict, non-negotiable engineering laws and beha
 
 | Directory | Scope & Role | Allowed Technologies |
 | :--- | :--- | :--- |
-| **`src/`** | **Core Backend Domain & Business Logic** | Better Auth, PostgreSQL (`pg` / Drizzle), JWT, Scrypt, Licensing engine, Storage (R2). **All real database models reside here.** |
-| **`api/`** | **Secure API Gateway Layer** | Node.js HTTP gateway, Better Auth routing, input validation (Zod), rate limiting, RBAC middlewares. Exposes REST/JSON endpoints. |
+| **`src/`** | **Unified Backend, API Gateway & Business Logic** | Node.js HTTP gateway, Better Auth, PostgreSQL (`pg`), JWT, Scrypt, Licensing engine, Storage (R2). Contains `src/api/` (HTTP transport & routes), `src/db/` (PostgreSQL models), and `src/auth/` (cryptographic security). |
 | **`apps/www`** | **Marketing & Central Auth Hub** | Public landing page, features showcase, central login & registration flows. |
 | **`apps/store`** | **Public Marketplace App** | Real-time product search, filtering, product details, checkout flow. **All products fetched from `/api/products`.** |
 | **`apps/studio`** | **Creator & Seller Dashboard** | Product listing upload, version releases, real sales graphs, payout management. **All data fetched from `/api/studio/*`.** |
