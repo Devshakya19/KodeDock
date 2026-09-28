@@ -42,9 +42,10 @@ jobs:
           }
           echo "Schema parity verified. Zero drift."
 
-      - name: Validate Docker Compose Configuration
+      - name: Validate Docker Compose Configurations
         run: |
           docker compose -f docker/docker-compose.yml config
+          docker compose -f docker/docker-compose.dev.yml config
 
   # ── 2. Typecheck Across All Monorepo Packages ────────────────────────────
   typecheck:
@@ -62,6 +63,9 @@ jobs:
 
       - name: Run Typecheck Across All Monorepo Packages
         run: pnpm run typecheck
+
+      - name: Run Core Unit Test Suite
+        run: pnpm test
 
   # ── 3. Production Build Matrix ───────────────────────────────────────────
   build-apps:

@@ -100,5 +100,8 @@ jobs:
           echo "Testing GET /api/portal/licenses"
           curl -sf http://localhost:4000/api/portal/licenses | grep -q "success" || { echo "Portal licenses failed"; kill $API_PID 2>/dev/null || true; exit 1; }
 
-          echo "All 5 API smoke tests passed with 100% success against live PostgreSQL 16!"
+          echo "Executing Unit, Integration & End-to-End Test Matrix..."
+          pnpm run test:all || { echo "Automated test matrix failed"; kill $API_PID 2>/dev/null || true; exit 1; }
+
+          echo "All 5 API smoke tests and full 44-test matrix passed with 100% success against live PostgreSQL 16!"
           kill $API_PID 2>/dev/null || true

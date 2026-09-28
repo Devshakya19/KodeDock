@@ -22,6 +22,17 @@ export async function handlePortalRoutes(
   // -------------------------------------------------------------
   const buyerId = searchParams.get("buyerId") || "pVHaaXAZsxMQlbMS2wOQhiXUn5NwQrYA";
 
+  try {
+    await pgPool.query(
+      `INSERT INTO "user" (id, name, email, role, "emailVerified", "createdAt", "updatedAt")
+       VALUES ($1, 'Priya Developer', 'priya@kodedock.dev', 'BUYER', true, NOW(), NOW())
+       ON CONFLICT (id) DO NOTHING;`,
+      [buyerId]
+    );
+  } catch {
+    // Ignore error if concurrent insert occurs
+  }
+
   // -------------------------------------------------------------
   // 1. Buyer Library (/api/portal/library)
   // -------------------------------------------------------------

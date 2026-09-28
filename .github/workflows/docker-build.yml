@@ -7,12 +7,14 @@ on:
       - 'docker/**'
       - 'api/**'
       - 'src/**'
+      - 'apps/**'
   pull_request:
     branches: [main]
     paths:
       - 'docker/**'
       - 'api/**'
       - 'src/**'
+      - 'apps/**'
   workflow_dispatch:
 
 concurrency:
@@ -30,8 +32,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Validate Compose Config
-        run: docker compose -f docker/docker-compose.yml config
+      - name: Validate Compose Configs
+        run: |
+          docker compose -f docker/docker-compose.yml config
+          docker compose -f docker/docker-compose.dev.yml config
 
   dockerfile-build:
     name: Build API Gateway Container Image

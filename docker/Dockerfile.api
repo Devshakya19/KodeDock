@@ -19,4 +19,4 @@ ENV PORT=4000
 COPY --from=builder /app /app
 
 EXPOSE 4000
-CMD ["node", "api/dist/server.js"]
+CMD ["./node_modules/.bin/tsx", "api/src/server.ts"]

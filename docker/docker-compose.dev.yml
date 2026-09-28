@@ -1,0 +1,42 @@
+# ── KodeDock Local Development Infrastructure (PostgreSQL 16 + Redis 7) ────
+name: kodedock-dev
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: kodedock-dev-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: kodedock_db
+      POSTGRES_USER: kodedock
+      POSTGRES_PASSWORD: kodedock_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - kodedock_dev_pgdata:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kodedock -d kodedock_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: kodedock-dev-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - kodedock_dev_redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  kodedock_dev_pgdata:
+    driver: local
+  kodedock_dev_redisdata:
+    driver: local

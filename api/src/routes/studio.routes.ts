@@ -568,7 +568,7 @@ export async function handleStudioRoutes(
     }
   }
 
-  if (pathname === "/api/studio/settings" && req.method === "PATCH") {
+  if (pathname === "/api/studio/settings" && (req.method === "PATCH" || req.method === "PUT")) {
     try {
       const body = await parseJsonBody<any>(req);
       const sellerId = "usr_kodedock_creator";
@@ -658,8 +658,28 @@ export async function handleStudioRoutes(
         [sellerId, gstin, pan, billingAddress, city, state, JSON.stringify(newNr), JSON.stringify(newCp)]
       );
 
+      const updatedData = {
+        payouts: {
+          payout_channel: newCp.payout_channel || "UPI",
+          upi_id: newCp.upi_id || "",
+          bank_name: newCp.bank_name || "",
+          bank_account_number: newCp.bank_account_number || "",
+          bank_ifsc: newCp.bank_ifsc || "",
+          bank_holder_name: newCp.bank_holder_name || "",
+          payout_threshold_inr: Number(newCp.payout_threshold_inr) || 5000,
+          revenue_split_percent: 95,
+        },
+        licensing: {
+          algorithm: newCp.licensing_algorithm || "Ed25519",
+          default_standard_price_paise: Number(newCp.default_standard_price_paise) || 499900,
+          default_extended_price_paise: Number(newCp.default_extended_price_paise) || 1499900,
+          default_allowed_domains: Number(newCp.default_allowed_domains) || 1,
+          default_machine_seats: Number(newCp.default_machine_seats) || 3,
+        },
+      };
+
       res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ success: true, message: "Studio preferences persisted successfully" }));
+      res.end(JSON.stringify({ success: true, message: "Studio preferences persisted successfully", data: updatedData }));
       return true;
     } catch (err: any) {
       res.writeHead(500, { "Content-Type": "application/json" });
@@ -734,9 +754,11 @@ export async function handleStudioRoutes(
             id,
             name,
             token: fullToken,
+            fullToken,
             tokenMasked: `kd_studio_sec_${keyHint}••••••••`,
             scopes,
             expiresAt,
+            status: "ACTIVE",
           },
         })
       );
@@ -763,7 +785,7 @@ export async function handleStudioRoutes(
       await pgPool.query(`DELETE FROM api_keys WHERE id = $1 AND user_id = $2`, [keyId, sellerId]);
 
       res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ success: true, message: "Studio API token revoked successfully" }));
+      res.end(JSON.stringify({ success: true, message: "Studio API token revoked successfully", data: { revokedId: keyId } }));
       return true;
     } catch (err: any) {
       res.writeHead(500, { "Content-Type": "application/json" });
