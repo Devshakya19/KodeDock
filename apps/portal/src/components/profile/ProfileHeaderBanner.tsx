@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import type { DeveloperProfile } from "../../types/portal";
 import { Check, Edit3, Share2, ShieldCheck } from "lucide-react";
+import { getAutoAvatar } from "@/lib/avatars";
 
 interface ProfileHeaderBannerProps {
   profile: DeveloperProfile;
@@ -43,11 +44,16 @@ export const ProfileHeaderBanner: React.FC<ProfileHeaderBannerProps> = ({
           {/* Avatar Box with Neon Glowing Border & Online Dot */}
           <div className="ref-avatar-box">
             <div className="ref-avatar-img-wrap">
-              {profile.image ? (
+              {profile.image && profile.image !== "/kd.svg" ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={profile.image} alt={profile.name} className="ref-avatar-img" />
               ) : (
-                <span className="ref-avatar-letter">{profile.name.charAt(0).toUpperCase()}</span>
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={getAutoAvatar(profile.id || profile.email || profile.name)}
+                  alt={profile.name}
+                  className="ref-avatar-img"
+                />
               )}
             </div>
             <span className="ref-avatar-online-dot" title="Active on KodeDock" />

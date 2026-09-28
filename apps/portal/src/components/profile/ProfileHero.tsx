@@ -44,7 +44,11 @@ export const ProfileHero: React.FC<ProfileHeroProps> = ({
             <div className="profile-avatar-halo">
               <div className="profile-avatar-core" style={{ borderRadius: "50%", overflow: "hidden" }}>
                 <img
-                  src={profile.image || getAutoAvatar(profile.id || profile.email || profile.name)}
+                  src={
+                    profile.image && profile.image !== "/kd.svg"
+                      ? profile.image
+                      : getAutoAvatar(profile.id || profile.email || profile.name)
+                  }
                   alt={profile.name}
                   className="profile-avatar-img"
                   style={{ borderRadius: "50%", objectFit: "cover", width: "100%", height: "100%" }}

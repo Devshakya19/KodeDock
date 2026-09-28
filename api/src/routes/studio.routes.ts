@@ -522,7 +522,7 @@ export async function handleStudioRoutes(
         profile: {
           name: u.name || "Verified Creator",
           email: u.email || "creator@kodedock.local",
-          image: u.image || "/kd.svg",
+          image: u.image || "",
           bio: cp.bio || "",
           github_handle: cp.github_handle || "",
           twitter_handle: cp.twitter_handle || "",

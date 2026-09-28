@@ -137,7 +137,10 @@ export const PortalShell: React.FC<PortalShellProps> = ({ children }) => {
         if (d.success && d.data) {
           setBuyerName(d.data.name || "Developer");
           if (d.data.email) setBuyerEmail(d.data.email);
-          setBuyerAvatar(d.data.image || getAutoAvatar(d.data.id || d.data.email || d.data.name));
+          const resolvedAvatar = (d.data.image && d.data.image !== "/kd.svg")
+            ? d.data.image
+            : getAutoAvatar(d.data.id || d.data.email || d.data.name);
+          setBuyerAvatar(resolvedAvatar);
 
           // Populate localStorage and sessionStorage on portal origin (port 3002)
           syncAuthStorage({

@@ -75,7 +75,9 @@ export const StoreNavbar: React.FC = () => {
   };
 
   const userAvatar =
-    user?.image || getAutoAvatar(user?.id || user?.email || user?.name || "developer");
+    (user?.image && user?.image !== "/kd.svg")
+      ? user.image
+      : getAutoAvatar(user?.id || user?.email || user?.name || "developer");
   const displayName = user?.name || "Developer";
   const displayEmail = user?.email || "developer@kodedock.local";
 

@@ -144,10 +144,11 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
         if (settingsData.success && settingsData.data?.profile) {
           setCreatorName(settingsData.data.profile.name || "Verified Creator");
           if (settingsData.data.profile.email) setCreatorEmail(settingsData.data.profile.email);
-          setCreatorAvatar(
-            settingsData.data.profile.image ||
-              getAutoAvatar(settingsData.data.profile.email || "creator@kodedock.local")
-          );
+          const rawImage = settingsData.data.profile.image;
+          const resolvedAvatar = (rawImage && rawImage !== "/kd.svg")
+            ? rawImage
+            : getAutoAvatar(settingsData.data.profile.email || "creator@kodedock.local");
+          setCreatorAvatar(resolvedAvatar);
 
           // Populate localStorage and sessionStorage on studio origin (port 3001)
           syncAuthStorage({
