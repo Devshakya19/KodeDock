@@ -45,9 +45,16 @@ jobs:
       - name: Install PostgreSQL Client
         run: sudo apt-get install -y postgresql-client
 
-      - name: Seed Database Schema
+      - name: Seed Database Schema & Smoke Test Identities
         run: |
           PGPASSWORD=kodedock_dev_password psql -h localhost -p 5432 -U kodedock -d kodedock_db -v ON_ERROR_STOP=1 -f docker/schema.sql
+          PGPASSWORD=kodedock_dev_password psql -h localhost -p 5432 -U kodedock -d kodedock_db -v ON_ERROR_STOP=1 -c "
+            INSERT INTO \"user\" (id, name, email, role, \"emailVerified\", \"createdAt\", \"updatedAt\")
+            VALUES 
+              ('usr_smoke_seller', 'Smoke Test Seller', 'smoke_seller@kodedock.test', 'SELLER', true, NOW(), NOW()),
+              ('usr_smoke_buyer', 'Smoke Test Buyer', 'smoke_buyer@kodedock.test', 'BUYER', true, NOW(), NOW())
+            ON CONFLICT (id) DO UPDATE SET role = EXCLUDED.role;
+          "
 
       - name: Launch API Gateway & Execute Smoke Tests
         env:
@@ -78,30 +85,71 @@ jobs:
             exit 1
           fi
 
+          echo "Generating cryptographic tokens for smoke test validation..."
+          SELLER_TOKEN=$(pnpm exec tsx -e '
+            import { signJwt } from "./src/auth/JWT/jwt.service";
+            const secret = process.env.BETTER_AUTH_SECRET || "kodedock_smoke_test_secret_32_characters_long";
+            console.log(signJwt({
+              sub: "usr_smoke_seller",
+              email: "smoke_seller@kodedock.test",
+              role: "SELLER",
+              name: "Smoke Test Seller",
+            }, secret, 3600));
+          ')
+
+          BUYER_TOKEN=$(pnpm exec tsx -e '
+            import { signJwt } from "./src/auth/JWT/jwt.service";
+            const secret = process.env.BETTER_AUTH_SECRET || "kodedock_smoke_test_secret_32_characters_long";
+            console.log(signJwt({
+              sub: "usr_smoke_buyer",
+              email: "smoke_buyer@kodedock.test",
+              role: "BUYER",
+              name: "Smoke Test Buyer",
+            }, secret, 3600));
+          ')
+
           echo "Running API smoke tests..."
           
-          # 1. Health check
+          # 1. Health check (Public)
           echo "Testing GET /api/health"
           curl -sf http://localhost:4000/api/health | grep -q "healthy" || { echo "Health check failed"; kill $API_PID 2>/dev/null || true; exit 1; }
 
-          # 2. Marketplace Products
+          # 2. Marketplace Products (Public)
           echo "Testing GET /api/products"
           curl -sf http://localhost:4000/api/products | grep -q "success" || { echo "Products endpoint failed"; kill $API_PID 2>/dev/null || true; exit 1; }
 
-          # 3. Studio Settings Suite
-          echo "Testing GET /api/studio/settings"
-          curl -sf http://localhost:4000/api/studio/settings | grep -q "profile" || { echo "Studio settings failed"; kill $API_PID 2>/dev/null || true; exit 1; }
+          # 3. Studio Settings Suite (SELLER Protected)
+          echo "Testing GET /api/studio/settings (with SELLER token)"
+          curl -sf -H "Authorization: Bearer $SELLER_TOKEN" http://localhost:4000/api/studio/settings | grep -q "profile" || { echo "Studio settings failed"; kill $API_PID 2>/dev/null || true; exit 1; }
 
-          # 4. Studio CLI Deployment Keys
-          echo "Testing GET /api/studio/api-keys"
-          curl -sf http://localhost:4000/api/studio/api-keys | grep -q "success" || { echo "Studio API keys failed"; kill $API_PID 2>/dev/null || true; exit 1; }
+          # 4. Studio CLI Deployment Keys (SELLER Protected)
+          echo "Testing GET /api/studio/api-keys (with SELLER token)"
+          curl -sf -H "Authorization: Bearer $SELLER_TOKEN" http://localhost:4000/api/studio/api-keys | grep -q "success" || { echo "Studio API keys failed"; kill $API_PID 2>/dev/null || true; exit 1; }
 
-          # 5. Portal Licenses
-          echo "Testing GET /api/portal/licenses"
-          curl -sf http://localhost:4000/api/portal/licenses | grep -q "success" || { echo "Portal licenses failed"; kill $API_PID 2>/dev/null || true; exit 1; }
+          # 5. Portal Licenses (BUYER Protected)
+          echo "Testing GET /api/portal/licenses (with BUYER token)"
+          curl -sf -H "Authorization: Bearer $BUYER_TOKEN" http://localhost:4000/api/portal/licenses | grep -q "success" || { echo "Portal licenses failed"; kill $API_PID 2>/dev/null || true; exit 1; }
+
+          # 6. Security Enforcement: Studio routes reject unauthenticated requests with 401
+          echo "Testing SECURITY: GET /api/studio/settings without auth returns 401"
+          UNAUTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:4000/api/studio/settings)
+          if [ "$UNAUTH_STATUS" != "401" ]; then
+            echo "Security check failed: expected 401 but got $UNAUTH_STATUS"
+            kill $API_PID 2>/dev/null || true
+            exit 1
+          fi
+
+          # 7. Security Enforcement: Studio routes reject BUYER role with 403 Forbidden
+          echo "Testing SECURITY: GET /api/studio/settings with BUYER token returns 403"
+          BUYER_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer $BUYER_TOKEN" http://localhost:4000/api/studio/settings)
+          if [ "$BUYER_STATUS" != "403" ]; then
+            echo "Security RBAC check failed: expected 403 but got $BUYER_STATUS"
+            kill $API_PID 2>/dev/null || true
+            exit 1
+          fi
 
           echo "Executing Unit, Integration & End-to-End Test Matrix..."
           pnpm run test:all || { echo "Automated test matrix failed"; kill $API_PID 2>/dev/null || true; exit 1; }
 
-          echo "All 5 API smoke tests and full 44-test matrix passed with 100% success against live PostgreSQL 16!"
+          echo "All API smoke tests and full 51-test matrix passed with 100% success against live PostgreSQL 16!"
           kill $API_PID 2>/dev/null || true
