@@ -336,13 +336,25 @@ export async function handleStudioRoutes(
   // -------------------------------------------------------------
   if (pathname === "/api/studio/payouts" && req.method === "GET") {
     try {
+      const sellerId = "usr_kodedock_creator";
+
+      // Fetch payouts from PostgreSQL
       const sql = `
         SELECT 
           id, amount, platform_fee, status, payout_account, processed_at, created_at
         FROM seller_payouts
+        WHERE seller_id = $1
         ORDER BY created_at DESC;
       `;
-      const result = await pgPool.query(sql);
+      const result = await pgPool.query(sql, [sellerId]);
+
+      // Fetch stored UPI ID from user_settings JSONB
+      const settingsRes = await pgPool.query(
+        `SELECT creator_preferences FROM user_settings WHERE user_id = $1 LIMIT 1`,
+        [sellerId]
+      );
+      const cp = settingsRes.rows[0]?.creator_preferences || {};
+      const storedUpiId = cp.upi_id || "";
 
       let pendingPaise = 0;
       let totalDisbursedPaise = 0;
@@ -373,7 +385,7 @@ export async function handleStudioRoutes(
             payouts,
             pendingBalancePaise: pendingPaise,
             totalWithdrawnPaise: totalDisbursedPaise,
-            upiId: "creator@okhdfcbank",
+            upiId: storedUpiId,
           },
         })
       );
@@ -387,7 +399,7 @@ export async function handleStudioRoutes(
             payouts: [],
             pendingBalancePaise: 0,
             totalWithdrawnPaise: 0,
-            upiId: "creator@okhdfcbank",
+            upiId: "",
           },
         })
       );
@@ -401,7 +413,7 @@ export async function handleStudioRoutes(
   if (pathname === "/api/studio/payouts/request" && req.method === "POST") {
     try {
       const body = await parseJsonBody<any>(req);
-      const { amountPaise, payoutAccount = "UPI: creator@okhdfcbank" } = body;
+      const { amountPaise, payoutAccount = "" } = body;
 
       const sellerId = "usr_kodedock_creator";
       const payoutId = `pay_${crypto.randomUUID().replace(/-/g, "").substring(0, 16)}`;

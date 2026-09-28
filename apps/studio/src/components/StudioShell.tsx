@@ -249,7 +249,7 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
         {/* Sidebar Footer with Storefront link and Creator Profile */}
         <div className="sidebar-footer">
           <a
-            href="http://localhost:3003"
+            href={process.env.NEXT_PUBLIC_STORE_URL || "http://localhost:3003"}
             target="_blank"
             rel="noopener noreferrer"
             className="sidebar-user-row"

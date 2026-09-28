@@ -185,7 +185,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                   )}
 
                   <a
-                    href="http://localhost:3001"
+                    href={process.env.NEXT_PUBLIC_STUDIO_URL || "http://localhost:3001"}
                     className="btn btn-primary"
                     style={{ fontSize: "0.85rem" }}
                   >

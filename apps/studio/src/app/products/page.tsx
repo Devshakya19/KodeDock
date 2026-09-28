@@ -244,7 +244,7 @@ export default function StudioProductsPage() {
                   <span>Release</span>
                 </Link>
                 <a
-                  href={`http://localhost:3003/product/${p.slug}`}
+                  href={`${process.env.NEXT_PUBLIC_STORE_URL || "http://localhost:3003"}/product/${p.slug}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn btn-ghost btn-icon"

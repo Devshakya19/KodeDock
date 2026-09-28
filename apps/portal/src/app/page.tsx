@@ -207,7 +207,7 @@ export default function LibraryPage() {
             You haven't purchased any developer templates yet. Explore our verified marketplace to acquire SaaS boilerplates and AI agents.
           </p>
           <a
-            href="http://localhost:3003"
+            href={process.env.NEXT_PUBLIC_STORE_URL || "http://localhost:3003"}
             className="btn btn-primary btn-md"
             style={{ marginTop: "0.5rem" }}
           >

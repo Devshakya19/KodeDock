@@ -343,7 +343,7 @@ function CheckoutContent() {
             {/* Next Steps CTA */}
             <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>
               <a
-                href="http://localhost:3002/licenses"
+                href={`${process.env.NEXT_PUBLIC_PORTAL_URL || "http://localhost:3002"}/licenses`}
                 className="btn btn-primary"
                 style={{ padding: "0.75rem 1.5rem", fontSize: "0.9rem" }}
               >

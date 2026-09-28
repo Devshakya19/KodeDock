@@ -40,9 +40,9 @@ export const StoreFooter: React.FC = () => {
           <div>
             <div className="footer-col-title">Ecosystem</div>
             <ul className="footer-links-list">
-              <li><a href="http://localhost:3002" className="footer-link">Buyer Developer Portal</a></li>
-              <li><a href="http://localhost:3001" className="footer-link">Creator Studio</a></li>
-              <li><a href="http://localhost:3000" className="footer-link">Marketing Hub</a></li>
+              <li><a href={process.env.NEXT_PUBLIC_PORTAL_URL || "http://localhost:3002"} className="footer-link">Buyer Developer Portal</a></li>
+              <li><a href={process.env.NEXT_PUBLIC_STUDIO_URL || "http://localhost:3001"} className="footer-link">Creator Studio</a></li>
+              <li><a href={process.env.NEXT_PUBLIC_WWW_URL || "http://localhost:3000"} className="footer-link">Marketing Hub</a></li>
               <li><Link href="/wishlist" className="footer-link">Saved Wishlist</Link></li>
               <li><Link href="/cart" className="footer-link">Checkout Bag</Link></li>
             </ul>

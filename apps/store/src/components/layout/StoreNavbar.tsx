@@ -211,7 +211,7 @@ export const StoreNavbar: React.FC = () => {
                   {/* Ecosystem Quick Access Links */}
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
                     <a
-                      href="http://localhost:3002"
+                      href={process.env.NEXT_PUBLIC_PORTAL_URL || "http://localhost:3002"}
                       className="user-dropdown-item-link"
                     >
                       <Package size={15} color="var(--accent-primary)" />
@@ -219,7 +219,7 @@ export const StoreNavbar: React.FC = () => {
                     </a>
 
                     <a
-                      href="http://localhost:3002/licenses"
+                      href={`${process.env.NEXT_PUBLIC_PORTAL_URL || "http://localhost:3002"}/licenses`}
                       className="user-dropdown-item-link"
                     >
                       <Key size={15} color="var(--accent-cyan)" />
@@ -227,7 +227,7 @@ export const StoreNavbar: React.FC = () => {
                     </a>
 
                     <a
-                      href="http://localhost:3001"
+                      href={process.env.NEXT_PUBLIC_STUDIO_URL || "http://localhost:3001"}
                       className="user-dropdown-item-link"
                     >
                       <Sparkles size={15} color="var(--status-warning)" />
@@ -235,7 +235,7 @@ export const StoreNavbar: React.FC = () => {
                     </a>
 
                     <a
-                      href="http://localhost:3002/settings"
+                      href={`${process.env.NEXT_PUBLIC_PORTAL_URL || "http://localhost:3002"}/settings`}
                       className="user-dropdown-item-link"
                     >
                       <Settings size={15} color="var(--text-muted)" />
@@ -246,7 +246,7 @@ export const StoreNavbar: React.FC = () => {
                   <div className="user-dropdown-divider" />
 
                   <a
-                    href="http://localhost:3002/profile"
+                    href={`${process.env.NEXT_PUBLIC_PORTAL_URL || "http://localhost:3002"}/profile`}
                     className="user-dropdown-item-link"
                     style={{ color: "var(--text-muted)" }}
                   >

@@ -247,7 +247,7 @@ export const PortalShell: React.FC<PortalShellProps> = ({ children }) => {
               <span>PG16 SYNCED</span>
             </div>
             <a
-              href="http://localhost:3003"
+              href={process.env.NEXT_PUBLIC_STORE_URL || "http://localhost:3003"}
               className="topbar-store-btn"
               target="_blank"
               rel="noopener noreferrer"
