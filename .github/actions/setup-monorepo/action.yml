@@ -24,7 +24,6 @@ runs:
   steps:
     - name: Install pnpm
       uses: pnpm/action-setup@v4
-      shell: bash
 
     - name: Setup Node.js ${{ inputs.node-version }}
       uses: actions/setup-node@v4

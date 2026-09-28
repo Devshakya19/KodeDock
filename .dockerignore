@@ -1,0 +1,17 @@
+# ── Docker Ignore Rules for KodeDock ─────────────────────────────────────────
+node_modules
+.pnpm-store
+.next
+.turbo
+dist
+build
+out
+coverage
+*.log
+.git
+.github
+.vscode
+.agents
+*.env*
+!*.env.example
+docker/kodedock_pgdata

@@ -5,6 +5,7 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -48,7 +49,7 @@ jobs:
         run: |
           PGPASSWORD=kodedock_dev_password psql -h localhost -p 5432 -U kodedock -d kodedock_db -v ON_ERROR_STOP=1 -f docker/schema.sql
 
-      - name: Launch API Server in Background
+      - name: Launch API Gateway & Execute Smoke Tests
         env:
           PORT: '4000'
           DATABASE_URL: 'postgres://kodedock:kodedock_dev_password@localhost:5432/kodedock_db'
@@ -56,43 +57,48 @@ jobs:
           BETTER_AUTH_URL: 'http://localhost:4000'
           NODE_ENV: 'test'
         run: |
+          echo "Starting API Gateway in background..."
           pnpm --filter @kodedock/api dev &
           API_PID=$!
-          echo "API_PID=$API_PID" >> $GITHUB_ENV
-          
-          echo "Waiting for API Gateway to become responsive on http://localhost:4000..."
+
+          echo "Waiting for API Gateway to become responsive on http://localhost:4000/api/health..."
+          READY=false
           for i in {1..30}; do
             if curl -s http://localhost:4000/api/health | grep -q "healthy"; then
               echo "API Gateway is healthy and listening on port 4000!"
-              exit 0
+              READY=true
+              break
             fi
             sleep 1
           done
-          echo "API Gateway failed to respond within 30 seconds."
-          exit 1
 
-      - name: Execute Endpoint Smoke Test Matrix
-        run: |
+          if [ "$READY" != "true" ]; then
+            echo "API Gateway failed to respond within 30 seconds."
+            kill $API_PID 2>/dev/null || true
+            exit 1
+          fi
+
           echo "Running API smoke tests..."
           
           # 1. Health check
           echo "Testing GET /api/health"
-          curl -sf http://localhost:4000/api/health | grep -q "healthy" || { echo "Health check failed"; exit 1; }
+          curl -sf http://localhost:4000/api/health | grep -q "healthy" || { echo "Health check failed"; kill $API_PID 2>/dev/null || true; exit 1; }
 
           # 2. Marketplace Products
           echo "Testing GET /api/products"
-          curl -sf http://localhost:4000/api/products | grep -q "success" || { echo "Products endpoint failed"; exit 1; }
+          curl -sf http://localhost:4000/api/products | grep -q "success" || { echo "Products endpoint failed"; kill $API_PID 2>/dev/null || true; exit 1; }
 
           # 3. Studio Settings Suite
           echo "Testing GET /api/studio/settings"
-          curl -sf http://localhost:4000/api/studio/settings | grep -q "profile" || { echo "Studio settings failed"; exit 1; }
+          curl -sf http://localhost:4000/api/studio/settings | grep -q "profile" || { echo "Studio settings failed"; kill $API_PID 2>/dev/null || true; exit 1; }
 
           # 4. Studio CLI Deployment Keys
           echo "Testing GET /api/studio/api-keys"
-          curl -sf http://localhost:4000/api/studio/api-keys | grep -q "success" || { echo "Studio API keys failed"; exit 1; }
+          curl -sf http://localhost:4000/api/studio/api-keys | grep -q "success" || { echo "Studio API keys failed"; kill $API_PID 2>/dev/null || true; exit 1; }
 
           # 5. Portal Licenses
           echo "Testing GET /api/portal/licenses"
-          curl -sf http://localhost:4000/api/portal/licenses | grep -q "success" || { echo "Portal licenses failed"; exit 1; }
+          curl -sf http://localhost:4000/api/portal/licenses | grep -q "success" || { echo "Portal licenses failed"; kill $API_PID 2>/dev/null || true; exit 1; }
 
           echo "All 5 API smoke tests passed with 100% success against live PostgreSQL 16!"
+          kill $API_PID 2>/dev/null || true
