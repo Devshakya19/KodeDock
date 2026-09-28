@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#190A28"/>
+      <stop offset="100%" stop-color="#4C1D95"/>
+    </linearGradient>
+    <linearGradient id="glow4" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="100%" stop-color="#F472B6"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="400" height="400" rx="200" fill="url(#bg4)"/>
+
+  <!-- AI Neural Network backdrop dots -->
+  <circle cx="100" cy="120" r="4" fill="#A78BFA" opacity="0.6"/>
+  <circle cx="300" cy="120" r="4" fill="#F472B6" opacity="0.6"/>
+  <circle cx="80" cy="220" r="4" fill="#A78BFA" opacity="0.4"/>
+  <circle cx="320" cy="220" r="4" fill="#F472B6" opacity="0.4"/>
+  <line x1="100" y1="120" x2="300" y2="120" stroke="url(#glow4)" stroke-width="1" opacity="0.3"/>
+
+  <!-- Body -->
+  <path d="M85,380 C85,280 135,240 200,240 C265,240 315,280 315,380 Z" fill="#2E1065"/>
+  <path d="M150,240 L200,310 L250,240" fill="#3B0764"/>
+
+  <!-- Neck & Face -->
+  <rect x="180" y="200" width="40" height="45" fill="#C58C6D" rx="6"/>
+  <path d="M140,140 C140,210 160,230 200,230 C240,230 260,210 260,140 C260,105 240,95 200,95 C160,95 140,105 140,140 Z" fill="#DE9E7E"/>
+
+  <!-- Futuristic Sci-Fi Visor -->
+  <rect x="135" y="130" width="130" height="35" rx="17.5" fill="#090A0F" stroke="url(#glow4)" stroke-width="3"/>
+  <line x1="145" y1="147.5" x2="255" y2="147.5" stroke="#F472B6" stroke-width="3"/>
+
+  <!-- Sleek Hair -->
+  <path d="M135,125 C135,70 160,55 200,55 C240,55 265,70 265,125 C250,85 230,70 200,70 C170,70 150,85 135,125 Z" fill="#1C1917"/>
+
+  <!-- Code Tag -->
+  <rect x="150" y="325" width="100" height="24" rx="12" fill="#190A28" stroke="#A78BFA" stroke-width="1.5"/>
+  <text x="200" y="341" font-family="monospace" font-size="11" font-weight="bold" fill="#C084FC" text-anchor="middle">&lt;AI_ENGINE&gt;</text>
+</svg>

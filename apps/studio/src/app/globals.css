@@ -3312,7 +3312,111 @@ select.form-input-custom option {
   gap: 1.25rem;
 }
 
+/* ── Redesigned Bento 5-Cell Financial Grid ───────────────────────────── */
+.studio-bento-5 {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 2.25rem;
+}
 
+@media (max-width: 1200px) {
+  .studio-bento-5 {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
 
+@media (max-width: 768px) {
+  .studio-bento-5 {
+    grid-template-columns: 1fr;
+  }
+}
 
+.bento-cell-lg {
+  grid-column: span 4;
+}
 
+.bento-cell-md {
+  grid-column: span 3;
+}
+
+.bento-cell-sm {
+  grid-column: span 2;
+}
+
+@media (max-width: 1200px) {
+  .bento-cell-lg,
+  .bento-cell-md,
+  .bento-cell-sm {
+    grid-column: span 3;
+  }
+}
+
+@media (max-width: 768px) {
+  .bento-cell-lg,
+  .bento-cell-md,
+  .bento-cell-sm {
+    grid-column: span 1;
+  }
+}
+
+/* ── Codebase Fleet Cards ──────────────────────────────────────────────── */
+.fleet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+}
+
+.fleet-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+
+.fleet-card:hover {
+  border-color: rgba(139, 92, 246, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+}
+
+.fleet-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.fleet-card:hover::before {
+  opacity: 1;
+}
+
+/* ── Diagnostics Bar ──────────────────────────────────────────────────── */
+.diagnostics-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 2.25rem;
+}
+
+.diagnostic-item {
+  background: rgba(18, 19, 26, 0.6);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.15rem;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}

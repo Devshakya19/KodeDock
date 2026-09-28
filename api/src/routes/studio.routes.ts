@@ -2,6 +2,7 @@ import type http from "node:http";
 import crypto from "node:crypto";
 import { pgPool } from "@kodedock/backend";
 import type { ApiResponse } from "@kodedock/types";
+import { requireRole } from "../middlewares/auth.middleware";
 
 function parseJsonBody<T>(req: http.IncomingMessage): Promise<T> {
   return new Promise((resolve, reject) => {
@@ -29,6 +30,16 @@ export async function handleStudioRoutes(
   pathname: string,
   searchParams: URLSearchParams
 ): Promise<boolean> {
+  // Only handle /api/studio/* paths
+  if (!pathname.startsWith("/api/studio")) {
+    return false;
+  }
+
+  // Enforce SELLER role on all studio routes
+  const authContext = await requireRole(req, res, ["SELLER"]);
+  if (!authContext) return true; // Auth middleware handles the response
+  const sellerId = authContext.user.id;
+
   // -------------------------------------------------------------
   // 1. Studio Key Stats (/api/studio/stats)
   // -------------------------------------------------------------
@@ -37,24 +48,25 @@ export async function handleStudioRoutes(
       // Aggregate real sales and listings from PostgreSQL
       const salesQuery = await pgPool.query(`
         SELECT 
-          COALESCE(SUM(amount), 0)::bigint AS total_gross_paise,
+          COALESCE(SUM(o.amount), 0)::bigint AS total_gross_paise,
           COUNT(*)::int AS total_sales_count
-        FROM orders
-        WHERE payment_status = 'COMPLETED';
-      `);
+        FROM orders o
+        JOIN products p ON o.product_id = p.id
+        WHERE o.payment_status = 'COMPLETED' AND p.seller_id = $1;
+      `, [sellerId]);
 
       const productsQuery = await pgPool.query(`
         SELECT COUNT(*)::int AS active_listings_count
         FROM products
-        WHERE status = 'PUBLISHED';
-      `);
+        WHERE status = 'PUBLISHED' AND seller_id = $1;
+      `, [sellerId]);
 
       const payoutsQuery = await pgPool.query(`
         SELECT 
           COALESCE(SUM(amount), 0)::bigint AS pending_payout_paise
         FROM seller_payouts
-        WHERE status = 'PENDING';
-      `);
+        WHERE status = 'PENDING' AND seller_id = $1;
+      `, [sellerId]);
 
       const totalGross = Number(salesQuery.rows[0]?.total_gross_paise || 0);
       const salesCount = Number(salesQuery.rows[0]?.total_sales_count || 0);
@@ -121,9 +133,10 @@ export async function handleStudioRoutes(
             'v1.0.0'
           ) AS active_version
         FROM products p
+        WHERE p.seller_id = $1
         ORDER BY p.created_at DESC;
       `;
-      const result = await pgPool.query(sql);
+      const result = await pgPool.query(sql, [sellerId]);
 
       const mapped = result.rows.map((r) => {
         const stdPrice = Number(r.standard_price || 0);
@@ -192,15 +205,6 @@ export async function handleStudioRoutes(
         res.end(JSON.stringify({ success: false, error: { message: "Missing required product fields" } }));
         return true;
       }
-
-      // Ensure default verified creator exists in user table
-      const sellerId = "usr_kodedock_creator";
-      await pgPool.query(
-        `INSERT INTO "user" (id, name, email, role, "emailVerified", "createdAt", "updatedAt")
-         VALUES ($1, 'Verified Creator', 'creator@kodedock.local', 'SELLER', true, NOW(), NOW())
-         ON CONFLICT (id) DO NOTHING;`,
-        [sellerId]
-      );
 
       const productId = `prod_${crypto.randomUUID().replace(/-/g, "").substring(0, 16)}`;
 
@@ -273,9 +277,10 @@ export async function handleStudioRoutes(
           v.created_at
         FROM product_versions v
         JOIN products p ON v.product_id = p.id
+        WHERE p.seller_id = $1
         ORDER BY v.created_at DESC;
       `;
-      const result = await pgPool.query(sql);
+      const result = await pgPool.query(sql, [sellerId]);
 
       const mapped = result.rows.map((r) => ({
         id: r.id,
@@ -312,6 +317,14 @@ export async function handleStudioRoutes(
         return true;
       }
 
+      // Verify the product belongs to this seller
+      const productCheck = await pgPool.query(`SELECT id FROM products WHERE id = $1 AND seller_id = $2`, [productId, sellerId]);
+      if (productCheck.rowCount === 0) {
+        res.writeHead(403, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: false, error: { message: "Unauthorized to release version for this product" } }));
+        return true;
+      }
+
       const versionId = `ver_${crypto.randomUUID().replace(/-/g, "").substring(0, 16)}`;
 
       await pgPool.query(
@@ -336,8 +349,6 @@ export async function handleStudioRoutes(
   // -------------------------------------------------------------
   if (pathname === "/api/studio/payouts" && req.method === "GET") {
     try {
-      const sellerId = "usr_kodedock_creator";
-
       // Fetch payouts from PostgreSQL
       const sql = `
         SELECT 
@@ -414,8 +425,6 @@ export async function handleStudioRoutes(
     try {
       const body = await parseJsonBody<any>(req);
       const { amountPaise, payoutAccount = "" } = body;
-
-      const sellerId = "usr_kodedock_creator";
       const payoutId = `pay_${crypto.randomUUID().replace(/-/g, "").substring(0, 16)}`;
       const fee = Math.round(Number(amountPaise) * 0.05);
 
@@ -450,11 +459,11 @@ export async function handleStudioRoutes(
           o.created_at
         FROM orders o
         JOIN products p ON o.product_id = p.id
-        WHERE o.payment_status = 'COMPLETED'
+        WHERE o.payment_status = 'COMPLETED' AND p.seller_id = $1
         ORDER BY o.created_at DESC
         LIMIT 10;
       `;
-      const result = await pgPool.query(sql);
+      const result = await pgPool.query(sql, [sellerId]);
 
       const sales = result.rows.map((r) => {
         const gross = Number(r.gross_paise || 0);
@@ -486,15 +495,7 @@ export async function handleStudioRoutes(
   // -------------------------------------------------------------
   if (pathname === "/api/studio/settings" && req.method === "GET") {
     try {
-      const sellerId = "usr_kodedock_creator";
-
-      await pgPool.query(
-        `INSERT INTO "user" (id, name, email, role, "emailVerified", "createdAt", "updatedAt")
-         VALUES ($1, 'Verified Creator', 'creator@kodedock.local', 'SELLER', true, NOW(), NOW())
-         ON CONFLICT (id) DO NOTHING;`,
-        [sellerId]
-      );
-
+      // Ensure user_settings row exists
       await pgPool.query(
         `INSERT INTO user_settings (user_id, creator_preferences, updated_at)
          VALUES ($1, '{}'::jsonb, NOW())
@@ -583,7 +584,6 @@ export async function handleStudioRoutes(
   if (pathname === "/api/studio/settings" && (req.method === "PATCH" || req.method === "PUT")) {
     try {
       const body = await parseJsonBody<any>(req);
-      const sellerId = "usr_kodedock_creator";
 
       if (body.profile?.name || body.profile?.image) {
         const updates: string[] = [];
@@ -705,7 +705,6 @@ export async function handleStudioRoutes(
   // -------------------------------------------------------------
   if (pathname === "/api/studio/api-keys" && req.method === "GET") {
     try {
-      const sellerId = "usr_kodedock_creator";
       const sql = `
         SELECT id, name, key_hint, permissions, expires_at, last_used_at, created_at
         FROM api_keys
@@ -738,7 +737,6 @@ export async function handleStudioRoutes(
   if (pathname === "/api/studio/api-keys" && req.method === "POST") {
     try {
       const body = await parseJsonBody<any>(req);
-      const sellerId = "usr_kodedock_creator";
       const name = (body.name || "Studio CLI Deploy Key").trim();
 
       const hex = crypto.randomBytes(18).toString("hex");
@@ -786,7 +784,6 @@ export async function handleStudioRoutes(
     try {
       const body = await parseJsonBody<any>(req);
       const keyId = body.id || searchParams.get("id");
-      const sellerId = "usr_kodedock_creator";
 
       if (!keyId) {
         res.writeHead(400, { "Content-Type": "application/json" });

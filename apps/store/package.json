@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@kodedock/auth": "workspace:*",
     "@kodedock/types": "workspace:*",
     "@kodedock/ui": "workspace:*",
     "framer-motion": "^13.4.0",

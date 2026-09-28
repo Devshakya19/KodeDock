@@ -9,6 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Central Marketing & Authentication Hub (`apps/www`)**:
+  - Standalone Next.js 16 micro-frontend running on port 3000 serving public landing page and central sovereign authentication gateway.
+  - Complete Login and Developer Registration suite (`/login`) with role-based onboarding (Buyer vs Creator/Seller).
+  - Integrated local Fontshare suite (*Clash Display*, *Satoshi*, *Azeret Mono*) and obsidian dark aesthetics.
+- **Sovereign Cookie Branding (`kodedock.session_token`)**:
+  - Replaced all default `better-auth` cookie namespaces with platform branding `kodedock.session_token` and `__Secure-kodedock.session_token`.
+  - Configured `appName: "KodeDock"` and `advanced: { cookiePrefix: "kodedock" }` across Better Auth server and `@kodedock/auth/client`.
+  - Updated API Gateway cookie parser and Next.js proxy middleware across `apps/studio`, `apps/portal`, and `apps/store` to prioritize `kodedock.session_token`.
+- **Browser Storage Synchronization (`localStorage` & `sessionStorage`)**:
+  - Added unified client-side storage persistence in `@kodedock/auth/client` (`syncAuthStorage`, `clearAuthStorage`, `getAuthStorage`).
+  - Automatically synchronizes `kodedock_user`, `kodedock_role`, `kodedock_session`, `kodedock_session_token`, and `kodedock_auth_state` across all origins on login, registration, and profile fetch.
+  - Wrapped `signOut` across all applications to purge browser storage and session cookies cleanly.
+- **Strict Role-Based Access Control (RBAC) & Tenant Data Isolation**:
+  - Added `POST /api/me/role` endpoint allowing verified buyers to transition to creator `SELLER` standing while strictly protecting privileged roles.
+  - Built full-screen **RBAC Access Restricted Gate** in `apps/studio/src/components/StudioShell.tsx` blocking `BUYER` accounts from accessing Creator Studio unless upgraded.
+  - Enforced strict SQL user isolation (`WHERE user_id = $1` / `WHERE seller_id = $1`) preventing cross-tenant leakage via port or API key inspection.
+  - Next.js 16 `proxy.ts` middlewares implemented across all apps (`apps/studio`, `apps/portal`, `apps/store`) to block unauthenticated access without valid session cookies.
+- **Trusted Origins & CORS Fortification**:
+  - Added comprehensive `trustedOrigins` across ports 3000, 3001, 3002, 3003, and 4000 in Better Auth, eliminating `INVALID_ORIGIN` rejections during cross-origin logins.
 - Created complete `.vscode/` developer workspace suite:
   - `.vscode/settings.json`: TypeScript workspace SDK, Prettier formatting on save, monorepo file nesting, search exclusions (`.turbo`, `.next`, `dist`), Tailwind CSS token completion, and SQLTools PostgreSQL configuration.
   - `.vscode/extensions.json`: Curated extension recommendations for ESLint, Prettier, Tailwind, Docker, SQLTools, REST Client, GitLens, YAML, and GitHub Actions.

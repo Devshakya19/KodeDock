@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg5" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E1B4B"/>
+      <stop offset="100%" stop-color="#312E81"/>
+    </linearGradient>
+    <linearGradient id="cap5" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#8B5CF6"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="400" height="400" rx="200" fill="url(#bg5)"/>
+
+  <!-- Body -->
+  <path d="M85,380 C85,280 135,240 200,240 C265,240 315,280 315,380 Z" fill="#1E1E38"/>
+  <path d="M150,240 L200,310 L250,240" fill="#2E2E54"/>
+
+  <!-- Face & Neck -->
+  <rect x="180" y="200" width="40" height="45" fill="#D29A78" rx="6"/>
+  <path d="M140,145 C140,210 160,230 200,230 C240,230 260,210 260,145 C260,110 240,100 200,100 C160,100 140,110 140,145 Z" fill="#EBB290"/>
+
+  <!-- Cap (Backwards / Developer style) -->
+  <path d="M130,120 C130,70 160,50 200,50 C240,50 270,70 270,120 Z" fill="url(#cap5)"/>
+  <rect x="120" y="110" width="160" height="18" rx="5" fill="#1D4ED8"/>
+
+  <!-- Headphones -->
+  <path d="M110,150 C110,95 150,70 200,70 C250,70 290,95 290,150" fill="none" stroke="#F43F5E" stroke-width="6"/>
+  <rect x="95" y="135" width="22" height="40" rx="8" fill="#F43F5E"/>
+  <rect x="283" y="135" width="22" height="40" rx="8" fill="#F43F5E"/>
+
+  <!-- Round Glasses -->
+  <circle cx="170" cy="155" r="18" fill="none" stroke="#FACC15" stroke-width="3"/>
+  <circle cx="230" cy="155" r="18" fill="none" stroke="#FACC15" stroke-width="3"/>
+  <line x1="188" y1="155" x2="212" y2="155" stroke="#FACC15" stroke-width="3"/>
+
+  <!-- Code Tag -->
+  <rect x="150" y="325" width="100" height="24" rx="12" fill="#090A0F" stroke="#38BDF8" stroke-width="1.5"/>
+  <text x="200" y="341" font-family="monospace" font-size="11" font-weight="bold" fill="#38BDF8" text-anchor="middle">&lt;REACT_DEV&gt;</text>
+</svg>

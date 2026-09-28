@@ -30,9 +30,16 @@ export default function PayoutsPage() {
 
   useEffect(() => {
     fetch("/api/studio/payouts")
-      .then((r) => r.json())
+      .then((r) => {
+        if (r.status === 401) {
+          const wwwUrl = process.env.NEXT_PUBLIC_WWW_URL || "http://localhost:3000";
+          window.location.href = `${wwwUrl}/login?redirect=${encodeURIComponent(window.location.href)}`;
+          return null;
+        }
+        return r.json();
+      })
       .then((d) => {
-        if (d.success && d.data) {
+        if (d && d.success && d.data) {
           setPayouts(d.data.payouts || []);
           setPendingBalancePaise(d.data.pendingBalancePaise || 0);
           setTotalWithdrawnPaise(d.data.totalWithdrawnPaise || 0);

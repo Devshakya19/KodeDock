@@ -2,6 +2,7 @@ import type http from "node:http";
 import crypto from "node:crypto";
 import { pgPool } from "@kodedock/backend";
 import type { ApiResponse } from "@kodedock/types";
+import { getAuthContext } from "../middlewares/auth.middleware";
 
 function parseJsonBody<T>(req: http.IncomingMessage): Promise<T> {
   return new Promise((resolve, reject) => {
@@ -69,6 +70,16 @@ export async function handleCheckoutRoutes(
       let productTitle = "Verified Codebase Package";
       let sellerId: string | null = null;
       let finalBuyerId = `usr_${crypto.randomUUID().replace(/-/g, "").substring(0, 16)}`;
+      let finalBuyerEmail = buyerEmail;
+      let finalBuyerName = buyerName;
+
+      // Verify authenticated session if present
+      const authContext = await getAuthContext(req);
+      if (authContext) {
+        finalBuyerId = authContext.user.id;
+        finalBuyerEmail = authContext.user.email || buyerEmail;
+        finalBuyerName = authContext.user.name || buyerName;
+      }
 
       try {
         // 1. Fetch product from database
@@ -84,20 +95,22 @@ export async function handleCheckoutRoutes(
         }
 
         // 2. Fetch or create buyer user
-        const userResult = await pgPool.query(
-          `SELECT id, name, email FROM "user" WHERE email = $1`,
-          [buyerEmail]
-        );
-
-        if (userResult.rows.length > 0) {
-          finalBuyerId = userResult.rows[0].id;
-        } else {
-          await pgPool.query(
-            `INSERT INTO "user" (id, name, email, role, "emailVerified", "createdAt", "updatedAt")
-             VALUES ($1, $2, $3, 'BUYER', true, NOW(), NOW())
-             ON CONFLICT (id) DO NOTHING`,
-            [finalBuyerId, buyerName, buyerEmail]
+        if (!authContext) {
+          const userResult = await pgPool.query(
+            `SELECT id, name, email FROM "user" WHERE email = $1`,
+            [finalBuyerEmail]
           );
+
+          if (userResult.rows.length > 0) {
+            finalBuyerId = userResult.rows[0].id;
+          } else {
+            await pgPool.query(
+              `INSERT INTO "user" (id, name, email, role, "emailVerified", "createdAt", "updatedAt")
+               VALUES ($1, $2, $3, 'BUYER', true, NOW(), NOW())
+               ON CONFLICT (id) DO NOTHING`,
+              [finalBuyerId, finalBuyerName, finalBuyerEmail]
+            );
+          }
         }
 
         // 3. Create Order

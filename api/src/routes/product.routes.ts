@@ -54,7 +54,7 @@ export async function handleProductRoutes(
           p.tech_stack, p.live_demo_url, p.thumbnail_url, p.preview_images,
           p.status, p.standard_price, p.extended_price, p.total_sales, p.avg_rating,
           p.created_at, p.updated_at,
-          u.id AS seller_id, u.name AS seller_name, u.image AS seller_image, u.email AS seller_email
+          u.id AS seller_id, u.name AS seller_name, u.image AS seller_image
         FROM products p
         JOIN "user" u ON p.seller_id = u.id
         WHERE p.slug = $1 AND p.status = 'PUBLISHED'

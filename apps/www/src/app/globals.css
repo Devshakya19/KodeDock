@@ -1,0 +1,14 @@
+
+:root {
+  --bg-canvas: #090A0F;
+  --bg-surface: #12131A;
+  --text-primary: #ffffff;
+  --text-secondary: #9ca3af;
+  --accent-primary: #8B5CF6;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+}
+
+body {
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+}

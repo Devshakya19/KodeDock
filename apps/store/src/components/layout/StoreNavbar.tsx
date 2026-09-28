@@ -19,6 +19,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { useStore } from "../../context/StoreContext";
+import { syncAuthStorage, clearAuthStorage, signOut } from "@kodedock/auth/client";
 
 export const StoreNavbar: React.FC = () => {
   const pathname = usePathname();
@@ -37,10 +38,19 @@ export const StoreNavbar: React.FC = () => {
   // Fetch live buyer / developer profile
   useEffect(() => {
     fetch("/api/portal/profile")
-      .then((r) => r.json())
+      .then((r) => {
+        if (r.status === 401) {
+          clearAuthStorage();
+        }
+        return r.json();
+      })
       .then((d) => {
         if (d.success && d.data) {
           setUser(d.data);
+          syncAuthStorage({
+            user: d.data,
+            role: d.data.role || "BUYER",
+          });
         }
       })
       .catch(() => {});
@@ -253,6 +263,30 @@ export const StoreNavbar: React.FC = () => {
                     <User size={15} />
                     <span>View Developer Profile</span>
                   </a>
+
+                  <div className="user-dropdown-divider" />
+
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await signOut();
+                      clearAuthStorage();
+                      const wwwUrl = process.env.NEXT_PUBLIC_WWW_URL || "http://localhost:3000";
+                      window.location.href = `${wwwUrl}/login`;
+                    }}
+                    className="user-dropdown-item-link"
+                    style={{
+                      width: "100%",
+                      background: "transparent",
+                      border: "none",
+                      color: "#f87171",
+                      cursor: "pointer",
+                      textAlign: "left",
+                    }}
+                  >
+                    <LogOut size={15} />
+                    <span>Sign Out</span>
+                  </button>
                 </div>
               )}
             </div>

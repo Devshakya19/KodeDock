@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { getAutoAvatar } from "@/lib/avatars";
+import { syncAuthStorage, clearAuthStorage, signOut } from "@kodedock/auth/client";
 import {
   Package,
   Key,
@@ -16,6 +17,7 @@ import {
   ExternalLink,
   ChevronRight,
   LayoutDashboard,
+  LogOut,
 } from "lucide-react";
 
 interface PortalShellProps {
@@ -108,11 +110,22 @@ export const PortalShell: React.FC<PortalShellProps> = ({ children }) => {
 
     // Fetch live buyer profile
     fetch("/api/portal/profile")
-      .then((r) => r.json())
+      .then((r) => {
+        if (r.status === 401) {
+          clearAuthStorage();
+        }
+        return r.json();
+      })
       .then((d) => {
         if (d.success && d.data) {
           setBuyerName(d.data.name || "Developer");
           setBuyerAvatar(d.data.image || getAutoAvatar(d.data.id || d.data.email || d.data.name));
+
+          // Populate localStorage and sessionStorage on portal origin (port 3002)
+          syncAuthStorage({
+            user: d.data,
+            role: d.data.role || "BUYER",
+          });
         }
       })
       .catch(() => {});
@@ -218,8 +231,8 @@ export const PortalShell: React.FC<PortalShellProps> = ({ children }) => {
         </nav>
 
         {/* User footer */}
-        <div className="sidebar-footer">
-          <Link href="/profile" className="sidebar-user-row" style={{ textDecoration: "none" }}>
+        <div className="sidebar-footer" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.5rem" }}>
+          <Link href="/profile" className="sidebar-user-row" style={{ textDecoration: "none", flex: 1, minWidth: 0 }}>
             <div className="user-avatar" aria-hidden="true">
               <img src={buyerAvatar || getAutoAvatar(buyerName)} alt={buyerName} />
             </div>
@@ -228,6 +241,32 @@ export const PortalShell: React.FC<PortalShellProps> = ({ children }) => {
               <div className="user-badge">Verified Developer</div>
             </div>
           </Link>
+          <button
+            type="button"
+            onClick={async () => {
+              await signOut();
+              clearAuthStorage();
+              const wwwUrl = process.env.NEXT_PUBLIC_WWW_URL || "http://localhost:3000";
+              window.location.href = `${wwwUrl}/login`;
+            }}
+            title="Sign Out"
+            style={{
+              background: "transparent",
+              border: "none",
+              color: "var(--text-muted)",
+              cursor: "pointer",
+              padding: "0.5rem",
+              borderRadius: "6px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "color 0.15s ease",
+            }}
+            onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "#f87171")}
+            onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--text-muted)")}
+          >
+            <LogOut size={16} />
+          </button>
         </div>
       </aside>
 

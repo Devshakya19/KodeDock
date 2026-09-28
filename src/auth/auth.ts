@@ -47,6 +47,7 @@ if (dbUrl.startsWith("postgres://") || dbUrl.startsWith("postgresql://")) {
  */
 export const auth = betterAuth({
   database: dbInstance as any,
+  appName: "KodeDock",
   logger: {
     level: "error",
   },
@@ -54,6 +55,55 @@ export const auth = betterAuth({
     process.env.BETTER_AUTH_SECRET ||
     "kodedock_dev_secret_key_32_characters_long_min!",
   baseURL: process.env.BETTER_AUTH_URL || "http://localhost:4000",
+  trustedOrigins: [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:3002",
+    "http://localhost:3003",
+    "http://localhost:4000",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:3001",
+    "http://127.0.0.1:3002",
+    "http://127.0.0.1:3003",
+    "http://127.0.0.1:4000",
+    "https://kodedock.com",
+    "https://www.kodedock.com",
+    "https://store.kodedock.com",
+    "https://studio.kodedock.com",
+    "https://portal.kodedock.com",
+    ...(process.env.ALLOWED_ORIGINS
+      ? process.env.ALLOWED_ORIGINS.split(",").map((s) => s.trim()).filter(Boolean)
+      : []),
+    ...(process.env.TRUSTED_ORIGINS
+      ? process.env.TRUSTED_ORIGINS.split(",").map((s) => s.trim()).filter(Boolean)
+      : []),
+  ],
+  advanced: {
+    cookiePrefix: "kodedock",
+    useSecureCookies: process.env.NODE_ENV === "production",
+    ...(process.env.COOKIE_DOMAIN
+      ? {
+          crossSubDomainCookies: {
+            enabled: true,
+            domain: process.env.COOKIE_DOMAIN,
+          },
+        }
+      : {}),
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          // Enforce RBAC validation on user registration: only BUYER or SELLER can be self-selected
+          const role = (user as any).role;
+          if (role !== "SELLER" && role !== "BUYER") {
+            (user as any).role = "BUYER";
+          }
+          return { data: user };
+        },
+      },
+    },
+  },
   emailAndPassword: {
     enabled: true,
     autoSignIn: true,

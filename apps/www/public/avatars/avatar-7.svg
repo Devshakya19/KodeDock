@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg7" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0C4A6E"/>
+      <stop offset="100%" stop-color="#0369A1"/>
+    </linearGradient>
+    <linearGradient id="accent7" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#818CF8"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="400" height="400" rx="200" fill="url(#bg7)"/>
+
+  <!-- Body -->
+  <path d="M85,380 C85,280 135,240 200,240 C265,240 315,280 315,380 Z" fill="#075985"/>
+  <rect x="185" y="240" width="30" height="140" fill="#0284C7"/>
+
+  <!-- Face & Neck -->
+  <rect x="180" y="200" width="40" height="45" fill="#BF8A69" rx="6"/>
+  <path d="M140,140 C140,205 160,225 200,225 C240,225 260,205 260,140 C260,105 240,95 200,95 C160,95 140,105 140,140 Z" fill="#DAA481"/>
+
+  <!-- Short Curly Hair -->
+  <circle cx="150" cy="110" r="18" fill="#1C1917"/>
+  <circle cx="180" cy="90" r="20" fill="#1C1917"/>
+  <circle cx="220" cy="90" r="20" fill="#1C1917"/>
+  <circle cx="250" cy="110" r="18" fill="#1C1917"/>
+
+  <!-- Tech Headset with mic -->
+  <path d="M125,145 C125,90 155,70 200,70 C245,70 275,90 275,145" fill="none" stroke="#38BDF8" stroke-width="5"/>
+  <rect x="110" y="130" width="18" height="32" rx="5" fill="#0284C7"/>
+  <rect x="272" y="130" width="18" height="32" rx="5" fill="#0284C7"/>
+  <path d="M280,150 L240,185" fill="none" stroke="#38BDF8" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="236" cy="188" r="5" fill="#38BDF8"/>
+
+  <!-- Code Tag -->
+  <rect x="150" y="325" width="100" height="24" rx="12" fill="#0C4A6E" stroke="#38BDF8" stroke-width="1.5"/>
+  <text x="200" y="341" font-family="monospace" font-size="11" font-weight="bold" fill="#38BDF8" text-anchor="middle">CLOUD//ARCH</text>
+</svg>

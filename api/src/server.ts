@@ -1,6 +1,6 @@
 import http from "node:http";
 import { toNodeHandler } from "better-auth/node";
-import { auth, initAuthDatabase } from "@kodedock/backend";
+import { auth, initAuthDatabase, pgPool } from "@kodedock/backend";
 import { handleCustomAuthRoutes } from "./routes/oauth.routes";
 import { handleProductRoutes } from "./routes/product.routes";
 import { handlePortalRoutes } from "./routes/portal.routes";
@@ -70,10 +70,10 @@ function setCorsHeaders(req: http.IncomingMessage, res: http.ServerResponse): bo
     res.setHeader("Access-Control-Allow-Origin", "*");
   }
 
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH");
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "Content-Type, Authorization, X-Requested-With, Cookie"
+    "Content-Type, Authorization, X-Requested-With, Cookie, Origin, Accept, X-Better-Auth-Origin"
   );
 
   if (req.method === "OPTIONS") {
@@ -127,29 +127,102 @@ export const server = http.createServer(async (req, res) => {
   const studioHandled = await handleStudioRoutes(req, res, pathname, url.searchParams);
   if (studioHandled) return;
 
-  // 3. Better Auth fallback routes (/api/auth/*)
+  // 7. Better Auth fallback routes (/api/auth/*)
   if (pathname.startsWith("/api/auth")) {
     return authNodeHandler(req, res);
   }
 
-  // 3. Protected endpoint: /api/me (Any authenticated user)
+  // 8. Protected endpoint: /api/me (Any authenticated user - verified from PostgreSQL)
   if (pathname === "/api/me" && req.method === "GET") {
     const authContext = await requireAuth(req, res);
     if (!authContext) return;
 
+    try {
+      const userRes = await pgPool.query(
+        `SELECT id, name, email, role, image, "emailVerified", "createdAt", "updatedAt" FROM "user" WHERE id = $1 LIMIT 1`,
+        [authContext.user.id]
+      );
+      const freshUser = userRes.rows[0] || authContext.user;
+
+      res.writeHead(200, { "Content-Type": "application/json" });
+      const response: ApiResponse = {
+        success: true,
+        data: {
+          user: {
+            ...authContext.user,
+            ...freshUser,
+          },
+          session: authContext.session,
+        },
+      };
+      res.end(JSON.stringify(response));
+      return;
+    } catch (err: any) {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(
+        JSON.stringify({
+          success: true,
+          data: {
+            user: authContext.user,
+            session: authContext.session,
+          },
+        })
+      );
+      return;
+    }
+  }
+
+  // 9. Role Update / Upgrade Endpoint: /api/me/role (Switch between BUYER and SELLER)
+  if (pathname === "/api/me/role" && (req.method === "POST" || req.method === "PUT" || req.method === "PATCH")) {
+    const authContext = await requireAuth(req, res);
+    if (!authContext) return;
+
+    let body = "";
+    for await (const chunk of req) body += chunk;
+    let data: any = {};
+    try {
+      data = JSON.parse(body || "{}");
+    } catch {
+      res.writeHead(400, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: false, error: { message: "Invalid JSON body" } }));
+      return;
+    }
+
+    const newRole = data.role;
+    if (newRole !== "BUYER" && newRole !== "SELLER") {
+      res.writeHead(400, { "Content-Type": "application/json" });
+      res.end(
+        JSON.stringify({
+          success: false,
+          error: {
+            code: "INVALID_ROLE",
+            message: "Self-selectable roles are restricted to 'BUYER' or 'SELLER'.",
+          },
+        })
+      );
+      return;
+    }
+
+    await pgPool.query(
+      `UPDATE "user" SET role = $1, "updatedAt" = NOW() WHERE id = $2`,
+      [newRole, authContext.user.id]
+    );
+
     res.writeHead(200, { "Content-Type": "application/json" });
-    const response: ApiResponse = {
-      success: true,
-      data: {
-        user: authContext.user,
-        session: authContext.session,
-      },
-    };
-    res.end(JSON.stringify(response));
+    res.end(
+      JSON.stringify({
+        success: true,
+        message: `Role successfully updated to ${newRole}`,
+        data: {
+          userId: authContext.user.id,
+          role: newRole,
+        },
+      })
+    );
     return;
   }
 
-  // 4. Protected endpoint: /api/studio/dashboard (SELLER role required)
+  // 10. Protected endpoint: /api/studio/dashboard (SELLER role required)
   if (pathname === "/api/studio/dashboard" && req.method === "GET") {
     const authContext = await requireRole(req, res, ["SELLER"]);
     if (!authContext) return;
