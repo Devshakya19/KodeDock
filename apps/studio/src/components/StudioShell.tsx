@@ -174,7 +174,7 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
                     />
                   )}
                   <Icon size={16} className="nav-item-icon" aria-hidden="true" />
-                  <span>{item.label}</span>
+                  <span style={{ whiteSpace: "nowrap" }}>{item.label}</span>
                   {badge !== undefined && badge > 0 && (
                     <span className="nav-badge">{badge}</span>
                   )}
@@ -186,6 +186,7 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
                         color: "var(--accent-primary)",
                         letterSpacing: "0.05em",
                         fontWeight: 700,
+                        flexShrink: 0,
                       }}
                     >
                       SHIP
@@ -214,7 +215,7 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
                     />
                   )}
                   <Icon size={16} className="nav-item-icon" aria-hidden="true" />
-                  <span>{item.label}</span>
+                  <span style={{ whiteSpace: "nowrap" }}>{item.label}</span>
                 </div>
               </Link>
             );
@@ -238,7 +239,7 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
                     />
                   )}
                   <Icon size={16} className="nav-item-icon" aria-hidden="true" />
-                  <span>{item.label}</span>
+                  <span style={{ whiteSpace: "nowrap" }}>{item.label}</span>
                 </div>
               </Link>
             );

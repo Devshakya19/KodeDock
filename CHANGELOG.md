@@ -48,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Harmonized Studio sidebar navigation into 3 logical groupings: *Engineering & Blueprints*, *Commerce & Settlements*, and *Preferences*.
 - Fixed sidebar route matching logic (`isRouteActive`), preventing `/products` from falsely matching `/products/new` and resolving duplicate active indicators and Framer Motion `layoutId="sidebarActivePill"` collisions.
 - Eliminated layout shifting and content jumps on sidebar navigation clicks by replacing `<AnimatePresence mode="wait">` with instant DOM mounting and enforcing `html { scrollbar-gutter: stable; overflow-y: scroll; }`.
+- Stabilized "Deploy Architecture" and all sidebar nav item positions by enforcing `white-space: nowrap`, expanding `--sidebar-width` to `272px`, adding `flex-shrink: 0` to badges, and removing disruptive hover/click `translateX` transforms so items stay permanently locked on a single line.
 - Restructured Deploy Architecture (`/products/new`) into an agency-tier 1380px side-by-side workspace: 4-step configuration chassis on the left and sticky live storefront comp preview on the right.
 - Replaced generic icon in Architecture Preview card with official `/kd.svg` brand logo with ambient purple drop-shadow.
 - Removed the redundant "Studio" badge chip next to the KodeDock brand in the sidebar header and simplified breadcrumb root to "KodeDock".
