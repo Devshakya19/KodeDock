@@ -300,10 +300,6 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
           </div>
 
           <div className="topbar-right">
-            <div className="db-status" aria-label="Database status: connected">
-              <div className="db-dot" aria-hidden="true" />
-              <span>PG16 SYNCED</span>
-            </div>
             <Link
               href="/products/new"
               className="island-cta-btn"

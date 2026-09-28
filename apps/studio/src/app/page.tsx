@@ -11,7 +11,6 @@ import {
   LayoutDashboard,
   ArrowUpRight,
   ShieldCheck,
-  Zap,
   ArrowRight,
   Clock,
   CheckCircle2,
@@ -21,7 +20,6 @@ import {
   CircleDollarSign,
   Activity,
   Terminal,
-  RefreshCw,
   Cpu,
   Lock,
   UploadCloud,
@@ -49,7 +47,6 @@ export default function StudioDashboardPage() {
 
   const [recentSales, setRecentSales] = useState<CreatorSale[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isSimulating, setIsSimulating] = useState(false);
   const [hoveredPoint, setHoveredPoint] = useState<ComputedPlotPoint | null>(null);
 
   const fetchStudioData = async () => {
@@ -75,45 +72,6 @@ export default function StudioDashboardPage() {
   useEffect(() => {
     fetchStudioData();
   }, []);
-
-  // Developer Sandbox: Real Order Simulator (Creates a real row in PostgreSQL `orders`, `licenses`, `seller_payouts`)
-  const handleSimulateSale = async () => {
-    setIsSimulating(true);
-    try {
-      const res = await fetch("/api/checkout/create-order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          items: [
-            {
-              id: "prod_nextjs_saas",
-              title: "Next.js 16 SaaS Architecture",
-              slug: "nextjs-16-saas-boilerplate",
-              licenseTier: "STANDARD",
-              pricePaise: 499900,
-            },
-          ],
-          customer: {
-            name: "Verified Engineer",
-            email: "engineer@enterprise.dev",
-            company: "Acme Systems",
-            domain: "app.acme.dev",
-          },
-          paymentMethod: "DEVELOPER_SANDBOX",
-          totalPaise: 499900,
-        }),
-      });
-
-      const json = await res.json();
-      if (json.success) {
-        await fetchStudioData();
-      }
-    } catch {
-      // Sandbox handling
-    } finally {
-      setIsSimulating(false);
-    }
-  };
 
   const creatorSharePaise = Math.round(stats.totalRevenuePaise * 0.95);
   const formattedCreatorShare = `₹${(creatorSharePaise / 100).toLocaleString("en-IN")}`;
@@ -207,28 +165,6 @@ export default function StudioDashboardPage() {
           </div>
 
           <div style={{ display: "flex", gap: "0.85rem", alignItems: "center", flexWrap: "wrap" }}>
-            {/* Developer Sandbox Order Trigger */}
-            <button
-              type="button"
-              onClick={handleSimulateSale}
-              disabled={isSimulating}
-              className="btn btn-secondary"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                padding: "0.55rem 1rem",
-                fontSize: "0.78rem",
-                borderRadius: "var(--radius-md)",
-                border: "1px dashed rgba(56, 189, 248, 0.3)",
-                color: "var(--accent-cyan)",
-              }}
-              title="Inserts a real order into PostgreSQL in sandbox mode"
-            >
-              <RefreshCw size={13} className={isSimulating ? "animate-spin" : ""} />
-              <span>{isSimulating ? "Transacting..." : "Simulate Sandbox Sale"}</span>
-            </button>
-
             <Link
               href="/payouts"
               className="btn btn-secondary"
@@ -354,13 +290,7 @@ export default function StudioDashboardPage() {
                 </p>
               </div>
 
-              {/* Real Connection Status Indicator */}
-              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                <span style={{ fontSize: "0.7rem", fontFamily: "var(--font-mono)", color: "var(--status-success)", background: "rgba(16, 185, 129, 0.08)", border: "1px solid rgba(16, 185, 129, 0.2)", padding: "0.3rem 0.65rem", borderRadius: "9999px", display: "inline-flex", alignItems: "center", gap: "0.4rem" }}>
-                  <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--status-success)", boxShadow: "0 0 6px var(--status-success)" }} />
-                  POSTGRESQL POOL ACTIVE
-                </span>
-              </div>
+
             </div>
 
             {/* Dynamic Graph Canvas: Real SQL Plot or Clean Hardware Telemetry */}
@@ -471,16 +401,6 @@ export default function StudioDashboardPage() {
                     No orders have been recorded in your PostgreSQL database yet. Once developers purchase your boilerplates on the KodeDock Store, live time-series velocity will plot here automatically.
                   </p>
                   <div style={{ display: "inline-flex", gap: "0.75rem", flexWrap: "wrap", justifyContent: "center" }}>
-                    <button
-                      type="button"
-                      onClick={handleSimulateSale}
-                      disabled={isSimulating}
-                      className="btn btn-secondary"
-                      style={{ padding: "0.5rem 1rem", fontSize: "0.8rem", color: "var(--accent-cyan)" }}
-                    >
-                      <Zap size={14} />
-                      <span>{isSimulating ? "Simulating..." : "Test Sandbox Transaction"}</span>
-                    </button>
                     <Link
                       href="/products/new"
                       className="btn btn-primary"

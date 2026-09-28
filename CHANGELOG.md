@@ -30,6 +30,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added backend checkout endpoint `POST /api/checkout/create-order` in `api/` creating real PostgreSQL `orders`, `licenses`, and `seller_payouts` records.
 
 ### Changed
+- Removed internal/toy debugging badges and simulation triggers across Studio in strict adherence to production SaaS standards:
+  - Removed `PG16 SYNCED` indicator badge from Studio topbar in `StudioShell.tsx`.
+  - Removed `Simulate Sandbox Sale` button, simulation handler, and empty-state sandbox trigger from `apps/studio/src/app/page.tsx`.
+  - Removed `POSTGRESQL POOL ACTIVE` badge from the sales velocity telemetry radar header in `apps/studio/src/app/page.tsx`.
+  - Replaced the Deploy Architecture (`/products/new`) subtitle with clean agency-tier copy: *"Configure specifications, release private archives, and publish production-grade architectures with 95% creator revenue share."*
+  - Removed `ZERO-LEAK HMAC ENFORCED` badge from the `/products/new` page header.
+  - Removed `REAL-TIME PREVIEW` badge from the sticky storefront comp preview card in `/products/new`.
+  - Removed `ACTIVE STANDING` tag from the verified creator standing card in `/settings`.
+- Verified 100% compliance with 60-30-10 color palette (`#090A0F` Obsidian Canvas, `#12131A` Graphite Surfaces, `#8B5CF6` Electric Purple, `#38BDF8` Cyber Cyan) and Fontshare typography across all Studio views.
 - Elevated `apps/store` navigation tab from generic "News" to "Radar" with developer-centric `<Radio />` icon.
 - Enhanced `PurchasePanel` and `ProductCard` to bind directly to reactive `useCart` and `useWishlist` hooks with instant visual feedback.
 

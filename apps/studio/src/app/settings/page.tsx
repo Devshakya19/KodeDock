@@ -142,9 +142,6 @@ export default function StudioSettingsPage() {
                   <h2 style={{ fontFamily: "var(--font-display)", fontSize: "1.2rem", fontWeight: 700, color: "#ffffff" }}>
                     {displayName || "Verified Creator Account"}
                   </h2>
-                  <span style={{ fontSize: "0.65rem", fontFamily: "var(--font-mono)", padding: "0.2rem 0.5rem", borderRadius: "4px", background: "rgba(16, 185, 129, 0.15)", border: "1px solid rgba(16, 185, 129, 0.3)", color: "var(--status-success)", fontWeight: 700 }}>
-                    ACTIVE STANDING
-                  </span>
                 </div>
                 <p style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: "0.25rem" }}>
                   {creatorEmail || "creator@kodedock.local"} &bull; Eligible for automated 95% payouts and featured marketplace curation.
@@ -352,8 +349,8 @@ export default function StudioSettingsPage() {
                     <span style={{ fontFamily: "var(--font-mono)", color: "var(--accent-cyan)", fontWeight: 700 }}>HMAC 60s SIGNED</span>
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span>Database State Parity</span>
-                    <span style={{ fontFamily: "var(--font-mono)", color: "var(--text-muted)" }}>PostgreSQL 16 SYNCED</span>
+                    <span>Archive Storage Vault</span>
+                    <span style={{ fontFamily: "var(--font-mono)", color: "var(--text-muted)" }}>Encrypted Private R2</span>
                   </div>
                 </div>
               </div>

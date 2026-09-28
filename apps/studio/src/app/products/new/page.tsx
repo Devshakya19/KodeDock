@@ -231,15 +231,8 @@ export default function DeployArchitecturePage() {
               Deploy <span style={{ color: "var(--accent-primary)" }}>Architecture</span>
             </h1>
             <p className="page-subtitle" style={{ fontSize: "0.92rem", maxWidth: "680px" }}>
-              List your production-ready software architecture with automated Ed25519 licensing, Cloudflare R2 private archives, and 95% creator payouts.
+              Configure specifications, release private archives, and publish production-grade architectures with 95% creator revenue share.
             </p>
-          </div>
-
-          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-            <span style={{ fontSize: "0.72rem", fontFamily: "var(--font-mono)", color: "var(--status-success)", background: "rgba(16, 185, 129, 0.1)", border: "1px solid rgba(16, 185, 129, 0.25)", padding: "0.35rem 0.75rem", borderRadius: "20px", display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
-              <ShieldCheck size={13} />
-              <span>ZERO-LEAK HMAC ENFORCED</span>
-            </span>
           </div>
         </div>
       </div>
@@ -868,9 +861,6 @@ export default function DeployArchitecturePage() {
                 Live Storefront Telemetry
               </span>
             </div>
-            <span style={{ fontSize: "0.68rem", color: "var(--accent-cyan)", fontFamily: "var(--font-mono)", fontWeight: 700 }}>
-              REAL-TIME PREVIEW
-            </span>
           </div>
 
           {/* Card Preview Component */}
