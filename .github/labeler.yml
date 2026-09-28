@@ -11,7 +11,7 @@ area:www:
   - apps/www/**/*
 
 area:api:
-  - api/**/*
+  - src/api/**/*
   - src/auth/**/*
 
 area:database:

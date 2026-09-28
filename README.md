@@ -186,7 +186,7 @@ All pull requests and commits are automatically verified through our focused Git
 - **`.github/workflows/ci.yml` (Master Monorepo CI)**:
   - `preflight`: Automated typo checks (`crate-ci/typos`), database DDL parity verification (`docker/schema.sql` vs `src/db/schema.sql`), and Docker Compose configuration syntax checks.
   - `typecheck`: Matrix typecheck across Node.js `20` and `22` (`pnpm run typecheck`).
-  - `build-apps`: Production build matrix for `@kodedock/store`, `@kodedock/portal`, and `@kodedock/api`.
+  - `build-apps`: Production build matrix for `@kodedock/store`, `@kodedock/portal`, `@kodedock/studio`, and `@kodedock/backend`.
   - `database-validation`: PostgreSQL 16 container, DDL execution, constraint integrity checks.
   - `ci-status-gate`: Master required rollup gate for branch protection.
 - **`.github/workflows/security.yml` (Security, Secrets & CodeQL)**:
