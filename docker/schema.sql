@@ -184,6 +184,7 @@ CREATE TABLE IF NOT EXISTS user_settings (
   state VARCHAR(100),
   notification_rules JSONB DEFAULT '{"new-release": true, "security-patch": true, "download-ready": true, "payment-confirm": true, "license-expiry": true, "newsletter": false}'::jsonb,
   domain_allowlist JSONB DEFAULT '[]'::jsonb,
+  creator_preferences JSONB DEFAULT '{}'::jsonb,
   public_profile BOOLEAN DEFAULT TRUE,
   purchase_history_public BOOLEAN DEFAULT FALSE,
   analytics_sharing BOOLEAN DEFAULT TRUE,

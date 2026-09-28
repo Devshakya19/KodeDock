@@ -9,7 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Created `@kodedock/studio` application package (`apps/studio`) running on port 3001 with Turbopack, Fontshare Suite, and high-end obsidian bento grid theme.
+- Created agency-grade, modular Creator Studio Settings Suite in `apps/studio/src/components/settings/` tailored for software creators, architects, and sellers, mirroring Portal Settings with 8 dedicated configuration domains:
+  - `CreatorProfileSettings.tsx`: Public architectural brand name, 10-identity avatar picker, manifesto/bio, and GitHub / Twitter / Portfolio social channels.
+  - `PayoutBankingSettings.tsx`: Instant UPI VPA and Direct Bank Transfer (NEFT/RTGS) rails, automatic settlement thresholds, and 95% creator revenue split ledger breakdown.
+  - `LicensingEngineSettings.tsx`: Ed25519 Curve25519 cryptographic parameters, default Standard & Extended pricing in paise, domain activation limits, and machine seat allocations.
+  - `StorageVaultSettings.tsx`: Cloudflare R2 isolated private bucket vault, strict 60-second HMAC signed download link expiration, mandatory SHA-256 archive digests, and upload quotas.
+  - `NotificationRulesSettings.tsx`: Real-time instant sale push/email alerts, payout settlement confirmations, release broadcasts, buyer review feedback, and outgoing Discord/Slack webhook feeds.
+  - `CliApiKeysSettings.tsx`: Studio CLI deployment keys (`kd_studio_sec_{hex}`) for headless CI/CD publishing (`kodedock deploy`, `kodedock release`) with customizable scopes and instant revocation.
+  - `TaxComplianceSettings.tsx`: Legal entity structures (Individual / LLP / Pvt Ltd), GSTIN, PAN, and registered billing address for Indian Section 194-O TDS compliance.
+  - `DangerZoneSettings.tsx`: Studio maintenance mode, catalog delisting, and typed two-step account decommissioning.
+- Added backend REST endpoints in `api/src/routes/studio.routes.ts` (`GET /api/studio/settings`, `PATCH /api/studio/settings`, `GET /api/studio/api-keys`, `POST /api/studio/api-keys`, `DELETE /api/studio/api-keys`) with 100% real PostgreSQL persistence and zero mock data.
+- Enforced database DDL parity across `docker/schema.sql` and `src/db/schema.sql` with `creator_preferences JSONB DEFAULT '{}'::jsonb` in `user_settings`.
 - Created Studio Shell layout (`StudioShell.tsx`) with fixed navigation sidebar, active route indicators, breadcrumbs, and Lenis smooth scrolling.
 - Created Creator Dashboard (`/`) featuring real-time gross revenue, 95% creator net split, active listing counts, copies sold, SVG trajectory graph, and live order feed.
 - Created Product Inventory & Catalog Manager (`/products`) with status badges, direct links to releases, and search filters.

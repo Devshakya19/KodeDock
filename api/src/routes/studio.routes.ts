@@ -469,5 +469,308 @@ export async function handleStudioRoutes(
     }
   }
 
+  // -------------------------------------------------------------
+  // 7. Creator Studio Settings Suite (/api/studio/settings)
+  // -------------------------------------------------------------
+  if (pathname === "/api/studio/settings" && req.method === "GET") {
+    try {
+      const sellerId = "usr_kodedock_creator";
+
+      await pgPool.query(
+        `INSERT INTO "user" (id, name, email, role, "emailVerified", "createdAt", "updatedAt")
+         VALUES ($1, 'Verified Creator', 'creator@kodedock.local', 'SELLER', true, NOW(), NOW())
+         ON CONFLICT (id) DO NOTHING;`,
+        [sellerId]
+      );
+
+      await pgPool.query(
+        `INSERT INTO user_settings (user_id, creator_preferences, updated_at)
+         VALUES ($1, '{}'::jsonb, NOW())
+         ON CONFLICT (user_id) DO NOTHING;`,
+        [sellerId]
+      );
+
+      const userRes = await pgPool.query(
+        `SELECT id, name, email, image, role, "createdAt" as created_at FROM "user" WHERE id = $1 LIMIT 1`,
+        [sellerId]
+      );
+      const settingsRes = await pgPool.query(
+        `SELECT gstin, pan, billing_address, city, state, notification_rules, creator_preferences, updated_at
+         FROM user_settings WHERE user_id = $1 LIMIT 1`,
+        [sellerId]
+      );
+
+      const u = userRes.rows[0] || {};
+      const s = settingsRes.rows[0] || {};
+      const cp = s.creator_preferences || {};
+      const nr = s.notification_rules || {};
+
+      const settingsData = {
+        profile: {
+          name: u.name || "Verified Creator",
+          email: u.email || "creator@kodedock.local",
+          image: u.image || "/kd.svg",
+          bio: cp.bio || "",
+          github_handle: cp.github_handle || "",
+          twitter_handle: cp.twitter_handle || "",
+          website_url: cp.website_url || "",
+        },
+        payouts: {
+          payout_channel: cp.payout_channel || "UPI",
+          upi_id: cp.upi_id || "",
+          bank_name: cp.bank_name || "",
+          bank_account_number: cp.bank_account_number || "",
+          bank_ifsc: cp.bank_ifsc || "",
+          bank_holder_name: cp.bank_holder_name || "",
+          payout_threshold_inr: Number(cp.payout_threshold_inr) || 5000,
+          revenue_split_percent: 95,
+        },
+        licensing: {
+          algorithm: "Ed25519",
+          default_standard_price_paise: Number(cp.default_standard_price_paise) || 499900,
+          default_extended_price_paise: Number(cp.default_extended_price_paise) || 1499900,
+          default_allowed_domains: Number(cp.default_allowed_domains) || 1,
+          default_machine_seats: Number(cp.default_machine_seats) || 3,
+        },
+        storage: {
+          provider: "Cloudflare R2",
+          bucket_name: cp.bucket_name || "kodedock-private-vault",
+          max_archive_mb: Number(cp.max_archive_mb) || 250,
+          hmac_ttl_seconds: 60,
+          checksum_algorithm: "SHA-256",
+        },
+        notifications: {
+          notify_on_sale: nr["sale-instant"] !== false,
+          notify_on_payout: nr["payout-confirm"] !== false,
+          notify_on_release: nr["release-broadcast"] !== false,
+          notify_on_review: nr["buyer-review"] !== false,
+          webhook_url: cp.webhook_url || "",
+        },
+        tax: {
+          legal_entity_type: cp.legal_entity_type || "INDIVIDUAL",
+          gstin: s.gstin || "",
+          pan: s.pan || "",
+          billing_address: s.billing_address || "",
+          city: s.city || "",
+          state: s.state || "",
+        },
+        is_maintenance_mode: Boolean(cp.is_maintenance_mode),
+        updated_at: s.updated_at || new Date().toISOString(),
+      };
+
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: true, data: settingsData }));
+      return true;
+    } catch (err: any) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: false, error: { message: err.message } }));
+      return true;
+    }
+  }
+
+  if (pathname === "/api/studio/settings" && req.method === "PATCH") {
+    try {
+      const body = await parseJsonBody<any>(req);
+      const sellerId = "usr_kodedock_creator";
+
+      if (body.profile?.name || body.profile?.image) {
+        const updates: string[] = [];
+        const params: any[] = [];
+        let pIdx = 1;
+
+        if (body.profile.name) {
+          updates.push(`name = $${pIdx++}`);
+          params.push(body.profile.name.trim());
+        }
+        if (body.profile.image) {
+          updates.push(`image = $${pIdx++}`);
+          params.push(body.profile.image.trim());
+        }
+        updates.push(`"updatedAt" = NOW()`);
+        params.push(sellerId);
+
+        await pgPool.query(
+          `UPDATE "user" SET ${updates.join(", ")} WHERE id = $${pIdx}`,
+          params
+        );
+      }
+
+      const currentRes = await pgPool.query(
+        `SELECT gstin, pan, billing_address, city, state, notification_rules, creator_preferences
+         FROM user_settings WHERE user_id = $1 LIMIT 1`,
+        [sellerId]
+      );
+      const currentCp = currentRes.rows[0]?.creator_preferences || {};
+      const currentNr = currentRes.rows[0]?.notification_rules || {};
+
+      const newCp = {
+        ...currentCp,
+        ...(body.profile?.bio !== undefined && { bio: body.profile.bio.trim() }),
+        ...(body.profile?.github_handle !== undefined && { github_handle: body.profile.github_handle.trim() }),
+        ...(body.profile?.twitter_handle !== undefined && { twitter_handle: body.profile.twitter_handle.trim() }),
+        ...(body.profile?.website_url !== undefined && { website_url: body.profile.website_url.trim() }),
+        ...(body.payouts?.payout_channel !== undefined && { payout_channel: body.payouts.payout_channel }),
+        ...(body.payouts?.upi_id !== undefined && { upi_id: body.payouts.upi_id.trim() }),
+        ...(body.payouts?.bank_name !== undefined && { bank_name: body.payouts.bank_name.trim() }),
+        ...(body.payouts?.bank_account_number !== undefined && { bank_account_number: body.payouts.bank_account_number.trim() }),
+        ...(body.payouts?.bank_ifsc !== undefined && { bank_ifsc: body.payouts.bank_ifsc.trim() }),
+        ...(body.payouts?.bank_holder_name !== undefined && { bank_holder_name: body.payouts.bank_holder_name.trim() }),
+        ...(body.payouts?.payout_threshold_inr !== undefined && { payout_threshold_inr: Number(body.payouts.payout_threshold_inr) }),
+        ...(body.licensing?.default_standard_price_paise !== undefined && { default_standard_price_paise: Number(body.licensing.default_standard_price_paise) }),
+        ...(body.licensing?.default_extended_price_paise !== undefined && { default_extended_price_paise: Number(body.licensing.default_extended_price_paise) }),
+        ...(body.licensing?.default_allowed_domains !== undefined && { default_allowed_domains: Number(body.licensing.default_allowed_domains) }),
+        ...(body.licensing?.default_machine_seats !== undefined && { default_machine_seats: Number(body.licensing.default_machine_seats) }),
+        ...(body.storage?.bucket_name !== undefined && { bucket_name: body.storage.bucket_name.trim() }),
+        ...(body.storage?.max_archive_mb !== undefined && { max_archive_mb: Number(body.storage.max_archive_mb) }),
+        ...(body.notifications?.webhook_url !== undefined && { webhook_url: body.notifications.webhook_url.trim() }),
+        ...(body.tax?.legal_entity_type !== undefined && { legal_entity_type: body.tax.legal_entity_type }),
+        ...(body.is_maintenance_mode !== undefined && { is_maintenance_mode: Boolean(body.is_maintenance_mode) }),
+      };
+
+      const newNr = {
+        ...currentNr,
+        ...(body.notifications?.notify_on_sale !== undefined && { "sale-instant": Boolean(body.notifications.notify_on_sale) }),
+        ...(body.notifications?.notify_on_payout !== undefined && { "payout-confirm": Boolean(body.notifications.notify_on_payout) }),
+        ...(body.notifications?.notify_on_release !== undefined && { "release-broadcast": Boolean(body.notifications.notify_on_release) }),
+        ...(body.notifications?.notify_on_review !== undefined && { "buyer-review": Boolean(body.notifications.notify_on_review) }),
+      };
+
+      const gstin = body.tax?.gstin !== undefined ? body.tax.gstin.trim() : (currentRes.rows[0]?.gstin || null);
+      const pan = body.tax?.pan !== undefined ? body.tax.pan.trim() : (currentRes.rows[0]?.pan || null);
+      const billingAddress = body.tax?.billing_address !== undefined ? body.tax.billing_address.trim() : (currentRes.rows[0]?.billing_address || null);
+      const city = body.tax?.city !== undefined ? body.tax.city.trim() : (currentRes.rows[0]?.city || null);
+      const state = body.tax?.state !== undefined ? body.tax.state.trim() : (currentRes.rows[0]?.state || null);
+
+      await pgPool.query(
+        `INSERT INTO user_settings (
+          user_id, gstin, pan, billing_address, city, state,
+          notification_rules, creator_preferences, updated_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8::jsonb, NOW())
+        ON CONFLICT (user_id) DO UPDATE SET
+          gstin = EXCLUDED.gstin,
+          pan = EXCLUDED.pan,
+          billing_address = EXCLUDED.billing_address,
+          city = EXCLUDED.city,
+          state = EXCLUDED.state,
+          notification_rules = EXCLUDED.notification_rules,
+          creator_preferences = EXCLUDED.creator_preferences,
+          updated_at = NOW();`,
+        [sellerId, gstin, pan, billingAddress, city, state, JSON.stringify(newNr), JSON.stringify(newCp)]
+      );
+
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: true, message: "Studio preferences persisted successfully" }));
+      return true;
+    } catch (err: any) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: false, error: { message: err.message } }));
+      return true;
+    }
+  }
+
+  // -------------------------------------------------------------
+  // 8. Studio CLI Deployment Tokens (/api/studio/api-keys)
+  // -------------------------------------------------------------
+  if (pathname === "/api/studio/api-keys" && req.method === "GET") {
+    try {
+      const sellerId = "usr_kodedock_creator";
+      const sql = `
+        SELECT id, name, key_hint, permissions, expires_at, last_used_at, created_at
+        FROM api_keys
+        WHERE user_id = $1 AND role = 'SELLER'
+        ORDER BY created_at DESC;
+      `;
+      const result = await pgPool.query(sql, [sellerId]);
+
+      const tokens = result.rows.map((r) => ({
+        id: r.id,
+        name: r.name,
+        tokenMasked: `kd_studio_sec_${r.key_hint}••••••••`,
+        createdAt: r.created_at,
+        expiresIn: r.expires_at ? new Date(r.expires_at).toLocaleDateString() : "Never",
+        scopes: Array.isArray(r.permissions) ? r.permissions : ["packages:write", "releases:publish"],
+        lastUsed: r.last_used_at ? new Date(r.last_used_at).toLocaleTimeString() : "Never",
+        status: r.expires_at && new Date(r.expires_at) < new Date() ? "REVOKED" : "ACTIVE",
+      }));
+
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: true, data: tokens }));
+      return true;
+    } catch (err: any) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: false, error: { message: err.message } }));
+      return true;
+    }
+  }
+
+  if (pathname === "/api/studio/api-keys" && req.method === "POST") {
+    try {
+      const body = await parseJsonBody<any>(req);
+      const sellerId = "usr_kodedock_creator";
+      const name = (body.name || "Studio CLI Deploy Key").trim();
+
+      const hex = crypto.randomBytes(18).toString("hex");
+      const fullToken = `kd_studio_sec_${hex}`;
+      const keyHash = crypto.createHash("sha256").update(fullToken).digest("hex");
+      const keyHint = hex.slice(0, 6);
+      const id = `cli_${Date.now()}`;
+      const expiryDays = Number(body.expiryDays) || 180;
+      const expiresAt = body.expiryDays === "never" ? null : new Date(Date.now() + expiryDays * 86400 * 1000);
+      const scopes = Array.isArray(body.scopes) && body.scopes.length > 0
+        ? body.scopes
+        : ["packages:write", "releases:publish", "telemetry:read"];
+
+      await pgPool.query(
+        `INSERT INTO api_keys (id, user_id, key_hash, key_hint, name, role, permissions, expires_at, created_at)
+         VALUES ($1, $2, $3, $4, $5, 'SELLER', $6::jsonb, $7, NOW());`,
+        [id, sellerId, keyHash, keyHint, name, JSON.stringify(scopes), expiresAt]
+      );
+
+      res.writeHead(201, { "Content-Type": "application/json" });
+      res.end(
+        JSON.stringify({
+          success: true,
+          data: {
+            id,
+            name,
+            token: fullToken,
+            tokenMasked: `kd_studio_sec_${keyHint}••••••••`,
+            scopes,
+            expiresAt,
+          },
+        })
+      );
+      return true;
+    } catch (err: any) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: false, error: { message: err.message } }));
+      return true;
+    }
+  }
+
+  if (pathname === "/api/studio/api-keys" && req.method === "DELETE") {
+    try {
+      const body = await parseJsonBody<any>(req);
+      const keyId = body.id || searchParams.get("id");
+      const sellerId = "usr_kodedock_creator";
+
+      if (!keyId) {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ success: false, error: { message: "Key ID required for revocation" } }));
+        return true;
+      }
+
+      await pgPool.query(`DELETE FROM api_keys WHERE id = $1 AND user_id = $2`, [keyId, sellerId]);
+
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: true, message: "Studio API token revoked successfully" }));
+      return true;
+    } catch (err: any) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: false, error: { message: err.message } }));
+      return true;
+    }
+  }
+
   return false;
 }
