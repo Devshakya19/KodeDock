@@ -1,0 +1,51 @@
+name: Docker Container Validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docker/**'
+      - 'api/**'
+      - 'src/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'docker/**'
+      - 'api/**'
+      - 'src/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  docker-compose-validate:
+    name: Validate Docker Compose Configuration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate Compose Config
+        run: docker compose -f docker/docker-compose.yml config
+
+  dockerfile-build:
+    name: Build API Gateway Container Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build API Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile.api
+          push: false
+          tags: kodedock/api:test

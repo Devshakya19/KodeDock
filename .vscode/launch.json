@@ -1,0 +1,83 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug: API Gateway (Port 4000)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@kodedock/api", "dev"],
+      "port": 9229,
+      "console": "integratedTerminal",
+      "restart": true,
+      "env": {
+        "PORT": "4000",
+        "DATABASE_URL": "postgres://kodedock:kodedock_dev_password@localhost:5432/kodedock_db",
+        "NODE_ENV": "development"
+      }
+    },
+    {
+      "name": "Debug: Studio App (Port 3001)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@kodedock/studio", "dev"],
+      "port": 9230,
+      "console": "integratedTerminal",
+      "env": {
+        "PORT": "3001",
+        "INTERNAL_API_URL": "http://localhost:4000",
+        "NODE_ENV": "development"
+      }
+    },
+    {
+      "name": "Debug: Store App (Port 3002)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@kodedock/store", "dev"],
+      "port": 9231,
+      "console": "integratedTerminal",
+      "env": {
+        "PORT": "3002",
+        "INTERNAL_API_URL": "http://localhost:4000",
+        "NODE_ENV": "development"
+      }
+    },
+    {
+      "name": "Debug: Portal App (Port 3003)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@kodedock/portal", "dev"],
+      "port": 9232,
+      "console": "integratedTerminal",
+      "env": {
+        "PORT": "3003",
+        "INTERNAL_API_URL": "http://localhost:4000",
+        "NODE_ENV": "development"
+      }
+    },
+    {
+      "name": "Attach: Chrome Debugger (Studio - 3001)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3001",
+      "webRoot": "${workspaceFolder}/apps/studio"
+    },
+    {
+      "name": "Attach: Chrome Debugger (Store - 3002)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3002",
+      "webRoot": "${workspaceFolder}/apps/store"
+    },
+    {
+      "name": "Attach: Chrome Debugger (Portal - 3003)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3003",
+      "webRoot": "${workspaceFolder}/apps/portal"
+    }
+  ]
+}

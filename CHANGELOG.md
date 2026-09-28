@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Created complete `.vscode/` developer workspace suite:
+  - `.vscode/settings.json`: TypeScript workspace SDK, Prettier formatting on save, monorepo file nesting, search exclusions (`.turbo`, `.next`, `dist`), Tailwind CSS token completion, and SQLTools PostgreSQL configuration.
+  - `.vscode/extensions.json`: Curated extension recommendations for ESLint, Prettier, Tailwind, Docker, SQLTools, REST Client, GitLens, YAML, and GitHub Actions.
+  - `.vscode/launch.json`: Full debugger profiles for API Gateway (port 4000), Studio (port 3001), Store (port 3002), Portal (port 3003), and Chrome browser attaching.
+  - `.vscode/tasks.json`: Monorepo build, dev, typecheck, lint, Docker Compose, and schema parity validation tasks.
+- Created extra GitHub Workflows and Reusable Actions in `.github/`:
+  - `.github/actions/setup-monorepo/action.yml`: Standardized composite action configuring pnpm, Node 22, and Turborepo cache.
+  - `.github/workflows/lint.yml`: Monorepo ESLint & code style quality gate.
+  - `.github/workflows/api-smoke-test.yml`: Live PostgreSQL 16 & API Gateway endpoint smoke test matrix (`/api/health`, `/api/products`, `/api/studio/settings`, `/api/studio/api-keys`, `/api/portal/licenses`).
+  - `.github/workflows/dependency-review.yml`: Supply chain vulnerability & commercial license compliance verification for pull requests.
+  - `.github/workflows/docker-build.yml`: Docker Compose configuration validation and multi-stage API Gateway container builds.
+  - `.github/workflows/stale.yml`: Automated stale issue and pull request thread lifecycle management.
+  - `docker/Dockerfile.api`: Production multi-stage containerfile for `@kodedock/api`.
 - Created agency-grade, modular Creator Studio Settings Suite in `apps/studio/src/components/settings/` tailored for software creators, architects, and sellers, mirroring Portal Settings with 8 dedicated configuration domains:
   - `CreatorProfileSettings.tsx`: Public architectural brand name, 10-identity avatar picker, manifesto/bio, and GitHub / Twitter / Portfolio social channels.
   - `PayoutBankingSettings.tsx`: Instant UPI VPA and Direct Bank Transfer (NEFT/RTGS) rails, automatic settlement thresholds, and 95% creator revenue split ledger breakdown.

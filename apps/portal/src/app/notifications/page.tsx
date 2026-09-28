@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bell, ShieldAlert, Sparkles, ArrowRight } from "lucide-react";
 
@@ -160,7 +161,7 @@ export default function NotificationsPage() {
                     </p>
 
                     <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                      <a
+                      <Link
                         href="/"
                         style={{
                           display: "inline-flex",
@@ -174,7 +175,7 @@ export default function NotificationsPage() {
                       >
                         <span>View Vault</span>
                         <ArrowRight size={13} aria-hidden="true" />
-                      </a>
+                      </Link>
                       <span
                         className={`pill ${item.type === "SECURITY" ? "pill-danger" : "pill-purple"}`}
                       >

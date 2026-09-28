@@ -1,0 +1,32 @@
+{
+  "recommendations": [
+    // ── Code Formatting & Linting ───────────────────────────────────────────
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "editorconfig.editorconfig",
+
+    // ── Styling, Tailwind & Design Intelligence ─────────────────────────────
+    "bradlc.vscode-tailwindcss",
+    "csstree.stylelint",
+
+    // ── Infrastructure & Databases ──────────────────────────────────────────
+    "ms-azuretools.vscode-docker",
+    "mtxr.sqltools",
+    "mtxr.sqltools-driver-pg",
+
+    // ── API & HTTP Verification ─────────────────────────────────────────────
+    "humao.rest-client",
+
+    // ── Version Control & GitHub Integration ────────────────────────────────
+    "eamodio.gitlens",
+    "github.vscode-github-actions",
+    "github.vscode-pull-request-github",
+
+    // ── Configuration & File Formats ────────────────────────────────────────
+    "redhat.vscode-yaml",
+    "tamasfe.even-better-toml"
+  ],
+  "unwantedRecommendations": [
+    "ms-vscode.vscode-typescript-tslint-plugin"
+  ]
+}

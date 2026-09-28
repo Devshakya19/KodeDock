@@ -1,0 +1,30 @@
+name: KodeDock Lint & Code Quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Monorepo ESLint & Code Style
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Monorepo Environment
+        uses: ./.github/actions/setup-monorepo
+        with:
+          turbo-cache-key: 'lint'
+
+      - name: Run ESLint across all apps and packages
+        run: pnpm run lint

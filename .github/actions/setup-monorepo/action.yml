@@ -1,0 +1,48 @@
+name: 'Setup KodeDock Monorepo'
+description: 'Standardized composite action to configure Node 22, pnpm, Turborepo caching, and dependencies'
+
+inputs:
+  node-version:
+    description: 'Node.js version to configure'
+    required: false
+    default: '22'
+  turbo-cache:
+    description: 'Whether to restore Turborepo cache'
+    required: false
+    default: 'true'
+  turbo-cache-key:
+    description: 'Cache key identifier'
+    required: false
+    default: 'default'
+  install-deps:
+    description: 'Whether to run pnpm install'
+    required: false
+    default: 'true'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+      shell: bash
+
+    - name: Setup Node.js ${{ inputs.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: 'pnpm'
+
+    - name: Restore Turborepo cache
+      if: inputs.turbo-cache == 'true'
+      uses: actions/cache@v4
+      with:
+        path: .turbo
+        key: ${{ runner.os }}-turbo-${{ inputs.turbo-cache-key }}-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-turbo-${{ inputs.turbo-cache-key }}-
+          ${{ runner.os }}-turbo-
+
+    - name: Install dependencies
+      if: inputs.install-deps == 'true'
+      run: pnpm install --frozen-lockfile
+      shell: bash

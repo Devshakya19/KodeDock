@@ -1,0 +1,61 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Monorepo: Start All Dev Servers (Turbo)",
+      "type": "shell",
+      "command": "pnpm run dev",
+      "isBackground": true,
+      "problemMatcher": ["$ts-checker-webpack-watch"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Monorepo: Production Build",
+      "type": "shell",
+      "command": "pnpm run build",
+      "group": "build",
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "Monorepo: Typecheck (tsc --noEmit)",
+      "type": "shell",
+      "command": "pnpm run typecheck",
+      "group": "test",
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "Monorepo: Lint Codebase (ESLint)",
+      "type": "shell",
+      "command": "pnpm run lint",
+      "group": "test",
+      "problemMatcher": ["$eslint-stylish"]
+    },
+    {
+      "label": "Database: Docker Compose Up (Postgres & Redis)",
+      "type": "shell",
+      "command": "docker compose -f docker/docker-compose.yml up -d",
+      "group": "none"
+    },
+    {
+      "label": "Database: Docker Compose Down",
+      "type": "shell",
+      "command": "docker compose -f docker/docker-compose.yml down",
+      "group": "none"
+    },
+    {
+      "label": "Database: Verify DDL Schema Parity",
+      "type": "shell",
+      "command": "diff -u --strip-trailing-cr docker/schema.sql src/db/schema.sql && echo 'Schema Parity Verified (0 drift)'",
+      "group": "test"
+    },
+    {
+      "label": "Monorepo: Clean Turborepo & Caches",
+      "type": "shell",
+      "command": "turbo run clean && rm -rf .turbo node_modules/.cache",
+      "group": "none"
+    }
+  ]
+}
