@@ -16,8 +16,10 @@ import {
   Settings,
   ExternalLink,
   ChevronRight,
+  ChevronDown,
   LayoutDashboard,
   LogOut,
+  Sparkles,
 } from "lucide-react";
 
 interface PortalShellProps {
@@ -39,8 +41,23 @@ export const PortalShell: React.FC<PortalShellProps> = ({ children }) => {
   const [libraryCount, setLibraryCount] = useState<number>(0);
   const [notifCount, setNotifCount] = useState<number>(0);
   const [buyerName, setBuyerName] = useState<string>("Developer");
+  const [buyerEmail, setBuyerEmail] = useState<string>("developer@kodedock.local");
   const [buyerAvatar, setBuyerAvatar] = useState<string>("");
+  const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const lenisRef = useRef<any>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
 
   useEffect(() => {
     // Init Lenis ultra-smooth scroll with liquid exponential physics
@@ -119,6 +136,7 @@ export const PortalShell: React.FC<PortalShellProps> = ({ children }) => {
       .then((d) => {
         if (d.success && d.data) {
           setBuyerName(d.data.name || "Developer");
+          if (d.data.email) setBuyerEmail(d.data.email);
           setBuyerAvatar(d.data.image || getAutoAvatar(d.data.id || d.data.email || d.data.name));
 
           // Populate localStorage and sessionStorage on portal origin (port 3002)
@@ -230,9 +248,9 @@ export const PortalShell: React.FC<PortalShellProps> = ({ children }) => {
           })}
         </nav>
 
-        {/* User footer */}
-        <div className="sidebar-footer" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.5rem" }}>
-          <Link href="/profile" className="sidebar-user-row" style={{ textDecoration: "none", flex: 1, minWidth: 0 }}>
+        {/* User footer with profile link and prominent Sign Out button */}
+        <div className="sidebar-footer">
+          <Link href="/profile" className="sidebar-user-row" style={{ textDecoration: "none", width: "100%" }}>
             <div className="user-avatar" aria-hidden="true">
               <img src={buyerAvatar || getAutoAvatar(buyerName)} alt={buyerName} />
             </div>
@@ -249,23 +267,12 @@ export const PortalShell: React.FC<PortalShellProps> = ({ children }) => {
               const wwwUrl = process.env.NEXT_PUBLIC_WWW_URL || "http://localhost:3000";
               window.location.href = `${wwwUrl}/login`;
             }}
-            title="Sign Out"
-            style={{
-              background: "transparent",
-              border: "none",
-              color: "var(--text-muted)",
-              cursor: "pointer",
-              padding: "0.5rem",
-              borderRadius: "6px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              transition: "color 0.15s ease",
-            }}
-            onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "#f87171")}
-            onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--text-muted)")}
+            className="sidebar-signout-btn"
+            title="Sign out of developer account"
+            aria-label="Sign Out"
           >
-            <LogOut size={16} />
+            <LogOut size={14} />
+            <span>Sign Out</span>
           </button>
         </div>
       </aside>
@@ -295,6 +302,100 @@ export const PortalShell: React.FC<PortalShellProps> = ({ children }) => {
               <span>Browse Store</span>
               <ExternalLink size={12} aria-hidden="true" />
             </a>
+
+            {/* Topbar User Profile Menu & Sign Out */}
+            <div className="user-profile-menu-container" ref={dropdownRef}>
+              <button
+                type="button"
+                onClick={() => setIsProfileOpen((prev) => !prev)}
+                className="user-profile-trigger-btn"
+                aria-label="User profile and account options"
+                aria-expanded={isProfileOpen}
+              >
+                <img
+                  src={buyerAvatar || getAutoAvatar(buyerName)}
+                  alt={buyerName}
+                  className="user-profile-avatar-circle"
+                />
+                <span style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--text-primary)" }}>
+                  {buyerName}
+                </span>
+                <ChevronDown
+                  size={13}
+                  style={{
+                    color: "var(--text-muted)",
+                    transition: "transform 0.2s ease",
+                    transform: isProfileOpen ? "rotate(180deg)" : "rotate(0deg)",
+                  }}
+                />
+              </button>
+
+              {/* Obsidian Dropdown Card */}
+              {isProfileOpen && (
+                <div className="user-profile-dropdown-card">
+                  <div className="user-dropdown-header">
+                    <img
+                      src={buyerAvatar || getAutoAvatar(buyerName)}
+                      alt={buyerName}
+                      className="user-dropdown-avatar-lg"
+                    />
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div className="user-dropdown-name">{buyerName}</div>
+                      <div className="user-dropdown-email">{buyerEmail}</div>
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
+                    <Link
+                      href="/profile"
+                      className="user-dropdown-item-link"
+                      onClick={() => setIsProfileOpen(false)}
+                    >
+                      <User size={15} color="var(--accent-primary)" />
+                      <span>Developer Profile</span>
+                    </Link>
+
+                    <Link
+                      href="/settings"
+                      className="user-dropdown-item-link"
+                      onClick={() => setIsProfileOpen(false)}
+                    >
+                      <Settings size={15} color="var(--text-muted)" />
+                      <span>Account Settings</span>
+                    </Link>
+
+                    <a
+                      href={process.env.NEXT_PUBLIC_STUDIO_URL || "http://localhost:3001"}
+                      className="user-dropdown-item-link"
+                    >
+                      <Sparkles size={15} color="var(--status-warning)" />
+                      <span>Creator Studio</span>
+                    </a>
+                  </div>
+
+                  <div className="user-dropdown-divider" />
+
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await signOut();
+                      clearAuthStorage();
+                      const wwwUrl = process.env.NEXT_PUBLIC_WWW_URL || "http://localhost:3000";
+                      window.location.href = `${wwwUrl}/login`;
+                    }}
+                    className="user-dropdown-item-link"
+                    style={{
+                      color: "#f87171",
+                      cursor: "pointer",
+                      fontWeight: 600,
+                    }}
+                  >
+                    <LogOut size={15} />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 

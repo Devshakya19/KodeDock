@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Universal User Profile Menu & Prominent Sign Out Controls**:
+  - Implemented topbar user profile dropdowns with obsidian dark styling across both **Developer Portal** (`apps/portal`) and **Creator Studio** (`apps/studio`), matching the UX of **Marketplace Store** (`apps/store`).
+  - Dropdown displays live user avatar, name, email address, fast-navigation ecosystem links (Library, License Vault, Studio Settings, Marketplace), and a prominent red `Sign Out` button.
+  - Upgraded sidebar footers in both Portal and Studio with dedicated, styled `[ Sign Out ]` action buttons with hover animations, ensuring immediate discoverability.
+  - Full cryptographic and session cleanup: invoking Sign Out invalidates session cookies (`signOut()`), purges all platform `localStorage` and `sessionStorage` tokens (`clearAuthStorage()`), and redirects cleanly to `${WWW_URL}/login`.
 - **Central Marketing & Authentication Hub (`apps/www`)**:
   - Standalone Next.js 16 micro-frontend running on port 3000 serving public landing page and central sovereign authentication gateway.
   - Complete Login and Developer Registration suite (`/login`) with role-based onboarding (Buyer vs Creator/Seller).

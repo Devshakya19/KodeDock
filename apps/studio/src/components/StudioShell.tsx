@@ -16,11 +16,14 @@ import {
   Sliders,
   ExternalLink,
   ChevronRight,
+  ChevronDown,
   ShieldCheck,
   ShieldAlert,
   Sparkles,
   Store,
   LogOut,
+  User,
+  Package,
 } from "lucide-react";
 
 interface StudioShellProps {
@@ -41,11 +44,26 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
   const pathname = usePathname();
   const [activeProductsCount, setActiveProductsCount] = useState<number>(0);
   const [creatorName, setCreatorName] = useState<string>("Verified Creator");
+  const [creatorEmail, setCreatorEmail] = useState<string>("creator@kodedock.local");
   const [creatorAvatar, setCreatorAvatar] = useState<string>("");
+  const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
   const [isForbiddenBuyer, setIsForbiddenBuyer] = useState<boolean>(false);
   const [isUpgradingRole, setIsUpgradingRole] = useState<boolean>(false);
   const [upgradeError, setUpgradeError] = useState<string>("");
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const lenisRef = useRef<any>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
 
   useEffect(() => {
     let rafId: number;
@@ -125,6 +143,7 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
         const settingsData = await settingsRes.json();
         if (settingsData.success && settingsData.data?.profile) {
           setCreatorName(settingsData.data.profile.name || "Verified Creator");
+          if (settingsData.data.profile.email) setCreatorEmail(settingsData.data.profile.email);
           setCreatorAvatar(
             settingsData.data.profile.image ||
               getAutoAvatar(settingsData.data.profile.email || "creator@kodedock.local")
@@ -496,8 +515,8 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
             <ExternalLink size={12} color="var(--text-muted)" />
           </a>
 
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.5rem" }}>
-            <Link href="/settings" className="sidebar-user-row" style={{ textDecoration: "none", flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+            <Link href="/settings" className="sidebar-user-row" style={{ textDecoration: "none", width: "100%" }}>
               <div className="user-avatar" aria-hidden="true">
                 <img src={creatorAvatar || getAutoAvatar(creatorName)} alt={creatorName} />
               </div>
@@ -517,6 +536,7 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
                 </div>
               </div>
             </Link>
+
             <button
               type="button"
               onClick={async () => {
@@ -525,23 +545,12 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
                 const wwwUrl = process.env.NEXT_PUBLIC_WWW_URL || "http://localhost:3000";
                 window.location.href = `${wwwUrl}/login`;
               }}
-              title="Sign Out"
-              style={{
-                background: "transparent",
-                border: "none",
-                color: "var(--text-muted)",
-                cursor: "pointer",
-                padding: "0.5rem",
-                borderRadius: "6px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                transition: "color 0.15s ease",
-              }}
-              onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "#f87171")}
-              onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--text-muted)")}
+              className="sidebar-signout-btn"
+              title="Sign out of creator studio"
+              aria-label="Sign Out"
             >
-              <LogOut size={16} />
+              <LogOut size={14} />
+              <span>Sign Out</span>
             </button>
           </div>
         </div>
@@ -567,6 +576,101 @@ export const StudioShell: React.FC<StudioShellProps> = ({ children }) => {
                 <UploadCloud size={12} strokeWidth={1.8} />
               </div>
             </Link>
+
+            {/* Topbar User Profile Menu & Sign Out */}
+            <div className="user-profile-menu-container" ref={dropdownRef}>
+              <button
+                type="button"
+                onClick={() => setIsProfileOpen((prev) => !prev)}
+                className="user-profile-trigger-btn"
+                aria-label="Creator profile and options"
+                aria-expanded={isProfileOpen}
+              >
+                <img
+                  src={creatorAvatar || getAutoAvatar(creatorName)}
+                  alt={creatorName}
+                  className="user-profile-avatar-circle"
+                />
+                <span style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--text-primary)" }}>
+                  {creatorName}
+                </span>
+                <ChevronDown
+                  size={13}
+                  style={{
+                    color: "var(--text-muted)",
+                    transition: "transform 0.2s ease",
+                    transform: isProfileOpen ? "rotate(180deg)" : "rotate(0deg)",
+                  }}
+                />
+              </button>
+
+              {/* Obsidian Dropdown Card */}
+              {isProfileOpen && (
+                <div className="user-profile-dropdown-card">
+                  <div className="user-dropdown-header">
+                    <img
+                      src={creatorAvatar || getAutoAvatar(creatorName)}
+                      alt={creatorName}
+                      className="user-dropdown-avatar-lg"
+                    />
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div className="user-dropdown-name">{creatorName}</div>
+                      <div className="user-dropdown-email">{creatorEmail}</div>
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
+                    <Link
+                      href="/settings"
+                      className="user-dropdown-item-link"
+                      onClick={() => setIsProfileOpen(false)}
+                    >
+                      <Sliders size={15} color="var(--accent-primary)" />
+                      <span>Studio Settings</span>
+                    </Link>
+
+                    <a
+                      href={process.env.NEXT_PUBLIC_PORTAL_URL || "http://localhost:3002"}
+                      className="user-dropdown-item-link"
+                    >
+                      <Package size={15} color="var(--accent-cyan)" />
+                      <span>Developer Portal</span>
+                    </a>
+
+                    <a
+                      href={process.env.NEXT_PUBLIC_STORE_URL || "http://localhost:3003"}
+                      className="user-dropdown-item-link"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Store size={15} color="var(--status-warning)" />
+                      <span>Buyer Marketplace</span>
+                    </a>
+                  </div>
+
+                  <div className="user-dropdown-divider" />
+
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await signOut();
+                      clearAuthStorage();
+                      const wwwUrl = process.env.NEXT_PUBLIC_WWW_URL || "http://localhost:3000";
+                      window.location.href = `${wwwUrl}/login`;
+                    }}
+                    className="user-dropdown-item-link"
+                    style={{
+                      color: "#f87171",
+                      cursor: "pointer",
+                      fontWeight: 600,
+                    }}
+                  >
+                    <LogOut size={15} />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 
