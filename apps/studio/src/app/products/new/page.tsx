@@ -77,7 +77,26 @@ export default function DeployArchitecturePage() {
 
   // Step 4: Storefront Spec
   const [thumbnailUrl, setThumbnailUrl] = useState("");
+  const [thumbnailLoadError, setThumbnailLoadError] = useState(false);
   const [description, setDescription] = useState("");
+
+  const getSafeImageUrl = (url: string): string | null => {
+    if (!url) return null;
+    const trimmed = url.trim();
+    if (!trimmed || trimmed === "/kd.svg") return null;
+    if (trimmed.startsWith("/") && !trimmed.startsWith("//") && !trimmed.includes("\\")) {
+      return trimmed;
+    }
+    try {
+      const parsed = new URL(trimmed);
+      if (parsed.protocol === "https:" || parsed.protocol === "http:") {
+        return parsed.href;
+      }
+    } catch {
+      return null;
+    }
+    return null;
+  };
 
   const handleTitleChange = (val: string) => {
     setTitle(val);
@@ -766,7 +785,10 @@ export default function DeployArchitecturePage() {
                 <input
                   type="url"
                   value={thumbnailUrl}
-                  onChange={(e) => setThumbnailUrl(e.target.value)}
+                  onChange={(e) => {
+                    setThumbnailUrl(e.target.value);
+                    setThumbnailLoadError(false);
+                  }}
                   placeholder="https://cdn.yoursite.com/preview.png or leave blank"
                   className="form-input-custom"
                 />
@@ -876,27 +898,31 @@ export default function DeployArchitecturePage() {
           >
             {/* Thumbnail */}
             <div style={{ width: "100%", height: "170px", background: "linear-gradient(135deg, #13141f 0%, #1f1b2e 50%, #0d0e15 100%)", position: "relative", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              {thumbnailUrl && thumbnailUrl !== "/kd.svg" ? (
-                <img
-                  src={thumbnailUrl}
-                  alt="Architecture Thumbnail Preview"
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                  onError={(e) => {
-                    (e.currentTarget as any).style.display = "none";
-                  }}
-                />
-              ) : (
-                <div style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-                  <img
-                    src="/kd.svg"
-                    alt="KodeDock Architecture"
-                    style={{ width: "44px", height: "44px", objectFit: "contain", marginBottom: "0.5rem", filter: "drop-shadow(0 0 12px rgba(139, 92, 246, 0.45))" }}
-                  />
-                  <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.72rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
-                    Architecture Preview
+              {(() => {
+                const safeUrl = getSafeImageUrl(thumbnailUrl);
+                if (safeUrl && !thumbnailLoadError) {
+                  return (
+                    <img
+                      src={safeUrl}
+                      alt="Architecture Thumbnail Preview"
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      onError={() => setThumbnailLoadError(true)}
+                    />
+                  );
+                }
+                return (
+                  <div style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                    <img
+                      src="/kd.svg"
+                      alt="KodeDock Architecture"
+                      style={{ width: "44px", height: "44px", objectFit: "contain", marginBottom: "0.5rem", filter: "drop-shadow(0 0 12px rgba(139, 92, 246, 0.45))" }}
+                    />
+                    <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.72rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                      Architecture Preview
+                    </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
 
               <div style={{ position: "absolute", top: "0.65rem", left: "0.65rem", display: "flex", gap: "0.4rem" }}>
                 <span style={{ fontSize: "0.62rem", fontFamily: "var(--font-mono)", fontWeight: 700, padding: "0.15rem 0.45rem", borderRadius: "4px", background: "rgba(9, 10, 15, 0.85)", backdropFilter: "blur(6px)", border: "1px solid rgba(255, 255, 255, 0.15)", color: "#ffffff" }}>

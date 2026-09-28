@@ -42,6 +42,27 @@ const statVariants = {
   }),
 };
 
+const LibraryCardThumbnail: React.FC<{ src?: string; title: string }> = ({ src, title }) => {
+  const [hasError, setHasError] = useState(false);
+  const safeSrc = src && (src.startsWith("/") || src.startsWith("http://") || src.startsWith("https://")) ? src : null;
+
+  if (hasError || !safeSrc) {
+    return (
+      <div className="lib-thumb" style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(139, 92, 246, 0.1)" }}>
+        <Package size={20} color="var(--accent-primary)" />
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={safeSrc}
+      alt={title}
+      className="lib-thumb"
+      onError={() => setHasError(true)}
+    />
+  );
+};
 
 export default function LibraryPage() {
   const [products, setProducts] = useState<PurchasedProduct[]>([]);
@@ -218,12 +239,7 @@ export default function LibraryPage() {
               >
                 {/* Card Header */}
                 <div className="library-card-head">
-                  <img
-                    src={item.thumbnailUrl}
-                    alt={item.title}
-                    className="lib-thumb"
-                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-                  />
+                  <LibraryCardThumbnail src={item.thumbnailUrl} title={item.title} />
                   <div className="lib-card-meta">
                     <div className="lib-tag-row">
                       <span className="pill pill-success">{item.licenseType}</span>

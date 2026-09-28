@@ -68,6 +68,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed post-job cache failure in `dependency-audit` job of `security.yml` by removing redundant pnpm store cache step when dependencies are not installed.
 - Fixed `pnpm/action-setup@v4` version conflict (`ERR_PNPM_BAD_PM_VERSION`) across all GitHub Actions workflows by deferring to `package.json`'s `packageManager`.
 
+### Fixed
+- Resolved all GitHub CodeQL Code Scanning security alerts and workflow configuration warnings:
+  - Re-created dedicated CodeQL workflow `.github/workflows/codeql.yml` with dual categories (`/language:actions` and `/language:javascript-typescript`), resolving the missing workflow warning.
+  - Fixed CodeQL Alert #18 (High - CORS misconfiguration for credentials transfer) in `api/src/server.ts` by strictly whitelisting trusted origins before granting `Access-Control-Allow-Credentials`.
+  - Fixed CodeQL Alert #25 (High - DOM text reinterpreted as HTML) in `apps/studio/src/app/products/new/page.tsx` by adding `getSafeImageUrl` protocol validation and replacing DOM element manipulation on `onError` with React state error handling.
+  - Proactively fortified `apps/portal/src/app/page.tsx` with safe image handling and error fallback component `<LibraryCardThumbnail />`.
+  - Fixed CodeQL Alerts #1-#24 (Medium - Workflow does not contain permissions) across all GitHub Actions workflows by enforcing least-privilege `permissions:` across `ci.yml`, `codeql.yml`, `security.yml`, `release.yml`, and `pr-triage.yml`.
+
 ---
 
 ## [1.0.0] - 2026-09-26

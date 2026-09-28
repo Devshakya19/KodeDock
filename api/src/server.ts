@@ -13,17 +13,68 @@ const PORT = parseInt(process.env.PORT || "4000", 10);
 const authNodeHandler = toNodeHandler(auth);
 
 /**
+ * Allowed CORS Origins & Verification
+ */
+const DEFAULT_ALLOWED_ORIGINS = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://localhost:3002",
+  "http://localhost:3003",
+  "http://127.0.0.1:3000",
+  "http://127.0.0.1:3001",
+  "http://127.0.0.1:3002",
+  "http://127.0.0.1:3003",
+  "https://kodedock.com",
+  "https://www.kodedock.com",
+  "https://store.kodedock.com",
+  "https://studio.kodedock.com",
+  "https://portal.kodedock.com",
+];
+
+const customOrigins = (process.env.ALLOWED_ORIGINS || "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
+
+const allowedOriginsSet = new Set([...DEFAULT_ALLOWED_ORIGINS, ...customOrigins]);
+
+function isOriginAllowed(origin: string): boolean {
+  if (allowedOriginsSet.has(origin)) return true;
+  try {
+    const url = new URL(origin);
+    if (
+      url.protocol === "https:" &&
+      (url.hostname === "kodedock.com" ||
+        url.hostname.endsWith(".kodedock.com") ||
+        url.hostname === "kodedock.dev" ||
+        url.hostname.endsWith(".kodedock.dev"))
+    ) {
+      return true;
+    }
+  } catch {
+    return false;
+  }
+  return false;
+}
+
+/**
  * CORS helper
  */
 function setCorsHeaders(req: http.IncomingMessage, res: http.ServerResponse): boolean {
-  const origin = req.headers.origin || "*";
-  res.setHeader("Access-Control-Allow-Origin", origin);
+  const origin = req.headers.origin;
+
+  if (origin && isOriginAllowed(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+  } else if (!origin) {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+  }
+
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.setHeader(
     "Access-Control-Allow-Headers",
     "Content-Type, Authorization, X-Requested-With, Cookie"
   );
-  res.setHeader("Access-Control-Allow-Credentials", "true");
 
   if (req.method === "OPTIONS") {
     res.writeHead(204);
