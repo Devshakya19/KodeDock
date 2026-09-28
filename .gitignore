@@ -42,3 +42,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+
+# Graphify
+graphify-out/
+graphify.json
