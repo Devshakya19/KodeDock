@@ -48,32 +48,17 @@ jobs:
 
   # ── 2. Typecheck Across All Monorepo Packages ────────────────────────────
   typecheck:
-    name: Monorepo Typecheck (Node ${{ env.NODE_VERSION }})
+    name: Monorepo Typecheck (Node 22)
     needs: [preflight]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v4
+      - name: Setup Node & Dependencies
+        uses: ./.github/actions/setup-monorepo
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-
-      - name: Restore Turborepo cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.TURBO_CACHE_DIR }}
-          key: ${{ runner.os }}-turbo-typecheck-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-typecheck-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+          turbo-cache-key: typecheck
 
       - name: Run Typecheck Across All Monorepo Packages
         run: pnpm run typecheck
@@ -91,25 +76,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v4
+      - name: Setup Node & Dependencies
+        uses: ./.github/actions/setup-monorepo
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-
-      - name: Restore Turborepo cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.TURBO_CACHE_DIR }}
-          key: ${{ runner.os }}-turbo-build-${{ matrix.app }}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-build-${{ matrix.app }}-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+          turbo-cache-key: build-${{ matrix.app }}
 
       - name: Build Target Application
         run: pnpm --filter @kodedock/${{ matrix.app }} run build
