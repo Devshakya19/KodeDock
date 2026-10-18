@@ -18,7 +18,7 @@ for (const envPath of possibleEnvPaths) {
 const { Pool } = pg;
 
 export const DEFAULT_POSTGRES_URL =
-  process.env.DATABASE_URL || "postgresql://postgres:postgrespassword@localhost:5432/kodedock";
+  process.env.DATABASE_URL || "postgresql://kodedock:kodedock_dev_password@localhost:5432/kodedock_db";
 
 /**
  * PostgreSQL Connection Pool
@@ -94,6 +94,7 @@ export async function initPostgresSchema(): Promise<void> {
         "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
         "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
       );
+      CREATE INDEX IF NOT EXISTS idx_session_user ON session("userId");
 
       CREATE TABLE IF NOT EXISTS account (
         id VARCHAR(64) PRIMARY KEY,
@@ -107,6 +108,7 @@ export async function initPostgresSchema(): Promise<void> {
         "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
         "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
       );
+      CREATE INDEX IF NOT EXISTS idx_account_user ON account("userId");
 
       CREATE TABLE IF NOT EXISTS verification (
         id VARCHAR(64) PRIMARY KEY,
@@ -182,6 +184,7 @@ export async function initPostgresSchema(): Promise<void> {
       CREATE INDEX IF NOT EXISTS idx_products_slug ON products(slug);
       CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
       CREATE INDEX IF NOT EXISTS idx_products_status ON products(status);
+      CREATE INDEX IF NOT EXISTS idx_products_seller ON products(seller_id);
 
       CREATE TABLE IF NOT EXISTS product_versions (
         id VARCHAR(64) PRIMARY KEY,
@@ -193,6 +196,7 @@ export async function initPostgresSchema(): Promise<void> {
         file_size_bytes BIGINT NOT NULL,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
       );
+      CREATE INDEX IF NOT EXISTS idx_product_versions_product ON product_versions(product_id);
 
       CREATE TABLE IF NOT EXISTS orders (
         id VARCHAR(64) PRIMARY KEY,
@@ -207,6 +211,7 @@ export async function initPostgresSchema(): Promise<void> {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
       );
       CREATE INDEX IF NOT EXISTS idx_orders_buyer ON orders(buyer_id);
+      CREATE INDEX IF NOT EXISTS idx_orders_product ON orders(product_id);
 
       CREATE TABLE IF NOT EXISTS licenses (
         id VARCHAR(64) PRIMARY KEY,
@@ -218,6 +223,8 @@ export async function initPostgresSchema(): Promise<void> {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
       );
       CREATE INDEX IF NOT EXISTS idx_licenses_key ON licenses(license_key);
+      CREATE INDEX IF NOT EXISTS idx_licenses_buyer ON licenses(buyer_id);
+      CREATE INDEX IF NOT EXISTS idx_licenses_order ON licenses(order_id);
 
       CREATE TABLE IF NOT EXISTS seller_payouts (
         id VARCHAR(64) PRIMARY KEY,
@@ -229,6 +236,7 @@ export async function initPostgresSchema(): Promise<void> {
         processed_at TIMESTAMP WITH TIME ZONE,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
       );
+      CREATE INDEX IF NOT EXISTS idx_seller_payouts_seller ON seller_payouts(seller_id);
 
       CREATE TABLE IF NOT EXISTS api_keys (
         id VARCHAR(64) PRIMARY KEY,
@@ -254,6 +262,23 @@ export async function initPostgresSchema(): Promise<void> {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
       );
       CREATE INDEX IF NOT EXISTS idx_email_otps_lookup ON email_otps(email, purpose);
+
+      CREATE TABLE IF NOT EXISTS user_settings (
+        user_id VARCHAR(64) PRIMARY KEY REFERENCES "user"(id) ON DELETE CASCADE,
+        gstin VARCHAR(50),
+        pan VARCHAR(50),
+        billing_address TEXT,
+        city VARCHAR(100),
+        state VARCHAR(100),
+        notification_rules JSONB DEFAULT '{"new-release": true, "security-patch": true, "download-ready": true, "payment-confirm": true, "license-expiry": true, "newsletter": false}'::jsonb,
+        domain_allowlist JSONB DEFAULT '[]'::jsonb,
+        creator_preferences JSONB DEFAULT '{}'::jsonb,
+        public_profile BOOLEAN DEFAULT TRUE,
+        purchase_history_public BOOLEAN DEFAULT FALSE,
+        analytics_sharing BOOLEAN DEFAULT TRUE,
+        two_factor_enabled BOOLEAN DEFAULT FALSE,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      );
     `);
 
     await client.query("COMMIT");

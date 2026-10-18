@@ -1,6 +1,5 @@
 import type http from "node:http";
-import Database from "better-sqlite3";
-import path from "node:path";
+import { pgPool } from "../../db";
 import {
   getGitHubAuthUrl,
   handleGitHubCallback,
@@ -15,10 +14,6 @@ import {
 } from "../../auth";
 import { requireAuth } from "../middlewares/auth.middleware";
 import type { ApiResponse } from "@kodedock/types";
-
-// Database reference for SQLite fallback
-const sqlitePath = path.resolve(process.cwd(), "kodedock.db");
-const db = new Database(sqlitePath);
 
 /**
  * Reads JSON payload from request body
@@ -80,10 +75,9 @@ export async function handleCustomAuthRoutes(
 
       const ipAddress = req.socket.remoteAddress;
       const userAgent = req.headers["user-agent"];
-      const result = await handleGitHubCallback(code, db, { ipAddress, userAgent });
+      const result = await handleGitHubCallback(code, pgPool, { ipAddress, userAgent });
 
       // Return session tokens or redirect to frontend with token
-      const frontendRedirect = searchParams.get("redirect") || "http://localhost:3000";
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(
         JSON.stringify({
@@ -140,7 +134,7 @@ export async function handleCustomAuthRoutes(
 
       const ipAddress = req.socket.remoteAddress;
       const userAgent = req.headers["user-agent"];
-      const result = await handleGoogleCallback(code, db, { ipAddress, userAgent });
+      const result = await handleGoogleCallback(code, pgPool, { ipAddress, userAgent });
 
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(
@@ -174,7 +168,7 @@ export async function handleCustomAuthRoutes(
         return true;
       }
 
-      const { otp, expiresAt } = createEmailOtp(db, body.email, body.purpose || "LOGIN");
+      const { otp, expiresAt } = await createEmailOtp(pgPool, body.email, body.purpose || "LOGIN");
       // In dev, return OTP in response for testing; in prod dispatch via email
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(
@@ -203,7 +197,7 @@ export async function handleCustomAuthRoutes(
     if (!authContext) return true;
 
     if (req.method === "GET") {
-      const keys = listUserApiKeys(db, authContext.user.id);
+      const keys = await listUserApiKeys(pgPool, authContext.user.id);
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ success: true, data: keys }));
       return true;
@@ -211,8 +205,8 @@ export async function handleCustomAuthRoutes(
 
     if (req.method === "POST") {
       const body = await readJsonBody(req);
-      const createdKey = createApiKey(
-        db,
+      const createdKey = await createApiKey(
+        pgPool,
         authContext.user.id,
         body.name || "Default API Key",
         (authContext.user as any).role || "BUYER",

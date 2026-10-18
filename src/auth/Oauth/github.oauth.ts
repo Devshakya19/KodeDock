@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
-import type Database from "better-sqlite3";
+import type pg from "pg";
+import { pgPool } from "../../db";
 import { signJwt } from "../JWT/jwt.service";
 import { createSession } from "../session/session.service";
 import type { User, UserRole } from "@kodedock/types";
@@ -8,7 +9,7 @@ import type { User, UserRole } from "@kodedock/types";
  * Dedicated GitHub OAuth 2.0 Engine for Kodedock
  * Handles authorization URL generation, code exchange, profile + email extraction,
  * account linking, and session + JWT creation.
- * 100% self-hosted & in our control.
+ * 100% self-hosted & PostgreSQL backed.
  */
 
 export interface GitHubUserProfile {
@@ -180,11 +181,11 @@ export async function fetchGitHubProfile(accessToken: string): Promise<GitHubUse
 
 /**
  * High-Level GitHub Callback Handler
- * Upserts user in database, links account, and generates active session + JWT
+ * Upserts user in PostgreSQL database, links account, and generates active session + JWT
  */
 export async function handleGitHubCallback(
   code: string,
-  db: Database.Database,
+  db: pg.Pool = pgPool,
   options?: { ipAddress?: string; userAgent?: string; redirectUri?: string }
 ): Promise<GitHubAuthResult> {
   // 1. Exchange code for access token
@@ -194,55 +195,54 @@ export async function handleGitHubCallback(
   const profile = await fetchGitHubProfile(accessToken);
 
   // 3. Find existing user by email or existing GitHub account
-  let user = db.prepare("SELECT * FROM user WHERE email = ?").get(profile.email) as any;
+  const uRes = await db.query(`SELECT * FROM "user" WHERE email = $1`, [profile.email]);
+  let user = uRes.rows[0];
   let isNewUser = false;
   const nowIso = new Date().toISOString();
 
   if (!user) {
     // Create new user (default role: BUYER)
     const newUserId = crypto.randomUUID();
-    db.prepare(`
-      INSERT INTO user (id, name, email, emailVerified, image, role, createdAt, updatedAt)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      newUserId,
-      profile.name,
-      profile.email,
-      1, // GitHub emails are verified
-      profile.avatarUrl,
-      "BUYER",
-      nowIso,
-      nowIso
+    const insRes = await db.query(
+      `INSERT INTO "user" (id, name, email, "emailVerified", image, role, "createdAt", "updatedAt")
+       VALUES ($1, $2, $3, TRUE, $4, 'BUYER', $5, $6)
+       RETURNING *`,
+      [newUserId, profile.name, profile.email, profile.avatarUrl, nowIso, nowIso]
     );
-
-    user = db.prepare("SELECT * FROM user WHERE id = ?").get(newUserId);
+    user = insRes.rows[0];
     isNewUser = true;
   } else {
     // Update avatar and name if missing
-    db.prepare(`
-      UPDATE user SET image = COALESCE(image, ?), updatedAt = ? WHERE id = ?
-    `).run(profile.avatarUrl, nowIso, user.id);
+    const updRes = await db.query(
+      `UPDATE "user" SET image = COALESCE(image, $1), "updatedAt" = $2 WHERE id = $3 RETURNING *`,
+      [profile.avatarUrl, nowIso, user.id]
+    );
+    user = updRes.rows[0] || user;
   }
 
   // 4. Link or update GitHub account record
-  const existingAccount = db.prepare(`
-    SELECT * FROM account WHERE providerId = 'github' AND accountId = ?
-  `).get(profile.id) as any;
+  const accRes = await db.query(
+    `SELECT * FROM account WHERE "providerId" = 'github' AND "accountId" = $1`,
+    [profile.id]
+  );
+  const existingAccount = accRes.rows[0];
 
   if (!existingAccount) {
     const accountId = crypto.randomUUID();
-    db.prepare(`
-      INSERT INTO account (id, userId, accountId, providerId, accessToken, createdAt, updatedAt)
-      VALUES (?, ?, ?, 'github', ?, ?, ?)
-    `).run(accountId, user.id, profile.id, accessToken, nowIso, nowIso);
+    await db.query(
+      `INSERT INTO account (id, "userId", "accountId", "providerId", "accessToken", "createdAt", "updatedAt")
+       VALUES ($1, $2, $3, 'github', $4, $5, $6)`,
+      [accountId, user.id, profile.id, accessToken, nowIso, nowIso]
+    );
   } else {
-    db.prepare(`
-      UPDATE account SET accessToken = ?, updatedAt = ? WHERE id = ?
-    `).run(accessToken, nowIso, existingAccount.id);
+    await db.query(
+      `UPDATE account SET "accessToken" = $1, "updatedAt" = $2 WHERE id = $3`,
+      [accessToken, nowIso, existingAccount.id]
+    );
   }
 
   // 5. Generate active session
-  const session = createSession(db, user.id, options?.ipAddress, options?.userAgent);
+  const session = await createSession(db, user.id, options?.ipAddress, options?.userAgent);
 
   // 6. Generate cryptographic JWT
   const userRole = (user.role || "BUYER") as UserRole;

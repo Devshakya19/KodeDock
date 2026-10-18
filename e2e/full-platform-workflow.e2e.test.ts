@@ -14,7 +14,7 @@ import { signJwt } from "../src/auth/JWT/jwt.service";
  */
 
 const BASE_URL = process.env.API_TEST_URL || "http://localhost:4000";
-const TEST_SECRET = process.env.BETTER_AUTH_SECRET || "kodedock_dev_secret_key_32_characters_long_min!";
+const TEST_SECRET = process.env.BETTER_AUTH_SECRET || "kodedock_production_secret_key_32_characters_minimum";
 
 const buyerId = "usr_e2e_platform_buyer";
 const buyerToken = signJwt({
@@ -154,5 +154,12 @@ describe("E2E: Full Platform Cross-Cutting Security & Workflows", () => {
     const body = (await res.json()) as any;
     assert.strictEqual(body.success, false);
     assert.strictEqual(body.error.code, "NOT_FOUND");
+  });
+
+  after(async () => {
+    if (startedLocalServer) {
+      server.close();
+    }
+    await pgPool.end();
   });
 });

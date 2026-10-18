@@ -13,7 +13,7 @@ import { createCookieGetter } from "better-auth/cookies";
  */
 
 const BASE_URL = process.env.API_TEST_URL || "http://localhost:4000";
-const TEST_SECRET = process.env.BETTER_AUTH_SECRET || "kodedock_dev_secret_key_32_characters_long_min!";
+const TEST_SECRET = process.env.BETTER_AUTH_SECRET || "kodedock_production_secret_key_32_characters_minimum";
 
 const sellerToken = signJwt({
   sub: "usr_test_seller_isolated",
@@ -65,6 +65,7 @@ describe("API Gateway & Microservice Route Integration", () => {
     if (startedLocalServer) {
       server.close();
     }
+    await pgPool.end();
   });
 
   it("GET /api/health - verifies server health and uptime", async () => {

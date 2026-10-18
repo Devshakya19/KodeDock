@@ -20,6 +20,8 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+    networks:
+      - kodedock-dev-net
 
   redis:
     image: redis:7-alpine
@@ -34,9 +36,15 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+    networks:
+      - kodedock-dev-net
 
 volumes:
   kodedock_dev_pgdata:
     driver: local
   kodedock_dev_redisdata:
     driver: local
+
+networks:
+  kodedock-dev-net:
+    driver: bridge

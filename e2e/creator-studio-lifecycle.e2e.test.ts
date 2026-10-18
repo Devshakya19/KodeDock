@@ -13,7 +13,7 @@ import { signJwt } from "../src/auth/JWT/jwt.service";
  */
 
 const BASE_URL = process.env.API_TEST_URL || "http://localhost:4000";
-const TEST_SECRET = process.env.BETTER_AUTH_SECRET || "kodedock_dev_secret_key_32_characters_long_min!";
+const TEST_SECRET = process.env.BETTER_AUTH_SECRET || "kodedock_production_secret_key_32_characters_minimum";
 
 const sellerToken = signJwt({
   sub: "usr_e2e_seller_lifecycle",
@@ -175,5 +175,12 @@ describe("E2E: Creator Studio Management Lifecycle", () => {
     const listBody = (await listRes.json()) as any;
     const found = listBody.data.find((k: any) => k.id === createdKeyId);
     assert.strictEqual(found, undefined, "Revoked key must not be returned in active list");
+  });
+
+  after(async () => {
+    if (startedLocalServer) {
+      server.close();
+    }
+    await pgPool.end();
   });
 });

@@ -62,7 +62,7 @@ services:
       REDIS_URL: "redis://redis:6379"
       BETTER_AUTH_SECRET: "kodedock_production_secret_key_32_characters_minimum"
       BETTER_AUTH_URL: "http://api:4000"
-      ALLOWED_ORIGINS: "http://localhost:3000,http://localhost:3001,http://localhost:3002"
+      ALLOWED_ORIGINS: "http://localhost:3000,http://localhost:3001,http://localhost:3002,http://localhost:3003"
     healthcheck:
       test: ["CMD-SHELL", "node -e 'require(\"http\").get(\"http://localhost:4000/api/health\", (r) => { process.exit(r.statusCode === 200 ? 0 : 1); })' || exit 1"]
       interval: 10s
@@ -72,12 +72,12 @@ services:
     networks:
       - kodedock-net
 
-  # ── 4. Public Marketplace Frontend (Port 3000) ───────────────────────────
-  store:
+  # ── 4. Marketing & Central Auth Hub (Port 3000) ──────────────────────────
+  www:
     build:
       context: ..
-      dockerfile: docker/Dockerfile.store
-    container_name: kodedock-store
+      dockerfile: docker/Dockerfile.www
+    container_name: kodedock-www
     restart: unless-stopped
     depends_on:
       api:
@@ -89,6 +89,10 @@ services:
       NODE_ENV: "production"
       INTERNAL_API_URL: "http://api:4000"
       NEXT_PUBLIC_API_URL: "http://localhost:4000"
+      NEXT_PUBLIC_WWW_URL: "http://localhost:3000"
+      NEXT_PUBLIC_STORE_URL: "http://localhost:3003"
+      NEXT_PUBLIC_STUDIO_URL: "http://localhost:3001"
+      NEXT_PUBLIC_PORTAL_URL: "http://localhost:3002"
     networks:
       - kodedock-net
 
@@ -109,6 +113,10 @@ services:
       NODE_ENV: "production"
       INTERNAL_API_URL: "http://api:4000"
       NEXT_PUBLIC_API_URL: "http://localhost:4000"
+      NEXT_PUBLIC_WWW_URL: "http://localhost:3000"
+      NEXT_PUBLIC_STORE_URL: "http://localhost:3003"
+      NEXT_PUBLIC_STUDIO_URL: "http://localhost:3001"
+      NEXT_PUBLIC_PORTAL_URL: "http://localhost:3002"
     networks:
       - kodedock-net
 
@@ -129,6 +137,34 @@ services:
       NODE_ENV: "production"
       INTERNAL_API_URL: "http://api:4000"
       NEXT_PUBLIC_API_URL: "http://localhost:4000"
+      NEXT_PUBLIC_WWW_URL: "http://localhost:3000"
+      NEXT_PUBLIC_STORE_URL: "http://localhost:3003"
+      NEXT_PUBLIC_STUDIO_URL: "http://localhost:3001"
+      NEXT_PUBLIC_PORTAL_URL: "http://localhost:3002"
+    networks:
+      - kodedock-net
+
+  # ── 7. Public Marketplace Frontend (Port 3003) ───────────────────────────
+  store:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.store
+    container_name: kodedock-store
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "3003:3003"
+    environment:
+      PORT: "3003"
+      NODE_ENV: "production"
+      INTERNAL_API_URL: "http://api:4000"
+      NEXT_PUBLIC_API_URL: "http://localhost:4000"
+      NEXT_PUBLIC_WWW_URL: "http://localhost:3000"
+      NEXT_PUBLIC_STORE_URL: "http://localhost:3003"
+      NEXT_PUBLIC_STUDIO_URL: "http://localhost:3001"
+      NEXT_PUBLIC_PORTAL_URL: "http://localhost:3002"
     networks:
       - kodedock-net
 

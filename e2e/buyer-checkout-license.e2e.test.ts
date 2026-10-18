@@ -15,7 +15,7 @@ import { signJwt } from "../src/auth/JWT/jwt.service";
  */
 
 const BASE_URL = process.env.API_TEST_URL || "http://localhost:4000";
-const TEST_SECRET = process.env.BETTER_AUTH_SECRET || "kodedock_dev_secret_key_32_characters_long_min!";
+const TEST_SECRET = process.env.BETTER_AUTH_SECRET || "kodedock_production_secret_key_32_characters_minimum";
 
 const buyerId = `usr_e2e_buyer_${Date.now()}`;
 const buyerEmail = `test_buyer_${Date.now()}@kodedock.dev`;
@@ -194,5 +194,12 @@ describe("E2E: Buyer Checkout & Ed25519 Licensing Flow", () => {
     assert.strictEqual(downloadData.downloadUrl.includes("/api/portal/stream/"), true);
     assert.strictEqual(downloadData.expiresInSeconds, 60);
     assert.strictEqual(typeof downloadData.checksumSha256, "string");
+  });
+
+  after(async () => {
+    if (startedLocalServer) {
+      server.close();
+    }
+    await pgPool.end();
   });
 });

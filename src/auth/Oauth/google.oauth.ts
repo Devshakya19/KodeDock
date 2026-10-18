@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
-import type Database from "better-sqlite3";
+import type pg from "pg";
+import { pgPool } from "../../db";
 import { signJwt } from "../JWT/jwt.service";
 import { createSession } from "../session/session.service";
 import type { User, UserRole } from "@kodedock/types";
@@ -8,7 +9,7 @@ import type { User, UserRole } from "@kodedock/types";
  * Dedicated Google OAuth 2.0 Engine for Kodedock
  * Handles authorization URL, code exchange, profile extraction,
  * account linking, and session + JWT creation.
- * 100% self-hosted & in our control.
+ * 100% self-hosted & PostgreSQL backed.
  */
 
 export interface GoogleUserProfile {
@@ -137,48 +138,56 @@ export async function fetchGoogleProfile(accessToken: string): Promise<GoogleUse
  */
 export async function handleGoogleCallback(
   code: string,
-  db: Database.Database,
+  db: pg.Pool = pgPool,
   options?: { ipAddress?: string; userAgent?: string; redirectUri?: string }
 ): Promise<GoogleAuthResult> {
   const accessToken = await exchangeGoogleCodeForToken(code, options?.redirectUri);
   const profile = await fetchGoogleProfile(accessToken);
 
-  let user = db.prepare("SELECT * FROM user WHERE email = ?").get(profile.email) as any;
+  const uRes = await db.query(`SELECT * FROM "user" WHERE email = $1`, [profile.email]);
+  let user = uRes.rows[0];
   let isNewUser = false;
   const nowIso = new Date().toISOString();
 
   if (!user) {
     const newUserId = crypto.randomUUID();
-    db.prepare(`
-      INSERT INTO user (id, name, email, emailVerified, image, role, createdAt, updatedAt)
-      VALUES (?, ?, ?, 1, ?, 'BUYER', ?, ?)
-    `).run(newUserId, profile.name, profile.email, profile.avatarUrl || null, nowIso, nowIso);
-
-    user = db.prepare("SELECT * FROM user WHERE id = ?").get(newUserId);
+    const insRes = await db.query(
+      `INSERT INTO "user" (id, name, email, "emailVerified", image, role, "createdAt", "updatedAt")
+       VALUES ($1, $2, $3, TRUE, $4, 'BUYER', $5, $6)
+       RETURNING *`,
+      [newUserId, profile.name, profile.email, profile.avatarUrl || null, nowIso, nowIso]
+    );
+    user = insRes.rows[0];
     isNewUser = true;
   } else {
-    db.prepare(`
-      UPDATE user SET image = COALESCE(image, ?), updatedAt = ? WHERE id = ?
-    `).run(profile.avatarUrl || null, nowIso, user.id);
+    const updRes = await db.query(
+      `UPDATE "user" SET image = COALESCE(image, $1), "updatedAt" = $2 WHERE id = $3 RETURNING *`,
+      [profile.avatarUrl || null, nowIso, user.id]
+    );
+    user = updRes.rows[0] || user;
   }
 
-  const existingAccount = db.prepare(`
-    SELECT * FROM account WHERE providerId = 'google' AND accountId = ?
-  `).get(profile.id) as any;
+  const accRes = await db.query(
+    `SELECT * FROM account WHERE "providerId" = 'google' AND "accountId" = $1`,
+    [profile.id]
+  );
+  const existingAccount = accRes.rows[0];
 
   if (!existingAccount) {
     const accountId = crypto.randomUUID();
-    db.prepare(`
-      INSERT INTO account (id, userId, accountId, providerId, accessToken, createdAt, updatedAt)
-      VALUES (?, ?, ?, 'google', ?, ?, ?)
-    `).run(accountId, user.id, profile.id, accessToken, nowIso, nowIso);
+    await db.query(
+      `INSERT INTO account (id, "userId", "accountId", "providerId", "accessToken", "createdAt", "updatedAt")
+       VALUES ($1, $2, $3, 'google', $4, $5, $6)`,
+      [accountId, user.id, profile.id, accessToken, nowIso, nowIso]
+    );
   } else {
-    db.prepare(`
-      UPDATE account SET accessToken = ?, updatedAt = ? WHERE id = ?
-    `).run(accessToken, nowIso, existingAccount.id);
+    await db.query(
+      `UPDATE account SET "accessToken" = $1, "updatedAt" = $2 WHERE id = $3`,
+      [accessToken, nowIso, existingAccount.id]
+    );
   }
 
-  const session = createSession(db, user.id, options?.ipAddress, options?.userAgent);
+  const session = await createSession(db, user.id, options?.ipAddress, options?.userAgent);
   const userRole = (user.role || "BUYER") as UserRole;
   const jwt = signJwt({
     sub: user.id,

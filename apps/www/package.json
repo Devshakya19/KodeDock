@@ -1,11 +1,11 @@
 {
   "name": "@kodedock/www",
-  "version": "0.1.0",
+  "version": "1.0.0-beta.1",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",
-    "start": "next start -p 3003",
+    "start": "next start -p 3000",
     "lint": "eslint"
   },
   "dependencies": {

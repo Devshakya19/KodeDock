@@ -1,12 +1,13 @@
 import crypto from "node:crypto";
-import type Database from "better-sqlite3";
+import type pg from "pg";
+import { pgPool } from "../../db";
 import type { UserRole } from "@kodedock/types";
 
 /**
  * Kodedock Developer API Keys & CLI Access Tokens Engine
  * For programmatic access, CLI tool authentication, and API integrations.
  * Formats: kd_live_<random_bytes> or kd_test_<random_bytes>
- * 100% self-hosted & in our control.
+ * 100% self-hosted & PostgreSQL backed.
  */
 
 export interface ApiKeyRecord {
@@ -30,25 +31,10 @@ export interface CreatedApiKey {
 }
 
 /**
- * Initializes the api_keys table in the self-hosted database
+ * Initializes the api_keys table check
  */
-export function ensureApiKeysTable(db: Database.Database): void {
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS api_keys (
-      id TEXT PRIMARY KEY,
-      userId TEXT NOT NULL,
-      keyHash TEXT NOT NULL UNIQUE,
-      keyHint TEXT NOT NULL,
-      name TEXT NOT NULL,
-      role TEXT NOT NULL DEFAULT 'BUYER',
-      permissions TEXT NOT NULL DEFAULT '[]',
-      lastUsedAt TEXT,
-      expiresAt TEXT,
-      createdAt TEXT NOT NULL,
-      FOREIGN KEY (userId) REFERENCES user(id) ON DELETE CASCADE
-    );
-    CREATE INDEX IF NOT EXISTS idx_api_keys_hash ON api_keys(keyHash);
-  `);
+export async function ensureApiKeysTable(_db: pg.Pool = pgPool): Promise<void> {
+  // Handled in initPostgresSchema()
 }
 
 /**
@@ -61,16 +47,14 @@ export function hashApiKey(rawKey: string): string {
 /**
  * Generates a new cryptographically secure API key for a developer
  */
-export function createApiKey(
-  db: Database.Database,
+export async function createApiKey(
+  db: pg.Pool = pgPool,
   userId: string,
   name: string,
   role: UserRole = "BUYER",
   permissions: string[] = ["read:assets", "download:purchased"],
   expiresInDays?: number
-): CreatedApiKey {
-  ensureApiKeysTable(db);
-
+): Promise<CreatedApiKey> {
   const rawBytes = crypto.randomBytes(24).toString("hex");
   const rawKey = `kd_live_${rawBytes}`;
   const keyHash = hashApiKey(rawKey);
@@ -81,19 +65,20 @@ export function createApiKey(
     ? new Date(now.getTime() + expiresInDays * 24 * 60 * 60 * 1000).toISOString()
     : null;
 
-  db.prepare(`
-    INSERT INTO api_keys (id, userId, keyHash, keyHint, name, role, permissions, expiresAt, createdAt)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `).run(
-    id,
-    userId,
-    keyHash,
-    keyHint,
-    name,
-    role,
-    JSON.stringify(permissions),
-    expiresAt,
-    now.toISOString()
+  await db.query(
+    `INSERT INTO api_keys (id, user_id, key_hash, key_hint, name, role, permissions, expires_at, created_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+    [
+      id,
+      userId,
+      keyHash,
+      keyHint,
+      name,
+      role,
+      JSON.stringify(permissions),
+      expiresAt,
+      now.toISOString(),
+    ]
   );
 
   return {
@@ -107,41 +92,47 @@ export function createApiKey(
 /**
  * Validates an incoming API key header (e.g. `Authorization: Bearer kd_live_...` or `x-api-key: kd_live_...`)
  */
-export function validateApiKey(
-  db: Database.Database,
+export async function validateApiKey(
+  db: pg.Pool = pgPool,
   rawKey: string
-): { isValid: boolean; record?: ApiKeyRecord; error?: string } {
-  ensureApiKeysTable(db);
-
+): Promise<{ isValid: boolean; record?: ApiKeyRecord; error?: string }> {
   if (!rawKey.startsWith("kd_live_") && !rawKey.startsWith("kd_test_")) {
     return { isValid: false, error: "Invalid API key prefix." };
   }
 
   const keyHash = hashApiKey(rawKey);
-  const record = db
-    .prepare(`SELECT * FROM api_keys WHERE keyHash = ?`)
-    .get(keyHash) as any;
+  const res = await db.query(`SELECT * FROM api_keys WHERE key_hash = $1`, [keyHash]);
+  const record = res.rows[0];
 
   if (!record) {
     return { isValid: false, error: "API key not found or revoked." };
   }
 
   // Check expiration
-  if (record.expiresAt && new Date(record.expiresAt).getTime() < Date.now()) {
+  if (record.expires_at && new Date(record.expires_at).getTime() < Date.now()) {
     return { isValid: false, error: "API key has expired." };
   }
 
   // Update lastUsedAt asynchronously
-  db.prepare(`UPDATE api_keys SET lastUsedAt = ? WHERE id = ?`).run(
-    new Date().toISOString(),
-    record.id
-  );
+  await db.query(`UPDATE api_keys SET last_used_at = NOW() WHERE id = $1`, [record.id]);
+
+  const parsedPermissions = Array.isArray(record.permissions)
+    ? record.permissions
+    : JSON.parse(record.permissions || "[]");
 
   return {
     isValid: true,
     record: {
-      ...record,
-      permissions: JSON.parse(record.permissions || "[]"),
+      id: record.id,
+      userId: record.user_id,
+      keyHash: record.key_hash,
+      keyHint: record.key_hint,
+      name: record.name,
+      role: record.role,
+      permissions: parsedPermissions,
+      lastUsedAt: record.last_used_at,
+      expiresAt: record.expires_at,
+      createdAt: record.created_at,
     },
   };
 }
@@ -149,20 +140,40 @@ export function validateApiKey(
 /**
  * Revokes an API key by ID
  */
-export function revokeApiKey(db: Database.Database, keyId: string, userId: string): boolean {
-  ensureApiKeysTable(db);
-  const result = db.prepare(`DELETE FROM api_keys WHERE id = ? AND userId = ?`).run(keyId, userId);
-  return result.changes > 0;
+export async function revokeApiKey(
+  db: pg.Pool = pgPool,
+  keyId: string,
+  userId: string
+): Promise<boolean> {
+  const result = await db.query(`DELETE FROM api_keys WHERE id = $1 AND user_id = $2`, [keyId, userId]);
+  return (result.rowCount || 0) > 0;
 }
 
 /**
  * Lists all active API keys for a developer (hiding the raw key, showing hints)
  */
-export function listUserApiKeys(db: Database.Database, userId: string): ApiKeyRecord[] {
-  ensureApiKeysTable(db);
-  const rows = db.prepare(`SELECT * FROM api_keys WHERE userId = ? ORDER BY createdAt DESC`).all(userId) as any[];
-  return rows.map((r) => ({
-    ...r,
-    permissions: JSON.parse(r.permissions || "[]"),
+export async function listUserApiKeys(
+  db: pg.Pool = pgPool,
+  userId: string
+): Promise<ApiKeyRecord[]> {
+  const res = await db.query(
+    `SELECT id, user_id, key_hash, key_hint, name, role, permissions, last_used_at, expires_at, created_at
+     FROM api_keys
+     WHERE user_id = $1
+     ORDER BY created_at DESC`,
+    [userId]
+  );
+
+  return res.rows.map((r) => ({
+    id: r.id,
+    userId: r.user_id,
+    keyHash: r.key_hash,
+    keyHint: r.key_hint,
+    name: r.name,
+    role: r.role,
+    permissions: Array.isArray(r.permissions) ? r.permissions : JSON.parse(r.permissions || "[]"),
+    lastUsedAt: r.last_used_at,
+    expiresAt: r.expires_at,
+    createdAt: r.created_at,
   }));
 }

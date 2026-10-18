@@ -29,6 +29,8 @@ CREATE TABLE IF NOT EXISTS session (
   "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
+CREATE INDEX IF NOT EXISTS idx_session_user ON session("userId");
+
 CREATE TABLE IF NOT EXISTS account (
   id VARCHAR(64) PRIMARY KEY,
   "userId" VARCHAR(64) NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
@@ -41,6 +43,8 @@ CREATE TABLE IF NOT EXISTS account (
   "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
+
+CREATE INDEX IF NOT EXISTS idx_account_user ON account("userId");
 
 CREATE TABLE IF NOT EXISTS verification (
   id VARCHAR(64) PRIMARY KEY,
@@ -86,6 +90,7 @@ CREATE TABLE IF NOT EXISTS products (
 CREATE INDEX IF NOT EXISTS idx_products_slug ON products(slug);
 CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
 CREATE INDEX IF NOT EXISTS idx_products_status ON products(status);
+CREATE INDEX IF NOT EXISTS idx_products_seller ON products(seller_id);
 
 CREATE TABLE IF NOT EXISTS product_versions (
   id VARCHAR(64) PRIMARY KEY,
@@ -97,6 +102,8 @@ CREATE TABLE IF NOT EXISTS product_versions (
   file_size_bytes BIGINT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+CREATE INDEX IF NOT EXISTS idx_product_versions_product ON product_versions(product_id);
 
 -- ----------------------------------------------------------------------------
 -- 3. ORDERS, CRYPTOGRAPHIC LICENSES & SELLER PAYOUTS
@@ -116,6 +123,7 @@ CREATE TABLE IF NOT EXISTS orders (
 );
 
 CREATE INDEX IF NOT EXISTS idx_orders_buyer ON orders(buyer_id);
+CREATE INDEX IF NOT EXISTS idx_orders_product ON orders(product_id);
 
 CREATE TABLE IF NOT EXISTS licenses (
   id VARCHAR(64) PRIMARY KEY,
@@ -128,6 +136,8 @@ CREATE TABLE IF NOT EXISTS licenses (
 );
 
 CREATE INDEX IF NOT EXISTS idx_licenses_key ON licenses(license_key);
+CREATE INDEX IF NOT EXISTS idx_licenses_buyer ON licenses(buyer_id);
+CREATE INDEX IF NOT EXISTS idx_licenses_order ON licenses(order_id);
 
 CREATE TABLE IF NOT EXISTS seller_payouts (
   id VARCHAR(64) PRIMARY KEY,
@@ -139,6 +149,8 @@ CREATE TABLE IF NOT EXISTS seller_payouts (
   processed_at TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+CREATE INDEX IF NOT EXISTS idx_seller_payouts_seller ON seller_payouts(seller_id);
 
 -- ----------------------------------------------------------------------------
 -- 4. API KEYS & OTP VERIFICATION
@@ -191,4 +203,3 @@ CREATE TABLE IF NOT EXISTS user_settings (
   two_factor_enabled BOOLEAN DEFAULT FALSE,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-

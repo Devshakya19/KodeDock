@@ -1,10 +1,11 @@
 import crypto from "node:crypto";
-import type Database from "better-sqlite3";
+import type pg from "pg";
+import { pgPool } from "../../db";
 
 /**
  * Kodedock Email OTP & Passwordless Magic Code Service
  * For passwordless developer logins, email verification, and password resets.
- * 100% self-hosted & in our control.
+ * 100% self-hosted & PostgreSQL backed.
  */
 
 export type OtpPurpose = "LOGIN" | "VERIFY_EMAIL" | "RESET_PASSWORD";
@@ -23,21 +24,10 @@ const OTP_EXPIRATION_MINUTES = 10;
 const MAX_VERIFICATION_ATTEMPTS = 5;
 
 /**
- * Initializes email_otps table in the self-hosted database
+ * Initializes email_otps table check
  */
-export function ensureOtpsTable(db: Database.Database): void {
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS email_otps (
-      id TEXT PRIMARY KEY,
-      email TEXT NOT NULL,
-      otpHash TEXT NOT NULL,
-      purpose TEXT NOT NULL,
-      attempts INTEGER DEFAULT 0,
-      expiresAt TEXT NOT NULL,
-      createdAt TEXT NOT NULL
-    );
-    CREATE INDEX IF NOT EXISTS idx_email_otps_lookup ON email_otps(email, purpose);
-  `);
+export async function ensureOtpsTable(_db: pg.Pool = pgPool): Promise<void> {
+  // Handled in initPostgresSchema()
 }
 
 /**
@@ -55,17 +45,15 @@ export function generateNumericOtp(): string {
 }
 
 /**
- * Creates and stores an OTP for a given email address
+ * Creates and stores an OTP for a given email address in PostgreSQL
  */
-export function createEmailOtp(
-  db: Database.Database,
+export async function createEmailOtp(
+  db: pg.Pool = pgPool,
   email: string,
   purpose: OtpPurpose = "LOGIN"
-): { otp: string; expiresAt: Date } {
-  ensureOtpsTable(db);
-
+): Promise<{ otp: string; expiresAt: Date }> {
   // Invalidate any existing OTPs for this email and purpose
-  db.prepare(`DELETE FROM email_otps WHERE email = ? AND purpose = ?`).run(email, purpose);
+  await db.query(`DELETE FROM email_otps WHERE email = $1 AND purpose = $2`, [email, purpose]);
 
   const otp = generateNumericOtp();
   const otpHash = hashOtp(otp);
@@ -73,47 +61,50 @@ export function createEmailOtp(
   const now = new Date();
   const expiresAt = new Date(now.getTime() + OTP_EXPIRATION_MINUTES * 60 * 1000);
 
-  db.prepare(`
-    INSERT INTO email_otps (id, email, otpHash, purpose, attempts, expiresAt, createdAt)
-    VALUES (?, ?, ?, ?, 0, ?, ?)
-  `).run(id, email, otpHash, purpose, expiresAt.toISOString(), now.toISOString());
+  await db.query(
+    `INSERT INTO email_otps (id, email, otp_hash, purpose, attempts, expires_at, created_at)
+     VALUES ($1, $2, $3, $4, 0, $5, $6)`,
+    [id, email, otpHash, purpose, expiresAt.toISOString(), now.toISOString()]
+  );
 
   return { otp, expiresAt };
 }
 
 /**
- * Verifies an OTP code for a given email address
+ * Verifies an OTP code for a given email address against PostgreSQL
  */
-export function verifyEmailOtp(
-  db: Database.Database,
+export async function verifyEmailOtp(
+  db: pg.Pool = pgPool,
   email: string,
   otp: string,
   purpose: OtpPurpose = "LOGIN"
-): { isValid: boolean; error?: string } {
-  ensureOtpsTable(db);
+): Promise<{ isValid: boolean; error?: string }> {
+  const res = await db.query(
+    `SELECT id, email, otp_hash, purpose, attempts, expires_at, created_at
+     FROM email_otps
+     WHERE email = $1 AND purpose = $2`,
+    [email, purpose]
+  );
 
-  const record = db
-    .prepare(`SELECT * FROM email_otps WHERE email = ? AND purpose = ?`)
-    .get(email, purpose) as OtpRecord | undefined;
-
+  const record = res.rows[0];
   if (!record) {
     return { isValid: false, error: "No active verification code found for this email." };
   }
 
   // Check expiration
-  if (new Date(record.expiresAt).getTime() < Date.now()) {
-    db.prepare(`DELETE FROM email_otps WHERE id = ?`).run(record.id);
+  if (new Date(record.expires_at).getTime() < Date.now()) {
+    await db.query(`DELETE FROM email_otps WHERE id = $1`, [record.id]);
     return { isValid: false, error: "Verification code has expired. Please request a new one." };
   }
 
   // Check attempt limit
   if (record.attempts >= MAX_VERIFICATION_ATTEMPTS) {
-    db.prepare(`DELETE FROM email_otps WHERE id = ?`).run(record.id);
+    await db.query(`DELETE FROM email_otps WHERE id = $1`, [record.id]);
     return { isValid: false, error: "Too many failed attempts. Code has been invalidated." };
   }
 
   const expectedHash = hashOtp(otp.trim());
-  const hashBufferA = Buffer.from(record.otpHash);
+  const hashBufferA = Buffer.from(record.otp_hash);
   const hashBufferB = Buffer.from(expectedHash);
 
   const isMatch =
@@ -122,7 +113,7 @@ export function verifyEmailOtp(
 
   if (!isMatch) {
     // Increment failed attempts
-    db.prepare(`UPDATE email_otps SET attempts = attempts + 1 WHERE id = ?`).run(record.id);
+    await db.query(`UPDATE email_otps SET attempts = attempts + 1 WHERE id = $1`, [record.id]);
     const remaining = MAX_VERIFICATION_ATTEMPTS - (record.attempts + 1);
     return {
       isValid: false,
@@ -131,6 +122,6 @@ export function verifyEmailOtp(
   }
 
   // Code is verified, delete it to prevent reuse
-  db.prepare(`DELETE FROM email_otps WHERE id = ?`).run(record.id);
+  await db.query(`DELETE FROM email_otps WHERE id = $1`, [record.id]);
   return { isValid: true };
 }
