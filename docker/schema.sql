@@ -38,7 +38,10 @@ CREATE TABLE IF NOT EXISTS account (
   "providerId" VARCHAR(50) NOT NULL,
   "accessToken" TEXT,
   "refreshToken" TEXT,
-  "expiresAt" TIMESTAMP WITH TIME ZONE,
+  "idToken" TEXT,
+  "accessTokenExpiresAt" TIMESTAMP WITH TIME ZONE,
+  "refreshTokenExpiresAt" TIMESTAMP WITH TIME ZONE,
+  "scope" TEXT,
   password TEXT,
   "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
@@ -59,7 +62,10 @@ CREATE TABLE IF NOT EXISTS jwks (
   id VARCHAR(64) PRIMARY KEY,
   "publicKey" TEXT NOT NULL,
   "privateKey" TEXT NOT NULL,
-  "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+  "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  "expiresAt" TIMESTAMP WITH TIME ZONE,
+  alg TEXT,
+  crv TEXT
 );
 
 -- ----------------------------------------------------------------------------

@@ -103,7 +103,10 @@ export async function initPostgresSchema(): Promise<void> {
         "providerId" VARCHAR(50) NOT NULL,
         "accessToken" TEXT,
         "refreshToken" TEXT,
-        "expiresAt" TIMESTAMP WITH TIME ZONE,
+        "idToken" TEXT,
+        "accessTokenExpiresAt" TIMESTAMP WITH TIME ZONE,
+        "refreshTokenExpiresAt" TIMESTAMP WITH TIME ZONE,
+        "scope" TEXT,
         password TEXT,
         "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
         "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
@@ -123,13 +126,25 @@ export async function initPostgresSchema(): Promise<void> {
         id VARCHAR(64) PRIMARY KEY,
         "publicKey" TEXT NOT NULL,
         "privateKey" TEXT NOT NULL,
-        "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+        "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+        "expiresAt" TIMESTAMP WITH TIME ZONE,
+        alg TEXT,
+        crv TEXT
       );
     `);
 
-    // Ensure NOT NULL on existing Better Auth columns to remove schema drift warnings
+    // Ensure Better Auth columns and NOT NULL constraints exist to prevent schema drift
     try {
       await client.query(`
+        ALTER TABLE account ADD COLUMN IF NOT EXISTS "idToken" TEXT;
+        ALTER TABLE account ADD COLUMN IF NOT EXISTS "accessTokenExpiresAt" TIMESTAMP WITH TIME ZONE;
+        ALTER TABLE account ADD COLUMN IF NOT EXISTS "refreshTokenExpiresAt" TIMESTAMP WITH TIME ZONE;
+        ALTER TABLE account ADD COLUMN IF NOT EXISTS "scope" TEXT;
+
+        ALTER TABLE jwks ADD COLUMN IF NOT EXISTS "expiresAt" TIMESTAMP WITH TIME ZONE;
+        ALTER TABLE jwks ADD COLUMN IF NOT EXISTS alg TEXT;
+        ALTER TABLE jwks ADD COLUMN IF NOT EXISTS crv TEXT;
+
         UPDATE "user" SET "emailVerified" = FALSE WHERE "emailVerified" IS NULL;
         UPDATE "user" SET "createdAt" = NOW() WHERE "createdAt" IS NULL;
         UPDATE "user" SET "updatedAt" = NOW() WHERE "updatedAt" IS NULL;
@@ -156,7 +171,7 @@ export async function initPostgresSchema(): Promise<void> {
         ALTER TABLE jwks ALTER COLUMN "createdAt" SET NOT NULL;
       `);
     } catch {
-      // Ignore if columns already NOT NULL
+      // Ignore if columns already NOT NULL or migrated
     }
 
     // 2. Kodedock Marketplace Core Tables
