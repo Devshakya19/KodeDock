@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.0-beta.2] - 2026-10-18
+
+### Fixed
+- **Better Auth JWKS & Account Schema Alignment (`column "alg" of relation "jwks" does not exist`)**:
+  - Resolved runtime PostgreSQL `ERROR: column "alg" of relation "jwks" does not exist` occurring during Better Auth JWT plugin key pair issuance and verification.
+  - Aligned `jwks` table schema in `docker/schema.sql`, `src/db/schema.sql`, and `src/db/index.ts` with Better Auth requirements by adding `expiresAt TIMESTAMP WITH TIME ZONE`, `alg TEXT`, and `crv TEXT` columns.
+  - Aligned `account` table schema with OAuth/OIDC requirements by adding `idToken TEXT`, `accessTokenExpiresAt TIMESTAMP WITH TIME ZONE`, `refreshTokenExpiresAt TIMESTAMP WITH TIME ZONE`, and `scope TEXT` columns.
+  - Integrated automatic column migration in `src/db/index.ts` (`initPostgresSchema()`) using `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` to ensure zero downtime and zero schema drift across all database deployments.
+  - Audited with Better Auth CLI migration engine (`@better-auth/cli`) and confirmed zero missing columns.
+
+---
+
 ## [1.0.0-beta.1] - 2026-10-18
 
 ### Added
@@ -29,11 +41,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Aligned default `BETTER_AUTH_SECRET` and `DEFAULT_POSTGRES_URL` across testing frameworks and Docker environments, eliminating credential drift.
 
 ### Fixed
-- **Better Auth JWKS & Account Schema Alignment (`column "alg" of relation "jwks" does not exist`)**:
-  - Resolved runtime PostgreSQL `ERROR: column "alg" of relation "jwks" does not exist` occurring during Better Auth JWT plugin key pair issuance and verification.
-  - Aligned `jwks` table schema in `docker/schema.sql`, `src/db/schema.sql`, and `src/db/index.ts` with Better Auth requirements by adding `expiresAt TIMESTAMP WITH TIME ZONE`, `alg TEXT`, and `crv TEXT` columns.
-  - Aligned `account` table schema with OAuth/OIDC requirements by adding `idToken TEXT`, `accessTokenExpiresAt TIMESTAMP WITH TIME ZONE`, `refreshTokenExpiresAt TIMESTAMP WITH TIME ZONE`, and `scope TEXT` columns.
-  - Integrated automatic column migration in `src/db/index.ts` (`initPostgresSchema()`) using `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` to ensure zero downtime and zero schema drift across all database deployments.
 - **Cross-Platform `pnpm install` Failure (`better-sqlite3` Native C++ Elimination)**:
   - Resolved `node-gyp rebuild` failure during `pnpm install` caused by `better-sqlite3@13.0.3` on Node 26 / Windows without MSVC C++ toolchain.
   - Eliminated `better-sqlite3` and `@types/better-sqlite3` from `src/package.json` and removed build approvals from `pnpm-workspace.yaml`.
